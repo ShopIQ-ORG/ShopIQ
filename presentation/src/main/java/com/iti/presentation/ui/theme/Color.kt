@@ -1,5 +1,4 @@
 package com.iti.presentation.ui.theme
-
 import androidx.compose.ui.graphics.Color
 
 val PrimaryLight = Color(0xFF263238)
