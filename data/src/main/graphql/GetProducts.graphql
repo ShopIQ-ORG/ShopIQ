@@ -1,0 +1,50 @@
+query GetProducts($first: Int!) {
+    products(first: $first) {
+        edges {
+            node {
+                id
+                title
+                description
+                handle
+                productType
+                vendor
+                tags
+                priceRange {
+                    minVariantPrice {
+                        amount
+                        currencyCode
+                    }
+                    maxVariantPrice {
+                        amount
+                        currencyCode
+                    }
+                }
+                images(first: 5) {
+                    edges {
+                        node {
+                            url
+                            altText
+                        }
+                    }
+                }
+                variants(first: 5) {
+                    edges {
+                        node {
+                            id
+                            title
+                            price {
+                                amount
+                                currencyCode
+                            }
+                            availableForSale
+                        }
+                    }
+                }
+            }
+        }
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+    }
+}
