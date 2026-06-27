@@ -1,0 +1,41 @@
+package com.iti.data.utils
+
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.network.okHttpClient
+import com.iti.data.BuildConfig
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
+
+object ShopifyNetworkConfig {
+
+    private const val API_VERSION = "2026-04"
+    private const val BASE_URL = "https://${BuildConfig.SHOPIFY_STORE_DOMAIN}/api/$API_VERSION/graphql.json"
+
+    private const val ADMIN_ACCESS_TOKEN = BuildConfig.SHOPIFY_ADMIN_ACCESS_TOKEN
+    private const val STOREFRONT_ACCESS_TOKEN = BuildConfig.SHOPIFY_STOREFRONT_ACCESS_TOKEN
+
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(StorefrontInterceptor())
+            .build()
+    }
+
+    val apolloClient: ApolloClient by lazy {
+        ApolloClient.Builder()
+            .serverUrl(BASE_URL)
+            .okHttpClient(okHttpClient)
+            .build()
+    }
+
+    private class StorefrontInterceptor : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request().newBuilder()
+                .addHeader("X-Shopify-Access-Token", ADMIN_ACCESS_TOKEN)
+                .addHeader("X-Shopify-Storefront-Access-Token", STOREFRONT_ACCESS_TOKEN)
+                .addHeader("Content-Type", "application/json")
+                .build()
+            return chain.proceed(request)
+        }
+    }
+}
