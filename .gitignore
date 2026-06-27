@@ -22,6 +22,7 @@ local.properties
 /app/release
 /domain/build
 /presentation/build
+/data/build
 *.log
 .navigation
 /output.json
