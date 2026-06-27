@@ -1,4 +1,4 @@
-package com.iti.shopiq
+package com.iti.app
 
 import org.junit.Test
 
