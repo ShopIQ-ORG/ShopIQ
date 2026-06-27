@@ -30,7 +30,13 @@ fun ShopIQTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = { Text(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+        placeholder = {
+            Text(
+                text = placeholder,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,

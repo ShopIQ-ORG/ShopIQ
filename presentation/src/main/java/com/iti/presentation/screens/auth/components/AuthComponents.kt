@@ -2,12 +2,13 @@ package com.iti.presentation.screens.auth.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -18,11 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
 import com.iti.presentation.components.SocialLoginButton
+import com.iti.presentation.ui.theme.LocalDarkTheme
 
 @Composable
 fun AuthHeader(title: String, subtitle: String) {
-    val isDark = isSystemInDarkTheme()
-    val logoRes = if (isDark) R.drawable.auth_logo_dark else R.drawable.auth_logo
+    val isDark = LocalDarkTheme.current
+    val logoRes = if (isDark) R.drawable.auth_logo_dark else R.drawable.auth_logo_light
 
     Image(
         painter = painterResource(id = logoRes),
@@ -79,7 +81,8 @@ fun AuthSocialSection() {
 fun AuthFooter(text: String, clickableText: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = text,
@@ -92,7 +95,10 @@ fun AuthFooter(text: String, clickableText: String, onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.primary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onClick() }
+                .padding(8.dp)
         )
     }
 }
@@ -103,7 +109,7 @@ fun TermsCheckbox(
     onCheckedChange: (Boolean) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { onCheckedChange(!checked) },
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
@@ -113,7 +119,7 @@ fun TermsCheckbox(
                 checkedColor = MaterialTheme.colorScheme.primary
             )
         )
-        
+
         val annotatedText = buildAnnotatedString {
             append(stringResource(R.string.i_agree_to_the) + " ")
             withStyle(style = androidx.compose.ui.text.SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {

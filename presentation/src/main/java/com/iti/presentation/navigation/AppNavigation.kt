@@ -3,6 +3,7 @@ package com.iti.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.iti.presentation.screens.home.HomeScreen
@@ -12,10 +13,11 @@ import com.iti.presentation.screens.auth.SignUpScreen
 import com.iti.presentation.screens.splash.SplashScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(modifier: Modifier = Modifier) {
     val backStack = remember { mutableStateListOf<Screen>(Screen.Splash) }
 
     NavDisplay(
+        modifier = modifier,
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {

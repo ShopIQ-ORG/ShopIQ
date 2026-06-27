@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     containerColor = MaterialTheme.colorScheme.background
                 ) { innerPadding ->
-                    AppNavigation()
+                    AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
