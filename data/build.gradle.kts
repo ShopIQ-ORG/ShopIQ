@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.material)
     implementation(project(":domain"))
     implementation(libs.koin.android)
+    implementation(libs.androidx.datastore.preferences)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
