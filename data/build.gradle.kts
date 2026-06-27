@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.koin.core)
     implementation(libs.apollo.runtime)
     implementation(libs.okhttp)
     implementation(libs.google.gson)
