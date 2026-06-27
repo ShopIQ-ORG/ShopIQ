@@ -39,7 +39,8 @@ fun AppNavigation() {
 
             entry<Screen.SignUp> {
                 SignUpScreen(
-                    onNavigateToHome = { backStack.add(Screen.Home) }
+                    onNavigateToHome = { backStack.add(Screen.Home) },
+                    onNavigateToSignIn = { backStack.removeLastOrNull() }
                 )
             }
 
