@@ -4,6 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.iti.data.sources.remote.auth.AuthRemoteDataSource
+import com.iti.data.sources.remote.auth.AuthRemoteDataSourceImpl
+import com.iti.data.repositories.AuthRepositoryImpl
+import com.iti.domain.repositories.auth.AuthRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -15,4 +21,9 @@ val dataModule = module {
             }
         )
     }
+    single { FirebaseAuth.getInstance() }
+    single { FirebaseFirestore.getInstance() }
+    
+    single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get()) }
 }
