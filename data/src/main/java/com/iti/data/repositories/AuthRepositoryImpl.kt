@@ -24,6 +24,36 @@ class AuthRepositoryImpl(
         }
     }
 
+    override suspend fun loginWithGoogle(idToken: String): Result<User> {
+        return try {
+            Result.Success(remoteDataSource.loginWithGoogle(idToken).toDomain())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.Failure(e.handleException())
+        }
+    }
+
+    override suspend fun loginWithFacebook(accessToken: String): Result<User> {
+        return try {
+            Result.Success(remoteDataSource.loginWithFacebook(accessToken).toDomain())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.Failure(e.handleException())
+        }
+    }
+
+    override suspend fun loginAsGuest(): Result<User> {
+        return try {
+            Result.Success(remoteDataSource.loginAsGuest().toDomain())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.Failure(e.handleException())
+        }
+    }
+
     override suspend fun register(info: RegistrationInfo): Result<User> {
         return try {
             Result.Success(remoteDataSource.register(info).toDomain())

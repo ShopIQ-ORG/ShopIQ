@@ -1,8 +1,12 @@
 package com.iti.domain.models
 
-data class User(
-    val uid: String,
-    val fullName: String,
-    val email: String,
-    val phone: String
-)
+sealed class User {
+    data class AuthenticatedUser(
+        val uid: String,
+        val fullName: String,
+        val email: String,
+        val phone: String
+    ) : User()
+
+    object GuestUser : User()
+}
