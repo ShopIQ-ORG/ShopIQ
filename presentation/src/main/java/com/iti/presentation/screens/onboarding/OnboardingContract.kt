@@ -1,4 +1,4 @@
-package com.iti.presentation.onboarding
+package com.iti.presentation.screens.onboarding
 
 class OnboardingContract {
 

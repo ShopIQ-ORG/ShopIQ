@@ -17,6 +17,14 @@ object Constants {
     const val SPLASH_INITIAL_DELAY = 700L
     const val SPLASH_INTER_LINE_DELAY = 150L
 
+    // Splash Layout Constants
+    const val SPLASH_LOGO_SIZE_DP = 220
+    const val SPLASH_SPACER_HEIGHT_DP = 32
+    const val SPLASH_DIVIDER_HEIGHT_DP = 2
+    const val SPLASH_DIVIDER_SPACER_DP = 24
+    const val SPLASH_LINE_SPACER_DP = 6
+    const val SPLASH_LETTER_SPACING_SP = 3
+
     // Splash Screen Texts
     const val SPLASH_TAGLINE_1 = "SMART SHOPPING."
     const val SPLASH_TAGLINE_2 = "BETTER CHOICES."
@@ -25,6 +33,9 @@ object Constants {
     const val ONBOARDING_IMAGE_1 = "file:///android_asset/images/1.svg"
     const val ONBOARDING_IMAGE_2 = "file:///android_asset/images/2.svg"
     const val ONBOARDING_IMAGE_3 = "file:///android_asset/images/3.svg"
+    const val ONBOARDING_IMAGE_1_DARK = "file:///android_asset/images/1_dark.png"
+    const val ONBOARDING_IMAGE_2_DARK = "file:///android_asset/images/2_dark.png"
+    const val ONBOARDING_IMAGE_3_DARK = "file:///android_asset/images/3_dark.png"
 
     // Onboarding Slides Content
     const val ONBOARDING_TITLE_1 = "Shop Smarter,\nEveryday"

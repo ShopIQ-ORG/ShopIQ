@@ -1,4 +1,4 @@
-package com.iti.presentation.onboarding.components
+package com.iti.presentation.screens.onboarding.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.iti.presentation.onboarding.model.OnboardingSlide
+import com.iti.presentation.screens.onboarding.model.OnboardingSlide
 
 @Composable
 fun OnboardingSlideContent(
@@ -28,7 +28,6 @@ fun OnboardingSlideContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Image loaded from assets using Coil - Made larger
         AsyncImage(
             model = slide.imagePath,
             contentDescription = null,
@@ -39,7 +38,6 @@ fun OnboardingSlideContent(
                 .padding(bottom = 24.dp)
         )
 
-        // Text Content - Placed cleanly below
         Column(
             modifier = Modifier
                 .weight(1.0f)

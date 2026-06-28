@@ -1,4 +1,4 @@
-package com.iti.presentation.onboarding
+package com.iti.presentation.screens.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

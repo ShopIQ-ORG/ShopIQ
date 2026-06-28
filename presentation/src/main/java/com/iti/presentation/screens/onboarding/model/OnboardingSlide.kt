@@ -1,4 +1,4 @@
-package com.iti.presentation.onboarding.model
+package com.iti.presentation.screens.onboarding.model
 
 data class OnboardingSlide(
     val imagePath: String,

@@ -1,4 +1,4 @@
-package com.iti.presentation.onboarding.components
+package com.iti.presentation.screens.onboarding.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -34,7 +34,6 @@ fun OnboardingIndicator(
         repeat(pageCount) { index ->
             val isSelected = currentPage == index
 
-            // Dynamic width animation for stretching pill effect
             val dotWidth by animateDpAsState(
                 targetValue = if (isSelected) 24.dp else 8.dp,
                 animationSpec = spring(
@@ -44,7 +43,6 @@ fun OnboardingIndicator(
                 label = "dotWidth"
             )
 
-            // Smooth color transition using themes
             val dotColor by animateColorAsState(
                 targetValue = if (isSelected) {
                     MaterialTheme.colorScheme.primary
