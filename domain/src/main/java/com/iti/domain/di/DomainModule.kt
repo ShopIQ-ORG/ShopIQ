@@ -5,6 +5,8 @@ import com.iti.domain.usecases.auth.LoginUseCase
 import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
 import com.iti.domain.usecases.auth.RegisterUseCase
+import com.iti.domain.usecase.IsOnboardingCompletedUseCase
+import com.iti.domain.usecase.SetOnboardingCompletedUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -13,4 +15,6 @@ val domainModule = module {
     factory { LoginWithFacebookUseCase(get()) }
     factory { LoginAsGuestUseCase(get()) }
     factory { RegisterUseCase(get()) }
+    factory { IsOnboardingCompletedUseCase(get()) }
+    factory { SetOnboardingCompletedUseCase(get()) }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Center the logo and scale it to 160dp to ensure it fits completely within the 192dp circular mask -->
+    <item
+        android:drawable="@drawable/logo_light"
+        android:width="180dp"
+        android:height="180dp"
+        android:gravity="center" />
+</layer-list>

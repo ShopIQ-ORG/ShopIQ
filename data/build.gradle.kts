@@ -33,6 +33,7 @@ android {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
         buildConfigField("String", "SHOPIFY_STOREFRONT_ACCESS_TOKEN", "\"$storefrontToken\"")
         buildConfigField("String", "SHOPIFY_ADMIN_ACCESS_TOKEN", "\"$adminToken\"")
         buildConfigField("String", "SHOPIFY_API_KEY", "\"$apiKey\"")

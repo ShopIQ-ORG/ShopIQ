@@ -7,10 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.iti.presentation.screens.home.HomeScreen
-import com.iti.presentation.screens.onboarding.OnBoardingScreen
+import com.iti.presentation.screens.onboarding.OnboardingScreen
+import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.auth.signin.SignInScreen
 import com.iti.presentation.screens.auth.signup.SignUpScreen
 import com.iti.presentation.screens.splash.SplashScreen
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
@@ -23,13 +25,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         entryProvider = entryProvider {
             entry<Screen.Splash> {
                 SplashScreen(
-                    onNavigateToOnBoarding = { backStack.add(Screen.OnBoarding) }
+                    onAnimationComplete = { backStack.add(Screen.OnBoarding) }
                 )
             }
 
             entry<Screen.OnBoarding> {
-                OnBoardingScreen(
-                    onNavigateToSignIn = { backStack.add(Screen.SignIn) }
+                val onboardingViewModel: OnboardingViewModel = koinViewModel()
+                OnboardingScreen(
+                    viewModel = onboardingViewModel,
+                    onNavigateToHome = { backStack.add(Screen.SignIn) }
                 )
             }
 
