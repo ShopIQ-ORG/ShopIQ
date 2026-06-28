@@ -21,20 +21,55 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.ui.theme.ShopIQTheme
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.iti.presentation.main.MainContract
+import com.iti.presentation.main.MainViewModel
+import com.iti.presentation.onboarding.OnboardingScreen
+import com.iti.presentation.onboarding.OnboardingViewModel
+import org.koin.androidx.compose.koinViewModel
+
+import com.iti.presentation.splash.SplashScreen
+
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ShopIQTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.background
-                ) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val mainViewModel: MainViewModel = koinViewModel()
+                val mainState by mainViewModel.state.collectAsState()
+
+                when (mainState) {
+                    is MainContract.State.Loading -> {
+                        SplashScreen()
+                    }
+                    is MainContract.State.ShowOnboarding -> {
+                        val onboardingViewModel: OnboardingViewModel = koinViewModel()
+                        OnboardingScreen(
+                            viewModel = onboardingViewModel,
+                            onNavigateToHome = {
+                                mainViewModel.sendIntent(MainContract.Intent.CheckOnboarding)
+                            }
+                        )
+                    }
+                    is MainContract.State.ShowHome -> {
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize(),
+                            containerColor = MaterialTheme.colorScheme.background
+                        ) { innerPadding ->
+                            Greeting(
+                                name = "Android",
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                    }
                 }
             }
         }

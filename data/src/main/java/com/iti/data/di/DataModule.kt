@@ -4,9 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.iti.data.repository.OnboardingRepositoryImpl
+import com.iti.domain.repository.OnboardingRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-
 val dataModule = module {
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create(
@@ -15,4 +16,5 @@ val dataModule = module {
             }
         )
     }
+    single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
 }
