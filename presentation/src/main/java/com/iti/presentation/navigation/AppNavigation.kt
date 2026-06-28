@@ -33,7 +33,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 val onboardingViewModel: OnboardingViewModel = koinViewModel()
                 OnboardingScreen(
                     viewModel = onboardingViewModel,
-                    onNavigateToHome = { backStack.add(Screen.Home) }
+                    onNavigateToHome = { backStack.add(Screen.SignIn) }
                 )
             }
 
