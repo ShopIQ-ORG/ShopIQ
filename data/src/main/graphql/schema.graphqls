@@ -4,8 +4,10 @@ schema {
 
 scalar DateTime
 scalar URL
+scalar Money
 
 type QueryRoot {
+  product(id: ID!): Product
   products(
     first: Int
     after: String
@@ -109,7 +111,7 @@ type ProductVariantEdge {
 type ProductVariant {
   id: ID!
   title: String!
-  price: MoneyV2!
+  price: Money!
   availableForSale: Boolean!
   quantityAvailable: Int
   image: Image

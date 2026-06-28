@@ -38,4 +38,16 @@
     <string name="error_password_required">Password is required</string>
     <string name="error_confirm_password_required">Please confirm your password</string>
     <string name="phone_number">Phone Number</string>
+    <string name="content_desc_back">Back</string>
+    <string name="content_desc_wishlist">Wishlist</string>
+    <string name="content_desc_cart">Cart</string>
+    <string name="btn_retry">Retry</string>
+    <string name="reviews_count">%1$d reviews</string>
+    <string name="no_description">No description available.</string>
+    <string name="label_color">Color: %1$s</string>
+    <string name="label_size">Size: %1$s</string>
+    <string name="size_guide">📏 Size Guide</string>
+    <string name="btn_wishlist">Add To Wishlist</string>
+    <string name="btn_add_to_cart">Add to Cart</string>
+    <string name="error_message">Error: %1$s</string>
 </resources>

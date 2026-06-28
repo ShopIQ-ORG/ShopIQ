@@ -1,5 +1,7 @@
 package com.iti.domain.di
 
+import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.auth.LoginAsGuestUseCase
 import com.iti.domain.usecases.auth.LoginUseCase
 import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
@@ -15,6 +17,8 @@ val domainModule = module {
     factory { LoginWithFacebookUseCase(get()) }
     factory { LoginAsGuestUseCase(get()) }
     factory { RegisterUseCase(get()) }
+    factory { GetProductsByNumberUseCase(get()) }
+    factory { GetProductDetailsUseCase(get()) }
     factory { IsOnboardingCompletedUseCase(get()) }
     factory { SetOnboardingCompletedUseCase(get()) }
 }
