@@ -17,15 +17,6 @@ type QueryRoot {
     sortKey: ProductSortKeys
     reverse: Boolean
   ): ProductConnection!
-  collections(
-    first: Int
-    after: String
-    last: Int
-    before: String
-    query: String
-    sortKey: CollectionSortKeys
-    reverse: Boolean
-  ): CollectionConnection!
 }
 
 enum ProductSortKeys {
@@ -132,33 +123,4 @@ type PageInfo {
   hasPreviousPage: Boolean!
   startCursor: String
   endCursor: String
-}
-
-enum CollectionSortKeys {
-  TITLE
-  UPDATED_AT
-  ID
-  RELEVANCE
-}
-
-type CollectionConnection {
-  edges: [CollectionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type CollectionEdge {
-  cursor: String!
-  node: Collection!
-}
-
-type Collection {
-  id: ID!
-  title: String!
-  handle: String!
-  image: Image
-  productsCount: CollectionProductsCount!
-}
-
-type CollectionProductsCount {
-  count: Int!
 }
