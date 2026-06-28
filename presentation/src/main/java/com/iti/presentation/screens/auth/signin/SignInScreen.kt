@@ -150,7 +150,8 @@ fun SignInScreen(
                 AuthSocialSection(
                     onGoogleClick = { },
                     onFacebookClick = { },
-                    onGuestClick = { viewModel.onIntent(SignInIntent.LoginAsGuest) }
+                    onGuestClick = { viewModel.onIntent(SignInIntent.LoginAsGuest) },
+                    enabled = !state.isLoading
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))

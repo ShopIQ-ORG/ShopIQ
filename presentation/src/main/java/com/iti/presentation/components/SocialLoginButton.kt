@@ -19,10 +19,12 @@ fun SocialLoginButton(
     iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     iconTint: Color = Color.Unspecified
 ) {
     OutlinedButton(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier.size(height = 56.dp, width = 88.dp),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),

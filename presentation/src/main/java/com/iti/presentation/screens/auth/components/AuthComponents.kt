@@ -51,10 +51,12 @@ fun AuthHeader(title: String, subtitle: String) {
 fun AuthSocialSection(
     onGoogleClick: () -> Unit,
     onFacebookClick: () -> Unit,
-    onGuestClick: () -> Unit
+    onGuestClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         HorizontalDivider(
@@ -79,9 +81,9 @@ fun AuthSocialSection(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        SocialLoginButton(iconRes = R.drawable.ic_google, onClick = onGoogleClick)
-        SocialLoginButton(iconRes = R.drawable.ic_guest, onClick = onGuestClick)
-        SocialLoginButton(iconRes = R.drawable.ic_facebook, onClick = onFacebookClick)
+        SocialLoginButton(iconRes = R.drawable.ic_google, onClick = onGoogleClick, enabled = enabled)
+        SocialLoginButton(iconRes = R.drawable.ic_guest, onClick = onGuestClick, enabled = enabled)
+        SocialLoginButton(iconRes = R.drawable.ic_facebook, onClick = onFacebookClick, enabled = enabled)
     }
 }
 
