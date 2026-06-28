@@ -20,7 +20,7 @@ import com.iti.presentation.main.MainViewModel
 import com.iti.presentation.screens.onboarding.OnboardingScreen
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.splash.SplashScreen
-import com.iti.presentation.productdetails.ProductDetailsScreen
+import com.iti.presentation.screens.home.HomeScreen
 import com.iti.presentation.ui.theme.ShopIQTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,22 +48,11 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     is MainContract.State.ShowHome -> {
-                        Scaffold(
-                            modifier = Modifier.fillMaxSize(),
-                            containerColor = MaterialTheme.colorScheme.background
-                        ) { innerPadding ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(innerPadding),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Home Screen",
-                                    style = MaterialTheme.typography.headlineMedium
-                                )
+                        HomeScreen(
+                            onNavigateToSplash = {
+                                mainViewModel.sendIntent(MainContract.Intent.CheckOnboarding)
                             }
-                        }
+                        )
                     }
                 }
             }
