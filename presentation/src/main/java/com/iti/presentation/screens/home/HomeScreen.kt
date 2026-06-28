@@ -10,6 +10,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -43,10 +45,10 @@ fun HomeScreen(onNavigateToSplash: () -> Unit) {
                     val isSelected = selectedIndex == index
                     NavigationBarItem(
                         icon = {
-                            val iconImage = if (isSelected) item.selectedIcon else item.unselectedIcon
                             Icon(
-                                imageVector = iconImage,
-                                contentDescription = item.label
+                                painter = painterResource(id = if (isSelected) item.selectedIcon else item.unselectedIcon),
+                                contentDescription = item.label,
+                                modifier = Modifier.size(24.dp)
                             )
                         },
                         label = { Text(text = item.label) },

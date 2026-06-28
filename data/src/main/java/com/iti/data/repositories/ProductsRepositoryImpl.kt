@@ -3,7 +3,9 @@ package com.iti.data.repositories
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainProducts
 import com.iti.data.mappers.toDomainProduct
+import com.iti.data.mappers.toDomainCategories
 import com.iti.domain.models.Product
+import com.iti.domain.models.Category
 import com.iti.domain.models.Money
 import com.iti.domain.models.ProductImage
 import com.iti.domain.models.Result
@@ -32,6 +34,17 @@ class ProductsRepositoryImpl(
             val response = remoteDataSource.getProductDetails(productId)
             val domainProduct = response.toDomainProduct()
             emit(Result.Success(domainProduct))
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun getMainCategories(): Flow<Result<List<Category>>> = flow {
+        emit(Result.Loading)
+        try {
+            val data = remoteDataSource.getMainCategories()
+            val categories = data.toDomainCategories()
+            emit(Result.Success(categories))
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }

@@ -1,6 +1,7 @@
 package com.iti.data.sources.remote
 
 import com.apollographql.apollo.ApolloClient
+import com.iti.data.GetMainCategoriesQuery
 import com.iti.data.GetProductsQuery
 import com.iti.data.GetProductDetailsQuery
 import com.iti.data.dto.ShopifyResponse
@@ -35,5 +36,17 @@ class ProductsRemoteDataSourceImpl(
 
         val productData = response.data?.product ?: throw Exception("Product details data is null")
         return productData.toShopifyResponse()
+    }
+
+    override suspend fun getMainCategories(): GetMainCategoriesQuery.Data {
+        val response = apolloClient.query(GetMainCategoriesQuery()).execute()
+
+        if (response.hasErrors()) {
+            throw Exception(
+                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
+            )
+        }
+
+        return response.data ?: throw Exception("Response data is null")
     }
 }

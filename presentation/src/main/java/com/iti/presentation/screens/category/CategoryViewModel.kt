@@ -2,8 +2,9 @@ package com.iti.presentation.screens.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iti.domain.models.Result
+import com.iti.domain.usecases.categories.GetCategoriesUseCase
 import com.iti.presentation.screens.category.model.CategoryItem
-import com.iti.presentation.util.Constants
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,22 +12,61 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class CategoryViewModel : ViewModel() {
+class CategoryViewModel(
+    private val getCategoriesUseCase: GetCategoriesUseCase
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(
-        CategoryContract.State(
-            categories = getInitialCategories()
-        )
-    )
+    private val _state = MutableStateFlow(CategoryContract.State())
     val state: StateFlow<CategoryContract.State> = _state.asStateFlow()
 
     private val _effect = Channel<CategoryContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    init {
+        sendIntent(CategoryContract.Intent.LoadCategories)
+    }
+
     fun sendIntent(intent: CategoryContract.Intent) {
         when (intent) {
+            is CategoryContract.Intent.LoadCategories -> handleLoadCategories()
             is CategoryContract.Intent.SearchQueryChanged -> handleSearchQueryChanged(intent.query)
             is CategoryContract.Intent.CategoryClicked -> handleCategoryClicked(intent.categoryId)
+        }
+    }
+
+    private fun handleLoadCategories() {
+        viewModelScope.launch {
+            getCategoriesUseCase().collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        _state.value = _state.value.copy(
+                            isLoading = true,
+                            errorMessage = null
+                        )
+                    }
+                    is Result.Success -> {
+                        val mappedCategories = result.data.map { category ->
+                            CategoryItem(
+                                id = category.id,
+                                title = category.title,
+                                itemCount = category.itemCount,
+                                imageAssetPath = category.imageAssetPath
+                            )
+                        }
+                        _state.value = _state.value.copy(
+                            categories = mappedCategories,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    is Result.Failure -> {
+                        _state.value = _state.value.copy(
+                            isLoading = false,
+                            errorMessage = result.exception.localizedMessage ?: "Failed to load categories"
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -38,58 +78,5 @@ class CategoryViewModel : ViewModel() {
         viewModelScope.launch {
             _effect.send(CategoryContract.Effect.NavigateToCategoryProducts(categoryId))
         }
-    }
-
-    private fun getInitialCategories(): List<CategoryItem> {
-        return listOf(
-            CategoryItem(
-                id = "men",
-                title = Constants.CATEGORY_MEN,
-                itemCount = Constants.CATEGORY_MEN_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_1
-            ),
-            CategoryItem(
-                id = "women",
-                title = Constants.CATEGORY_WOMEN,
-                itemCount = Constants.CATEGORY_WOMEN_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_2
-            ),
-            CategoryItem(
-                id = "shoes",
-                title = Constants.CATEGORY_SHOES,
-                itemCount = Constants.CATEGORY_SHOES_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_3
-            ),
-            CategoryItem(
-                id = "bags",
-                title = Constants.CATEGORY_BAGS,
-                itemCount = Constants.CATEGORY_BAGS_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_1
-            ),
-            CategoryItem(
-                id = "accessories",
-                title = Constants.CATEGORY_ACCESSORIES,
-                itemCount = Constants.CATEGORY_ACCESSORIES_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_2
-            ),
-            CategoryItem(
-                id = "beauty",
-                title = Constants.CATEGORY_BEAUTY,
-                itemCount = Constants.CATEGORY_BEAUTY_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_3
-            ),
-            CategoryItem(
-                id = "kids",
-                title = Constants.CATEGORY_KIDS,
-                itemCount = Constants.CATEGORY_KIDS_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_1
-            ),
-            CategoryItem(
-                id = "sale",
-                title = Constants.CATEGORY_SALE,
-                itemCount = Constants.CATEGORY_SALE_COUNT,
-                imageAssetPath = Constants.ONBOARDING_IMAGE_2
-            )
-        )
     }
 }

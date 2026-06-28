@@ -2,11 +2,13 @@ package com.iti.data.mappers
 
 import com.iti.data.GetProductsQuery
 import com.iti.data.GetProductDetailsQuery
+import com.iti.data.GetMainCategoriesQuery
 import com.iti.data.dto.*
 import com.iti.domain.models.Money
 import com.iti.domain.models.Product
 import com.iti.domain.models.ProductImage
 import com.iti.domain.models.ProductVariant
+import com.iti.domain.models.Category
 
 fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
     val productEdges = this.products.edges.map { edge ->
@@ -235,4 +237,16 @@ fun ShopifyResponse.toDomainProduct(): Product {
             )
         }
     )
+}
+
+fun GetMainCategoriesQuery.Data.toDomainCategories(): List<Category> {
+    return this.collections.edges.map { edge ->
+        val node = edge.node
+        Category(
+            id = node.id,
+            title = node.title,
+            itemCount = node.productsCount.count,
+            imageAssetPath = node.image?.url?.toString() ?: ""
+        )
+    }
 }

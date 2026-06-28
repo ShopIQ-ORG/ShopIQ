@@ -33,9 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.iti.presentation.screens.category.components.CategoryCard
+import com.iti.presentation.screens.category.components.CategoryCardShimmer
 import com.iti.presentation.screens.category.components.CategorySearchBar
+import com.iti.presentation.screens.category.components.CategoryTopAppBar
 import com.iti.presentation.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,51 +49,9 @@ fun CategoryScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = Constants.CATEGORY_TITLE,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = { /* Handle cart click */ },
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Box {
-                            Icon(
-                                painter = rememberAsyncImagePainter(model = Constants.ASSET_SHOPPING_CART),
-                                contentDescription = "Cart",
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .offset(x = 6.dp, y = (-6).dp)
-                                    .size(16.dp)
-                                    .background(Color.Red, shape = CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "3",
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 10.sp
-                                    )
-                                )
-                            }
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            CategoryTopAppBar(
+                onDrawerClick = { /* Handle drawer click */ },
+                onCartClick = { /* Handle cart click */ }
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -122,34 +81,49 @@ fun CategoryScreen(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            val filteredCategories = remember(state.categories, state.searchQuery) {
-                if (state.searchQuery.isEmpty()) {
-                    state.categories
-                } else {
-                    state.categories.filter {
-                        it.title.contains(state.searchQuery, ignoreCase = true)
+            if (state.isLoading) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 16.dp)
+                ) {
+                    items(6) {
+                        CategoryCardShimmer()
                     }
                 }
-            }
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 16.dp)
-            ) {
-                items(
-                    items = filteredCategories,
-                    key = { it.id }
-                ) { category ->
-                    CategoryCard(
-                        category = category,
-                        onClick = {
-                            viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
+            } else {
+                val filteredCategories = remember(state.categories, state.searchQuery) {
+                    if (state.searchQuery.isEmpty()) {
+                        state.categories
+                    } else {
+                        state.categories.filter {
+                            it.title.contains(state.searchQuery, ignoreCase = true)
                         }
-                    )
+                    }
+                }
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 16.dp)
+                ) {
+                    items(
+                        items = filteredCategories,
+                        key = { it.id }
+                    ) { category ->
+                        CategoryCard(
+                            category = category,
+                            onClick = {
+                                viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
+                            }
+                        )
+                    }
                 }
             }
         }
