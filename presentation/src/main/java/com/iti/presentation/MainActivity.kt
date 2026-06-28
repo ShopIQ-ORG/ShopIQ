@@ -20,6 +20,7 @@ import com.iti.presentation.main.MainViewModel
 import com.iti.presentation.screens.onboarding.OnboardingScreen
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.splash.SplashScreen
+import com.iti.presentation.productdetails.ProductDetailsScreen
 import com.iti.presentation.ui.theme.ShopIQTheme
 import org.koin.androidx.compose.koinViewModel
 

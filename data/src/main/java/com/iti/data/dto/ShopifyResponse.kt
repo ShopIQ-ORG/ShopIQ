@@ -7,7 +7,8 @@ data class ShopifyResponse(
 )
 
 data class ShopifyData(
-    val products: ProductConnection
+    val products: ProductConnection? = null,
+    val product: ProductNode? = null
 )
 
 data class ProductConnection(
