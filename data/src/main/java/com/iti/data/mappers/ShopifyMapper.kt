@@ -2,10 +2,7 @@ package com.iti.data.mappers
 
 import com.iti.data.GetProductsQuery
 import com.iti.data.dto.*
-import com.iti.domain.models.Money
-import com.iti.domain.models.Product
-import com.iti.domain.models.ProductImage
-import com.iti.domain.models.ProductVariant
+import com.iti.domain.models.*
 
 fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
     val productEdges = this.products.edges.map { edge ->
@@ -136,4 +133,21 @@ fun ShopifyResponse.toDomainProducts(): List<Product> {
             }
         )
     }
+}
+
+fun BrandDto.toDomainBrand(): Brand {
+    return Brand(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.imageUrl
+    )
+}
+
+fun AdDto.toDomainAd(): Ad {
+    return Ad(
+        id = this.id,
+        imageUrl = this.imageUrl,
+        title = this.title,
+        subtitle = this.subtitle
+    )
 }

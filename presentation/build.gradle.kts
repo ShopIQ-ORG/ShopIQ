@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -33,6 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -48,8 +52,11 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    
     implementation(project(":data"))
     implementation(project(":domain"))
     testImplementation(libs.junit)

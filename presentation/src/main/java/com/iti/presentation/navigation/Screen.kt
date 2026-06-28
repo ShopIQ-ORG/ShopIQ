@@ -10,4 +10,6 @@ sealed class Screen {
     data object SignIn : Screen()
     data object SignUp : Screen()
     data object Home : Screen()
+    data object AllBrands : Screen()
+    data class AllProducts(val brandName: String? = null) : Screen()
 }

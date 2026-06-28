@@ -1,9 +1,13 @@
 package com.iti.domain.repositories.products
 
+import com.iti.domain.models.Ad
+import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
 import kotlinx.coroutines.flow.Flow
 
 interface ProductsRepository {
-    fun getProductsByNumber(count: Int = 10): Flow<Result<List<Product>>>
+    fun getProductsByNumber(count: Int = 250): Flow<Result<List<Product>>>
+    fun getBrands(): Flow<Result<List<Brand>>>
+    fun getAds(): Flow<Result<List<Ad>>>
 }

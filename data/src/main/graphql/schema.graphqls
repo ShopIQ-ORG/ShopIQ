@@ -15,6 +15,13 @@ type QueryRoot {
     sortKey: ProductSortKeys
     reverse: Boolean
   ): ProductConnection!
+  collections(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    query: String
+  ): CollectionConnection!
 }
 
 enum ProductSortKeys {
@@ -121,4 +128,22 @@ type PageInfo {
   hasPreviousPage: Boolean!
   startCursor: String
   endCursor: String
+}
+
+type CollectionConnection {
+  edges: [CollectionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CollectionEdge {
+  cursor: String!
+  node: Collection!
+}
+
+type Collection {
+  id: ID!
+  title: String!
+  description: String!
+  handle: String!
+  image: Image
 }
