@@ -50,8 +50,8 @@ fun CategoryScreen(
     Scaffold(
         topBar = {
             CategoryTopAppBar(
-                onDrawerClick = { /* Handle drawer click */ },
-                onCartClick = { /* Handle cart click */ }
+                onDrawerClick = { },
+                onCartClick = { }
             )
         },
         containerColor = MaterialTheme.colorScheme.background,

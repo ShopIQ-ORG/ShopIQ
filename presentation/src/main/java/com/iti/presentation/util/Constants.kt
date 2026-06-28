@@ -29,13 +29,19 @@ object Constants {
     const val SPLASH_TAGLINE_1 = "SMART SHOPPING."
     const val SPLASH_TAGLINE_2 = "BETTER CHOICES."
 
+    // Brand Logo Assets
+    const val ASSET_LOGO_DARK = "file:///android_asset/logo_dark.svg"
+    const val ASSET_LOGO_LIGHT = "file:///android_asset/logo_light.svg"
+    const val ASSET_AUTH_LOGO_DARK = "file:///android_asset/auth_logo_dark.webp"
+    const val ASSET_AUTH_LOGO_LIGHT = "file:///android_asset/auth_logo_light.webp"
+
     // Onboarding Slides Assets
-    const val ONBOARDING_IMAGE_1 = "file:///android_asset/images/1.svg"
-    const val ONBOARDING_IMAGE_2 = "file:///android_asset/images/2.svg"
-    const val ONBOARDING_IMAGE_3 = "file:///android_asset/images/3.svg"
-    const val ONBOARDING_IMAGE_1_DARK = "file:///android_asset/images/1_dark.png"
-    const val ONBOARDING_IMAGE_2_DARK = "file:///android_asset/images/2_dark.png"
-    const val ONBOARDING_IMAGE_3_DARK = "file:///android_asset/images/3_dark.png"
+    const val ONBOARDING_IMAGE_1 = "file:///android_asset/on_boarding_1.svg"
+    const val ONBOARDING_IMAGE_2 = "file:///android_asset/on_boarding_2.svg"
+    const val ONBOARDING_IMAGE_3 = "file:///android_asset/on_boarding_3.svg"
+    const val ONBOARDING_IMAGE_1_DARK = "file:///android_asset/on_boarding_1_dark.png"
+    const val ONBOARDING_IMAGE_2_DARK = "file:///android_asset/on_boarding_2_dark.png"
+    const val ONBOARDING_IMAGE_3_DARK = "file:///android_asset/on_boarding_3_dark.png"
 
     // Onboarding Slides Content
     const val ONBOARDING_TITLE_1 = "Shop Smarter,\nEveryday"
@@ -47,9 +53,9 @@ object Constants {
     const val ONBOARDING_TITLE_3 = "Save, Cart &\nCheckout with Ease"
     const val ONBOARDING_DESC_3 = "Save favorites, manage your cart, and checkout securely in just a few taps."
 
-    // Category Screen Assets
-    const val ASSET_DRAWER = "file:///android_asset/images/drawer.svg"
-    const val ASSET_SHOPPING_CART = "file:///android_asset/images/shopping-cart%20.svg"
+    // Shared Toolbar/UI Assets
+    const val ASSET_DRAWER = "file:///android_asset/ic_drawer.svg"
+    const val ASSET_SHOPPING_CART_UNFILLED = "file:///android_asset/ic_shopping_cart_unfilled.svg"
 
     // Category Screen Strings
     const val CATEGORY_TITLE = "Categories"
@@ -77,9 +83,13 @@ object Constants {
     const val CATEGORY_KIDS_COUNT = 56
     const val CATEGORY_SALE_COUNT = 132
 
-    // Bottom Navigation SVG Assets
-    const val ASSET_NAV_HOME = "file:///android_asset/images/home%20(1)%201.svg"
-    const val ASSET_NAV_CATEGORY = "file:///android_asset/images/category%201.svg"
-    const val ASSET_NAV_WISHLIST = "file:///android_asset/images/heart%201.svg"
-    const val ASSET_NAV_PROFILE = "file:///android_asset/images/user%201.svg"
+    // Bottom Navigation SVG Assets (Active & Inactive States)
+    const val ASSET_NAV_HOME_FILLED = "file:///android_asset/ic_home_filled.svg"
+    const val ASSET_NAV_HOME_UNFILLED = "file:///android_asset/ic_home_unfilled.svg"
+    const val ASSET_NAV_CATEGORY_FILLED = "file:///android_asset/ic_category_filled.svg"
+    const val ASSET_NAV_CATEGORY_UNFILLED = "file:///android_asset/ic_category_unfilled.svg"
+    const val ASSET_NAV_WISHLIST_FILLED = "file:///android_asset/ic_heart_filled.svg"
+    const val ASSET_NAV_WISHLIST_UNFILLED = "file:///android_asset/ic_heart_unfilled.svg"
+    const val ASSET_NAV_PROFILE_FILLED = "file:///android_asset/ic_user_filled.svg"
+    const val ASSET_NAV_PROFILE_UNFILLED = "file:///android_asset/ic_user.svg"
 }
