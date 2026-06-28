@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.ide.v2.TestSuiteSourceImpl.Companion.assets
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -6,13 +8,18 @@ plugins {
 
 android {
     namespace = "com.iti.presentation"
+
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs(File(rootDir, "assets"))
+        }
+    }
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
         minSdk = 26
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -26,18 +33,18 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
-    sourceSets {
-        getByName("main") {
-            assets.srcDirs(File(rootDir, "assets"))
-        }
-    }
+
 }
 
 dependencies {
@@ -61,6 +68,7 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
