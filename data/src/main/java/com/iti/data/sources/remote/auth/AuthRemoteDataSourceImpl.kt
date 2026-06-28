@@ -1,5 +1,7 @@
 package com.iti.data.sources.remote.auth
 
+import android.util.Log
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -61,6 +63,7 @@ class AuthRemoteDataSourceImpl(
         auth.signInAnonymously().await()
         return UserDto(isGuest = true)
     }
+
 
     override suspend fun register(info: RegistrationInfo): UserDto {
         val result = auth.createUserWithEmailAndPassword(info.email, info.password).await()

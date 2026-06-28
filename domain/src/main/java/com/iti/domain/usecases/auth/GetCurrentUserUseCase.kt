@@ -4,6 +4,6 @@ import com.iti.domain.models.User
 import com.iti.domain.repositories.auth.AuthRepository
 
 class GetCurrentUserUseCase(private val repository: AuthRepository) {
-    operator fun invoke(): Result<User> =
+    suspend operator fun invoke(): Result<User> =
         repository.getCurrentUser()
 }

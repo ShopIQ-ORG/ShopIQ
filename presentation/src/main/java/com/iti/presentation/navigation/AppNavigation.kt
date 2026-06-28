@@ -8,8 +8,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.iti.presentation.screens.home.HomeScreen
 import com.iti.presentation.screens.onboarding.OnBoardingScreen
-import com.iti.presentation.screens.auth.SignInScreen
-import com.iti.presentation.screens.auth.SignUpScreen
+import com.iti.presentation.screens.auth.signin.SignInScreen
+import com.iti.presentation.screens.auth.signup.SignUpScreen
 import com.iti.presentation.screens.splash.SplashScreen
 
 @Composable
@@ -35,7 +35,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.SignIn> {
                 SignInScreen(
-                    onNavigateToSignUp = { backStack.add(Screen.SignUp) }
+                    onNavigateToSignUp = { backStack.add(Screen.SignUp) },
+                    onNavigateToHome = { backStack.add(Screen.Home) },
+                    onNavigateToForgotPassword = { /* TODO: open forgot password screen */ }
                 )
             }
 

@@ -24,18 +24,29 @@ import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQTextField
 
 @Composable
-fun EmailField(value: String, onValueChange: (String) -> Unit, placeholder: String = stringResource(R.string.email_address)) {
+fun EmailField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String = stringResource(R.string.email_address),
+    errorMessage: String? = null,
+) {
     ShopIQTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = placeholder,
         leadingIcon = Icons.Outlined.Email,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        errorMessage = errorMessage,
     )
 }
 
 @Composable
-fun PasswordField(value: String, onValueChange: (String) -> Unit, placeholder: String = stringResource(R.string.password)) {
+fun PasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String = stringResource(R.string.password),
+    errorMessage: String? = null,
+) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     ShopIQTextField(
@@ -53,27 +64,39 @@ fun PasswordField(value: String, onValueChange: (String) -> Unit, placeholder: S
             }
         },
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        errorMessage = errorMessage,
     )
 }
 
 @Composable
-fun FullNameField(value: String, onValueChange: (String) -> Unit) {
+fun FullNameField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    errorMessage: String? = null,
+) {
     ShopIQTextField(
         value = value,
         onValueChange = onValueChange,
         placeholder = stringResource(R.string.full_name),
-        leadingIcon = Icons.Outlined.Person
+        leadingIcon = Icons.Outlined.Person,
+        errorMessage = errorMessage,
     )
 }
 
 @Composable
-fun PhoneField(value: String, onValueChange: (String) -> Unit) {
+fun PhoneField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String = stringResource(R.string.phone_number),
+    errorMessage: String? = null,
+) {
     ShopIQTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = stringResource(R.string.phone_number_optional),
+        placeholder = placeholder,
         leadingIcon = Icons.Outlined.Phone,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        errorMessage = errorMessage,
     )
 }

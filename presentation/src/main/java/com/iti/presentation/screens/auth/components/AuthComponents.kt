@@ -11,10 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
@@ -50,19 +48,29 @@ fun AuthHeader(title: String, subtitle: String) {
 }
 
 @Composable
-fun AuthSocialSection() {
+fun AuthSocialSection(
+    onGoogleClick: () -> Unit,
+    onFacebookClick: () -> Unit,
+    onGuestClick: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
         Text(
             text = stringResource(R.string.or_continue_with),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 14.sp,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
-        HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
     }
 
     Spacer(modifier = Modifier.height(24.dp))
@@ -71,9 +79,9 @@ fun AuthSocialSection() {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        SocialLoginButton(iconRes = R.drawable.ic_google, onClick = { })
-        SocialLoginButton(iconRes = R.drawable.ic_guest, onClick = { })
-        SocialLoginButton(iconRes = R.drawable.ic_facebook, onClick = { })
+        SocialLoginButton(iconRes = R.drawable.ic_google, onClick = onGoogleClick)
+        SocialLoginButton(iconRes = R.drawable.ic_guest, onClick = onGuestClick)
+        SocialLoginButton(iconRes = R.drawable.ic_facebook, onClick = onFacebookClick)
     }
 }
 
@@ -99,42 +107,6 @@ fun AuthFooter(text: String, clickableText: String, onClick: () -> Unit) {
                 .clip(RoundedCornerShape(8.dp))
                 .clickable { onClick() }
                 .padding(8.dp)
-        )
-    }
-}
-
-@Composable
-fun TermsCheckbox(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary
-            )
-        )
-
-        val annotatedText = buildAnnotatedString {
-            append(stringResource(R.string.i_agree_to_the) + " ")
-            withStyle(style = androidx.compose.ui.text.SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                append(stringResource(R.string.terms_of_service))
-            }
-            append(" " + stringResource(R.string.and) + " ")
-            withStyle(style = androidx.compose.ui.text.SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) {
-                append(stringResource(R.string.privacy_policy))
-            }
-        }
-
-        Text(
-            text = annotatedText,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 13.sp
         )
     }
 }

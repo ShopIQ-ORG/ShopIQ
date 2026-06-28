@@ -18,11 +18,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShopIQTheme {
-                Scaffold(
+                androidx.compose.material3.Surface(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.background
-                ) { innerPadding ->
-                    AppNavigation(modifier = Modifier.padding(innerPadding))
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation()
                 }
             }
         }

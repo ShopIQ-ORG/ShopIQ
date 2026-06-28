@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.apollo)
-    alias(libs.plugins.google.services)
 }
 
 val localProperties = Properties().apply {
@@ -32,10 +31,8 @@ android {
 
     defaultConfig {
         minSdk = 26
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
         buildConfigField("String", "SHOPIFY_STOREFRONT_ACCESS_TOKEN", "\"$storefrontToken\"")
         buildConfigField("String", "SHOPIFY_ADMIN_ACCESS_TOKEN", "\"$adminToken\"")
         buildConfigField("String", "SHOPIFY_API_KEY", "\"$apiKey\"")
@@ -52,12 +49,16 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
