@@ -1,0 +1,22 @@
+query GetMainCategories {
+  collections(first: 50, query: "collection_type:custom") {
+    edges {
+      node {
+        id
+        title
+        handle
+        image {
+          url
+          altText
+        }
+        productsCount {
+          count
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
