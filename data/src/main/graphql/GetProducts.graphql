@@ -32,10 +32,7 @@ query GetProducts($first: Int!) {
                         node {
                             id
                             title
-                            price {
-                                amount
-                                currencyCode
-                            }
+                            price
                             availableForSale
                         }
                     }

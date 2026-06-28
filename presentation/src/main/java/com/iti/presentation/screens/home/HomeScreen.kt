@@ -23,12 +23,14 @@ import com.iti.presentation.components.HomeTabContent
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
 import com.iti.presentation.screens.category.CategoryScreen
+import com.iti.presentation.screens.category.CategoryViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(onNavigateToSplash: () -> Unit) {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val navItems = BottomNavItem.entries
+    val categoryViewModel: CategoryViewModel = koinViewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -53,8 +55,8 @@ fun HomeScreen(onNavigateToSplash: () -> Unit) {
                             indicatorColor = Color.Transparent,
                             selectedIconColor = MaterialTheme.colorScheme.primary,
                             selectedTextColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.outline,
-                            unselectedTextColor = MaterialTheme.colorScheme.outline
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         ),
                         onClick = { selectedIndex = index }
                     )
@@ -65,7 +67,7 @@ fun HomeScreen(onNavigateToSplash: () -> Unit) {
         Box(modifier = Modifier.padding(innerPadding)) {
             when (navItems[selectedIndex]) {
                 BottomNavItem.Home -> HomeTabContent()
-                BottomNavItem.Category -> CategoryScreen(viewModel = koinViewModel())
+                BottomNavItem.Category -> CategoryScreen(viewModel = categoryViewModel)
                 BottomNavItem.Wishlist -> WishlistTabContent()
                 BottomNavItem.Profile -> ProfileTabContent(
                     onNavigateToSplash = onNavigateToSplash
