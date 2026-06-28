@@ -44,7 +44,7 @@ fun CategorySearchBar(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(30.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(30.dp))
             .padding(horizontal = 16.dp),
         decorationBox = { innerTextField ->
             Row(

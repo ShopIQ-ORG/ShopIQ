@@ -13,6 +13,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 
 fun Modifier.shimmer(): Modifier = composed {
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -27,9 +28,9 @@ fun Modifier.shimmer(): Modifier = composed {
     )
 
     val shimmerColors = listOf(
-        Color(0xFFE5E5EA),
-        Color(0xFFF2F2F7),
-        Color(0xFFE5E5EA)
+        MaterialTheme.colorScheme.outlineVariant,
+        MaterialTheme.colorScheme.surface,
+        MaterialTheme.colorScheme.outlineVariant
     )
 
     val brush = Brush.linearGradient(

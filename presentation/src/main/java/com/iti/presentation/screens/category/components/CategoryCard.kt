@@ -36,7 +36,7 @@ fun CategoryCard(
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF5F6F8)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -52,7 +52,7 @@ fun CategoryCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
-                        .background(Color(0xFFE5E5EA), shape = RoundedCornerShape(12.dp)),
+                        .background(MaterialTheme.colorScheme.outlineVariant, shape = RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -66,8 +66,8 @@ fun CategoryCard(
                 AsyncImage(
                     model = category.imageAssetPath,
                     contentDescription = category.title,
-                    error = painterResource(id = R.drawable.auth_logo_light),
-                    fallback = painterResource(id = R.drawable.auth_logo_light),
+                    error = painterResource(id = R.drawable.category_fill),
+                    fallback = painterResource(id = R.drawable.category_fill),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
@@ -81,7 +81,7 @@ fun CategoryCard(
                 text = category.title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF1C1C1E)
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -89,7 +89,7 @@ fun CategoryCard(
             Text(
                 text = "${category.itemCount} ${Constants.CATEGORY_ITEMS_SUFFIX}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF8E8E93)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
