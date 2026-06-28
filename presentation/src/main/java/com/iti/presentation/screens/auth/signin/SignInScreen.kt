@@ -42,6 +42,10 @@ import com.iti.presentation.screens.auth.components.EmailField
 import com.iti.presentation.screens.auth.components.PasswordField
 import com.iti.presentation.ui.theme.ShopIQTheme
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import com.iti.presentation.screens.auth.rememberGoogleSignInHelper
+import com.iti.presentation.screens.auth.rememberFacebookSignInHelper
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
@@ -53,6 +57,19 @@ fun SignInScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val onSocialError: (String) -> Unit = { msg -> scope.launch { snackBarHostState.showError(msg) } }
+
+    val googleHelper = rememberGoogleSignInHelper(
+        onSuccess = { idToken -> viewModel.onIntent(SignInIntent.LoginWithGoogle(idToken)) },
+        onError = onSocialError
+    )
+
+    val facebookHelper = rememberFacebookSignInHelper(
+        onSuccess = { token -> viewModel.onIntent(SignInIntent.LoginWithFacebook(token)) },
+        onError = onSocialError
+    )
+
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -69,7 +86,7 @@ fun SignInScreen(
     }
 
     val emailRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_email_or_phone_required }
+        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_email_required }
         ?.resolve(context)
 
     val passwordRequiredError = state.error
@@ -77,7 +94,7 @@ fun SignInScreen(
         ?.resolve(context)
 
     val otherFieldError = state.error
-        ?.takeIf { it.isFieldError() && (it !is UiText.StringResource || (it.resId != R.string.error_email_or_phone_required && it.resId != R.string.error_password_required)) }
+        ?.takeIf { it.isFieldError() && (it !is UiText.StringResource || (it.resId != R.string.error_email_required && it.resId != R.string.error_password_required)) }
         ?.resolve(context)
 
     Scaffold(
@@ -148,8 +165,8 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AuthSocialSection(
-                    onGoogleClick = { },
-                    onFacebookClick = { },
+                    onGoogleClick = { googleHelper.signIn() },
+                    onFacebookClick = { facebookHelper.signIn() },
                     onGuestClick = { viewModel.onIntent(SignInIntent.LoginAsGuest) },
                     enabled = !state.isLoading
                 )
