@@ -65,7 +65,7 @@ fun CategoryScreen(
                     ) {
                         Box {
                             Icon(
-                                painter = rememberAsyncImagePainter(model = Constants.ASSET_SHOPPING_CART),
+                                painter = rememberAsyncImagePainter(model = Constants.ASSET_SHOPPING_CART_UNFILLED),
                                 contentDescription = "Cart",
                                 tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(24.dp)
