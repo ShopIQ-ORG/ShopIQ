@@ -1,10 +1,21 @@
 import com.android.build.gradle.internal.ide.v2.TestSuiteSourceImpl.Companion.assets
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+val googleWebClientId = localProperties.getProperty("google.web.client.id") ?: "YOUR_GOOGLE_WEB_CLIENT_ID"
+val facebookAppId = localProperties.getProperty("facebook.app.id") ?: "YOUR_FACEBOOK_APP_ID"
+val facebookClientToken = localProperties.getProperty("facebook.client.token") ?: "YOUR_FACEBOOK_CLIENT_TOKEN"
 
 android {
     namespace = "com.iti.presentation"
@@ -18,10 +29,23 @@ android {
         version = release(36)
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+        buildConfigField("String", "FACEBOOK_APP_ID", "\"$facebookAppId\"")
+        buildConfigField("String", "FACEBOOK_CLIENT_TOKEN", "\"$facebookClientToken\"")
+
+        resValue("string", "google_web_client_id", googleWebClientId)
+        resValue("string", "facebook_app_id", facebookAppId)
+        resValue("string", "facebook_client_token", facebookClientToken)
+        resValue("string", "fb_login_protocol_scheme", "fb$facebookAppId")
     }
 
     buildTypes {
@@ -69,6 +93,9 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(libs.googleid)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.facebook.login)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

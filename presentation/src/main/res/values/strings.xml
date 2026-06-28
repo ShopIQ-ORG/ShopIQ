@@ -33,7 +33,6 @@
     <string name="error_agree_to_terms">Please agree to terms and conditions</string>
     <string name="error_full_name_required">Full name is required</string>
     <string name="error_email_required">Email address is required</string>
-    <string name="error_email_or_phone_required">Email or phone number is required</string>
     <string name="error_phone_required">Phone number is required</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_confirm_password_required">Please confirm your password</string>
@@ -50,4 +49,8 @@
     <string name="btn_wishlist">Add To Wishlist</string>
     <string name="btn_add_to_cart">Add to Cart</string>
     <string name="error_message">Error: %1$s</string>
+    <string name="error_google_client_id_missing">Google Client ID is not configured in local.properties</string>
+    <string name="error_google_sign_in_failed">Google Sign-In failed</string>
+    <string name="error_facebook_activity_missing">Could not find a valid activity for Facebook login.</string>
+    <string name="error_facebook_sign_in_failed">Facebook Sign-In failed</string>
 </resources>

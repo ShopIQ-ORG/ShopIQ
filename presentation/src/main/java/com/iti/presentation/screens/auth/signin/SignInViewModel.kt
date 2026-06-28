@@ -47,7 +47,7 @@ class SignInViewModel(
         val email = _state.value.email
         val password = _state.value.password
         if (email.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_email_or_phone_required))
+            handleValidationError(UiText.StringResource(R.string.error_email_required))
             return
         }
         if (password.isBlank()) {
