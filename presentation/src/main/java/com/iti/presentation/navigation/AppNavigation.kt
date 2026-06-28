@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.iti.presentation.screens.home.HomeScreen
@@ -34,7 +33,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 val onboardingViewModel: OnboardingViewModel = koinViewModel()
                 OnboardingScreen(
                     viewModel = onboardingViewModel,
-                    onNavigateToHome = { backStack.add(Screen.SignIn) }
+                    onNavigateToHome = { backStack.add(Screen.Home) }
                 )
             }
 

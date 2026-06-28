@@ -21,7 +21,7 @@ import com.iti.presentation.navigation.AppNavigation
 import com.iti.presentation.screens.onboarding.OnboardingScreen
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.splash.SplashScreen
-import com.iti.presentation.productdetails.ProductDetailsScreen
+import com.iti.presentation.screens.home.HomeScreen
 import com.iti.presentation.ui.theme.ShopIQTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -33,6 +33,30 @@ class MainActivity : ComponentActivity() {
         setContent {
             ShopIQTheme {
                 AppNavigation()
+                val mainViewModel: MainViewModel = koinViewModel()
+                val mainState by mainViewModel.state.collectAsState()
+
+                when (mainState) {
+                    is MainContract.State.Loading -> {
+                        SplashScreen()
+                    }
+                    is MainContract.State.ShowOnboarding -> {
+                        val onboardingViewModel: OnboardingViewModel = koinViewModel()
+                        OnboardingScreen(
+                            viewModel = onboardingViewModel,
+                            onNavigateToHome = {
+                                mainViewModel.sendIntent(MainContract.Intent.CheckOnboarding)
+                            }
+                        )
+                    }
+                    is MainContract.State.ShowHome -> {
+                        HomeScreen(
+                            onNavigateToSplash = {
+                                mainViewModel.sendIntent(MainContract.Intent.CheckOnboarding)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
