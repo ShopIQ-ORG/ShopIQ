@@ -4,9 +4,12 @@ import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
 import com.iti.data.mappers.toDomainProducts
+import com.iti.data.mappers.toDomainProduct
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
+import com.iti.domain.models.Money
+import com.iti.domain.models.ProductImage
 import com.iti.domain.models.Result
 import com.iti.domain.repositories.products.ProductsRepository
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +45,17 @@ class ProductsRepositoryImpl(
         try {
             val ads = remoteDataSource.getAds().map { it.toDomainAd() }
             emit(Result.Success(ads))
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun getProductDetails(productId: Long): Flow<Result<Product>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProductDetails(productId)
+            val domainProduct = response.toDomainProduct()
+            emit(Result.Success(domainProduct))
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }

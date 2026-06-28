@@ -32,10 +32,7 @@ query GetProducts($first: Int!, $sortKey: ProductSortKeys, $reverse: Boolean) {
                         node {
                             id
                             title
-                            price {
-                                amount
-                                currencyCode
-                            }
+                            price
                             availableForSale
                         }
                     }

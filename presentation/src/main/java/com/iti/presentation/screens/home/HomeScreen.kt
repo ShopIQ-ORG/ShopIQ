@@ -1,13 +1,9 @@
 package com.iti.presentation.screens.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -19,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -32,19 +29,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
-import com.iti.domain.models.Money
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
-import com.iti.presentation.components.*
+import com.iti.presentation.components.BottomNavItem
+import com.iti.presentation.components.HomeTabContent
+import com.iti.presentation.components.ProfileTabContent
+import com.iti.presentation.components.WishlistTabContent
+import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.ui.theme.ShopIQTheme
-import com.iti.presentation.R
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -86,7 +84,10 @@ fun HomeScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(
                             text = "ShopIQ",
                             fontSize = 20.sp,
@@ -131,15 +132,24 @@ fun HomeScreenContent(
                 tonalElevation = 8.dp
             ) {
                 navItems.forEachIndexed { index, item ->
+                    val isSelected = selectedIndex == index
                     NavigationBarItem(
                         icon = {
+                            val iconImage = if (isSelected) item.selectedIcon else item.unselectedIcon
                             Icon(
-                                imageVector = item.icon,
+                                imageVector = iconImage,
                                 contentDescription = item.label
                             )
                         },
                         label = { Text(text = item.label, fontSize = 10.sp) },
-                        selected = selectedIndex == index,
+                        selected = isSelected,
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent,
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        ),
                         onClick = { selectedIndex = index }
                     )
                 }
@@ -155,7 +165,7 @@ fun HomeScreenContent(
                     onNavigateToAllBrands = onNavigateToAllBrands,
                     onNavigateToAllProducts = onNavigateToAllProducts
                 )
-                BottomNavItem.Category -> CategoryTabContent()
+                BottomNavItem.Category -> CategoryScreen(viewModel = koinViewModel())
                 BottomNavItem.Wishlist -> WishlistTabContent()
                 BottomNavItem.Profile -> ProfileTabContent(
                     onNavigateToSplash = onNavigateToSplash

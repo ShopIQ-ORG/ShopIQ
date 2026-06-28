@@ -7,7 +7,8 @@ import com.iti.domain.models.Result
 import kotlinx.coroutines.flow.Flow
 
 interface ProductsRepository {
-    fun getProductsByNumber(count: Int = 250): Flow<Result<List<Product>>>
     fun getBrands(): Flow<Result<List<Brand>>>
     fun getAds(): Flow<Result<List<Ad>>>
+    fun getProductsByNumber(count: Int = 10): Flow<Result<List<Product>>>
+    fun getProductDetails(productId: Long): Flow<Result<Product>>
 }
