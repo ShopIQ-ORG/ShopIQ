@@ -46,4 +46,40 @@ object Constants {
 
     const val ONBOARDING_TITLE_3 = "Save, Cart &\nCheckout with Ease"
     const val ONBOARDING_DESC_3 = "Save favorites, manage your cart, and checkout securely in just a few taps."
+
+    // Category Screen Assets
+    const val ASSET_DRAWER = "file:///android_asset/images/drawer.svg"
+    const val ASSET_SHOPPING_CART = "file:///android_asset/images/shopping-cart%20.svg"
+
+    // Category Screen Strings
+    const val CATEGORY_TITLE = "Categories"
+    const val CATEGORY_SEARCH_PLACEHOLDER = "Search categories..."
+    const val CATEGORY_SECTION_TITLE = "Shop by Category"
+    const val CATEGORY_ITEMS_SUFFIX = "items"
+
+    // Category Names
+    const val CATEGORY_MEN = "Men"
+    const val CATEGORY_WOMEN = "Women"
+    const val CATEGORY_SHOES = "Shoes"
+    const val CATEGORY_BAGS = "Bags"
+    const val CATEGORY_ACCESSORIES = "Accessories"
+    const val CATEGORY_BEAUTY = "Beauty"
+    const val CATEGORY_KIDS = "Kids"
+    const val CATEGORY_SALE = "Sale"
+
+    // Category Item Counts
+    const val CATEGORY_MEN_COUNT = 120
+    const val CATEGORY_WOMEN_COUNT = 98
+    const val CATEGORY_SHOES_COUNT = 76
+    const val CATEGORY_BAGS_COUNT = 54
+    const val CATEGORY_ACCESSORIES_COUNT = 68
+    const val CATEGORY_BEAUTY_COUNT = 42
+    const val CATEGORY_KIDS_COUNT = 56
+    const val CATEGORY_SALE_COUNT = 132
+
+    // Bottom Navigation SVG Assets
+    const val ASSET_NAV_HOME = "file:///android_asset/images/home%20(1)%201.svg"
+    const val ASSET_NAV_CATEGORY = "file:///android_asset/images/category%201.svg"
+    const val ASSET_NAV_WISHLIST = "file:///android_asset/images/heart%201.svg"
+    const val ASSET_NAV_PROFILE = "file:///android_asset/images/user%201.svg"
 }

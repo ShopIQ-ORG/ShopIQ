@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,11 +16,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.iti.presentation.components.BottomNavItem
-import com.iti.presentation.components.CategoryTabContent
 import com.iti.presentation.components.HomeTabContent
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
+import com.iti.presentation.screens.category.CategoryScreen
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(onNavigateToSplash: () -> Unit) {
@@ -28,17 +33,29 @@ fun HomeScreen(onNavigateToSplash: () -> Unit) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.background,
+                tonalElevation = 0.dp
+            ) {
                 navItems.forEachIndexed { index, item ->
+                    val isSelected = selectedIndex == index
                     NavigationBarItem(
                         icon = {
+                            val iconImage = if (isSelected) item.selectedIcon else item.unselectedIcon
                             Icon(
-                                imageVector = item.icon,
+                                imageVector = iconImage,
                                 contentDescription = item.label
                             )
                         },
                         label = { Text(text = item.label) },
-                        selected = selectedIndex == index,
+                        selected = isSelected,
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent,
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.outline,
+                            unselectedTextColor = MaterialTheme.colorScheme.outline
+                        ),
                         onClick = { selectedIndex = index }
                     )
                 }
@@ -48,7 +65,7 @@ fun HomeScreen(onNavigateToSplash: () -> Unit) {
         Box(modifier = Modifier.padding(innerPadding)) {
             when (navItems[selectedIndex]) {
                 BottomNavItem.Home -> HomeTabContent()
-                BottomNavItem.Category -> CategoryTabContent()
+                BottomNavItem.Category -> CategoryScreen(viewModel = koinViewModel())
                 BottomNavItem.Wishlist -> WishlistTabContent()
                 BottomNavItem.Profile -> ProfileTabContent(
                     onNavigateToSplash = onNavigateToSplash
