@@ -5,12 +5,15 @@ import com.iti.presentation.screens.category.model.CategoryItem
 interface CategoryContract {
     data class State(
         val categories: List<CategoryItem> = emptyList(),
-        val searchQuery: String = ""
+        val searchQuery: String = "",
+        val isLoading: Boolean = false,
+        val errorMessage: String? = null
     )
 
     sealed interface Intent {
         data class SearchQueryChanged(val query: String) : Intent
         data class CategoryClicked(val categoryId: String) : Intent
+        data object LoadCategories : Intent
     }
 
     sealed interface Effect {
