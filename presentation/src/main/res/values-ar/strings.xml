@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">شوب آي كيو</string>
+    <string name="content_desc_back">رجوع</string>
+    <string name="content_desc_wishlist">قائمة الرغبات</string>
+    <string name="content_desc_cart">عربة التسوق</string>
+    <string name="btn_retry">إعادة المحاولة</string>
+    <string name="reviews_count">%1$d تقييم</string>
+    <string name="no_description">لا يوجد وصف متاح.</string>
+    <string name="label_color">اللون: %1$s</string>
+    <string name="label_size">المقاس: %1$s</string>
+    <string name="size_guide">📏 دليل المقاسات</string>
+    <string name="btn_wishlist">المفضلة</string>
+    <string name="btn_add_to_cart">أضف إلى العربة</string>
+    <string name="error_message">خطأ: %1$s</string>
+</resources>

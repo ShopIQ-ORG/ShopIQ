@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductsRepository {
     fun getProductsByNumber(count: Int = 10): Flow<Result<List<Product>>>
+    fun getProductDetails(productId: Long): Flow<Result<Product>>
 }

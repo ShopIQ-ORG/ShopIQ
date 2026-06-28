@@ -9,8 +9,8 @@ import okhttp3.Response
 
 object ShopifyNetworkConfig {
 
-    private const val API_VERSION = "2026-04"
-    private const val BASE_URL = "https://${BuildConfig.SHOPIFY_STORE_DOMAIN}/api/$API_VERSION/graphql.json"
+    private const val API_VERSION = "2024-07"
+    private const val BASE_URL = "https://${BuildConfig.SHOPIFY_STORE_DOMAIN}/admin/api/$API_VERSION/graphql.json"
 
     private const val ADMIN_ACCESS_TOKEN = BuildConfig.SHOPIFY_ADMIN_ACCESS_TOKEN
     private const val STOREFRONT_ACCESS_TOKEN = BuildConfig.SHOPIFY_STOREFRONT_ACCESS_TOKEN
