@@ -1,0 +1,124 @@
+schema {
+  query: QueryRoot
+}
+
+scalar DateTime
+scalar URL
+
+type QueryRoot {
+  products(
+    first: Int
+    after: String
+    last: Int
+    before: String
+    query: String
+    sortKey: ProductSortKeys
+    reverse: Boolean
+  ): ProductConnection!
+}
+
+enum ProductSortKeys {
+  TITLE
+  PRODUCT_TYPE
+  VENDOR
+  UPDATED_AT
+  CREATED_AT
+  BEST_SELLING
+  PRICE
+  ID
+  RELEVANCE
+}
+
+type ProductConnection {
+  edges: [ProductEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProductEdge {
+  cursor: String!
+  node: Product!
+}
+
+type Product {
+  id: ID!
+  title: String!
+  description: String!
+  handle: String!
+  productType: String!
+  vendor: String!
+  tags: [String!]!
+  priceRange: ProductPriceRange!
+  images(first: Int, after: String): ImageConnection!
+  variants(first: Int, after: String): ProductVariantConnection!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProductPriceRange {
+  minVariantPrice: MoneyV2!
+  maxVariantPrice: MoneyV2!
+}
+
+type MoneyV2 {
+  amount: String!
+  currencyCode: CurrencyCode!
+}
+
+enum CurrencyCode {
+  USD
+  EUR
+  GBP
+  EGP
+  SAR
+  AED
+  CAD
+  AUD
+  JPY
+  CNY
+  INR
+}
+
+type ImageConnection {
+  edges: [ImageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ImageEdge {
+  cursor: String!
+  node: Image!
+}
+
+type Image {
+  id: ID
+  url: URL!
+  altText: String
+  width: Int
+  height: Int
+}
+
+type ProductVariantConnection {
+  edges: [ProductVariantEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ProductVariantEdge {
+  cursor: String!
+  node: ProductVariant!
+}
+
+type ProductVariant {
+  id: ID!
+  title: String!
+  price: MoneyV2!
+  availableForSale: Boolean!
+  quantityAvailable: Int
+  image: Image
+  sku: String
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
