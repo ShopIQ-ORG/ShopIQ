@@ -24,12 +24,16 @@ import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
 import com.iti.presentation.util.Constants
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryTopAppBar(
     onDrawerClick: () -> Unit,
     onCartClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSearchActive: Boolean = false
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -43,12 +47,21 @@ fun CategoryTopAppBar(
         },
         navigationIcon = {
             IconButton(onClick = onDrawerClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.drawer),
-                    contentDescription = "Menu",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
-                )
+                if (isSearchActive) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.drawer),
+                        contentDescription = "Menu",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         },
         actions = {

@@ -30,9 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.iti.presentation.R
 import com.iti.presentation.screens.category.components.CategoryCard
 import com.iti.presentation.screens.category.components.CategoryCardShimmer
 import com.iti.presentation.screens.category.components.CategorySearchBar
@@ -50,8 +53,15 @@ fun CategoryScreen(
     Scaffold(
         topBar = {
             CategoryTopAppBar(
-                onDrawerClick = { },
-                onCartClick = { }
+                onDrawerClick = {
+                    if (state.searchQuery.isNotEmpty()) {
+                        viewModel.sendIntent(CategoryContract.Intent.SearchQueryChanged(""))
+                    } else {
+                        /* Handle drawer click */
+                    }
+                },
+                onCartClick = { /* Handle cart click */ },
+                isSearchActive = state.searchQuery.isNotEmpty()
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -105,24 +115,61 @@ fun CategoryScreen(
                     }
                 }
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 16.dp)
-                ) {
-                    items(
-                        items = filteredCategories,
-                        key = { it.id }
-                    ) { category ->
-                        CategoryCard(
-                            category = category,
-                            onClick = {
-                                viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
-                            }
-                        )
+                if (filteredCategories.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 80.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.category_fill),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                modifier = Modifier.size(80.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No categories found",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "We couldn't find any categories matching \"${state.searchQuery}\"",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
+                            )
+                        }
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        items(
+                            items = filteredCategories,
+                            key = { it.id }
+                        ) { category ->
+                            CategoryCard(
+                                category = category,
+                                onClick = {
+                                    viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
+                                }
+                            )
+                        }
                     }
                 }
             }
