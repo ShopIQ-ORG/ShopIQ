@@ -77,7 +77,7 @@ class CategoryViewModel(
                             errorMessage = null
                         )
                     }
-                    is Result.Error -> {
+                    is Result.Failure -> {
                         _state.value = _state.value.copy(
                             isLoading = false,
                             errorMessage = result.exception.message ?: "Failed to load categories"
