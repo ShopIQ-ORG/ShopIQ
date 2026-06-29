@@ -1,4 +1,4 @@
-package com.iti.domain.repository
+package com.iti.domain.repositories.onboarding
 
 import kotlinx.coroutines.flow.Flow
 

@@ -2,7 +2,7 @@ package com.iti.presentation.screens.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iti.domain.usecase.SetOnboardingCompletedUseCase
+import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

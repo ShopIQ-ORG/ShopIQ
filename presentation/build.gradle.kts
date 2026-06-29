@@ -1,10 +1,10 @@
-import com.android.build.gradle.internal.ide.v2.TestSuiteSourceImpl.Companion.assets
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val localProperties = Properties().apply {
@@ -19,18 +19,17 @@ val facebookClientToken = localProperties.getProperty("facebook.client.token") ?
 
 android {
     namespace = "com.iti.presentation"
+    compileSdk = 36
 
     sourceSets {
         getByName("main") {
             assets.srcDirs(File(rootDir, "assets"))
         }
     }
-    compileSdk {
-        version = release(36)
-    }
 
     buildFeatures {
         buildConfig = true
+        compose = true
     }
 
     defaultConfig {
@@ -68,7 +67,6 @@ kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
-
 }
 
 dependencies {
@@ -88,8 +86,10 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.compose.shimmer)
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(libs.googleid)

@@ -1,6 +1,6 @@
-package com.iti.domain.usecase
+package com.iti.domain.usecases.onboarding
 
-import com.iti.domain.repository.OnboardingRepository
+import com.iti.domain.repositories.onboarding.OnboardingRepository
 
 class SetOnboardingCompletedUseCase(
     private val repository: OnboardingRepository

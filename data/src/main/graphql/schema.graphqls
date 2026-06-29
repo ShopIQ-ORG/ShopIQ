@@ -23,8 +23,6 @@ type QueryRoot {
     last: Int
     before: String
     query: String
-    sortKey: CollectionSortKeys
-    reverse: Boolean
   ): CollectionConnection!
 }
 

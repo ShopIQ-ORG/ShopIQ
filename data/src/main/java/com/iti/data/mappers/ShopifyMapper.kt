@@ -4,6 +4,7 @@ import com.iti.data.GetProductsQuery
 import com.iti.data.GetProductDetailsQuery
 import com.iti.data.GetMainCategoriesQuery
 import com.iti.data.dto.*
+import com.iti.domain.models.*
 import com.iti.domain.models.Money
 import com.iti.domain.models.Product
 import com.iti.domain.models.ProductImage
@@ -249,4 +250,21 @@ fun GetMainCategoriesQuery.Data.toDomainCategories(): List<Category> {
             imageAssetPath = node.image?.url?.toString() ?: ""
         )
     }
+}
+
+fun BrandDto.toDomainBrand(): Brand {
+    return Brand(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.imageUrl
+    )
+}
+
+fun AdDto.toDomainAd(): Ad {
+    return Ad(
+        id = this.id,
+        imageUrl = this.imageUrl,
+        title = this.title,
+        subtitle = this.subtitle
+    )
 }
