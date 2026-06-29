@@ -8,6 +8,9 @@ import com.iti.domain.repositories.onboarding.OnboardingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+
 class OnboardingRepositoryImpl(
     private val dataStore: DataStore<Preferences>
 ) : OnboardingRepository {
@@ -23,8 +26,10 @@ class OnboardingRepositoryImpl(
     }
 
     override suspend fun setOnboardingCompleted() {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.ONBOARDING_COMPLETED] = true
+        withContext(NonCancellable) {
+            dataStore.edit { preferences ->
+                preferences[PreferencesKeys.ONBOARDING_COMPLETED] = true
+            }
         }
     }
 }

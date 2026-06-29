@@ -31,7 +31,9 @@ import com.iti.presentation.R
 import com.iti.presentation.components.AppTopBar
 import com.iti.presentation.components.SearchBar
 import com.iti.presentation.screens.category.components.CategoryCard
+import com.iti.presentation.screens.category.components.CategoryCardShimmer
 import com.iti.presentation.util.Constants
+import com.valentinilk.shimmer.shimmer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +77,7 @@ fun CategoryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .then(if (state.isLoading) Modifier.shimmer() else Modifier)
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Column(modifier = Modifier.padding(bottom = 8.dp)) {
@@ -91,16 +94,22 @@ fun CategoryScreen(
                 }
             }
 
-            items(
-                items = filteredCategories,
-                key = { it.id }
-            ) { category ->
-                CategoryCard(
-                    category = category,
-                    onClick = {
-                        viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
-                    }
-                )
+            if (state.isLoading) {
+                items(6) {
+                    CategoryCardShimmer()
+                }
+            } else {
+                items(
+                    items = filteredCategories,
+                    key = { it.id }
+                ) { category ->
+                    CategoryCard(
+                        category = category,
+                        onClick = {
+                            viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
+                        }
+                    )
+                }
             }
         }
     }

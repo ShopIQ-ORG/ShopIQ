@@ -10,6 +10,7 @@ import com.iti.domain.usecases.auth.LoginUseCase
 import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
 import com.iti.domain.usecases.auth.RegisterUseCase
+import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
@@ -25,6 +26,7 @@ val domainModule = module {
     factory { LoginAsGuestUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { RegisterUseCase(get()) }
+    factory { LogoutUseCase(get()) }
     factory { GetProductsByNumberUseCase(get()) }
     factory { GetProductDetailsUseCase(get()) }
     factory { IsOnboardingCompletedUseCase(get()) }

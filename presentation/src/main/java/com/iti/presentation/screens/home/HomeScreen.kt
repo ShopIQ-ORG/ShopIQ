@@ -54,6 +54,10 @@ fun HomeScreen(
                 is HomeContract.Effect.NavigateToProducts -> {
                     onNavigateToAllProducts(effect.brandName)
                 }
+
+                HomeContract.Effect.NavigateToSplash -> {
+                    onNavigateToSplash()
+                }
             }
         }
     }
@@ -61,7 +65,7 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onIntent = viewModel::sendIntent,
-        onNavigateToSplash = onNavigateToSplash
+        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) }
     )
 }
 
@@ -69,7 +73,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
-    onNavigateToSplash: () -> Unit
+    onLogout: () -> Unit
 ) {
 
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -133,7 +137,7 @@ fun HomeScreenContent(
 
             BottomNavItem.Profile -> {
                 ProfileTabContent(
-                    onNavigateToSplash = onNavigateToSplash
+                    onLogout = onLogout
                 )
             }
         }

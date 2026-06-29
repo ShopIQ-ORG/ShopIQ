@@ -56,7 +56,7 @@ fun CategoryCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.category_fill),
+                        painter = painterResource(id = R.drawable.logo_light),
                         contentDescription = category.title,
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                         modifier = Modifier.size(48.dp)
