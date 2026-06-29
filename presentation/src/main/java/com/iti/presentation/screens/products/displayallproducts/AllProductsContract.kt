@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products
+package com.iti.presentation.screens.products.displayallproducts
 
 import com.iti.domain.models.Product
 import com.iti.presentation.core.UiText

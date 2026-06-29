@@ -31,17 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
-import com.iti.domain.models.Brand
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.BrandCard
-import com.iti.presentation.components.CustomNetworkImage
 import com.iti.presentation.components.NoInternetScreen
 import org.koin.androidx.compose.koinViewModel
 

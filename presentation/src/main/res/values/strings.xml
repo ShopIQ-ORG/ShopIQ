@@ -130,6 +130,8 @@
     <string name="sort_price_low_high">Price: Low to High</string>
     <string name="sort_price_high_low">Price: High to Low</string>
     <string name="sort_apply">Apply Sorting</string>
+    <string name="sort_price_asc_label">↑ Price</string>
+    <string name="sort_price_desc_label">↓ Price</string>
 
     <!-- Popular Search Chips -->
     <string name="popular_snowboard">Snowboard</string>
@@ -149,4 +151,7 @@
     <string name="cd_search">Search</string>
     <string name="cd_filter">Filter</string>
     <string name="cd_sort">Sort</string>
-</resources>
+
+    <!-- Product Details -->
+    <string name="product_details">Product Details</string>
+</resources>

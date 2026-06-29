@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products
+package com.iti.presentation.screens.products.displayallproducts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,8 +7,8 @@ import com.iti.domain.models.Result
 import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
 import com.iti.presentation.R
 import com.iti.presentation.core.UiText
-import com.iti.presentation.screens.products.AllProductsContract.FilterState
-import com.iti.presentation.screens.products.AllProductsContract.SortOption
+import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.FilterState
+import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.SortOption
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

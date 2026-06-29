@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.components
+package com.iti.presentation.screens.products.displayallproducts.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,7 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.screens.products.AllProductsContract.FilterState
+import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.FilterState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

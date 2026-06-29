@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.components
+package com.iti.presentation.screens.products.displayallproducts.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.screens.products.AllProductsContract.SortOption
+import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.SortOption
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

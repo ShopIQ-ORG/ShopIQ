@@ -1,4 +1,4 @@
-package com.iti.presentation.productdetails
+package com.iti.presentation.screens.products.productdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

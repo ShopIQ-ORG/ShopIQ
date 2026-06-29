@@ -20,4 +20,7 @@
     <string name="error_loading_products">خطأ في تحميل المنتجات</string>
     <string name="no_products_found">لم يتم العثور على منتجات</string>
     <string name="clear_filter">إلغاء التصفية</string>
+    <string name="product_details">تفاصيل المنتج</string>
+    <string name="sort_price_asc_label">↑ السعر</string>
+    <string name="sort_price_desc_label">↓ السعر</string>
 </resources>

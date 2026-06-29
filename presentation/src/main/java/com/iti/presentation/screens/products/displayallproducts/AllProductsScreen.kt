@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products
+package com.iti.presentation.screens.products.displayallproducts
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -59,12 +59,16 @@ import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.NoResultsFeedback
 import com.iti.presentation.components.ProductCard
-import com.iti.presentation.screens.products.components.AllProductsShimmer
-import com.iti.presentation.screens.products.components.FilterBottomSheet
-import com.iti.presentation.screens.products.components.SortBottomSheet
+import com.iti.presentation.screens.products.displayallproducts.components.FilterBottomSheet
+import com.iti.presentation.screens.products.displayallproducts.components.SortBottomSheet
+import com.iti.presentation.screens.products.displayallproducts.components.ActiveFiltersRow
+import com.iti.presentation.screens.products.displayallproducts.components.FilterBanner
+import com.iti.presentation.screens.products.displayallproducts.components.ProductsHeaderControls
+import com.iti.presentation.screens.products.displayallproducts.components.AllProductsShimmer
+import androidx.compose.foundation.ExperimentalFoundationApi
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AllProductsScreen(
     brandName: String? = null,
@@ -144,174 +148,15 @@ fun AllProductsScreen(
                 else -> 0
             }
 
-            // ── Filter, Sort, and Count Row ──────────────────────────────────
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Filter Button
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(50.dp)
-                        )
-                        .clickable { viewModel.sendIntent(AllProductsContract.Intent.OpenFilterSheet) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = stringResource(R.string.cd_filter),
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = stringResource(R.string.filter_button_label),
-                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (filterCount > 0) {
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(16.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "!",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                }
-
-                // Sort Button
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(50.dp)
-                        )
-                        .clickable { viewModel.sendIntent(AllProductsContract.Intent.OpenSortSheet) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.Sort,
-                        contentDescription = stringResource(R.string.cd_sort),
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = stringResource(R.string.sort_button_label),
-                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Count text
-                Text(
-                    text = stringResource(R.string.products_count, productCount),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // ── Horizontal Subcategory Scrollable Chips Row ──────────────────
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // "All" chip
-                item {
-                    val isAllSelected = state.filterState.selectedCategory == null
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50.dp))
-                            .background(
-                                if (isAllSelected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = if (isAllSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                                shape = RoundedCornerShape(50.dp)
-                            )
-                            .clickable {
-                                viewModel.sendIntent(AllProductsContract.Intent.SelectCategory(null))
-                            }
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.all_subcategory),
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Medium
-                            ),
-                            color = if (isAllSelected) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                // Subcategory chips
-                items(state.availableCategories) { category ->
-                    val isSelected = state.filterState.selectedCategory == category
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50.dp))
-                            .background(
-                                if (isSelected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                            )
-                            .border(
-                                width = 1.dp,
-                                color = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                                shape = RoundedCornerShape(50.dp)
-                            )
-                            .clickable {
-                                viewModel.sendIntent(AllProductsContract.Intent.SelectCategory(category))
-                            }
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = category,
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                            ),
-                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
+            // ── Products Header Controls (Filter, Sort, Category chips) ─────
+            ProductsHeaderControls(
+                state = state,
+                filterCount = filterCount,
+                productCount = productCount,
+                onFilterClick = { viewModel.sendIntent(AllProductsContract.Intent.OpenFilterSheet) },
+                onSortClick = { viewModel.sendIntent(AllProductsContract.Intent.OpenSortSheet) },
+                onCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.SelectCategory(it)) }
+            )
 
             // ── Main Grid Content ────────────────────────────────────────────
             when (val screenState = state.screenState) {
@@ -429,89 +274,5 @@ fun AllProductsScreen(
                 onDismiss = { viewModel.sendIntent(AllProductsContract.Intent.CloseSortSheet) }
             )
         }
-    }
-}
-
-// ── Active Filters Summary Row ─────────────────────────────────────────────────
-@Composable
-private fun ActiveFiltersRow(
-    state: AllProductsContract.State,
-    onRemoveBrand: (String) -> Unit,
-    onRemoveSort: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        if (state.sortOption != AllProductsContract.SortOption.BEST_SELLING) {
-            ActiveChip(
-                label = when (state.sortOption) {
-                    AllProductsContract.SortOption.PRICE_ASC  -> "↑ Price"
-                    AllProductsContract.SortOption.PRICE_DESC -> "↓ Price"
-                    AllProductsContract.SortOption.BEST_SELLING -> ""
-                },
-                onRemove = onRemoveSort
-            )
-        }
-    }
-}
-
-@Composable
-private fun ActiveChip(label: String, onRemove: () -> Unit) {
-    FilterChip(
-        selected = true,
-        onClick = onRemove,
-        label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Medium
-            )
-        },
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.clear_filter),
-                modifier = Modifier.size(14.dp)
-            )
-        },
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    )
-}
-
-// ── Legacy Brand Filter Banner ─────────────────────────────────────────────────
-@Composable
-private fun FilterBanner(
-    brandName: String,
-    onClear: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        FilterChip(
-            selected = true,
-            onClick = onClear,
-            label = { Text(text = brandName, style = MaterialTheme.typography.labelMedium) },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.clear_filter),
-                    modifier = Modifier.size(16.dp)
-                )
-            },
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        )
     }
 }
