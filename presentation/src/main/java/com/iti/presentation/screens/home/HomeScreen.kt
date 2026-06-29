@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
@@ -94,11 +95,9 @@ fun HomeScreenContent(
                         },
                         icon = {
                             Icon(
-                                imageVector =
-                                    if (selectedIndex == index)
-                                        item.selectedIcon
-                                    else
-                                        item.unselectedIcon,
+                                painter = painterResource(
+                                    id = if (selectedIndex == index) item.selectedIcon else item.unselectedIcon
+                                ),
                                 contentDescription = item.label
                             )
                         },

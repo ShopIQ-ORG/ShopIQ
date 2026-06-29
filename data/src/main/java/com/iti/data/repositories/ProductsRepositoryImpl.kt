@@ -7,9 +7,11 @@ import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
 import com.iti.data.mappers.toDomainProducts
 import com.iti.data.mappers.toDomainProduct
+import com.iti.data.mappers.toDomainCategories
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
+import com.iti.domain.models.Category
 import com.iti.domain.models.Money
 import com.iti.domain.models.ProductImage
 import com.iti.domain.models.Result
@@ -28,7 +30,6 @@ class ProductsRepositoryImpl(
             val domainProducts = shopifyResponse.toDomainProducts()
             emit(Result.Success(domainProducts))
         } catch (e: Exception) {
-            Log.e("TAG", "getProductsByNumber: ", e )
             emit(Result.Failure(e.handleException()))
         }
     }
@@ -59,6 +60,17 @@ class ProductsRepositoryImpl(
             val response = remoteDataSource.getProductDetails(productId)
             val domainProduct = response.toDomainProduct()
             emit(Result.Success(domainProduct))
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun getMainCategories(): Flow<Result<List<Category>>> = flow {
+        emit(Result.Loading)
+        try {
+            val data = remoteDataSource.getMainCategories()
+            val categories = data.toDomainCategories()
+            emit(Result.Success(categories))
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }

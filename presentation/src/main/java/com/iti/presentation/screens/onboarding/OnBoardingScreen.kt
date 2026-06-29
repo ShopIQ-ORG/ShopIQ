@@ -103,7 +103,7 @@ fun OnboardingScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) { page ->
-                val slide = getOnboardingSlides(isDark)[page]
+                val slide = getOnboardingSlides()[page]
                 val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
                 val alpha = 0.5f + 0.5f * (1f - pageOffset.coerceIn(0f, 1f))
                 val scale = 0.85f + 0.15f * (1f - pageOffset.coerceIn(0f, 1f))
@@ -167,19 +167,19 @@ fun OnboardingScreen(
     }
 }
 
-private fun getOnboardingSlides(isDark: Boolean) = listOf(
+private fun getOnboardingSlides() = listOf(
     OnboardingSlide(
-        imagePath = if (isDark) Constants.ONBOARDING_IMAGE_1_DARK else Constants.ONBOARDING_IMAGE_1,
+        imageRes = com.iti.presentation.R.drawable.onboarding_1,
         title = Constants.ONBOARDING_TITLE_1,
         description = Constants.ONBOARDING_DESC_1
     ),
     OnboardingSlide(
-        imagePath = if (isDark) Constants.ONBOARDING_IMAGE_2_DARK else Constants.ONBOARDING_IMAGE_2,
+        imageRes = com.iti.presentation.R.drawable.onboarding_2,
         title = Constants.ONBOARDING_TITLE_2,
         description = Constants.ONBOARDING_DESC_2
     ),
     OnboardingSlide(
-        imagePath = if (isDark) Constants.ONBOARDING_IMAGE_3_DARK else Constants.ONBOARDING_IMAGE_3,
+        imageRes = com.iti.presentation.R.drawable.onboarding_3,
         title = Constants.ONBOARDING_TITLE_3,
         description = Constants.ONBOARDING_DESC_3
     )

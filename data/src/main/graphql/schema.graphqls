@@ -132,6 +132,14 @@ type PageInfo {
   endCursor: String
 }
 
+enum CollectionSortKeys {
+  TITLE
+  ID
+  HANDLE
+  RELEVANCE
+  UPDATED_AT
+}
+
 type CollectionConnection {
   edges: [CollectionEdge!]!
   pageInfo: PageInfo!
@@ -145,7 +153,11 @@ type CollectionEdge {
 type Collection {
   id: ID!
   title: String!
-  description: String!
   handle: String!
   image: Image
+  productsCount: CollectionProductsCount!
+}
+
+type CollectionProductsCount {
+  count: Int!
 }

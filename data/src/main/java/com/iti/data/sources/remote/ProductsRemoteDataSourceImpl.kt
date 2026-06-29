@@ -2,6 +2,7 @@ package com.iti.data.sources.remote
 
 import com.apollographql.apollo.ApolloClient
 import com.iti.data.GetCollectionsQuery
+import com.iti.data.GetMainCategoriesQuery
 import com.iti.data.GetProductsQuery
 import com.iti.data.GetProductDetailsQuery
 import com.iti.data.dto.AdDto
@@ -77,5 +78,17 @@ class ProductsRemoteDataSourceImpl(
                 subtitle = node.title.uppercase()
             )
         }
+    }
+
+    override suspend fun getMainCategories(): GetMainCategoriesQuery.Data {
+        val response = apolloClient.query(GetMainCategoriesQuery()).execute()
+
+        if (response.hasErrors()) {
+            throw Exception(
+                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
+            )
+        }
+
+        return response.data ?: throw Exception("Response data is null")
     }
 }

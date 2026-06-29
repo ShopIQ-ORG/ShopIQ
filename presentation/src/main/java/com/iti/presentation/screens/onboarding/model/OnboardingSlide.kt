@@ -1,7 +1,7 @@
 package com.iti.presentation.screens.onboarding.model
 
 data class OnboardingSlide(
-    val imagePath: String,
+    val imageRes: Int,
     val title: String,
     val description: String
 )

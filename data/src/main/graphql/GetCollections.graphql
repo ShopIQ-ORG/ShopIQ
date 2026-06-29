@@ -4,7 +4,6 @@ query GetCollections($first: Int!) {
             node {
                 id
                 title
-                description
                 handle
                 image {
                     url

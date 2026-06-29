@@ -1,6 +1,8 @@
 package com.iti.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -12,10 +14,12 @@ import com.iti.presentation.screens.onboarding.OnboardingScreen
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.auth.signin.SignInScreen
 import com.iti.presentation.screens.auth.signup.SignUpScreen
+import com.iti.presentation.screens.splash.SplashDestination
 import com.iti.presentation.screens.splash.SplashScreen
-import org.koin.androidx.compose.koinViewModel
+import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
 import com.iti.presentation.screens.products.AllProductsScreen
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
@@ -27,8 +31,20 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<Screen.Splash> {
+                val viewModel: SplashViewModel = koinViewModel()
+                val destination by viewModel.destination.collectAsState()
+
                 SplashScreen(
-                    onAnimationComplete = { backStack.add(Screen.OnBoarding) }
+                    onAnimationComplete = {
+                        destination?.let {
+                            backStack.clear()
+                            when (it) {
+                                is SplashDestination.OnBoarding -> backStack.add(Screen.OnBoarding)
+                                is SplashDestination.SignIn -> backStack.add(Screen.SignIn)
+                                is SplashDestination.Home -> backStack.add(Screen.Home)
+                            }
+                        }
+                    }
                 )
             }
 
@@ -62,19 +78,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         backStack.add(Screen.Splash)
                     },
                     onNavigateToProduct = { productId ->
-                        backStack.add(
-                            Screen.ProductDetails(
-                                productId = productId
-                            )
-                        )
+                        backStack.add(Screen.ProductDetails(productId = productId))
                     },
                     onNavigateToAllBrands = { backStack.add(Screen.AllBrands) },
                     onNavigateToAllProducts = { brandName ->
-                        backStack.add(
-                            Screen.AllProducts(
-                                brandName
-                            )
-                        )
+                        backStack.add(Screen.AllProducts(brandName))
                     }
                 )
             }
@@ -83,11 +91,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AllBrandsScreen(
                     onNavigateBack = { backStack.removeLastOrNull() },
                     onNavigateToAllProducts = { brandName ->
-                        backStack.add(
-                            Screen.AllProducts(
-                                brandName
-                            )
-                        )
+                        backStack.add(Screen.AllProducts(brandName))
                     }
                 )
             }
