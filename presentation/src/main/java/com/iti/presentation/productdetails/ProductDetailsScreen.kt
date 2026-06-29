@@ -40,6 +40,7 @@ import com.iti.presentation.ui.theme.BackgroundLight
 import com.iti.presentation.ui.theme.PrimaryLight
 import com.iti.presentation.ui.theme.TextPrimaryDark
 import com.iti.presentation.ui.theme.TextPrimaryLight
+import com.iti.presentation.components.NoInternetScreen
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,38 +135,19 @@ fun ProductDetailsScreen(
     ) { innerPadding ->
         when {
             state.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
-            }
-            state.error != null -> {
-                Box(
+                ProductDetailsShimmer(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(id = R.string.error_message, state.error ?: ""),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = { viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId)) },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text(stringResource(id = R.string.btn_retry))
-                        }
-                    }
-                }
+                )
+            }
+            state.error != null -> {
+                NoInternetScreen(
+                    onRetry = { viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId)) },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
             }
             state.product != null -> {
                 val product = state.product!!
@@ -541,7 +523,8 @@ fun BottomActionBar(
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = BackgroundLight,
                     contentColor = TextPrimaryLight
-                )
+                ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Icon(
                     imageVector = if (isWishlisted) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -567,7 +550,8 @@ fun BottomActionBar(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = BackgroundDark,
                     contentColor = TextPrimaryDark
-                )
+                ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,

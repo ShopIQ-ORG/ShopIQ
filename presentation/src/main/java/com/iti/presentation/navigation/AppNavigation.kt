@@ -104,7 +104,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.AllProducts> { allProductsScreen ->
                 AllProductsScreen(
                     brandName = allProductsScreen.brandName,
-                    onNavigateBack = { backStack.removeLastOrNull() }
+                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateToProduct = { productId ->
+                        backStack.add(Screen.ProductDetails(productId = productId))
+                    }
                 )
             }
 

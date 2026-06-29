@@ -9,10 +9,12 @@ import com.iti.presentation.screens.brands.AllBrandsViewModel
 import com.iti.presentation.screens.category.CategoryViewModel
 import com.iti.presentation.screens.products.AllProductsViewModel
 import com.iti.presentation.screens.splash.SplashViewModel
+import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
+    single { NetworkMonitor(get()) }
     viewModel { HomeViewModel(get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get(), get()) }

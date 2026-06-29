@@ -30,9 +30,10 @@ import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.AppTopBar
 import com.iti.presentation.components.SearchBar
+import com.iti.presentation.components.NoInternetScreen
+import com.iti.presentation.components.NoResultsFeedback
 import com.iti.presentation.screens.category.components.CategoryCard
 import com.iti.presentation.screens.category.components.CategoryCardShimmer
-import com.iti.presentation.util.Constants
 import com.valentinilk.shimmer.shimmer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,51 +65,73 @@ fun CategoryScreen(
             )
         }
     ) { innerPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding() + 8.dp,
-                bottom = bottomPadding + 16.dp,
-                start = 16.dp,
-                end = 16.dp
-            ),
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .then(if (state.isLoading) Modifier.shimmer() else Modifier)
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                    SearchBar()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = Constants.CATEGORY_SECTION_TITLE,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+        if (state.errorMessage != null) {
+            NoInternetScreen(
+                onRetry = { viewModel.sendIntent(CategoryContract.Intent.LoadCategories) },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(
+                    top = innerPadding.calculateTopPadding() + 8.dp,
+                    bottom = bottomPadding + 16.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .then(if (state.isLoading) Modifier.shimmer() else Modifier)
+            ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                        SearchBar(
+                            value = state.searchQuery,
+                            placeholderText = stringResource(id = R.string.category_search_placeholder),
+                            onValueChanged = {
+                                viewModel.sendIntent(CategoryContract.Intent.SearchQueryChanged(it))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(id = R.string.category_section_title),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                 }
-            }
 
-            if (state.isLoading) {
-                items(6) {
-                    CategoryCardShimmer()
-                }
-            } else {
-                items(
-                    items = filteredCategories,
-                    key = { it.id }
-                ) { category ->
-                    CategoryCard(
-                        category = category,
-                        onClick = {
-                            viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
-                        }
-                    )
+                if (state.isLoading) {
+                    items(6) {
+                        CategoryCardShimmer()
+                    }
+                } else if (filteredCategories.isEmpty() && state.searchQuery.isNotEmpty()) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        NoResultsFeedback(
+                            query = state.searchQuery,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
+                } else {
+                    items(
+                        items = filteredCategories,
+                        key = { it.id }
+                    ) { category ->
+                        CategoryCard(
+                            category = category,
+                            onClick = {
+                                viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
+                            }
+                        )
+                    }
                 }
             }
         }

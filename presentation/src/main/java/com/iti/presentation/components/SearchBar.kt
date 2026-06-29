@@ -24,10 +24,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
+
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
     value: String = "",
+    placeholderText: String = stringResource(id = R.string.search_placeholder),
     onValueChanged: (String) -> Unit = {}
 ) {
     BasicTextField(
@@ -63,7 +67,7 @@ fun SearchBar(
                     Box {
                         if (value.isEmpty()) {
                             Text(
-                                "Search for products, brands...",
+                                text = placeholderText,
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

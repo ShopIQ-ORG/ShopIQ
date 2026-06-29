@@ -26,6 +26,7 @@ import com.iti.presentation.R
 import coil.compose.AsyncImage
 import com.iti.presentation.screens.category.model.CategoryItem
 import com.iti.presentation.util.Constants
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun CategoryCard(
@@ -66,8 +67,8 @@ fun CategoryCard(
                 AsyncImage(
                     model = category.imageAssetPath,
                     contentDescription = category.title,
-                    error = painterResource(id = R.drawable.category_fill),
-                    fallback = painterResource(id = R.drawable.category_fill),
+                    error = painterResource(id = R.drawable.logo_light),
+                    fallback = painterResource(id = R.drawable.logo_light),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(140.dp)
@@ -87,7 +88,7 @@ fun CategoryCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = "${category.itemCount} ${Constants.CATEGORY_ITEMS_SUFFIX}",
+                text = stringResource(id = R.string.category_items_count, category.itemCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

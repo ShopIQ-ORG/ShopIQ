@@ -29,11 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.iti.presentation.R
 import com.iti.presentation.screens.onboarding.components.OnboardingIndicator
 import com.iti.presentation.screens.onboarding.components.OnboardingSlideContent
 import com.iti.presentation.screens.onboarding.model.OnboardingSlide
@@ -88,7 +90,7 @@ fun OnboardingScreen(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Text(
-                    text = "Skip",
+                    text = stringResource(id = R.string.onboarding_skip),
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.clickable {
@@ -149,7 +151,7 @@ fun OnboardingScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if (isLastPage) "Get Started" else "Next",
+                            text = if (isLastPage) stringResource(id = R.string.onboarding_get_started) else stringResource(id = R.string.onboarding_next),
                             style = MaterialTheme.typography.labelLarge
                         )
                         if (!isLastPage) {
@@ -167,20 +169,21 @@ fun OnboardingScreen(
     }
 }
 
+@Composable
 private fun getOnboardingSlides() = listOf(
     OnboardingSlide(
         imageRes = com.iti.presentation.R.drawable.onboarding_1,
-        title = Constants.ONBOARDING_TITLE_1,
-        description = Constants.ONBOARDING_DESC_1
+        title = stringResource(id = R.string.onboarding_title_1),
+        description = stringResource(id = R.string.onboarding_desc_1)
     ),
     OnboardingSlide(
         imageRes = com.iti.presentation.R.drawable.onboarding_2,
-        title = Constants.ONBOARDING_TITLE_2,
-        description = Constants.ONBOARDING_DESC_2
+        title = stringResource(id = R.string.onboarding_title_2),
+        description = stringResource(id = R.string.onboarding_desc_2)
     ),
     OnboardingSlide(
         imageRes = com.iti.presentation.R.drawable.onboarding_3,
-        title = Constants.ONBOARDING_TITLE_3,
-        description = Constants.ONBOARDING_DESC_3
+        title = stringResource(id = R.string.onboarding_title_3),
+        description = stringResource(id = R.string.onboarding_desc_3)
     )
 )

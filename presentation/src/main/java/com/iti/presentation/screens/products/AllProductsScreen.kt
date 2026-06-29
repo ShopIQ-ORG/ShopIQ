@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
-import com.iti.presentation.components.ErrorScreen
+import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ProductCard
 import com.iti.presentation.screens.products.components.AllProductsShimmer
 import org.koin.androidx.compose.koinViewModel
@@ -47,6 +47,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AllProductsScreen(
     brandName: String? = null,
     onNavigateBack: () -> Unit,
+    onNavigateToProduct: (Long) -> Unit,
     viewModel: AllProductsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,7 +60,10 @@ fun AllProductsScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is AllProductsContract.Effect.NavigateToProduct -> {}
+                is AllProductsContract.Effect.NavigateToProduct -> {
+                    val idLong = effect.productId.substringAfterLast("/").toLong()
+                    onNavigateToProduct(idLong)
+                }
             }
         }
     }
@@ -98,9 +102,11 @@ fun AllProductsScreen(
                 }
 
                 is AllProductsContract.ScreenState.Failure -> {
-                    ErrorScreen(
-                        message = screenState.message,
-                        onRetry = { viewModel.sendIntent(AllProductsContract.Intent.Retry) }
+                    NoInternetScreen(
+                        onRetry = { viewModel.sendIntent(AllProductsContract.Intent.Retry) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     )
                 }
 

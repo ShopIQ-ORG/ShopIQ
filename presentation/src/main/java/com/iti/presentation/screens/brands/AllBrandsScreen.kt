@@ -42,7 +42,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.BrandCard
 import com.iti.presentation.components.CustomNetworkImage
-import com.iti.presentation.components.ErrorScreen
+import com.iti.presentation.components.NoInternetScreen
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,9 +81,11 @@ fun AllBrandsScreen(
             }
 
             is AllBrandsContract.ScreenState.Failure -> {
-                ErrorScreen(
-                    message = screenState.message,
-                    onRetry = { viewModel.sendIntent(AllBrandsContract.Intent.Retry) }
+                NoInternetScreen(
+                    onRetry = { viewModel.sendIntent(AllBrandsContract.Intent.Retry) },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 )
             }
 

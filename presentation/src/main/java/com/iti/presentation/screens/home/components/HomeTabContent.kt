@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,8 +31,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.AppTopBar
-import com.iti.presentation.components.ErrorScreen
-import com.iti.presentation.components.ProductsStaticGrid
+import com.iti.presentation.components.NoInternetScreen
+import com.iti.presentation.components.ProductCard
 import com.iti.presentation.components.SearchBar
 import com.iti.presentation.screens.home.HomeContract
 
@@ -63,9 +66,11 @@ fun HomeTabContent(
             }
 
             is HomeContract.ScreenState.Failure -> {
-                ErrorScreen(
-                    message = screenState.message,
-                    onRetry = { onIntent(HomeContract.Intent.Retry) }
+                NoInternetScreen(
+                    onRetry = { onIntent(HomeContract.Intent.Retry) },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 )
             }
 
@@ -112,11 +117,20 @@ fun HomeTabContent(
                     }
 
                     item {
-                        ProductsStaticGrid(
-                            products = data.products.take(6),
-                            onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) },
-                            onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(it)) }
-                        )
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(data.products.take(6)) { product ->
+                                ProductCard(
+                                    product = product,
+                                    onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
+                                    onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                    modifier = Modifier.width(160.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
