@@ -1,4 +1,4 @@
-package com.iti.presentation.components
+package com.iti.presentation.screens.home.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.Brand
+import com.iti.presentation.components.BrandCard
 
 @Composable
 fun BrandsRow(

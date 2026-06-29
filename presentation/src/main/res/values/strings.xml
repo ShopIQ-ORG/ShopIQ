@@ -62,4 +62,12 @@
     <string name="error_loading_products">Error loading products</string>
     <string name="clicked_product">Clicked %1$s</string>
     <string name="categories_title">Categories</string>
+    <string name="error_loading_brands">Failed to load brands</string>
+    <string name="error_loading_ads">Failed to load ads</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="brands_title">Brands</string>
+    <string name="all_products_title">All Products</string>
+    <string name="no_products_found">No products found</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>

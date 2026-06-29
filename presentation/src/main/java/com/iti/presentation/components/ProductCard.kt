@@ -2,6 +2,8 @@ package com.iti.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,10 +40,17 @@ fun ProductCard(
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) {
+                onClick()
+            }
     ) {
         Box(
             modifier = Modifier
@@ -50,7 +60,7 @@ fun ProductCard(
                 .background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
             CustomNetworkImage(
-                imageUrl = product.images.firstOrNull()?.url ?: "",
+                imageUrl = product.images.firstOrNull()?.url.orEmpty(),
                 contentDescription = product.title,
                 modifier = Modifier.matchParentSize()
             )
@@ -58,17 +68,23 @@ fun ProductCard(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(6.dp)
-                    .size(24.dp)
-                    .background(MaterialTheme.colorScheme.background, CircleShape)
-                    .clickable { onFavoriteClick() },
+                    .padding(8.dp)
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        onFavoriteClick()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(13.dp)
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
@@ -94,20 +110,27 @@ fun ProductCard(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = "Rating",
                 tint = Color(0xFFF9A825),
                 modifier = Modifier.size(14.dp)
             )
+
             Spacer(modifier = Modifier.width(4.dp))
+
             Text(
                 text = "4.6",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
             Spacer(modifier = Modifier.width(4.dp))
+
             Text(
                 text = "(128)",
                 style = MaterialTheme.typography.labelSmall,

@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.iti.presentation.productdetails.ProductDetailsScreen
 import com.iti.presentation.screens.home.HomeScreen
 import com.iti.presentation.screens.onboarding.OnboardingScreen
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
@@ -60,15 +61,34 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         backStack.clear()
                         backStack.add(Screen.Splash)
                     },
+                    onNavigateToProduct = { productId ->
+                        backStack.add(
+                            Screen.ProductDetails(
+                                productId = productId
+                            )
+                        )
+                    },
                     onNavigateToAllBrands = { backStack.add(Screen.AllBrands) },
-                    onNavigateToAllProducts = { brandName -> backStack.add(Screen.AllProducts(brandName)) }
+                    onNavigateToAllProducts = { brandName ->
+                        backStack.add(
+                            Screen.AllProducts(
+                                brandName
+                            )
+                        )
+                    }
                 )
             }
 
             entry<Screen.AllBrands> {
                 AllBrandsScreen(
                     onNavigateBack = { backStack.removeLastOrNull() },
-                    onNavigateToAllProducts = { brandName -> backStack.add(Screen.AllProducts(brandName)) }
+                    onNavigateToAllProducts = { brandName ->
+                        backStack.add(
+                            Screen.AllProducts(
+                                brandName
+                            )
+                        )
+                    }
                 )
             }
 
@@ -76,6 +96,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AllProductsScreen(
                     brandName = allProductsScreen.brandName,
                     onNavigateBack = { backStack.removeLastOrNull() }
+                )
+            }
+
+            entry<Screen.ProductDetails> { productDetailsScreen ->
+                ProductDetailsScreen(
+                    productId = productDetailsScreen.productId,
+                    onBackClick = { backStack.removeLastOrNull() }
                 )
             }
         }

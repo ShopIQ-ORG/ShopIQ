@@ -51,7 +51,7 @@ fun ProductsStaticGrid(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        products.chunked(2).forEach { rowProducts ->
+        products.take(6).chunked(2).forEach { rowProducts ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)

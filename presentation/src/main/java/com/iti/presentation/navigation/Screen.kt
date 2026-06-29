@@ -8,4 +8,6 @@ sealed class Screen {
     data object Home : Screen()
     data object AllBrands : Screen()
     data class AllProducts(val brandName: String? = null) : Screen()
+
+    data class ProductDetails(val productId: Long) : Screen()
 }

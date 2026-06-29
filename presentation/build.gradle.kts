@@ -89,7 +89,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
-
+    implementation(libs.compose.shimmer)
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(libs.googleid)

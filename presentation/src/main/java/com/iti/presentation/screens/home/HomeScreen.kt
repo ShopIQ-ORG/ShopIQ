@@ -1,7 +1,5 @@
 package com.iti.presentation.screens.home
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Icon
@@ -11,6 +9,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -18,10 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.iti.domain.models.Ad
-import com.iti.domain.models.Brand
-import com.iti.domain.models.Product
-import com.iti.domain.models.Result
 import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
@@ -34,32 +29,50 @@ fun HomeScreen(
     onNavigateToSplash: () -> Unit,
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
+    onNavigateToProduct: (Long) -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val productsResult by viewModel.products.collectAsState()
-    val brandsResult by viewModel.brands.collectAsState()
-    val adsResult by viewModel.ads.collectAsState()
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+
+                is HomeContract.Effect.NavigateToAllBrands -> {
+                    onNavigateToAllBrands()
+                }
+
+                HomeContract.Effect.NavigateToAllProducts -> {
+                    onNavigateToAllProducts(null)
+                }
+
+                is HomeContract.Effect.NavigateToProduct -> {
+                    onNavigateToProduct(effect.productId)
+                }
+
+                is HomeContract.Effect.NavigateToProducts -> {
+                    onNavigateToAllProducts(effect.brandName)
+                }
+            }
+        }
+    }
 
     HomeScreenContent(
-        onNavigateToSplash = onNavigateToSplash,
-        onNavigateToAllBrands = onNavigateToAllBrands,
-        onNavigateToAllProducts = onNavigateToAllProducts,
-        productsResult = productsResult,
-        brandsResult = brandsResult,
-        adsResult = adsResult
+        state = state,
+        onIntent = viewModel::sendIntent,
+        onNavigateToSplash = onNavigateToSplash
     )
 }
 
 @Composable
 fun HomeScreenContent(
-    onNavigateToSplash: () -> Unit,
-    onNavigateToAllBrands: () -> Unit = {},
-    onNavigateToAllProducts: (String?) -> Unit = {},
-    productsResult: Result<List<Product>> = Result.Loading,
-    brandsResult: Result<List<Brand>> = Result.Loading,
-    adsResult: Result<List<Ad>> = Result.Loading
+    state: HomeContract.State,
+    onIntent: (HomeContract.Intent) -> Unit,
+    onNavigateToSplash: () -> Unit
 ) {
+
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+
     val navItems = BottomNavItem.entries
 
     Scaffold(
@@ -71,40 +84,59 @@ fun HomeScreenContent(
                 containerColor = MaterialTheme.colorScheme.background,
                 tonalElevation = 0.dp
             ) {
+
                 navItems.forEachIndexed { index, item ->
-                    val isSelected = selectedIndex == index
+
                     NavigationBarItem(
+                        selected = selectedIndex == index,
+                        onClick = {
+                            selectedIndex = index
+                        },
                         icon = {
                             Icon(
-                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                imageVector =
+                                    if (selectedIndex == index)
+                                        item.selectedIcon
+                                    else
+                                        item.unselectedIcon,
                                 contentDescription = item.label
                             )
                         },
                         label = {
-                            Text(text = item.label, style = MaterialTheme.typography.labelSmall)
-                        },
-                        selected = isSelected,
-                        onClick = { selectedIndex = index }
+                            Text(item.label)
+                        }
                     )
                 }
             }
         }
-    ) { outerPadding ->
+    ) { padding ->
+
         when (navItems[selectedIndex]) {
-            BottomNavItem.Home -> HomeTabContent(
-                productsResult = productsResult,
-                brandsResult = brandsResult,
-                adsResult = adsResult,
-                onNavigateToAllBrands = onNavigateToAllBrands,
-                onNavigateToAllProducts = onNavigateToAllProducts,
-                bottomPadding = outerPadding.calculateBottomPadding()
-            )
-            BottomNavItem.Category -> CategoryScreen(
-                viewModel = koinViewModel(),
-                bottomPadding = outerPadding.calculateBottomPadding()
-            )
-            BottomNavItem.Wishlist -> WishlistTabContent()
-            BottomNavItem.Profile -> ProfileTabContent(onNavigateToSplash = onNavigateToSplash)
+
+            BottomNavItem.Home -> {
+                HomeTabContent(
+                    state = state,
+                    onIntent = onIntent,
+                    bottomPadding = padding.calculateBottomPadding()
+                )
+            }
+
+            BottomNavItem.Category -> {
+                CategoryScreen(
+                    viewModel = koinViewModel(),
+                    bottomPadding = padding.calculateBottomPadding()
+                )
+            }
+
+            BottomNavItem.Wishlist -> {
+                WishlistTabContent()
+            }
+
+            BottomNavItem.Profile -> {
+                ProfileTabContent(
+                    onNavigateToSplash = onNavigateToSplash
+                )
+            }
         }
     }
 }
