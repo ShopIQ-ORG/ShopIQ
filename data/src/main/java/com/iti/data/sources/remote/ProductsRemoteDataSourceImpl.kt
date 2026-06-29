@@ -17,8 +17,6 @@ class ProductsRemoteDataSourceImpl(
         val response = apolloClient.query(
             GetProductsQuery(
                 first = first,
-                sortKey = com.apollographql.apollo.api.Optional.present(com.iti.data.type.ProductSortKeys.BEST_SELLING),
-                reverse = com.apollographql.apollo.api.Optional.present(true)
             )
         ).execute()
 

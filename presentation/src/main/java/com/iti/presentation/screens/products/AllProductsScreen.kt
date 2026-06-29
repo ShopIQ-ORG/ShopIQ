@@ -13,17 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
-import com.iti.presentation.components.ProductItem
+import com.iti.presentation.components.ProductCard
 import com.iti.presentation.screens.home.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,24 +59,11 @@ fun AllProductsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (activeBrand != null) "$activeBrand Products" else "Featured Products", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
             // Filter banner if a brand filter is active
             if (activeBrand != null) {
                 Row(
@@ -128,7 +109,7 @@ fun AllProductsScreen(
                                 verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 items(products) { product ->
-                                    ProductItem(product = product)
+                                    ProductCard(product = product, onClick = {}, onFavoriteClick = {})
                                 }
                             }
                         }
@@ -147,4 +128,3 @@ fun AllProductsScreen(
             }
         }
     }
-}

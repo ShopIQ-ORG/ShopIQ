@@ -53,4 +53,13 @@
     <string name="error_google_sign_in_failed">Google Sign-In failed</string>
     <string name="error_facebook_activity_missing">Could not find a valid activity for Facebook login.</string>
     <string name="error_facebook_sign_in_failed">Facebook Sign-In failed</string>
+    <string name="home_title">Home</string>
+    <string name="top_brands">Top Brands</string>
+    <string name="featured_products">Featured Products</string>
+    <string name="view_all">View all &gt;</string>
+    <string name="shop_now">SHOP NOW</string>
+    <string name="no_brands_available">No brands available</string>
+    <string name="error_loading_products">Error loading products</string>
+    <string name="clicked_product">Clicked %1$s</string>
+    <string name="categories_title">Categories</string>
 </resources>

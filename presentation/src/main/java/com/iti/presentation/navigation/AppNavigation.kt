@@ -43,7 +43,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 SignInScreen(
                     onNavigateToSignUp = { backStack.add(Screen.SignUp) },
                     onNavigateToHome = { backStack.add(Screen.Home) },
-                    onNavigateToForgotPassword = { /* TODO: open forgot password screen */ }
+                    onNavigateToForgotPassword = { }
                 )
             }
 

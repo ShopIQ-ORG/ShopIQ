@@ -1,5 +1,7 @@
 package com.iti.data.repositories
 
+import android.util.Log
+import com.iti.data.core.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
@@ -26,7 +28,8 @@ class ProductsRepositoryImpl(
             val domainProducts = shopifyResponse.toDomainProducts()
             emit(Result.Success(domainProducts))
         } catch (e: Exception) {
-            emit(Result.Failure(e))
+            Log.e("TAG", "getProductsByNumber: ", e )
+            emit(Result.Failure(e.handleException()))
         }
     }
 
