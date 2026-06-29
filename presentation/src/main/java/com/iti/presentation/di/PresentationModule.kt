@@ -1,7 +1,7 @@
 package com.iti.presentation.di
 
 import com.iti.presentation.screens.home.HomeViewModel
-import com.iti.presentation.productdetails.ProductDetailsViewModel
+import com.iti.presentation.screens.productdetails.ProductDetailsViewModel
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.auth.signin.SignInViewModel
 import com.iti.presentation.screens.auth.signup.SignUpViewModel
