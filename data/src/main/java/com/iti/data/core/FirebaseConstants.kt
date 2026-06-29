@@ -1,6 +1,7 @@
 package com.iti.data.core
 
-object FirebaseConstants {
+object
+FirebaseConstants {
 
     object Collections {
         const val USERS = "users"

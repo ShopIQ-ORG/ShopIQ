@@ -1,6 +1,7 @@
 package com.iti.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -33,6 +34,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.Splash> {
                 val viewModel: SplashViewModel = koinViewModel()
                 val destination by viewModel.destination.collectAsState()
+
+                LaunchedEffect(Unit) {
+                    viewModel.checkDestination()
+                }
 
                 SplashScreen(
                     onAnimationComplete = {
@@ -99,7 +104,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.AllProducts> { allProductsScreen ->
                 AllProductsScreen(
                     brandName = allProductsScreen.brandName,
-                    onNavigateBack = { backStack.removeLastOrNull() }
+                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateToProduct = { productId ->
+                        backStack.add(Screen.ProductDetails(productId = productId))
+                    }
                 )
             }
 

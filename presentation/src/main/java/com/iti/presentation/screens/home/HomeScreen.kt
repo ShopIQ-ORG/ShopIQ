@@ -18,6 +18,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
+import com.iti.presentation.util.NetworkMonitor
+import org.koin.compose.koinInject
 import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
@@ -54,6 +62,10 @@ fun HomeScreen(
                 is HomeContract.Effect.NavigateToProducts -> {
                     onNavigateToAllProducts(effect.brandName)
                 }
+
+                HomeContract.Effect.NavigateToSplash -> {
+                    onNavigateToSplash()
+                }
             }
         }
     }
@@ -61,7 +73,7 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onIntent = viewModel::sendIntent,
-        onNavigateToSplash = onNavigateToSplash
+        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) }
     )
 }
 
@@ -69,8 +81,24 @@ fun HomeScreen(
 fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
-    onNavigateToSplash: () -> Unit
+    onLogout: () -> Unit
 ) {
+    val networkMonitor: NetworkMonitor = koinInject()
+    val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
+    val snackbarHostState = remember { SnackbarHostState() }
+    var wasConnected by remember { mutableStateOf(isConnected) }
+    val connectionLostMessage = stringResource(id = R.string.network_connection_lost)
+
+    LaunchedEffect(isConnected) {
+        if (!isConnected && wasConnected) {
+            if (state.screenState is HomeContract.ScreenState.Success) {
+                snackbarHostState.showSnackbar(
+                    message = connectionLostMessage
+                )
+            }
+        }
+        wasConnected = isConnected
+    }
 
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
 
@@ -79,6 +107,7 @@ fun HomeScreenContent(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             NavigationBar(
                 modifier = Modifier.navigationBarsPadding(),
@@ -133,7 +162,7 @@ fun HomeScreenContent(
 
             BottomNavItem.Profile -> {
                 ProfileTabContent(
-                    onNavigateToSplash = onNavigateToSplash
+                    onLogout = onLogout
                 )
             }
         }

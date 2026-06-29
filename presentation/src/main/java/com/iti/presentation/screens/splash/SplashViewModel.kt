@@ -25,21 +25,18 @@ class SplashViewModel(
     private val _destination = MutableStateFlow<SplashDestination?>(null)
     val destination: StateFlow<SplashDestination?> = _destination.asStateFlow()
 
-    init {
-        checkNavDestination()
-    }
 
-    private fun checkNavDestination() {
+    fun checkDestination() {
+        _destination.value = null
         viewModelScope.launch {
-            val completed = isOnboardingCompletedUseCase().first()
-            if (!completed) {
+            val isOnboardingDone = isOnboardingCompletedUseCase().first()
+            if (!isOnboardingDone) {
                 _destination.value = SplashDestination.OnBoarding
-            } else {
-                when (getCurrentUserUseCase()) {
-                    is Result.Success -> _destination.value = SplashDestination.Home
-                    is Result.Failure -> _destination.value = SplashDestination.SignIn
-                    else -> {}
-                }
+                return@launch
+            }
+            when (getCurrentUserUseCase()) {
+                is Result.Success -> _destination.value = SplashDestination.Home
+                else -> _destination.value = SplashDestination.SignIn
             }
         }
     }

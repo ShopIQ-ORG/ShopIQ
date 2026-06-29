@@ -70,4 +70,34 @@
     <string name="all_products_title">All Products</string>
     <string name="no_products_found">No products found</string>
     <string name="clear_filter">Clear filter</string>
+
+    <!-- Connection & Empty States -->
+    <string name="no_internet_title">No Internet Connection</string>
+    <string name="no_internet_subtitle">Please check your connection and try again</string>
+    <string name="no_internet_btn_retry">Try Again</string>
+    <string name="no_internet_btn_settings">Check Settings</string>
+
+    <string name="no_results_title">No results found</string>
+    <string name="no_results_subtitle">We couldn’t find any products matching \"%1$s\".</string>
+    <string name="no_results_subtitle_generic">We couldn’t find any products matching your search.</string>
+    <string name="no_results_btn_search">Try another search</string>
+    <string name="no_results_btn_browse">Browse Categories</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_title_1">Shop Smarter,\nEveryday</string>
+    <string name="onboarding_desc_1">Discover quality products from trusted brands, all in one place.</string>
+    <string name="onboarding_title_2">Explore Categories\nYou Love</string>
+    <string name="onboarding_desc_2">Browse by categories, brands, and collections that match your style.</string>
+    <string name="onboarding_title_3">Save, Cart &amp;\nCheckout with Ease</string>
+    <string name="onboarding_desc_3">Save favorites, manage your cart, and checkout securely in just a few taps.</string>
+
+    <!-- Category Screen -->
+    <string name="category_search_placeholder">Search categories...</string>
+    <string name="category_section_title">Shop by Category</string>
+    <string name="category_items_count">%1$d items</string>
+    <string name="search_placeholder">Search for products, brands...</string>
+    <string name="network_connection_lost">Internet connection lost</string>
 </resources>

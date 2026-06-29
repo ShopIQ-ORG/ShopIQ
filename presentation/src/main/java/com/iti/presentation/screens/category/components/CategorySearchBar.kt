@@ -25,7 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import com.iti.presentation.util.Constants
+import com.iti.presentation.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun CategorySearchBar(
@@ -61,7 +62,7 @@ fun CategorySearchBar(
                 Box(modifier = Modifier.weight(1f)) {
                     if (query.isEmpty()) {
                         Text(
-                            text = Constants.CATEGORY_SEARCH_PLACEHOLDER,
+                            text = stringResource(id = R.string.category_search_placeholder),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )

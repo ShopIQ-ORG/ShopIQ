@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileTabContent(onNavigateToSplash: () -> Unit) {
+fun ProfileTabContent(onLogout: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -40,7 +40,7 @@ fun ProfileTabContent(onNavigateToSplash: () -> Unit) {
             modifier = Modifier.padding(top = 8.dp)
         )
         Spacer(modifier = Modifier.height(32.dp))
-        OutlinedButton(onClick = onNavigateToSplash) {
+        OutlinedButton(onClick = onLogout) {
             Text(text = "Logout (Back to Splash)")
         }
     }

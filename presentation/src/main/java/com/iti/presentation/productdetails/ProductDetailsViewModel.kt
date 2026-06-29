@@ -39,7 +39,7 @@ class ProductDetailsViewModel(
             getProductDetailsUseCase(productId).collect { result ->
                 when (result) {
                     is Result.Loading -> {
-                        _state.update { it.copy(isLoading = true, error = null) }
+                        _state.update { it.copy(isLoading = true, product = null, error = null) }
                     }
                     is Result.Success -> {
                         _state.update {

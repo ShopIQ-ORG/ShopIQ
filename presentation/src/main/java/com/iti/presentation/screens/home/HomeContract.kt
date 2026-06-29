@@ -32,6 +32,7 @@ object HomeContract {
         data class BrandClicked(val brandName: String) : Intent()
         data object ViewAllBrandsClicked : Intent()
         data object ViewAllProductsClicked : Intent()
+        data object Logout : Intent()
     }
 
     sealed class Effect {
@@ -40,5 +41,6 @@ object HomeContract {
         data class NavigateToProducts(val brandName: String? = null) : Effect()
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
+        data object NavigateToSplash : Effect()
     }
 }

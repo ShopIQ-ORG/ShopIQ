@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
 import com.iti.domain.usecases.products.GetAdsUseCase
+import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.presentation.R
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val getProductsByNumberUseCase: GetProductsByNumberUseCase,
     private val getBrandsUseCase: GetBrandsUseCase,
-    private val getAdsUseCase: GetAdsUseCase
+    private val getAdsUseCase: GetAdsUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeContract.State())
@@ -54,6 +56,14 @@ class HomeViewModel(
             is HomeContract.Intent.ViewAllProductsClicked -> emitEffect(
                 HomeContract.Effect.NavigateToAllProducts
             )
+            is HomeContract.Intent.Logout -> logout()
+        }
+    }
+
+    private fun logout() {
+        viewModelScope.launch {
+            logoutUseCase()
+            emitEffect(HomeContract.Effect.NavigateToSplash)
         }
     }
 
