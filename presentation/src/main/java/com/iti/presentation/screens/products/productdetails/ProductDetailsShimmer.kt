@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.productdetails
+package com.iti.presentation.screens.products.productdetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

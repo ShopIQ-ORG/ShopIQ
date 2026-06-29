@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.productdetails
+package com.iti.presentation.screens.products.productdetails
 
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,16 +99,24 @@ fun ProductDetailsScreen(
     ) { innerPadding ->
         when {
             state.isLoading -> ProductDetailsShimmer(
-                modifier = Modifier.fillMaxSize().padding(innerPadding)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             )
+
             state.error != null -> NoInternetScreen(
                 onRetry = { viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId)) },
-                modifier = Modifier.fillMaxSize().padding(innerPadding)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             )
+
             state.product != null -> ProductDetailsContent(
                 state = state,
                 onIntent = viewModel::handleIntent,
-                modifier = Modifier.fillMaxSize().padding(innerPadding)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             )
         }
     }
@@ -130,10 +139,14 @@ private fun ProductDetailsContent(
             contentPadding = PaddingValues(bottom = 8.dp)
         ) {
             item {
-                if (product.images.size == 1) {
-                    SingleProductImage(imageUrl = product.images.first().url)
-                } else {
-                    ProductImageGallery(
+                when {
+                    product.images.isEmpty() -> SingleProductImage(imageUrl = "",
+                    )
+                    product.images.size == 1 -> SingleProductImage(
+                        imageUrl = product.images.first().url
+                    )
+
+                    else -> ProductImageGallery(
                         images = product.images.map { it.url },
                         selectedIndex = state.selectedImageIndex,
                         onSelectIndex = { onIntent(ProductDetailsIntent.SelectImage(it)) }
@@ -178,7 +191,8 @@ private fun SingleProductImage(imageUrl: String) {
             .aspectRatio(1f / 1f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
+        error = painterResource(id = R.drawable.logo_light)
     )
 }
 
@@ -215,7 +229,10 @@ private fun ProductImageGallery(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp))
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            RoundedCornerShape(10.dp)
+                        )
                         .clip(RoundedCornerShape(10.dp))
                         .clickable { onSelectIndex(maxThumbnails) },
                     contentAlignment = Alignment.Center
@@ -372,9 +389,9 @@ private fun ColorSelectionSection(
     onColorSelect: (String) -> Unit
 ) {
     val colors = listOf(
-        "Beige"     to Color(0xFFE6D7C3),
+        "Beige" to Color(0xFFE6D7C3),
         "Grey-Blue" to Color(0xFF8F9CA6),
-        "Black"     to Color(0xFF1A1D20)
+        "Black" to Color(0xFF1A1D20)
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

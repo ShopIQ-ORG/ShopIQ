@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.iti.presentation.screens.productdetails.ProductDetailsScreen
+import com.iti.presentation.screens.products.productdetails.ProductDetailsScreen
 import com.iti.presentation.screens.home.HomeScreen
 import com.iti.presentation.screens.onboarding.OnboardingScreen
 import com.iti.presentation.screens.onboarding.OnboardingViewModel
@@ -19,7 +19,7 @@ import com.iti.presentation.screens.splash.SplashDestination
 import com.iti.presentation.screens.splash.SplashScreen
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
-import com.iti.presentation.screens.products.AllProductsScreen
+import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
