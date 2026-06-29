@@ -29,9 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.ShoppingBag
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,8 +55,7 @@ import coil.compose.AsyncImage
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
-import com.iti.presentation.ui.theme.BackgroundDark
-import com.iti.presentation.ui.theme.TextPrimaryDark
+import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.ui.theme.WarningLight
 import org.koin.androidx.compose.koinViewModel
 
@@ -163,16 +161,12 @@ private fun ProductDetailsContent(
                 )
             }
 
-            item {
-                SizeSelectionSection(
-                    selectedSize = state.selectedSize ?: "M",
-                    onSizeSelect = { onIntent(ProductDetailsIntent.SelectSize(it)) }
-                )
-            }
         }
 
-        AddToCartButton(
+        ShopIQButton(
+            text = stringResource(id = R.string.btn_add_to_cart),
             onClick = { onIntent(ProductDetailsIntent.AddToCart) },
+            leadingIcon = Icons.Rounded.ShoppingBag,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
     }
@@ -185,7 +179,7 @@ private fun SingleProductImage(imageUrl: String) {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(4f / 5f)
+            .aspectRatio(1f / 1f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentScale = ContentScale.Crop
@@ -205,7 +199,7 @@ private fun ProductImageGallery(
         Column(
             modifier = Modifier
                 .width(64.dp)
-                .aspectRatio(4f / 5f),
+                .aspectRatio(1f / 1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val maxThumbnails = 3
@@ -243,7 +237,7 @@ private fun ProductImageGallery(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .aspectRatio(4f / 5f)
+                .aspectRatio(1f / 1f)
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
@@ -433,117 +427,4 @@ private fun ColorSwatch(
             .clip(CircleShape)
             .clickable(onClick = onClick)
     )
-}
-
-@Composable
-private fun SizeSelectionSection(
-    selectedSize: String,
-    onSizeSelect: (String) -> Unit
-) {
-    val sizes = listOf("S", "M", "L", "XL", "XXL")
-
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "Size:",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = selectedSize,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Text(
-                text = stringResource(id = R.string.size_guide),
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable { }
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            sizes.forEach { size ->
-                SizeChip(
-                    size = size,
-                    isSelected = size == selectedSize,
-                    onClick = { onSizeSelect(size) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SizeChip(
-    size: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(width = 48.dp, height = 38.dp)
-            .border(
-                BorderStroke(
-                    width = if (isSelected) 1.5.dp else 1.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.outlineVariant
-                ),
-                RoundedCornerShape(8.dp)
-            )
-            .clip(RoundedCornerShape(8.dp))
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.06f)
-                else Color.Transparent
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = size,
-            fontSize = 13.sp,
-            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (isSelected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onBackground
-        )
-    }
-}
-
-@Composable
-private fun AddToCartButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .navigationBarsPadding(),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = BackgroundDark,
-            contentColor = TextPrimaryDark
-        )
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.ShoppingBag,
-            contentDescription = null,
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(id = R.string.btn_add_to_cart),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
 }
