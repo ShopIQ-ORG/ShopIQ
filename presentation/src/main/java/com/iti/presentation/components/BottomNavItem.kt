@@ -1,14 +1,39 @@
 package com.iti.presentation.components
 
-import com.iti.presentation.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.GridView
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.PersonOutline
+import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class BottomNavItem(
     val label: String,
-    val selectedIcon: Int,
-    val unselectedIcon: Int
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
 ) {
-    Home("Home", R.drawable.home_fill, R.drawable.home_not_fill),
-    Category("Categories", R.drawable.category_fill, R.drawable.category_not_fill),
-    Wishlist("Wishlist", R.drawable.heart_fill, R.drawable.heart_not_fill),
-    Profile("Profile", R.drawable.user_fill, R.drawable.user_not_fill)
+    Home(
+        label = "Home",
+        selectedIcon = Icons.Rounded.Home,
+        unselectedIcon = Icons.Outlined.Home
+    ),
+    Category(
+        label = "Categories",
+        selectedIcon = Icons.Rounded.GridView,
+        unselectedIcon = Icons.Outlined.GridView
+    ),
+    Wishlist(
+        label = "Wishlist",
+        selectedIcon = Icons.Rounded.Favorite,
+        unselectedIcon = Icons.Rounded.FavoriteBorder
+    ),
+    Profile(
+        label = "Profile",
+        selectedIcon = Icons.Rounded.Person,
+        unselectedIcon = Icons.Rounded.PersonOutline
+    )
 }
