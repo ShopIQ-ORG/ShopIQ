@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -168,7 +169,6 @@ private fun ProductDetailsContent(
                     onSizeSelect = { onIntent(ProductDetailsIntent.SelectSize(it)) }
                 )
             }
-
         }
 
         AddToCartButton(
@@ -185,7 +185,7 @@ private fun SingleProductImage(imageUrl: String) {
         contentDescription = null,
         modifier = Modifier
             .fillMaxWidth()
-            .height(260.dp)
+            .aspectRatio(4f / 5f)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentScale = ContentScale.Crop
@@ -199,15 +199,13 @@ private fun ProductImageGallery(
     onSelectIndex: (Int) -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(260.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Column(
             modifier = Modifier
-                .width(60.dp)
-                .fillMaxHeight(),
+                .width(64.dp)
+                .aspectRatio(4f / 5f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val maxThumbnails = 3
@@ -217,14 +215,16 @@ private fun ProductImageGallery(
                 ThumbnailItem(
                     imageUrl = images[i],
                     isSelected = selectedIndex == i,
-                    onClick = { onSelectIndex(i) }
+                    onClick = { onSelectIndex(i) },
+                    modifier = Modifier.weight(1f)
                 )
             }
 
             if (images.size > maxThumbnails) {
                 Box(
                     modifier = Modifier
-                        .size(60.dp)
+                        .weight(1f)
+                        .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp))
                         .clip(RoundedCornerShape(10.dp))
                         .clickable { onSelectIndex(maxThumbnails) },
@@ -243,7 +243,7 @@ private fun ProductImageGallery(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
+                .aspectRatio(4f / 5f)
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
@@ -268,13 +268,14 @@ private fun ProductImageGallery(
 private fun ThumbnailItem(
     imageUrl: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     AsyncImage(
         model = imageUrl,
         contentDescription = null,
-        modifier = Modifier
-            .size(60.dp)
+        modifier = modifier
+            .fillMaxWidth()
             .border(
                 BorderStroke(
                     width = if (isSelected) 2.dp else 1.dp,
@@ -283,7 +284,8 @@ private fun ThumbnailItem(
                 ),
                 RoundedCornerShape(10.dp)
             )
-            .clip(RoundedCornerShape(10.dp)),
+            .clip(RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick),
         contentScale = ContentScale.Crop
     )
 }
