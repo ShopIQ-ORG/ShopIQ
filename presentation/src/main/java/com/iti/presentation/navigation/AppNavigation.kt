@@ -13,10 +13,17 @@ import com.iti.presentation.screens.auth.signin.SignInScreen
 import com.iti.presentation.screens.auth.signup.SignUpScreen
 import com.iti.presentation.screens.splash.SplashScreen
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import com.iti.domain.usecase.IsOnboardingCompletedUseCase
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val backStack = remember { mutableStateListOf<Screen>(Screen.Splash) }
+    val isOnboardingCompletedUseCase: IsOnboardingCompletedUseCase = koinInject()
+    val scope = rememberCoroutineScope()
 
     NavDisplay(
         modifier = modifier,
@@ -25,7 +32,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         entryProvider = entryProvider {
             entry<Screen.Splash> {
                 SplashScreen(
-                    onAnimationComplete = { backStack.add(Screen.OnBoarding) }
+                    onAnimationComplete = {
+                        scope.launch {
+                            val completed = isOnboardingCompletedUseCase().first()
+                            backStack.clear()
+                            if (completed) {
+                                backStack.add(Screen.SignIn)
+                            } else {
+                                backStack.add(Screen.OnBoarding)
+                            }
+                        }
+                    }
                 )
             }
 

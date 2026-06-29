@@ -16,6 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import com.iti.presentation.R
 import coil.compose.AsyncImage
 import com.iti.presentation.screens.category.model.CategoryItem
 import com.iti.presentation.util.Constants
@@ -38,18 +45,37 @@ fun CategoryCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
-            AsyncImage(
-                model = category.imageAssetPath,
-                contentDescription = category.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
+            if (category.imageAssetPath.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant, shape = RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.category_fill),
+                        contentDescription = category.title,
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            } else {
+                AsyncImage(
+                    model = category.imageAssetPath,
+                    contentDescription = category.title,
+                    error = painterResource(id = R.drawable.category_fill),
+                    fallback = painterResource(id = R.drawable.category_fill),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = category.title,
@@ -58,7 +84,7 @@ fun CategoryCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             Text(
                 text = "${category.itemCount} ${Constants.CATEGORY_ITEMS_SUFFIX}",
