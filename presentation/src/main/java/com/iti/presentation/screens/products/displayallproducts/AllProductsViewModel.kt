@@ -1,7 +1,8 @@
-package com.iti.presentation.screens.products
+package com.iti.presentation.screens.products.displayallproducts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iti.domain.models.Product
 import com.iti.domain.models.Result
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.presentation.R
@@ -24,7 +25,7 @@ class AllProductsViewModel(
     private val _effect = Channel<AllProductsContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    private var allProducts: List<com.iti.domain.models.Product> = emptyList()
+    private var allProducts: List<Product> = emptyList()
 
     fun sendIntent(intent: AllProductsContract.Intent) {
         when (intent) {

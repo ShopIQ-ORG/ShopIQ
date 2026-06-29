@@ -1,4 +1,4 @@
-package com.iti.presentation.productdetails
+package com.iti.presentation.screens.products.productdetails
 
 import com.iti.domain.models.Product
 

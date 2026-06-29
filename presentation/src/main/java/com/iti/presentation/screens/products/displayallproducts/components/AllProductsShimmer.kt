@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.components
+package com.iti.presentation.screens.products.displayallproducts.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +17,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
 
 
 @Composable
-fun AllProductsShimmer(topPadding: androidx.compose.ui.unit.Dp) {
+fun AllProductsShimmer(topPadding: Dp) {
     val shimmerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
 
     LazyVerticalGrid(
