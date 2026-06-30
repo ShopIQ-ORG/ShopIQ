@@ -1,6 +1,7 @@
 package com.iti.data.sources.remote.cart
 
 import com.apollographql.apollo.ApolloClient
+import com.iti.data.core.executeOrThrow
 import com.iti.data.dto.cart.CartDto
 import com.iti.data.mappers.toDto
 import com.iti.data.storefront.CartCreateMutation
@@ -21,7 +22,7 @@ class CartRemoteDataSourceImpl(
     override suspend fun getCart(cartId: String): CartDto {
         val response = apolloClient.query(
             GetCartQuery(cartId)
-        ).execute()
+        ).executeOrThrow()
 
         validator.validateGraphQLErrors(response.errors)
 
@@ -34,7 +35,7 @@ class CartRemoteDataSourceImpl(
     override suspend fun createCart(): String {
         val response = apolloClient.mutation(
             CartCreateMutation()
-        ).execute()
+        ).executeOrThrow()
 
         validator.validateGraphQLErrors(response.errors)
 
@@ -53,7 +54,6 @@ class CartRemoteDataSourceImpl(
         variantId: String,
         quantity: Int
     ): CartDto {
-
         if (quantity <= 0) {
             throw CartException.InvalidQuantity()
         }
@@ -62,13 +62,10 @@ class CartRemoteDataSourceImpl(
             CartLinesAddMutation(
                 cartId = cartId,
                 lines = listOf(
-                    CartLineInput(
-                        merchandiseId = variantId,
-                        quantity = quantity
-                    )
+                    CartLineInput(merchandiseId = variantId, quantity = quantity)
                 )
             )
-        ).execute()
+        ).executeOrThrow()
 
         validator.validateGraphQLErrors(response.errors)
 
@@ -83,10 +80,7 @@ class CartRemoteDataSourceImpl(
 
         val dto = cart.cartFields.toDto()
 
-        return validator.validateLineAdded(
-            cart = dto,
-            variantId = variantId
-        )
+        return validator.validateLineAdded(cart = dto, variantId = variantId)
     }
 
     override suspend fun updateLines(
@@ -94,7 +88,6 @@ class CartRemoteDataSourceImpl(
         lineId: String,
         quantity: Int
     ): CartDto {
-
         if (quantity < 0) {
             throw CartException.InvalidQuantity()
         }
@@ -103,13 +96,10 @@ class CartRemoteDataSourceImpl(
             CartLinesUpdateMutation(
                 cartId = cartId,
                 lines = listOf(
-                    CartLineUpdateInput(
-                        id = lineId,
-                        quantity = quantity
-                    )
+                    CartLineUpdateInput(id = lineId, quantity = quantity)
                 )
             )
-        ).execute()
+        ).executeOrThrow()
 
         validator.validateGraphQLErrors(response.errors)
 
@@ -131,17 +121,13 @@ class CartRemoteDataSourceImpl(
         )
     }
 
-    override suspend fun removeLines(
-        cartId: String,
-        lineIds: List<String>
-    ) {
-
+    override suspend fun removeLines(cartId: String, lineIds: List<String>) {
         val response = apolloClient.mutation(
             CartLinesRemoveMutation(
                 cartId = cartId,
                 lineIds = lineIds
             )
-        ).execute()
+        ).executeOrThrow()
 
         validator.validateGraphQLErrors(response.errors)
 
@@ -153,23 +139,16 @@ class CartRemoteDataSourceImpl(
 
         val cart = getCart(cartId)
 
-        validator.validateLinesRemoved(
-            cart = cart,
-            removedIds = lineIds
-        )
+        validator.validateLinesRemoved(cart = cart, removedIds = lineIds)
     }
 
-    override suspend fun updateDiscountCodes(
-        cartId: String,
-        codes: List<String>
-    ): CartDto {
-
+    override suspend fun updateDiscountCodes(cartId: String, codes: List<String>): CartDto {
         val response = apolloClient.mutation(
             CartDiscountCodesUpdateMutation(
                 cartId = cartId,
                 discountCodes = codes
             )
-        ).execute()
+        ).executeOrThrow()
 
         validator.validateGraphQLErrors(response.errors)
 
@@ -184,9 +163,6 @@ class CartRemoteDataSourceImpl(
 
         val dto = cart.cartFields.toDto()
 
-        return validator.validateDiscountCodes(
-            cart = dto,
-            requestedCodes = codes
-        )
+        return validator.validateDiscountCodes(cart = dto, requestedCodes = codes)
     }
 }

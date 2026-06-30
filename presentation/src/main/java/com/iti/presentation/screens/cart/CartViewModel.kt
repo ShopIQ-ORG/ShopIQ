@@ -3,6 +3,7 @@ package com.iti.presentation.screens.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.models.cart.Cart
 import com.iti.domain.models.cart.recalculatedAfterQuantityChange
 import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
 import com.iti.domain.usecases.cart.GetCartUseCase
@@ -35,6 +36,8 @@ class CartViewModel(
     val effect = _effect.receiveAsFlow()
 
     private val quantityUpdateJobs = mutableMapOf<String, Job>()
+
+    private val quantityRollbackSnapshots = mutableMapOf<String, Cart>()
 
     init {
         loadCart()
@@ -102,6 +105,7 @@ class CartViewModel(
         val currentItem = _state.value.cart?.items?.find { it.id == itemId } ?: return
         val newQuantity = currentItem.quantity + 1
 
+        captureRollbackSnapshotIfNeeded(itemId)
         updateQuantityOptimistically(itemId, newQuantity)
         debounceQuantityUpdate(itemId, newQuantity)
     }
@@ -113,8 +117,16 @@ class CartViewModel(
 
         val newQuantity = currentItem.quantity - 1
 
+        captureRollbackSnapshotIfNeeded(itemId)
         updateQuantityOptimistically(itemId, newQuantity)
         debounceQuantityUpdate(itemId, newQuantity)
+    }
+
+
+    private fun captureRollbackSnapshotIfNeeded(itemId: String) {
+        if (quantityUpdateJobs[itemId]?.isActive != true) {
+            _state.value.cart?.let { quantityRollbackSnapshots[itemId] = it }
+        }
     }
 
     private fun debounceQuantityUpdate(itemId: String, newQuantity: Int) {
@@ -124,13 +136,21 @@ class CartViewModel(
             delay(500L)
 
             when (val result = updateCartItemQuantityUseCase(itemId, newQuantity)) {
+                is Result.Success -> {
+                    quantityRollbackSnapshots.remove(itemId)
+                }
                 is Result.Failure -> {
-                    refreshCart()
+                    rollbackQuantityChange(itemId)
                     _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
                 }
                 else -> Unit
             }
         }
+    }
+
+    private fun rollbackQuantityChange(itemId: String) {
+        val snapshot = quantityRollbackSnapshots.remove(itemId) ?: return
+        _state.update { it.copy(cart = snapshot) }
     }
 
     private fun updateQuantityOptimistically(itemId: String, quantity: Int) {
