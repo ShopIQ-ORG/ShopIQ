@@ -14,6 +14,10 @@ import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
+import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
+import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
+import com.iti.domain.usecases.products.IsProductFavoriteUseCase
+import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -27,9 +31,13 @@ val domainModule = module {
     factory { GetCurrentUserUseCase(get()) }
     factory { RegisterUseCase(get()) }
     factory { LogoutUseCase(get()) }
-    factory { GetProductsByNumberUseCase(get()) }
     factory { GetProductDetailsUseCase(get()) }
     factory { IsOnboardingCompletedUseCase(get()) }
     factory { SetOnboardingCompletedUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
+
+    factory { AddProductToFavoritesUseCase(get()) }
+    factory { RemoveProductFromFavoritesUseCase(get()) }
+    factory { GetFavoriteProductsUseCase(get()) }
+    factory { IsProductFavoriteUseCase(get()) }
 }
