@@ -11,7 +11,8 @@ data class Product(
     val minPrice: Money,
     val maxPrice: Money,
     val images: List<ProductImage>,
-    val variants: List<ProductVariant>
+    val variants: List<ProductVariant>,
+    val isFavorite: Boolean = false
 )
 
 data class Money(

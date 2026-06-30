@@ -9,32 +9,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.iti.presentation.screens.wishlist.WishlistScreen
 
 @Composable
-fun WishlistTabContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "❤️",
-            style = MaterialTheme.typography.displayLarge
-        )
-        Text(
-            text = "Wishlist",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(top = 16.dp)
-        )
-        Text(
-            text = "Your saved items",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-    }
+fun WishlistTabContent(
+    onProductClick: (String) -> Unit = {},
+    onExploreClick: () -> Unit = {}
+) {
+    WishlistScreen(
+        onBackClick = {},
+        onExploreProductsClick = onExploreClick,
+        onProductClick = onProductClick
+    )
 }

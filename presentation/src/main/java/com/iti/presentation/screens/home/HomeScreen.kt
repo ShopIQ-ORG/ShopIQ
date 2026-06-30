@@ -73,7 +73,8 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onIntent = viewModel::sendIntent,
-        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) }
+        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
+        onNavigateToProduct = onNavigateToProduct
     )
 }
 
@@ -81,7 +82,8 @@ fun HomeScreen(
 fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNavigateToProduct: (Long) -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -155,7 +157,13 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.Wishlist -> {
-                WishlistTabContent()
+                WishlistTabContent(
+                    onProductClick = { productId ->
+                        val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
+                        onNavigateToProduct(idLong)
+                    },
+                    onExploreClick = { selectedIndex = 0 }
+                )
             }
 
             BottomNavItem.Profile -> {

@@ -3,7 +3,10 @@ package com.iti.presentation.screens.products.productdetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
+import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -14,7 +17,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
-    private val getProductDetailsUseCase: GetProductDetailsUseCase
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
+    private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
+    private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
+    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -42,10 +48,12 @@ class ProductDetailsViewModel(
                         _state.update { it.copy(isLoading = true, product = null, error = null) }
                     }
                     is Result.Success -> {
+                        val product = result.data
+                        observeFavoriteStatus(product.id)
                         _state.update {
                             it.copy(
                                 isLoading = false,
-                                product = result.data,
+                                product = product,
                                 // Default selection logic
                                 selectedColor = "Beige", // default as per mockup
                                 selectedSize = "M",      // default as per mockup
@@ -66,6 +74,17 @@ class ProductDetailsViewModel(
         }
     }
 
+    private fun observeFavoriteStatus(productId: String) {
+        viewModelScope.launch {
+            getFavoriteProductsUseCase().collect { result ->
+                if (result is Result.Success) {
+                    val isFavorite = result.data.any { it.id == productId }
+                    _state.update { it.copy(isWishlisted = isFavorite) }
+                }
+            }
+        }
+    }
+
     private fun selectColor(color: String) {
         _state.update { it.copy(selectedColor = color) }
     }
@@ -79,10 +98,27 @@ class ProductDetailsViewModel(
     }
 
     private fun toggleWishlist() {
-        _state.update { it.copy(isWishlisted = !it.isWishlisted) }
+        val currentProduct = _state.value.product ?: return
+        val currentlyWishlisted = _state.value.isWishlisted
+        
         viewModelScope.launch {
-            val message = if (_state.value.isWishlisted) "Added to Wishlist" else "Removed from Wishlist"
-            _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
+            try {
+                // Optimistic update
+                _state.update { it.copy(isWishlisted = !currentlyWishlisted) }
+
+                if (currentlyWishlisted) {
+                    removeProductFromFavoritesUseCase(currentProduct.id)
+                } else {
+                    addProductToFavoritesUseCase(currentProduct)
+                }
+                
+                val message = if (!currentlyWishlisted) "Added to Wishlist" else "Removed from Wishlist"
+                _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
+            } catch (e: Exception) {
+                // Revert optimistic update
+                _state.update { it.copy(isWishlisted = currentlyWishlisted) }
+                _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Error: ${e.message}"))
+            }
         }
     }
 

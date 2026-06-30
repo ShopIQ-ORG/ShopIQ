@@ -16,14 +16,14 @@ import org.koin.dsl.module
 
 val presentationModule = module {
     single { NetworkMonitor(get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { CategoryViewModel(get()) }
     viewModel { AllBrandsViewModel(get()) }
-    viewModel { AllProductsViewModel(get()) }
-    viewModel { ProductDetailsViewModel(get()) }
+    viewModel { AllProductsViewModel(get(), get(), get(), get()) }
+    viewModel { ProductDetailsViewModel(get(), get(), get(), get()) }
     viewModel { SplashViewModel(get(), get()) }
 
     viewModel { WishlistViewModel(get(), get()) }
