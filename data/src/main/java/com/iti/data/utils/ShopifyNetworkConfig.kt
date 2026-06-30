@@ -6,6 +6,7 @@ import com.iti.data.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 
 object ShopifyNetworkConfig {
 
@@ -19,12 +20,14 @@ object ShopifyNetworkConfig {
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(AdminInterceptor())
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 
     private val storefrontOkHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(StorefrontInterceptor())
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 
@@ -59,6 +62,14 @@ object ShopifyNetworkConfig {
                 .addHeader("Content-Type", "application/json")
                 .build()
             return chain.proceed(request)
+        }
+    }
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
         }
     }
 }

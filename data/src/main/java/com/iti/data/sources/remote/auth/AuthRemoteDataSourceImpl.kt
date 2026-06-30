@@ -1,11 +1,12 @@
 package com.iti.data.sources.remote.auth
 
-import android.util.Log
-import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.iti.data.core.FirebaseConstants
 import com.iti.data.dto.auth.UserDto
 import com.iti.data.mappers.toUserDto
@@ -20,66 +21,143 @@ class AuthRemoteDataSourceImpl(
 ) : AuthRemoteDataSource {
 
     override suspend fun login(credentials: LoginCredentials): UserDto {
+        val previousUid = auth.currentUser?.takeIf { it.isAnonymous }?.uid
+
         auth.signInWithEmailAndPassword(credentials.email, credentials.password).await()
         val uid = auth.currentUser?.uid ?: throw AuthException.UserNotFound()
+
+        if (previousUid != null && previousUid != uid) {
+            mergeGuestCartInto(previousUid, uid)
+        }
+
         return getUserDocument(uid)
     }
 
     override suspend fun loginWithGoogle(idToken: String): UserDto {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        val result = auth.signInWithCredential(credential).await()
-        val uid = result.user?.uid ?: throw AuthException.UserNotFound()
-        val isNew = result.additionalUserInfo?.isNewUser == true
-        if (isNew) {
-            val userDto = UserDto(
-                id = uid,
-                fullName = result.user?.displayName.orEmpty(),
-                email = result.user?.email.orEmpty()
-            )
-            saveUserDocument(uid, userDto)
-            return userDto
+        return linkOrSignIn(credential) { uid, isNew ->
+            if (isNew) {
+                UserDto(
+                    id = uid,
+                    fullName = auth.currentUser?.displayName.orEmpty(),
+                    email = auth.currentUser?.email.orEmpty()
+                )
+            } else null
         }
-        return getUserDocument(uid)
     }
 
     override suspend fun loginWithFacebook(accessToken: String): UserDto {
         val credential = FacebookAuthProvider.getCredential(accessToken)
-        val result = auth.signInWithCredential(credential).await()
-        val uid = result.user?.uid ?: throw AuthException.UserNotFound()
-        val isNew = result.additionalUserInfo?.isNewUser == true
-        if (isNew) {
-            val userDto = UserDto(
-                id = uid,
-                fullName = result.user?.displayName.orEmpty(),
-                email = result.user?.email.orEmpty()
-            )
-            saveUserDocument(uid, userDto)
-            return userDto
+        return linkOrSignIn(credential) { uid, isNew ->
+            if (isNew) {
+                UserDto(
+                    id = uid,
+                    fullName = auth.currentUser?.displayName.orEmpty(),
+                    email = auth.currentUser?.email.orEmpty()
+                )
+            } else null
         }
-        return getUserDocument(uid)
     }
 
     override suspend fun loginAsGuest(): UserDto {
-        auth.signInAnonymously().await()
-        return UserDto(isGuest = true)
+        val result = auth.signInAnonymously().await()
+        val uid = result.user?.uid ?: throw AuthException.UserNotFound()
+        val userDto = UserDto(id = uid, isGuest = true)
+        // Register the guest doc so cart ID has somewhere to live.
+        saveUserDocument(uid, userDto, merge = true)
+        return userDto
     }
 
-
     override suspend fun register(info: RegistrationInfo): UserDto {
+        val currentUser = auth.currentUser
+        val userDto: UserDto
+        val uid: String
+
+        if (currentUser != null && currentUser.isAnonymous) {
+            val credential = EmailAuthProvider.getCredential(info.email, info.password)
+            try {
+                val result = currentUser.linkWithCredential(credential).await()
+                uid = result.user?.uid ?: throw AuthException.UserNotFound()
+                userDto = info.toUserDto(uid).copy(isGuest = false)
+                saveUserDocument(uid, userDto, merge = true)
+                return userDto
+            } catch (_: FirebaseAuthUserCollisionException) {
+                throw AuthException.EmailAlreadyInUse()
+            }
+        }
+
         val result = auth.createUserWithEmailAndPassword(info.email, info.password).await()
-        val uid = result.user?.uid ?: throw AuthException.UserNotFound()
-        val userDto = info.toUserDto(uid)
-        saveUserDocument(uid, userDto)
+        uid = result.user?.uid ?: throw AuthException.UserNotFound()
+        userDto = info.toUserDto(uid)
+        saveUserDocument(uid, userDto, merge = false)
         return userDto
     }
 
     override suspend fun getCurrentUser(): UserDto {
         val firebaseUser = auth.currentUser ?: throw AuthException.UserNotFound()
-        if (firebaseUser.isAnonymous) return UserDto(isGuest = true)
+        if (firebaseUser.isAnonymous) return UserDto(id = firebaseUser.uid, isGuest = true)
         return getUserDocument(firebaseUser.uid)
     }
 
     override fun logout() = auth.signOut()
+
+    private suspend fun linkOrSignIn(
+        credential: com.google.firebase.auth.AuthCredential,
+        buildNewUserDto: (uid: String, isNew: Boolean) -> UserDto?
+    ): UserDto {
+        val currentUser = auth.currentUser
+
+        if (currentUser != null && currentUser.isAnonymous) {
+            try {
+                val result = currentUser.linkWithCredential(credential).await()
+                val uid = result.user?.uid ?: throw AuthException.UserNotFound()
+                val isNew = result.additionalUserInfo?.isNewUser == true
+                val newDto = buildNewUserDto(uid, isNew)
+                return if (newDto != null) {
+                    saveUserDocument(uid, newDto, merge = true)
+                    newDto
+                } else {
+                    getUserDocument(uid)
+                }
+            } catch (_: FirebaseAuthUserCollisionException) {
+                val previousUid = currentUser.uid
+                val result = auth.signInWithCredential(credential).await()
+                val uid = result.user?.uid ?: throw AuthException.UserNotFound()
+                mergeGuestCartInto(previousUid, uid)
+                return getUserDocument(uid)
+            }
+        }
+
+        val result = auth.signInWithCredential(credential).await()
+        val uid = result.user?.uid ?: throw AuthException.UserNotFound()
+        val isNew = result.additionalUserInfo?.isNewUser == true
+        val newDto = buildNewUserDto(uid, isNew)
+        return if (newDto != null) {
+            saveUserDocument(uid, newDto, merge = true)
+            newDto
+        } else {
+            getUserDocument(uid)
+        }
+    }
+
+    private suspend fun mergeGuestCartInto(guestUid: String, targetUid: String) {
+        val guestSnapshot = firestore.collection(FirebaseConstants.Collections.USERS)
+            .document(guestUid)
+            .get()
+            .await()
+
+        val cartId = guestSnapshot.getString(FirebaseConstants.UserFields.CART_ID) ?: return
+
+        firestore.collection(FirebaseConstants.Collections.USERS)
+            .document(targetUid)
+            .set(mapOf(FirebaseConstants.UserFields.CART_ID to cartId), SetOptions.merge())
+            .await()
+
+        firestore.collection(FirebaseConstants.Collections.USERS)
+            .document(guestUid)
+            .delete()
+            .await()
+    }
 
     private suspend fun getUserDocument(uid: String): UserDto {
         return firestore.collection(FirebaseConstants.Collections.USERS)
@@ -89,10 +167,8 @@ class AuthRemoteDataSourceImpl(
             .toObject(UserDto::class.java) ?: throw AuthException.UserNotFound()
     }
 
-    private suspend fun saveUserDocument(uid: String, userDto: UserDto) {
-        firestore.collection(FirebaseConstants.Collections.USERS)
-            .document(uid)
-            .set(userDto)
-            .await()
+    private suspend fun saveUserDocument(uid: String, userDto: UserDto, merge: Boolean) {
+        val ref = firestore.collection(FirebaseConstants.Collections.USERS).document(uid)
+        if (merge) ref.set(userDto, SetOptions.merge()).await() else ref.set(userDto).await()
     }
 }

@@ -174,14 +174,34 @@ fun CartDiscountCodesUpdateMutation.Cart.toDto(): CartDto {
     )
 }
 fun CartDto.toDomain(): Cart {
+    val discountAmount = computeDiscountAmount()
+
     return Cart(
         id = id,
         items = lines.map { it.toDomain() },
         discountCodes = discountCodes.filter { it.applicable }.map { it.code },
+        discountAmount = discountAmount,
         subtotal = Money(subtotalAmount.amount, subtotalAmount.currencyCode),
         total = Money(totalAmount.amount, totalAmount.currencyCode),
         totalTax = totalTaxAmount?.let { Money(it.amount, it.currencyCode) }
     )
+}
+
+private fun CartDto.computeDiscountAmount(): Money? {
+    if (discountCodes.none { it.applicable }) return null
+
+    val totalDiscount = lines.sumOf { line ->
+        val perQuantity = line.amountPerQuantity.amount.toDoubleOrNull() ?: 0.0
+        val quantity = line.quantity
+        val lineTotal = line.totalAmount.amount.toDoubleOrNull() ?: 0.0
+        val expectedFullPrice = perQuantity * quantity
+        (expectedFullPrice - lineTotal).coerceAtLeast(0.0)
+    }
+
+    if (totalDiscount <= 0.0) return null
+
+    val currencyCode = subtotalAmount.currencyCode
+    return Money("%.2f".format(totalDiscount), currencyCode)
 }
 
 fun CartLineDto.toDomain(): CartItem {

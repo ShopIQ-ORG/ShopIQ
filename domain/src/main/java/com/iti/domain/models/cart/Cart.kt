@@ -6,8 +6,8 @@ data class Cart(
     val id: String,
     val items: List<CartItem>,
     val discountCodes: List<String>,
+    val discountAmount: Money?,
     val subtotal: Money,
     val total: Money,
     val totalTax: Money?
 )
-

@@ -11,6 +11,7 @@ import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
 import com.iti.domain.usecases.auth.RegisterUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
+import com.iti.domain.usecases.cart.AddCartItemUseCase
 import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
 import com.iti.domain.usecases.cart.GetCartUseCase
 import com.iti.domain.usecases.cart.RemoveCartItemUseCase
@@ -40,4 +41,5 @@ val domainModule = module {
     factory { UpdateCartItemQuantityUseCase(get()) }
     factory { RemoveCartItemUseCase(get()) }
     factory { ApplyDiscountCodesUseCase(get()) }
+    factory { AddCartItemUseCase(get()) }
 }
