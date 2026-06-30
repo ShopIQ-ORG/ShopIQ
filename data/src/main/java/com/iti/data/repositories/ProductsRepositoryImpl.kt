@@ -11,6 +11,7 @@ import com.iti.data.mappers.toDomainCategories
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
+import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Category
 import com.iti.domain.models.Result
 import com.iti.domain.repositories.products.ProductsRepository
@@ -27,6 +28,27 @@ class ProductsRepositoryImpl(
             val shopifyResponse = remoteDataSource.getProductsByNumber(count)
             val domainProducts = shopifyResponse.toDomainProducts()
             emit(Result.Success(domainProducts))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
+    }
+
+    override fun getProductsPaginated(count: Int, after: String?): Flow<Result<PaginatedProducts>> = flow {
+        emit(Result.Loading)
+        try {
+            val shopifyResponse = remoteDataSource.getProductsByNumber(count, after)
+            val domainProducts = shopifyResponse.toDomainProducts()
+            val hasNextPage = shopifyResponse.data.products?.pageInfo?.hasNextPage ?: false
+            val endCursor = shopifyResponse.data.products?.pageInfo?.endCursor
+            emit(
+                Result.Success(
+                    PaginatedProducts(
+                        products = domainProducts,
+                        hasNextPage = hasNextPage,
+                        endCursor = endCursor
+                    )
+                )
+            )
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }

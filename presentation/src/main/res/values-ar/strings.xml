@@ -12,4 +12,15 @@
     <string name="btn_wishlist">المفضلة</string>
     <string name="btn_add_to_cart">أضف إلى العربة</string>
     <string name="error_message">خطأ: %1$s</string>
+    <string name="products_count">%1$d منتج</string>
+    <string name="filter_button_label">تصفية</string>
+    <string name="sort_button_label">ترتيب</string>
+    <string name="all_subcategory">الكل</string>
+    <string name="all_products_title">كل المنتجات</string>
+    <string name="error_loading_products">خطأ في تحميل المنتجات</string>
+    <string name="no_products_found">لم يتم العثور على منتجات</string>
+    <string name="clear_filter">إلغاء التصفية</string>
+    <string name="product_details">تفاصيل المنتج</string>
+    <string name="sort_price_asc_label">↑ السعر</string>
+    <string name="sort_price_desc_label">↓ السعر</string>
 </resources>
