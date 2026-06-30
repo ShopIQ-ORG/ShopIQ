@@ -1,12 +1,10 @@
-package com.iti.presentation.screens.products
+package com.iti.presentation.screens.products.displayallproducts
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +36,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ProductCard
-import com.iti.presentation.screens.products.components.AllProductsShimmer
+import com.iti.presentation.screens.products.displayallproducts.components.AllProductsShimmer
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -129,9 +129,7 @@ fun HomeScreenContent(
                         },
                         icon = {
                             Icon(
-                                painter = painterResource(
-                                    id = if (selectedIndex == index) item.selectedIcon else item.unselectedIcon
-                                ),
+                                imageVector = if (selectedIndex == index) item.selectedIcon else item.unselectedIcon,
                                 contentDescription = item.label
                             )
                         },
