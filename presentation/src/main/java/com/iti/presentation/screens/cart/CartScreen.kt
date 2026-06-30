@@ -25,7 +25,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
-    onBack: () -> Unit,
+    onBackClick: () -> Unit,
     onCheckout: () -> Unit,
     onBrowseProducts: () -> Unit,
     viewModel: CartViewModel = koinViewModel()
@@ -55,7 +55,7 @@ fun CartScreen(
         topBar = {
             BackTopBar(
                 title = stringResource(R.string.cart_title),
-                onBack = onBack,
+                onBack = onBackClick,
                 scrollBehavior = scrollBehavior
             )
         },
