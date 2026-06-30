@@ -26,8 +26,8 @@ googleid = "1.2.0"
 credentials = "1.3.0"
 credentialsPlayServicesAuth = "1.3.0"
 facebookSdk = "18.2.3"
-room = "2.6.1"
-ksp = "2.0.21-1.0.27"
+room = "2.8.4"
+ksp = "2.3.9"
 
 [libraries]
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }

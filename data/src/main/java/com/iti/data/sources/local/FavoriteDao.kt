@@ -12,12 +12,12 @@ interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavorite(product: FavoriteEntity)
 
-    @Query("DELETE FROM favorites WHERE id = :productId")
-    suspend fun deleteFavorite(productId: String)
+    @Query("DELETE FROM favorites WHERE productId = :productId AND userId = :userId")
+    suspend fun deleteFavorite(productId: String, userId: String)
 
-    @Query("SELECT * FROM favorites")
-    fun getAllFavorites(): Flow<List<FavoriteEntity>>
+    @Query("SELECT * FROM favorites WHERE userId = :userId")
+    fun getAllFavorites(userId: String): Flow<List<FavoriteEntity>>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE id = :productId)")
-    suspend fun isFavorite(productId: String): Boolean
+    @Query("SELECT EXISTS(SELECT 1 FROM favorites WHERE productId = :productId AND userId = :userId)")
+    suspend fun isFavorite(productId: String, userId: String): Boolean
 }

@@ -25,7 +25,7 @@ import org.koin.dsl.module
 val dataModule = module {
     single { ShopifyNetworkConfig.apolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get(), get()) }
+    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get()) }
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create(
             produceFile = {
@@ -34,9 +34,6 @@ val dataModule = module {
         )
     }
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
-    single { ShopifyNetworkConfig.apolloClient }
-    single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get(), get()) }
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 

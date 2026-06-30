@@ -5,9 +5,10 @@ import com.iti.domain.models.Product
 import com.iti.domain.models.Money
 import com.iti.domain.models.ProductImage
 
-fun Product.toFavoriteEntity(): FavoriteEntity {
+fun Product.toFavoriteEntity(userId: String): FavoriteEntity {
     return FavoriteEntity(
-        id = this.id,
+        productId = this.id,
+        userId = userId,
         title = this.title,
         price = this.minPrice.amount,
         imageUrl = this.images.firstOrNull()?.url ?: ""
@@ -16,7 +17,7 @@ fun Product.toFavoriteEntity(): FavoriteEntity {
 
 fun FavoriteEntity.toDomainProduct(): Product {
     return Product(
-        id = this.id,
+        id = this.productId,
         title = this.title,
         description = "",
         handle = "",
@@ -26,6 +27,7 @@ fun FavoriteEntity.toDomainProduct(): Product {
         minPrice = Money(amount = this.price, currencyCode = "EGP"),
         maxPrice = Money(amount = this.price, currencyCode = "EGP"),
         images = if (this.imageUrl.isNotEmpty()) listOf(ProductImage(url = this.imageUrl, altText = null)) else emptyList(),
-        variants = emptyList()
+        variants = emptyList(),
+        isFavorite = true
     )
 }
