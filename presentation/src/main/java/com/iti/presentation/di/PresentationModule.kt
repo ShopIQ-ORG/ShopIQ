@@ -7,7 +7,6 @@ import com.iti.presentation.screens.auth.signin.SignInViewModel
 import com.iti.presentation.screens.auth.signup.SignUpViewModel
 import com.iti.presentation.screens.brands.AllBrandsViewModel
 import com.iti.presentation.screens.category.CategoryViewModel
-import com.iti.presentation.screens.products.AllProductsViewModel
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.splash.SplashViewModel

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Product
 import com.iti.presentation.R
 import com.iti.presentation.components.ErrorScreen
-import com.iti.presentation.components.NoResultsScreen
+import com.iti.presentation.components.NoResultsFeedback
 import com.iti.presentation.components.ProductsGrid
 import com.iti.presentation.components.ProductsStaticGrid
 import com.valentinilk.shimmer.shimmer
@@ -117,11 +117,12 @@ fun SearchScreen(
                 }
                 is SearchContract.ScreenState.Suggestions -> {
                     if (screenState.products.isEmpty()) {
-                        NoResultsScreen(
-                            query = state.query,
-                            onTryAnotherSearch = { focusRequester.requestFocus() },
-                            onBrowseCategories = onNavigateBack
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            NoResultsFeedback(query = state.query)
+                        }
                     } else {
                         ProductsGrid(
                             products = screenState.products,
@@ -134,11 +135,12 @@ fun SearchScreen(
                 }
                 is SearchContract.ScreenState.Success -> {
                     if (screenState.products.isEmpty()) {
-                        NoResultsScreen(
-                            query = state.query,
-                            onTryAnotherSearch = { focusRequester.requestFocus() },
-                            onBrowseCategories = onNavigateBack
-                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            NoResultsFeedback(query = state.query)
+                        }
                     } else {
                         ProductsGrid(
                             products = screenState.products,

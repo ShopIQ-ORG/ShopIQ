@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -124,7 +125,7 @@ fun NoResultsScreen(
             shape = RoundedCornerShape(CORNER_RADIUS)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.home_fill),
+                imageVector = Icons.Rounded.Home,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.primary

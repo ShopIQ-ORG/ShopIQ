@@ -19,7 +19,6 @@ import com.iti.presentation.screens.splash.SplashDestination
 import com.iti.presentation.screens.splash.SplashScreen
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
-import com.iti.presentation.screens.products.AllProductsScreen
 import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
