@@ -9,6 +9,7 @@ import com.iti.presentation.screens.brands.AllBrandsViewModel
 import com.iti.presentation.screens.category.CategoryViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.splash.SplashViewModel
+import com.iti.presentation.screens.wishlist.WishlistViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -24,4 +25,6 @@ val presentationModule = module {
     viewModel { AllProductsViewModel(get()) }
     viewModel { ProductDetailsViewModel(get()) }
     viewModel { SplashViewModel(get(), get()) }
+
+    viewModel { WishlistViewModel(get(), get()) }
 }
