@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
@@ -23,7 +25,8 @@ class AllProductsViewModel(
     private val getProductsByNumberUseCase: GetProductsByNumberUseCase,
     private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
-    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase
+    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AllProductsContract.State())
@@ -31,6 +34,8 @@ class AllProductsViewModel(
 
     private val _effect = Channel<AllProductsContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     private val _activeBrand = MutableStateFlow<String?>(null)
     private var isDataLoaded = false
@@ -55,34 +60,31 @@ class AllProductsViewModel(
 
     private fun toggleFavorite(product: Product) {
         viewModelScope.launch {
-            try {
-                val isCurrentlyFavorite = product.isFavorite
-                // Optimistic update
-                updateProductFavoriteStatus(product.id, !isCurrentlyFavorite)
+            val userResult = getCurrentUserUseCase()
+            if (userResult is Result.Success && userResult.data is User.GuestUser) {
+                emitEffect(AllProductsContract.Effect.ShowAuthRequired)
+                return@launch
+            }
 
-                if (isCurrentlyFavorite) {
-                    removeProductFromFavoritesUseCase(product.id)
+            val productId = product.id
+            val isFavorite = product.isFavorite
+
+            try {
+                // Optimistic update via override map
+                favoriteOverrides.update { it + (productId to !isFavorite) }
+
+                if (isFavorite) {
+                    removeProductFromFavoritesUseCase(productId)
                 } else {
                     addProductToFavoritesUseCase(product)
                 }
+                
+                // Clear override after a short delay
+                kotlinx.coroutines.delay(500)
+                favoriteOverrides.update { it - productId }
             } catch (e: Exception) {
-                // Revert optimistic update on failure
-                updateProductFavoriteStatus(product.id, product.isFavorite)
-            }
-        }
-    }
-
-    private fun updateProductFavoriteStatus(productId: String, isFavorite: Boolean) {
-        _state.update { currentState ->
-            if (currentState.screenState is AllProductsContract.ScreenState.Success) {
-                val updatedProducts = currentState.screenState.products.map {
-                    if (it.id == productId) it.copy(isFavorite = isFavorite) else it
-                }
-                currentState.copy(
-                    screenState = AllProductsContract.ScreenState.Success(updatedProducts)
-                )
-            } else {
-                currentState
+                // Revert optimistic update
+                favoriteOverrides.update { it - productId }
             }
         }
     }
@@ -92,8 +94,9 @@ class AllProductsViewModel(
             combine(
                 getProductsByNumberUseCase(),
                 getFavoriteProductsUseCase(),
-                _activeBrand
-            ) { productsResult, favoritesResult, brandName ->
+                _activeBrand,
+                favoriteOverrides
+            ) { productsResult, favoritesResult, brandName, overrides ->
                 _state.update { it.copy(activeBrand = brandName) }
                 
                 when (productsResult) {
@@ -107,7 +110,9 @@ class AllProductsViewModel(
                         }
                         
                         val productsWithFavorites = allProducts.map { product ->
-                            product.copy(isFavorite = product.id in favoriteIds)
+                            val isFavoriteInDb = product.id in favoriteIds
+                            val isFavorite = overrides[product.id] ?: isFavoriteInDb
+                            product.copy(isFavorite = isFavorite)
                         }
                         
                         val filtered = if (brandName != null) {

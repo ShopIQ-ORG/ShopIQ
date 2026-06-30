@@ -6,6 +6,7 @@ sealed interface WishlistUiState {
     object Loading : WishlistUiState
     data class Success(val products: List<Product>) : WishlistUiState
     data class Error(val message: String) : WishlistUiState
+    object RequireAuth : WishlistUiState
 }
 
 sealed interface WishlistIntent {
@@ -15,4 +16,5 @@ sealed interface WishlistIntent {
 
 sealed interface WishlistUiEffect {
     data class ShowToast(val message: String) : WishlistUiEffect
+    object NavigateToAuth : WishlistUiEffect
 }

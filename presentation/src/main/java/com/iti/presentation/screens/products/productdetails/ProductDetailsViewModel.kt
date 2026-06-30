@@ -3,16 +3,21 @@ package com.iti.presentation.screens.products.productdetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
-import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -20,7 +25,8 @@ class ProductDetailsViewModel(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
-    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase
+    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -28,6 +34,8 @@ class ProductDetailsViewModel(
 
     private val _sideEffects = MutableSharedFlow<ProductDetailsSideEffect>()
     val sideEffects: SharedFlow<ProductDetailsSideEffect> = _sideEffects.asSharedFlow()
+
+    private val favoriteOverride = MutableStateFlow<Boolean?>(null)
 
     fun handleIntent(intent: ProductDetailsIntent) {
         when (intent) {
@@ -49,7 +57,12 @@ class ProductDetailsViewModel(
                     }
                     is Result.Success -> {
                         val product = result.data
-                        observeFavoriteStatus(product.id)
+                        
+                        val userResult = getCurrentUserUseCase()
+                        if (userResult is Result.Success && userResult.data is User.AuthenticatedUser) {
+                            observeFavoriteStatus(product.id)
+                        }
+
                         _state.update {
                             it.copy(
                                 isLoading = false,
@@ -76,12 +89,15 @@ class ProductDetailsViewModel(
 
     private fun observeFavoriteStatus(productId: String) {
         viewModelScope.launch {
-            getFavoriteProductsUseCase().collect { result ->
+            combine(
+                getFavoriteProductsUseCase(),
+                favoriteOverride
+            ) { result: Result<List<com.iti.domain.models.Product>>, override: Boolean? ->
                 if (result is Result.Success) {
-                    val isFavorite = result.data.any { it.id == productId }
-                    _state.update { it.copy(isWishlisted = isFavorite) }
+                    val isFavoriteInDb = result.data.any { it.id == productId }
+                    _state.update { it.copy(isWishlisted = override ?: isFavoriteInDb) }
                 }
-            }
+            }.collect()
         }
     }
 
@@ -102,9 +118,16 @@ class ProductDetailsViewModel(
         val currentlyWishlisted = _state.value.isWishlisted
         
         viewModelScope.launch {
+            val userResult = getCurrentUserUseCase()
+            if (userResult is Result.Success && userResult.data is User.GuestUser) {
+                _sideEffects.emit(ProductDetailsSideEffect.NavigateToAuth)
+                return@launch
+            }
+
             try {
-                // Optimistic update
-                _state.update { it.copy(isWishlisted = !currentlyWishlisted) }
+                val newStatus = !currentlyWishlisted
+                // Optimistic update via override
+                favoriteOverride.value = newStatus
 
                 if (currentlyWishlisted) {
                     removeProductFromFavoritesUseCase(currentProduct.id)
@@ -112,11 +135,15 @@ class ProductDetailsViewModel(
                     addProductToFavoritesUseCase(currentProduct)
                 }
                 
-                val message = if (!currentlyWishlisted) "Added to Wishlist" else "Removed from Wishlist"
+                val message = if (newStatus) "Added to Wishlist" else "Removed from Wishlist"
                 _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
+                
+                // Clear override after short delay
+                kotlinx.coroutines.delay(500)
+                favoriteOverride.value = null
             } catch (e: Exception) {
                 // Revert optimistic update
-                _state.update { it.copy(isWishlisted = currentlyWishlisted) }
+                favoriteOverride.value = null
                 _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Error: ${e.message}"))
             }
         }

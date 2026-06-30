@@ -88,6 +88,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToAllBrands = { backStack.add(Screen.AllBrands) },
                     onNavigateToAllProducts = { brandName ->
                         backStack.add(Screen.AllProducts(brandName))
+                    },
+                    onNavigateToAuth = {
+                        backStack.add(Screen.SignIn)
                     }
                 )
             }
@@ -107,6 +110,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateBack = { backStack.removeLastOrNull() },
                     onNavigateToProduct = { productId ->
                         backStack.add(Screen.ProductDetails(productId = productId))
+                    },
+                    onNavigateToAuth = {
+                        backStack.add(Screen.SignIn)
                     }
                 )
             }
@@ -114,7 +120,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.ProductDetails> { productDetailsScreen ->
                 ProductDetailsScreen(
                     productId = productDetailsScreen.productId,
-                    onBackClick = { backStack.removeLastOrNull() }
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onNavigateToAuth = {
+                        backStack.add(Screen.SignIn)
+                    }
                 )
             }
         }

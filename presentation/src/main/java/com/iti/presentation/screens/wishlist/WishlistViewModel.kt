@@ -3,6 +3,8 @@ package com.iti.presentation.screens.wishlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import kotlinx.coroutines.channels.Channel
@@ -14,7 +16,8 @@ import kotlinx.coroutines.launch
 
 class WishlistViewModel(
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
-    private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase
+    private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WishlistUiState>(WishlistUiState.Loading)
@@ -36,6 +39,12 @@ class WishlistViewModel(
 
     private fun loadFavorites() {
         viewModelScope.launch {
+            val userResult = getCurrentUserUseCase()
+            if (userResult is Result.Success && userResult.data is User.GuestUser) {
+                _uiState.value = WishlistUiState.RequireAuth
+                return@launch
+            }
+
             getFavoriteProductsUseCase().collect { result ->
                 when (result) {
                     is Result.Loading -> _uiState.value = WishlistUiState.Loading

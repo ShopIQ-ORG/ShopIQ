@@ -3,6 +3,8 @@ package com.iti.presentation.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetAdsUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
@@ -28,7 +30,8 @@ class HomeViewModel(
     private val logoutUseCase: LogoutUseCase,
     private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
-    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase
+    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeContract.State())
@@ -36,6 +39,9 @@ class HomeViewModel(
 
     private val _effect = Channel<HomeContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
+
+    // To track local favorite overrides during async DB updates to prevent flickering
+    private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     init {
         sendIntent(HomeContract.Intent.LoadData)
@@ -75,36 +81,32 @@ class HomeViewModel(
 
     private fun toggleFavorite(product: com.iti.domain.models.Product) {
         viewModelScope.launch {
-            try {
-                val isCurrentlyFavorite = product.isFavorite
-                // Optimistic update
-                updateProductFavoriteStatus(product.id, !isCurrentlyFavorite)
+            val userResult = getCurrentUserUseCase()
+            if (userResult is Result.Success && userResult.data is User.GuestUser) {
+                emitEffect(HomeContract.Effect.ShowAuthRequired)
+                return@launch
+            }
 
-                if (isCurrentlyFavorite) {
-                    removeProductFromFavoritesUseCase(product.id)
+            val productId = product.id
+            val isFavorite = product.isFavorite
+            
+            try {
+                // Optimistic update via override map
+                favoriteOverrides.update { it + (productId to !isFavorite) }
+
+                if (isFavorite) {
+                    removeProductFromFavoritesUseCase(productId)
                 } else {
                     addProductToFavoritesUseCase(product)
                 }
+                
+                // Clear override after a short delay to ensure DB flow has emitted the new state
+                // This prevents the heart from "jumping" back and forth
+                kotlinx.coroutines.delay(500)
+                favoriteOverrides.update { it - productId }
             } catch (e: Exception) {
-                // Revert optimistic update on failure
-                updateProductFavoriteStatus(product.id, product.isFavorite)
-            }
-        }
-    }
-
-    private fun updateProductFavoriteStatus(productId: String, isFavorite: Boolean) {
-        _state.update { currentState ->
-            if (currentState.screenState is HomeContract.ScreenState.Success) {
-                val updatedProducts = currentState.screenState.data.products.map {
-                    if (it.id == productId) it.copy(isFavorite = isFavorite) else it
-                }
-                currentState.copy(
-                    screenState = HomeContract.ScreenState.Success(
-                        currentState.screenState.data.copy(products = updatedProducts)
-                    )
-                )
-            } else {
-                currentState
+                // Revert optimistic update
+                favoriteOverrides.update { it - productId }
             }
         }
     }
@@ -116,8 +118,9 @@ class HomeViewModel(
                 getProductsByNumberUseCase(),
                 getBrandsUseCase(),
                 getAdsUseCase(),
-                getFavoriteProductsUseCase()
-            ) { productsResult, brandsResult, adsResult, favoritesResult ->
+                getFavoriteProductsUseCase(),
+                favoriteOverrides
+            ) { productsResult, brandsResult, adsResult, favoritesResult, overrides ->
                 val anyLoading = productsResult is Result.Loading
                         || brandsResult is Result.Loading
                         || adsResult is Result.Loading
@@ -152,7 +155,9 @@ class HomeViewModel(
                         }
                         
                         val updatedProducts = products.map { product ->
-                            product.copy(isFavorite = product.id in favoriteIds)
+                            val isFavoriteInDb = product.id in favoriteIds
+                            val isFavorite = overrides[product.id] ?: isFavoriteInDb
+                            product.copy(isFavorite = isFavorite)
                         }
 
                         HomeContract.ScreenState.Success(

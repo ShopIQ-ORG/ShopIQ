@@ -39,6 +39,7 @@ fun HomeScreen(
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onNavigateToAuth: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -66,6 +67,10 @@ fun HomeScreen(
                 HomeContract.Effect.NavigateToSplash -> {
                     onNavigateToSplash()
                 }
+
+                HomeContract.Effect.ShowAuthRequired -> {
+                    onNavigateToAuth()
+                }
             }
         }
     }
@@ -74,7 +79,8 @@ fun HomeScreen(
         state = state,
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
-        onNavigateToProduct = onNavigateToProduct
+        onNavigateToProduct = onNavigateToProduct,
+        onNavigateToAuth = onNavigateToAuth
     )
 }
 
@@ -83,7 +89,8 @@ fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
     onLogout: () -> Unit,
-    onNavigateToProduct: (Long) -> Unit
+    onNavigateToProduct: (Long) -> Unit,
+    onNavigateToAuth: () -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -162,7 +169,8 @@ fun HomeScreenContent(
                         val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
                         onNavigateToProduct(idLong)
                     },
-                    onExploreClick = { selectedIndex = 0 }
+                    onExploreClick = { selectedIndex = 0 },
+                    onAuthClick = onNavigateToAuth
                 )
             }
 

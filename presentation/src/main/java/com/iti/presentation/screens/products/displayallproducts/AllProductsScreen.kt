@@ -45,6 +45,7 @@ fun AllProductsScreen(
     brandName: String? = null,
     onNavigateBack: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onNavigateToAuth: () -> Unit,
     viewModel: AllProductsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -60,6 +61,10 @@ fun AllProductsScreen(
                 is AllProductsContract.Effect.NavigateToProduct -> {
                     val idLong = effect.productId.substringAfterLast("/").toLong()
                     onNavigateToProduct(idLong)
+                }
+
+                AllProductsContract.Effect.ShowAuthRequired -> {
+                    onNavigateToAuth()
                 }
             }
         }

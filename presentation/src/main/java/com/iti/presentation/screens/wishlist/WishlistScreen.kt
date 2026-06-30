@@ -35,6 +35,7 @@ fun WishlistScreen(
     onBackClick: () -> Unit,
     onExploreProductsClick: () -> Unit,
     onProductClick: (String) -> Unit,
+    onAuthClick: () -> Unit,
     viewModel: WishlistViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -53,6 +54,7 @@ fun WishlistScreen(
                 is WishlistUiEffect.ShowToast -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
                 }
+                is WishlistUiEffect.NavigateToAuth -> onAuthClick()
             }
         }
     }
@@ -107,6 +109,14 @@ fun WishlistScreen(
                             onProductClick = onProductClick
                         )
                     }
+                }
+                is WishlistUiState.RequireAuth -> {
+                    GuestWishlistState(
+                        textSecondaryColor = textSecondaryColor,
+                        buttonBgColor = buttonBgColor,
+                        buttonTextColor = buttonTextColor,
+                        onAuthClick = onAuthClick
+                    )
                 }
                 is WishlistUiState.Error -> {
                     ErrorScreen(
@@ -180,6 +190,74 @@ fun EmptyWishlistState(
         ) {
             Text(
                 text = "Explore Products",
+                style = MaterialTheme.typography.labelLarge,
+                color = buttonTextColor
+            )
+        }
+    }
+}
+
+@Composable
+fun GuestWishlistState(
+    textSecondaryColor: androidx.compose.ui.graphics.Color,
+    buttonBgColor: androidx.compose.ui.graphics.Color,
+    buttonTextColor: androidx.compose.ui.graphics.Color,
+    onAuthClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(
+                    color = PrimaryLight.copy(alpha = 0.1f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = null,
+                modifier = Modifier.size(50.dp),
+                tint = PrimaryLight
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Wishlist is locked",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = "You need to sign in or sign up to save your favorite products and view them here.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = textSecondaryColor,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onAuthClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = buttonBgColor)
+        ) {
+            Text(
+                text = "Sign In / Sign Up",
                 style = MaterialTheme.typography.labelLarge,
                 color = buttonTextColor
             )

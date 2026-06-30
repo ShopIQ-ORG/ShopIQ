@@ -14,11 +14,13 @@ import com.iti.presentation.screens.wishlist.WishlistScreen
 @Composable
 fun WishlistTabContent(
     onProductClick: (String) -> Unit = {},
-    onExploreClick: () -> Unit = {}
+    onExploreClick: () -> Unit = {},
+    onAuthClick: () -> Unit = {}
 ) {
     WishlistScreen(
         onBackClick = {},
         onExploreProductsClick = onExploreClick,
-        onProductClick = onProductClick
+        onProductClick = onProductClick,
+        onAuthClick = onAuthClick
     )
 }
