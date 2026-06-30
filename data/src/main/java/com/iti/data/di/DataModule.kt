@@ -9,6 +9,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.room.Room
 import com.iti.data.repositories.OnboardingRepositoryImpl
 import com.iti.domain.repositories.onboarding.OnboardingRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -16,13 +17,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
 import com.iti.data.sources.remote.auth.AuthRemoteDataSourceImpl
 import com.iti.data.repositories.AuthRepositoryImpl
+import com.iti.data.sources.local.AppDatabase
 import com.iti.domain.repositories.auth.AuthRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+
 val dataModule = module {
     single { ShopifyNetworkConfig.apolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get()) }
+    single<ProductsRepository> { ProductsRepositoryImpl(get(), get()) }
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create(
             produceFile = {
@@ -33,10 +36,16 @@ val dataModule = module {
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
     single { ShopifyNetworkConfig.apolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get()) }
+    single<ProductsRepository> { ProductsRepositoryImpl(get(), get()) }
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)
+            .build()
+    }
+    single { get<AppDatabase>().favoriteDao() }
 }

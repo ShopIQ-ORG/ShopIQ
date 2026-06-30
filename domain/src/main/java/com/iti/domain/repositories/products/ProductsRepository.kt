@@ -13,4 +13,10 @@ interface ProductsRepository {
     fun getProductsByNumber(count: Int = 10): Flow<Result<List<Product>>>
     fun getProductDetails(productId: Long): Flow<Result<Product>>
     fun getMainCategories(): Flow<Result<List<Category>>>
+
+    suspend fun addToFavorites(product: Product)
+    suspend fun removeFromFavorites(productId: String)
+    fun getFavorites(): Flow<Result<List<Product>>>
+    suspend fun isFavorite(productId: String): Boolean
+
 }

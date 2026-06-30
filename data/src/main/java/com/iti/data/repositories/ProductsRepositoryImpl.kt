@@ -8,6 +8,8 @@ import com.iti.data.mappers.toDomainBrand
 import com.iti.data.mappers.toDomainProducts
 import com.iti.data.mappers.toDomainProduct
 import com.iti.data.mappers.toDomainCategories
+import com.iti.data.mappers.toFavoriteEntity
+import com.iti.data.sources.local.FavoriteDao
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
@@ -20,7 +22,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class ProductsRepositoryImpl(
-    private val remoteDataSource: ProductsRemoteDataSource
+    private val remoteDataSource: ProductsRemoteDataSource,
+    private val favoriteDao: FavoriteDao
 ) : ProductsRepository {
 
     override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
@@ -74,5 +77,30 @@ class ProductsRepositoryImpl(
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
+    }
+
+
+
+    override suspend fun addToFavorites(product: Product) {
+        favoriteDao.insertFavorite(product.toFavoriteEntity())
+    }
+
+    override suspend fun removeFromFavorites(productId: String) {
+        favoriteDao.deleteFavorite(productId)
+    }
+
+    override fun getFavorites(): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            favoriteDao.getAllFavorites().collect { list ->
+                emit(Result.Success(list.map { it.toDomainProduct() }))
+            }
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override suspend fun isFavorite(productId: String): Boolean {
+        return favoriteDao.isFavorite(productId)
     }
 }
