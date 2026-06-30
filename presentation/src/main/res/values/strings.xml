@@ -81,7 +81,7 @@
     <string name="no_results_subtitle">We couldn’t find any products matching \"%1$s\".</string>
     <string name="no_results_subtitle_generic">We couldn’t find any products matching your search.</string>
     <string name="no_results_btn_search">Try another search</string>
-    <string name="no_results_btn_browse">Browse Categories</string>
+    <string name="no_results_btn_browse">Browse Products</string>
 
     <!-- Onboarding Screen -->
     <string name="onboarding_skip">Skip</string>

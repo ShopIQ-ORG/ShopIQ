@@ -1,5 +1,5 @@
-query GetProducts($first: Int!, $sortKey: ProductSortKeys, $reverse: Boolean) {
-    products(first: $first, sortKey: $sortKey, reverse: $reverse) {
+query GetProducts($first: Int!, $query: String, $sortKey: ProductSortKeys, $reverse: Boolean) {
+    products(first: $first, query: $query, sortKey: $sortKey, reverse: $reverse) {
         edges {
             node {
                 id

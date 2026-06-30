@@ -123,7 +123,7 @@ fun NoResultsScreen(
             shape = RoundedCornerShape(CORNER_RADIUS)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.category_fill),
+                painter = painterResource(id = R.drawable.home_fill),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.primary

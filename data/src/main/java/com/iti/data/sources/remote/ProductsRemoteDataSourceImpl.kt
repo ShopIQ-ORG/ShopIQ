@@ -9,6 +9,7 @@ import com.iti.data.dto.AdDto
 import com.iti.data.dto.BrandDto
 import com.iti.data.dto.ShopifyResponse
 import com.iti.data.mappers.toShopifyResponse
+import com.iti.data.type.ProductSortKeys
 
 class ProductsRemoteDataSourceImpl(
     private val apolloClient: ApolloClient
@@ -18,6 +19,31 @@ class ProductsRemoteDataSourceImpl(
         val response = apolloClient.query(
             GetProductsQuery(
                 first = first,
+            )
+        ).execute()
+
+        if (response.hasErrors()) {
+            throw Exception(
+                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
+            )
+        }
+
+        val data = response.data ?: throw Exception("Response data is null")
+        return data.toShopifyResponse()
+    }
+
+    override suspend fun getProducts(
+        first: Int,
+        query: String?,
+        sortKey: ProductSortKeys?,
+        reverse: Boolean?
+    ): ShopifyResponse {
+        val response = apolloClient.query(
+            GetProductsQuery(
+                first = first,
+                query = com.apollographql.apollo.api.Optional.presentIfNotNull(query),
+                sortKey = com.apollographql.apollo.api.Optional.presentIfNotNull(sortKey),
+                reverse = com.apollographql.apollo.api.Optional.presentIfNotNull(reverse)
             )
         ).execute()
 

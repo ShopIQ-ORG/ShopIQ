@@ -32,4 +32,10 @@ val domainModule = module {
     factory { IsOnboardingCompletedUseCase(get()) }
     factory { SetOnboardingCompletedUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
+    factory { com.iti.domain.usecases.products.SearchProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetPopularProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.search.GetSearchHistoryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.AddSearchQueryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.DeleteSearchQueryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.ClearSearchHistoryUseCase(get()) }
 }
