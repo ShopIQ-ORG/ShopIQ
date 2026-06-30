@@ -13,6 +13,7 @@ import com.iti.domain.exceptions.AuthException
 import com.iti.domain.exceptions.NetworkException
 import java.io.IOException
 import android.util.Log
+import com.iti.domain.exceptions.CartException
 
 fun Throwable.handleException(): Throwable {
     val result = when (this) {
@@ -24,6 +25,7 @@ fun Throwable.handleException(): Throwable {
         is ApolloNetworkException -> NetworkException.NoConnection()
         is ApolloHttpException -> NetworkException.ServerError(statusCode, message)
         is IOException -> NetworkException.NoConnection()
+        is CartException -> this
         is AuthException -> this
         is NetworkException -> this
         is AppException -> this

@@ -16,7 +16,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,9 +34,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    onNavigateToSplash: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
+    onCartClick: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
@@ -63,8 +63,8 @@ fun HomeScreen(
                     onNavigateToAllProducts(effect.brandName)
                 }
 
-                HomeContract.Effect.NavigateToSplash -> {
-                    onNavigateToSplash()
+                HomeContract.Effect.NavigateToSignIn -> {
+                    onNavigateToSignIn()
                 }
             }
         }
@@ -73,7 +73,8 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onIntent = viewModel::sendIntent,
-        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) }
+        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
+        onCartClick = onCartClick
     )
 }
 
@@ -81,8 +82,9 @@ fun HomeScreen(
 fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
-    onLogout: () -> Unit
-) {
+    onLogout: () -> Unit,
+    onCartClick: () -> Unit,
+    ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
     val snackbarHostState = remember { SnackbarHostState() }
@@ -143,7 +145,8 @@ fun HomeScreenContent(
                 HomeTabContent(
                     state = state,
                     onIntent = onIntent,
-                    bottomPadding = padding.calculateBottomPadding()
+                    bottomPadding = padding.calculateBottomPadding(),
+                    onCartClick = onCartClick
                 )
             }
 

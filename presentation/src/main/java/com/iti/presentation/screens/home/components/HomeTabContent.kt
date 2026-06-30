@@ -41,7 +41,8 @@ import com.iti.presentation.screens.home.HomeContract
 fun HomeTabContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
-    bottomPadding: Dp = 0.dp
+    bottomPadding: Dp = 0.dp,
+    onCartClick: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var query by remember { mutableStateOf("") }
@@ -53,7 +54,7 @@ fun HomeTabContent(
             AppTopBar(
                 scrollBehavior = scrollBehavior,
                 onMenuClick = {},
-                onCartClick = {}
+                onCartClick = onCartClick
             )
         }
     ) { innerPadding ->

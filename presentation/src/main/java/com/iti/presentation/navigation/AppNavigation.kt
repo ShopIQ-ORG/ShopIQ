@@ -19,6 +19,7 @@ import com.iti.presentation.screens.splash.SplashDestination
 import com.iti.presentation.screens.splash.SplashScreen
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
+import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -78,9 +79,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.Home> {
                 HomeScreen(
-                    onNavigateToSplash = {
+                    onNavigateToSignIn = {
                         backStack.clear()
-                        backStack.add(Screen.Splash)
+                        backStack.add(Screen.SignIn)
                     },
                     onNavigateToProduct = { productId ->
                         backStack.add(Screen.ProductDetails(productId = productId))
@@ -88,6 +89,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToAllBrands = { backStack.add(Screen.AllBrands) },
                     onNavigateToAllProducts = { brandName ->
                         backStack.add(Screen.AllProducts(brandName))
+                    },
+                    onCartClick = {
+                        if (backStack.lastOrNull() !is Screen.Cart) {
+                            backStack.add(Screen.Cart)
+                        }
                     }
                 )
             }
@@ -115,6 +121,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = productDetailsScreen.productId,
                     onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
+
+            entry<Screen.Cart> {
+                CartScreen(
+                    onBack = { backStack.removeLastOrNull() },
+                    onCheckout = {},
+                    onBrowseProducts = {}
                 )
             }
         }

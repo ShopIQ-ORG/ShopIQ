@@ -1,5 +1,6 @@
 package com.iti.data.sources.remote.auth
 
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -35,27 +36,23 @@ class AuthRemoteDataSourceImpl(
 
     override suspend fun loginWithGoogle(idToken: String): UserDto {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        return linkOrSignIn(credential) { uid, isNew ->
-            if (isNew) {
-                UserDto(
-                    id = uid,
-                    fullName = auth.currentUser?.displayName.orEmpty(),
-                    email = auth.currentUser?.email.orEmpty()
-                )
-            } else null
+        return linkOrSignIn(credential) { uid, profile ->
+            UserDto(
+                id = uid,
+                fullName = (profile?.get("name") as? String).orEmpty(),
+                email = (profile?.get("email") as? String).orEmpty()
+            )
         }
     }
 
     override suspend fun loginWithFacebook(accessToken: String): UserDto {
         val credential = FacebookAuthProvider.getCredential(accessToken)
-        return linkOrSignIn(credential) { uid, isNew ->
-            if (isNew) {
-                UserDto(
-                    id = uid,
-                    fullName = auth.currentUser?.displayName.orEmpty(),
-                    email = auth.currentUser?.email.orEmpty()
-                )
-            } else null
+        return linkOrSignIn(credential) { uid, profile ->
+            UserDto(
+                id = uid,
+                fullName = (profile?.get("name") as? String).orEmpty(),
+                email = (profile?.get("email") as? String).orEmpty()
+            )
         }
     }
 
@@ -63,7 +60,6 @@ class AuthRemoteDataSourceImpl(
         val result = auth.signInAnonymously().await()
         val uid = result.user?.uid ?: throw AuthException.UserNotFound()
         val userDto = UserDto(id = uid, isGuest = true)
-        // Register the guest doc so cart ID has somewhere to live.
         saveUserDocument(uid, userDto, merge = true)
         return userDto
     }
@@ -102,8 +98,8 @@ class AuthRemoteDataSourceImpl(
     override fun logout() = auth.signOut()
 
     private suspend fun linkOrSignIn(
-        credential: com.google.firebase.auth.AuthCredential,
-        buildNewUserDto: (uid: String, isNew: Boolean) -> UserDto?
+        credential: AuthCredential,
+        buildUserDto: (uid: String, profile: Map<String, Any?>?) -> UserDto
     ): UserDto {
         val currentUser = auth.currentUser
 
@@ -111,14 +107,9 @@ class AuthRemoteDataSourceImpl(
             try {
                 val result = currentUser.linkWithCredential(credential).await()
                 val uid = result.user?.uid ?: throw AuthException.UserNotFound()
-                val isNew = result.additionalUserInfo?.isNewUser == true
-                val newDto = buildNewUserDto(uid, isNew)
-                return if (newDto != null) {
-                    saveUserDocument(uid, newDto, merge = true)
-                    newDto
-                } else {
-                    getUserDocument(uid)
-                }
+                val dto = buildUserDto(uid, result.additionalUserInfo?.profile)
+                saveUserDocument(uid, dto, merge = true)
+                return dto
             } catch (_: FirebaseAuthUserCollisionException) {
                 val previousUid = currentUser.uid
                 val result = auth.signInWithCredential(credential).await()
@@ -130,14 +121,9 @@ class AuthRemoteDataSourceImpl(
 
         val result = auth.signInWithCredential(credential).await()
         val uid = result.user?.uid ?: throw AuthException.UserNotFound()
-        val isNew = result.additionalUserInfo?.isNewUser == true
-        val newDto = buildNewUserDto(uid, isNew)
-        return if (newDto != null) {
-            saveUserDocument(uid, newDto, merge = true)
-            newDto
-        } else {
-            getUserDocument(uid)
-        }
+        val dto = buildUserDto(uid, result.additionalUserInfo?.profile)
+        saveUserDocument(uid, dto, merge = true)
+        return dto
     }
 
     private suspend fun mergeGuestCartInto(guestUid: String, targetUid: String) {

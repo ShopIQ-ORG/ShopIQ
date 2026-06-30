@@ -101,4 +101,31 @@
     <string name="search_placeholder">Search for products, brands...</string>
     <string name="network_connection_lost">Internet connection lost</string>
     <string name="product_details">Product Details</string>
+
+    <string name="cart_title">My Cart</string>
+    <string name="cart_promo_label">Have a promo code?</string>
+    <string name="cart_promo_apply">Apply</string>
+    <string name="cart_promo_hint">Enter code</string>
+    <string name="cart_subtotal">Subtotal</string>
+    <string name="cart_discount">Discount</string>
+    <string name="cart_shipping">Shipping</string>
+    <string name="cart_shipping_free">Free</string>
+    <string name="cart_total">Total</string>
+    <string name="cart_proceed_to_checkout">Proceed to Checkout</string>
+    <string name="cart_remove_item_cd">Remove item</string>
+    <string name="cart_empty_title">Your cart is empty</string>
+    <string name="cart_empty_subtitle">Add items to get started</string>
+    <string name="cart_browse_products">Browse Products</string>
+    <string name="cart_promo_empty_error">Please enter a promo code</string>
+    <string name="cart_promo_invalid_error">Invalid promo code</string>
+    <string name="cart_quantity_update_error">Failed to update quantity</string>
+    <string name="cart_remove_item_error">Failed to remove item</string>
+    <string name="cart_load_error">Unknown error</string>
+
+    <!-- res/values/plurals.xml (or inside strings.xml, both work) -->
+    <plurals name="cart_items_count">
+        <item quantity="one">%d Item</item>
+        <item quantity="other">%d Items</item>
+    </plurals>
+
 </resources>
