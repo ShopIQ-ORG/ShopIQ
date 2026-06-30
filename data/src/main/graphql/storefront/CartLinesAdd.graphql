@@ -1,0 +1,11 @@
+mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+  cartLinesAdd(cartId: $cartId, lines: $lines) {
+    cart {
+      id
+      lines(first: 5) {
+        edges { node { id quantity } }
+      }
+    }
+    userErrors { field message }
+  }
+}

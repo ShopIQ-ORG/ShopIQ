@@ -66,6 +66,12 @@ kotlin {
 apollo {
     service("shopify") {
         packageName.set("com.iti.data")
+        srcDir("src/main/graphql/admin")
+    }
+
+    service("shopify-storefront") {
+        packageName.set("com.iti.data.storefront")
+        srcDir("src/main/graphql/storefront")
     }
 }
 

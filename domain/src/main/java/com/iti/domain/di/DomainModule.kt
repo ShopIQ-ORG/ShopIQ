@@ -11,11 +11,10 @@ import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
 import com.iti.domain.usecases.auth.RegisterUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
-import com.iti.domain.usecases.cart.ApplyPromoCodeUseCase
-import com.iti.domain.usecases.cart.DecreaseCartItemQuantityUseCase
+import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
 import com.iti.domain.usecases.cart.GetCartUseCase
-import com.iti.domain.usecases.cart.IncreaseCartItemQuantityUseCase
 import com.iti.domain.usecases.cart.RemoveCartItemUseCase
+import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
@@ -38,8 +37,7 @@ val domainModule = module {
     factory { SetOnboardingCompletedUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
     factory { GetCartUseCase(get()) }
-    factory { IncreaseCartItemQuantityUseCase(get()) }
-    factory { DecreaseCartItemQuantityUseCase(get()) }
+    factory { UpdateCartItemQuantityUseCase(get()) }
     factory { RemoveCartItemUseCase(get()) }
-    factory { ApplyPromoCodeUseCase(get()) }
+    factory { ApplyDiscountCodesUseCase(get()) }
 }

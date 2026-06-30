@@ -1,0 +1,168 @@
+schema {
+  query: QueryRoot
+  mutation: Mutation
+}
+
+scalar DateTime
+scalar URL
+scalar Money
+
+type QueryRoot {
+  cart(id: ID!): Cart
+}
+
+type Mutation {
+  cartCreate(input: CartInput!): CartCreatePayload
+  cartLinesAdd(cartId: ID!, lines: [CartLineInput!]!): CartLinesAddPayload
+  cartLinesUpdate(cartId: ID!, lines: [CartLineUpdateInput!]!): CartLinesUpdatePayload
+  cartLinesRemove(cartId: ID!, lineIds: [ID!]!): CartLinesRemovePayload
+  cartDiscountCodesUpdate(cartId: ID!, discountCodes: [String!]!): CartDiscountCodesUpdatePayload
+}
+
+type Cart {
+  id: ID!
+  lines(first: Int): CartLineConnection!
+  discountCodes: [CartDiscountCode!]!
+  cost: CartCost!
+  buyerIdentity: CartBuyerIdentity
+}
+
+type CartLineConnection {
+  edges: [CartLineEdge!]!
+}
+
+type CartLineEdge {
+  node: CartLine!
+}
+
+type CartLine {
+  id: ID!
+  quantity: Int!
+  cost: CartLineCost!
+  merchandise: CartLineMerchandise!
+}
+
+type CartLineCost {
+  amountPerQuantity: MoneyV2!
+  subtotalAmount: MoneyV2!
+  totalAmount: MoneyV2!
+}
+
+interface CartLineMerchandise {
+  __typename: String!
+}
+
+type ProductVariant implements CartLineMerchandise {
+  id: ID!
+  title: String!
+  image: Image
+  price: MoneyV2!
+  compareAtPrice: MoneyV2
+  selectedOptions: [SelectedOption!]!
+  product: Product!
+}
+
+type Product {
+  id: ID!
+  title: String!
+  handle: String!
+  featuredImage: Image
+  vendor: String
+}
+
+type Image {
+  id: ID
+  url: URL!
+  altText: String
+}
+
+type SelectedOption {
+  name: String!
+  value: String!
+}
+
+type CartDiscountCode {
+  code: String!
+  applicable: Boolean!
+}
+
+type CartCost {
+  subtotalAmount: MoneyV2!
+  totalAmount: MoneyV2!
+  totalTaxAmount: MoneyV2
+  totalDutyAmount: MoneyV2
+}
+
+type CartBuyerIdentity {
+  email: String
+  phone: String
+  countryCode: String
+}
+
+type MoneyV2 {
+  amount: String!
+  currencyCode: CurrencyCode!
+}
+
+enum CurrencyCode {
+  USD
+  EUR
+  GBP
+  EGP
+  SAR
+  AED
+  CAD
+  AUD
+  JPY
+  CNY
+  INR
+}
+
+input CartInput {
+  lines: [CartLineInput!]
+  buyerIdentity: CartBuyerIdentityInput
+}
+
+input CartLineInput {
+  merchandiseId: ID!
+  quantity: Int!
+}
+
+input CartLineUpdateInput {
+  id: ID!
+  quantity: Int!
+}
+
+input CartBuyerIdentityInput {
+  email: String
+}
+
+type CartCreatePayload {
+  cart: Cart
+  userErrors: [UserError!]!
+}
+
+type CartLinesAddPayload {
+  cart: Cart
+  userErrors: [UserError!]!
+}
+
+type CartLinesUpdatePayload {
+  cart: Cart
+  userErrors: [UserError!]!
+}
+
+type CartLinesRemovePayload {
+  cart: Cart
+  userErrors: [UserError!]!
+}
+
+type CartDiscountCodesUpdatePayload {
+  cart: Cart
+  userErrors: [UserError!]!
+}
+
+type UserError {
+  field: [String!]
+  message: String!
+}

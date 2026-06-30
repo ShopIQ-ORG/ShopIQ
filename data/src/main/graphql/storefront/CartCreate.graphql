@@ -1,0 +1,6 @@
+mutation CartCreate {
+  cartCreate(input: {}) {
+    cart { id }
+    userErrors { field message }
+  }
+}

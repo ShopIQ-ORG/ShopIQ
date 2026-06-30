@@ -1,0 +1,86 @@
+query GetCart($id: ID!) {
+  cart(id: $id) {
+    id
+    lines(first: 100) {
+      edges {
+        node {
+          id
+          quantity
+          cost {
+            amountPerQuantity {
+              amount
+              currencyCode
+            }
+            subtotalAmount {
+              amount
+              currencyCode
+            }
+            totalAmount {
+              amount
+              currencyCode
+            }
+          }
+          merchandise {
+            ... on ProductVariant {
+              id
+              title
+              image {
+                url
+                altText
+              }
+              price {
+                amount
+                currencyCode
+              }
+              compareAtPrice {
+                amount
+                currencyCode
+              }
+              selectedOptions {
+                name
+                value
+              }
+              product {
+                id
+                title
+                handle
+                featuredImage {
+                  url
+                  altText
+                }
+                vendor
+              }
+            }
+          }
+        }
+      }
+    }
+    buyerIdentity {
+      email
+      phone
+      countryCode
+    }
+    discountCodes {
+      code
+      applicable
+    }
+    cost {
+      subtotalAmount {
+        amount
+        currencyCode
+      }
+      totalAmount {
+        amount
+        currencyCode
+      }
+      totalTaxAmount {
+        amount
+        currencyCode
+      }
+      totalDutyAmount {
+        amount
+        currencyCode
+      }
+    }
+  }
+}

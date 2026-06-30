@@ -5,6 +5,7 @@ import com.iti.domain.models.Money
 data class CartItem(
     val id: String,
     val productId: String,
+    val variantId: String,
     val title: String,
     val variant: String,
     val price: Money,
