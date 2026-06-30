@@ -1,6 +1,18 @@
 mutation CartCreate {
-  cartCreate(input: {}) {
-    cart { id }
-    userErrors { field message }
-  }
+
+    cartCreate(input:{}){
+
+        cart{
+
+            ...CartFields
+
+        }
+
+        userErrors{
+            field
+            message
+        }
+
+    }
+
 }

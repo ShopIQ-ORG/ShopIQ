@@ -11,6 +11,7 @@ import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.presentation.R
 import com.iti.presentation.core.UiText
 import com.iti.presentation.core.toUiMessage
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,8 @@ class CartViewModel(
 
     private val _effect = Channel<CartContract.Effect>()
     val effect = _effect.receiveAsFlow()
+
+    private val quantityUpdateJobs = mutableMapOf<String, Job>()
 
     init {
         loadCart()
@@ -100,16 +103,7 @@ class CartViewModel(
         val newQuantity = currentItem.quantity + 1
 
         updateQuantityOptimistically(itemId, newQuantity)
-
-        viewModelScope.launch {
-            when (val result = updateCartItemQuantityUseCase(itemId, newQuantity)) {
-                is Result.Failure -> {
-                    updateQuantityOptimistically(itemId, currentItem.quantity)
-                    _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
-                }
-                else -> Unit
-            }
-        }
+        debounceQuantityUpdate(itemId, newQuantity)
     }
 
     private fun decreaseQuantity(itemId: String) {
@@ -118,12 +112,20 @@ class CartViewModel(
         if (currentItem.quantity <= 1) return
 
         val newQuantity = currentItem.quantity - 1
-        updateQuantityOptimistically(itemId, newQuantity)
 
-        viewModelScope.launch {
+        updateQuantityOptimistically(itemId, newQuantity)
+        debounceQuantityUpdate(itemId, newQuantity)
+    }
+
+    private fun debounceQuantityUpdate(itemId: String, newQuantity: Int) {
+        quantityUpdateJobs[itemId]?.cancel()
+
+        quantityUpdateJobs[itemId] = viewModelScope.launch {
+            delay(500L)
+
             when (val result = updateCartItemQuantityUseCase(itemId, newQuantity)) {
                 is Result.Failure -> {
-                    updateQuantityOptimistically(itemId, currentItem.quantity)
+                    refreshCart()
                     _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
                 }
                 else -> Unit
@@ -186,5 +188,4 @@ class CartViewModel(
             }
         }
     }
-
 }

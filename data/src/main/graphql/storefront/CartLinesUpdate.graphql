@@ -1,19 +1,21 @@
-mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
-  cartLinesUpdate(cartId: $cartId, lines: $lines) {
-    cart {
-      id
-      lines(first: 100) {
-        edges {
-          node {
-            id
-            quantity
-          }
+mutation CartLinesUpdate($cartId: ID!, $lines:[CartLineUpdateInput!]!) {
+
+    cartLinesUpdate(
+        cartId:$cartId,
+        lines:$lines
+    ){
+
+        cart{
+
+            ...CartFields
+
         }
-      }
+
+        userErrors{
+            field
+            message
+        }
+
     }
-    userErrors {
-      field
-      message
-    }
-  }
+
 }

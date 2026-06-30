@@ -9,18 +9,44 @@ import com.iti.presentation.core.UiText.*
 
 fun Throwable.toUiMessage(): UiText = when (this) {
     is AppException -> when (this) {
-        is AuthException.InvalidCredentials -> StringResource(R.string.error_invalid_credentials)
-        is AuthException.UserNotFound -> StringResource(R.string.error_user_not_found)
-        is AuthException.EmailAlreadyInUse -> StringResource(R.string.error_email_already_in_use)
-        is AuthException.WeakPassword -> StringResource(R.string.error_weak_password)
-        is NetworkException.NoConnection -> StringResource(R.string.error_network)
+        is AuthException.InvalidCredentials ->
+            StringResource(R.string.error_invalid_credentials)
 
-        is AppException.Unknown -> StringResource(R.string.error_unknown)
-        is CartException.CartNotFound -> StringResource(R.string.cart_load_error)
-        is CartException.InvalidDiscountCode -> StringResource(R.string.cart_promo_invalid_error)
-        is CartException.InvalidQuantity -> StringResource(R.string.cart_quantity_update_error)
-        is CartException.UserErrors -> StringResource(R.string.something_went_wrong)
-        is NetworkException.ServerError -> StringResource(R.string.something_went_wrong)
+        is AuthException.UserNotFound ->
+            StringResource(R.string.error_user_not_found)
+
+        is AuthException.EmailAlreadyInUse ->
+            StringResource(R.string.error_email_already_in_use)
+
+        is AuthException.WeakPassword ->
+            StringResource(R.string.error_weak_password)
+
+        is NetworkException.NoConnection ->
+            StringResource(R.string.error_network)
+
+        is NetworkException.ServerError ->
+            StringResource(R.string.something_went_wrong)
+
+        is CartException.CartNotFound ->
+            StringResource(R.string.cart_load_error)
+
+        is CartException.InvalidDiscountCode ->
+            StringResource(R.string.cart_promo_invalid_error)
+
+        is CartException.InvalidQuantity ->
+            StringResource(R.string.cart_quantity_update_error)
+
+        is CartException.OperationRejected ->
+            StringResource(R.string.cart_quantity_update_error)
+
+        is CartException.GraphQLError ->
+            StringResource(R.string.something_went_wrong)
+
+        is CartException.UserErrors ->
+            StringResource(R.string.something_went_wrong)
+
+        is AppException.Unknown ->
+            StringResource(R.string.error_unknown)
     }
 
     else -> StringResource(R.string.error_unknown)

@@ -1,11 +1,21 @@
 mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
-  cartLinesAdd(cartId: $cartId, lines: $lines) {
-    cart {
-      id
-      lines(first: 5) {
-        edges { node { id quantity } }
-      }
+
+    cartLinesAdd(
+        cartId:$cartId,
+        lines:$lines
+    ){
+
+        cart{
+
+            ...CartFields
+
+        }
+
+        userErrors{
+            field
+            message
+        }
+
     }
-    userErrors { field message }
-  }
+
 }

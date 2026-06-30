@@ -26,6 +26,7 @@ import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import com.iti.data.sources.remote.cart.CartIdDataSource
 import com.iti.data.sources.remote.cart.CartIdRemoteDataSourceImpl
+import com.iti.data.sources.remote.cart.CartResponseValidator
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -56,7 +57,13 @@ val dataModule = module {
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
 
+    single<CartResponseValidator> { CartResponseValidator() }
     single<CartIdDataSource> { CartIdRemoteDataSourceImpl(get(), get()) }
-    single<CartRemoteDataSource> { CartRemoteDataSourceImpl(get(named("storefrontApolloClient"))) }
+    single<CartRemoteDataSource> {
+        CartRemoteDataSourceImpl(
+            get(named("storefrontApolloClient")),
+            get()
+        )
+    }
     single<CartRepository> { CartRepositoryImpl(get(), get()) }
 }
