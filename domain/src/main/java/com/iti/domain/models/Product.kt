@@ -30,3 +30,9 @@ data class ProductVariant(
     val price: Money,
     val availableForSale: Boolean
 )
+
+data class PaginatedProducts(
+    val products: List<Product>,
+    val hasNextPage: Boolean,
+    val endCursor: String?
+)

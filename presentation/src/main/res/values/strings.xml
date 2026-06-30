@@ -81,7 +81,7 @@
     <string name="no_results_subtitle">We couldn’t find any products matching \"%1$s\".</string>
     <string name="no_results_subtitle_generic">We couldn’t find any products matching your search.</string>
     <string name="no_results_btn_search">Try another search</string>
-    <string name="no_results_btn_browse">Browse Categories</string>
+    <string name="no_results_btn_browse">Browse Products</string>
 
     <!-- Onboarding Screen -->
     <string name="onboarding_skip">Skip</string>
@@ -98,8 +98,61 @@
     <string name="category_search_placeholder">Search categories...</string>
     <string name="category_section_title">Shop by Category</string>
     <string name="category_items_count">%1$d items</string>
-    <string name="search_placeholder">Search for products, brands...</string>
+    <string name="search_placeholder">Search for products, brands…</string>
     <string name="network_connection_lost">Internet connection lost</string>
+
+    <!-- All Products – Search -->
+    <string name="search_products_hint">Search for products…</string>
+    <string name="search_recent_label">Recent Searches</string>
+    <string name="search_popular_label">Popular Searches</string>
+    <string name="search_clear_all">Clear All</string>
+    <string name="search_empty_hint">Search for products, brands\nor categories</string>
+    <string name="search_cd_close">Close search</string>
+    <string name="search_cd_clear">Clear text</string>
+
+    <!-- All Products – Filter -->
+    <string name="filter_title">Filters</string>
+    <string name="filter_reset">Reset</string>
+    <string name="filter_by_category">Filter By Category</string>
+    <string name="filter_by_subcategory">Filter By Sub Category</string>
+    <string name="filter_by_brand">Filter By Brand</string>
+    <string name="filter_select_category">Select Category</string>
+    <string name="filter_select_subcategory">Select Sub Category</string>
+    <string name="filter_search_brand">Search Brand</string>
+    <string name="filter_apply">Apply Filters</string>
+    <string name="filter_cd_expand">Expand section</string>
+    <string name="filter_cd_collapse">Collapse section</string>
+
+    <!-- All Products – Sort -->
+    <string name="sort_title">Sort By</string>
+    <string name="sort_label">Sort By</string>
+    <string name="sort_best_seller">Best Seller</string>
+    <string name="sort_price_low_high">Price: Low to High</string>
+    <string name="sort_price_high_low">Price: High to Low</string>
+    <string name="sort_apply">Apply Sorting</string>
+    <string name="sort_price_asc_label">↑ Price</string>
+    <string name="sort_price_desc_label">↓ Price</string>
+
+    <!-- Popular Search Chips -->
+    <string name="popular_snowboard">Snowboard</string>
+    <string name="popular_shoes">Shoes</string>
+    <string name="popular_backpack">Backpack</string>
+    <string name="popular_gift_card">Gift Card</string>
+    <string name="popular_hoodie">Hoodie</string>
+    <string name="popular_sunglasses">Sunglasses</string>
+
+    <!-- All Products Toolbar / Controls -->
+    <string name="products_count">%1$d products</string>
+    <string name="filter_button_label">Filter</string>
+    <string name="sort_button_label">Sort</string>
+    <string name="all_subcategory">All</string>
+
+    <!-- Toolbar icons content descriptions -->
+    <string name="cd_search">Search</string>
+    <string name="cd_filter">Filter</string>
+    <string name="cd_sort">Sort</string>
+
+    <!-- Product Details -->
     <string name="product_details">Product Details</string>
 
     <string name="cart_title">My Cart</string>

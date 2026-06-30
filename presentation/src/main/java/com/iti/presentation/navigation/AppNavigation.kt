@@ -19,6 +19,8 @@ import com.iti.presentation.screens.splash.SplashDestination
 import com.iti.presentation.screens.splash.SplashScreen
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
+import com.iti.presentation.screens.search.SearchScreen
+import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import org.koin.androidx.compose.koinViewModel
@@ -79,10 +81,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.Home> {
                 HomeScreen(
-                    onNavigateToSignIn = {
-                        backStack.clear()
-                        backStack.add(Screen.SignIn)
-                    },
                     onNavigateToProduct = { productId ->
                         backStack.add(Screen.ProductDetails(productId = productId))
                     },
@@ -90,11 +88,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToAllProducts = { brandName ->
                         backStack.add(Screen.AllProducts(brandName))
                     },
+                    onNavigateToSearch = {
+                        backStack.add(Screen.Search)
+                    },
                     onCartClick = {
                         if (backStack.lastOrNull() !is Screen.Cart) {
                             backStack.add(Screen.Cart)
                         }
-                    }
+                    },
+                    onNavigateToSignIn = {
+                        backStack.clear()
+                        backStack.add(Screen.SignIn)
+                    },
                 )
             }
 
@@ -129,6 +134,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onBack = { backStack.removeLastOrNull() },
                     onCheckout = {},
                     onBrowseProducts = {}
+                )
+            }
+
+            entry<Screen.Search> {
+                val searchViewModel: SearchViewModel = koinViewModel()
+                SearchScreen(
+                    viewModel = searchViewModel,
+                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateToProduct = { productId ->
+                        backStack.add(Screen.ProductDetails(productId = productId))
+                    }
                 )
             }
         }

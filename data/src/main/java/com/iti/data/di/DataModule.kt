@@ -21,13 +21,20 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
+import com.iti.domain.repositories.search.SearchHistoryRepository
+import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import com.iti.data.sources.remote.cart.CartIdDataSource
 import com.iti.data.sources.remote.cart.CartIdRemoteDataSourceImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+
 import org.koin.core.qualifier.named
 
 val dataModule = module {
+    single { Gson() }
+    single { ShopifyNetworkConfig.apolloClient }
+    single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
@@ -40,6 +47,8 @@ val dataModule = module {
         )
     }
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
+    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get()) }
+
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 

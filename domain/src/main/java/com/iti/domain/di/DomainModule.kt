@@ -4,6 +4,7 @@ import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.GetAdsUseCase
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
+import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.auth.LoginAsGuestUseCase
 import com.iti.domain.usecases.auth.LoginUseCase
@@ -23,6 +24,7 @@ import org.koin.dsl.module
 
 val domainModule = module {
     factory { GetProductsByNumberUseCase(get()) }
+    factory { GetProductsPaginatedUseCase(get()) }
     factory { GetBrandsUseCase(get()) }
     factory { GetAdsUseCase(get()) }
     factory { LoginUseCase(get()) }
@@ -37,6 +39,12 @@ val domainModule = module {
     factory { IsOnboardingCompletedUseCase(get()) }
     factory { SetOnboardingCompletedUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
+    factory { com.iti.domain.usecases.products.SearchProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetPopularProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.search.GetSearchHistoryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.AddSearchQueryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.DeleteSearchQueryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.ClearSearchHistoryUseCase(get()) }
     factory { GetCartUseCase(get()) }
     factory { UpdateCartItemQuantityUseCase(get()) }
     factory { RemoveCartItemUseCase(get()) }

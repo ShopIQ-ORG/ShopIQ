@@ -6,7 +6,13 @@ import com.iti.data.dto.ShopifyResponse
 import com.iti.data.GetMainCategoriesQuery
 
 interface ProductsRemoteDataSource {
-    suspend fun getProductsByNumber(first: Int = 10): ShopifyResponse
+    suspend fun getProductsByNumber(first: Int = 10, after: String? = null): ShopifyResponse
+    suspend fun getProducts(
+        first: Int = 10,
+        query: String? = null,
+        sortKey: com.iti.data.type.ProductSortKeys? = null,
+        reverse: Boolean? = null
+    ): ShopifyResponse
     suspend fun getProductDetails(productId: Long): ShopifyResponse
     suspend fun getMainCategories(): GetMainCategoriesQuery.Data
     suspend fun getBrands(): List<BrandDto>

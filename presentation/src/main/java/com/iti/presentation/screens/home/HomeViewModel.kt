@@ -56,6 +56,9 @@ class HomeViewModel(
             is HomeContract.Intent.ViewAllProductsClicked -> emitEffect(
                 HomeContract.Effect.NavigateToAllProducts
             )
+            is HomeContract.Intent.SearchBarClicked -> emitEffect(
+                HomeContract.Effect.NavigateToSearch
+            )
             is HomeContract.Intent.Logout -> logout()
         }
     }
