@@ -12,6 +12,11 @@ import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
 import com.iti.domain.usecases.auth.RegisterUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
+import com.iti.domain.usecases.cart.AddCartItemUseCase
+import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
+import com.iti.domain.usecases.cart.GetCartUseCase
+import com.iti.domain.usecases.cart.RemoveCartItemUseCase
+import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
@@ -40,4 +45,9 @@ val domainModule = module {
     factory { com.iti.domain.usecases.search.AddSearchQueryUseCase(get()) }
     factory { com.iti.domain.usecases.search.DeleteSearchQueryUseCase(get()) }
     factory { com.iti.domain.usecases.search.ClearSearchHistoryUseCase(get()) }
+    factory { GetCartUseCase(get()) }
+    factory { UpdateCartItemQuantityUseCase(get()) }
+    factory { RemoveCartItemUseCase(get()) }
+    factory { ApplyDiscountCodesUseCase(get()) }
+    factory { AddCartItemUseCase(get()) }
 }

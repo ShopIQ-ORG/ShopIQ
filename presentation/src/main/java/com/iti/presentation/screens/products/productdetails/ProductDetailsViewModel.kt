@@ -3,6 +3,7 @@ package com.iti.presentation.screens.products.productdetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.usecases.cart.AddCartItemUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
-    private val getProductDetailsUseCase: GetProductDetailsUseCase
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
+    private val addToCartUseCase: AddCartItemUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -46,9 +48,8 @@ class ProductDetailsViewModel(
                             it.copy(
                                 isLoading = false,
                                 product = result.data,
-                                // Default selection logic
-                                selectedColor = "Beige", // default as per mockup
-                                selectedSize = "M",      // default as per mockup
+                                selectedColor = "Beige",
+                                selectedSize = "M",
                                 selectedImageIndex = 0
                             )
                         }
@@ -87,8 +88,47 @@ class ProductDetailsViewModel(
     }
 
     private fun addToCart() {
-        viewModelScope.launch {
-            _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Added to Cart!"))
+        // Guard against double taps / no selected variant
+        if (_state.value.isAddingToCart) return
+
+        val variantId = selectedVariantId()
+        if (variantId == null) {
+            viewModelScope.launch {
+                _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Please select options first"))
+            }
+            return
         }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isAddingToCart = true) }
+
+            when (val result = addToCartUseCase(variantId = variantId, quantity = 1)) {
+                is Result.Success -> {
+                    _state.update { it.copy(isAddingToCart = false) }
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Added to Cart!"))
+                }
+                is Result.Failure -> {
+                    _state.update { it.copy(isAddingToCart = false) }
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowToast(
+                            result.exception.message ?: "Failed to add to cart"
+                        )
+                    )
+                }
+                is Result.Loading -> Unit
+            }
+        }
+    }
+
+    private fun selectedVariantId(): String? {
+        val product = _state.value.product ?: return null
+        val color = _state.value.selectedColor
+        val size = _state.value.selectedSize
+
+        return product.variants.firstOrNull { variant ->
+            val matchesColor = color == null || variant.title.contains(color, ignoreCase = true)
+            val matchesSize = size == null || variant.title.contains(size, ignoreCase = true)
+            matchesColor && matchesSize
+        }?.id ?: product.variants.firstOrNull()?.id
     }
 }

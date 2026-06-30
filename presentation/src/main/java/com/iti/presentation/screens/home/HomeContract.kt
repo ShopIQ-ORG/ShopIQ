@@ -42,6 +42,6 @@ object HomeContract {
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
         data object NavigateToSearch : Effect()
-        data object NavigateToSplash : Effect()
+        data object NavigateToSignIn : Effect()
     }
 }

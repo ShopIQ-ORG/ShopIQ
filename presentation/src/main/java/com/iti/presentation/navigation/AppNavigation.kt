@@ -21,6 +21,7 @@ import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
 import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
+import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,11 +29,27 @@ import org.koin.androidx.compose.koinViewModel
 fun AppNavigation(modifier: Modifier = Modifier) {
     val backStack = remember { mutableStateListOf<Screen>(Screen.Splash) }
 
+    fun navigate(screen: Screen) {
+        backStack.add(screen)
+    }
+
+    fun navigateBack() {
+        if (backStack.size > 1) {
+            backStack.removeAt(backStack.lastIndex)
+        }
+    }
+
+    fun replaceRoot(screen: Screen) {
+        backStack.clear()
+        backStack.add(screen)
+    }
+
     NavDisplay(
         modifier = modifier,
         backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
+        onBack = ::navigateBack,
         entryProvider = entryProvider {
+
             entry<Screen.Splash> {
                 val viewModel: SplashViewModel = koinViewModel()
                 val destination by viewModel.destination.collectAsState()
@@ -44,11 +61,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 SplashScreen(
                     onAnimationComplete = {
                         destination?.let {
-                            backStack.clear()
                             when (it) {
-                                is SplashDestination.OnBoarding -> backStack.add(Screen.OnBoarding)
-                                is SplashDestination.SignIn -> backStack.add(Screen.SignIn)
-                                is SplashDestination.Home -> backStack.add(Screen.Home)
+                                is SplashDestination.OnBoarding ->
+                                    replaceRoot(Screen.OnBoarding)
+
+                                is SplashDestination.SignIn ->
+                                    replaceRoot(Screen.SignIn)
+
+                                is SplashDestination.Home ->
+                                    replaceRoot(Screen.Home)
                             }
                         }
                     }
@@ -57,79 +78,103 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.OnBoarding> {
                 val onboardingViewModel: OnboardingViewModel = koinViewModel()
+
                 OnboardingScreen(
                     viewModel = onboardingViewModel,
-                    onNavigateToHome = { backStack.add(Screen.SignIn) }
+                    onNavigateToHome = {
+                        navigate(Screen.SignIn)
+                    }
                 )
             }
 
             entry<Screen.SignIn> {
                 SignInScreen(
-                    onNavigateToSignUp = { backStack.add(Screen.SignUp) },
-                    onNavigateToHome = { backStack.add(Screen.Home) },
+                    onNavigateToSignUp = {
+                        navigate(Screen.SignUp)
+                    },
+                    onNavigateToHome = {
+                        navigate(Screen.Home)
+                    },
                     onNavigateToForgotPassword = { }
                 )
             }
 
             entry<Screen.SignUp> {
                 SignUpScreen(
-                    onNavigateToHome = { backStack.add(Screen.Home) },
-                    onNavigateToSignIn = { backStack.removeLastOrNull() }
+                    onNavigateToHome = {
+                        navigate(Screen.Home)
+                    },
+                    onNavigateToSignIn = ::navigateBack
                 )
             }
 
             entry<Screen.Home> {
                 HomeScreen(
-                    onNavigateToSplash = {
-                        backStack.clear()
-                        backStack.add(Screen.Splash)
-                    },
                     onNavigateToProduct = { productId ->
-                        backStack.add(Screen.ProductDetails(productId = productId))
+                        navigate(Screen.ProductDetails(productId))
                     },
-                    onNavigateToAllBrands = { backStack.add(Screen.AllBrands) },
+                    onNavigateToAllBrands = {
+                        navigate(Screen.AllBrands)
+                    },
                     onNavigateToAllProducts = { brandName ->
-                        backStack.add(Screen.AllProducts(brandName))
+                        navigate(Screen.AllProducts(brandName))
                     },
                     onNavigateToSearch = {
-                        backStack.add(Screen.Search)
+                        navigate(Screen.Search)
+                    },
+                    onCartClick = {
+                        if (backStack.lastOrNull() !is Screen.Cart) {
+                            navigate(Screen.Cart)
+                        }
+                    },
+                    onNavigateToSignIn = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
 
             entry<Screen.AllBrands> {
                 AllBrandsScreen(
-                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateBack = ::navigateBack,
                     onNavigateToAllProducts = { brandName ->
-                        backStack.add(Screen.AllProducts(brandName))
+                        navigate(Screen.AllProducts(brandName))
                     }
                 )
             }
 
-            entry<Screen.AllProducts> { allProductsScreen ->
+            entry<Screen.AllProducts> { screen ->
                 AllProductsScreen(
-                    brandName = allProductsScreen.brandName,
-                    onNavigateBack = { backStack.removeLastOrNull() },
+                    brandName = screen.brandName,
+                    onNavigateBack = ::navigateBack,
                     onNavigateToProduct = { productId ->
-                        backStack.add(Screen.ProductDetails(productId = productId))
+                        navigate(Screen.ProductDetails(productId))
                     }
                 )
             }
 
-            entry<Screen.ProductDetails> { productDetailsScreen ->
+            entry<Screen.ProductDetails> { screen ->
                 ProductDetailsScreen(
-                    productId = productDetailsScreen.productId,
-                    onBackClick = { backStack.removeLastOrNull() }
+                    productId = screen.productId,
+                    onBackClick = ::navigateBack
+                )
+            }
+
+            entry<Screen.Cart> {
+                CartScreen(
+                    onBackClick = ::navigateBack,
+                    onCheckout = {},
+                    onBrowseProducts = ::navigateBack
                 )
             }
 
             entry<Screen.Search> {
                 val searchViewModel: SearchViewModel = koinViewModel()
+
                 SearchScreen(
                     viewModel = searchViewModel,
-                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateBack = ::navigateBack,
                     onNavigateToProduct = { productId ->
-                        backStack.add(Screen.ProductDetails(productId = productId))
+                        navigate(Screen.ProductDetails(productId))
                     }
                 )
             }

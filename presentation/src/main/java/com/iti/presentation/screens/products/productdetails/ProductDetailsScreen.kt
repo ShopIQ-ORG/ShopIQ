@@ -176,8 +176,10 @@ private fun ProductDetailsContent(
             text = stringResource(id = R.string.btn_add_to_cart),
             onClick = { onIntent(ProductDetailsIntent.AddToCart) },
             leadingIcon = Icons.Rounded.ShoppingBag,
+            isLoading = state.isAddingToCart,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
+
     }
 }
 
