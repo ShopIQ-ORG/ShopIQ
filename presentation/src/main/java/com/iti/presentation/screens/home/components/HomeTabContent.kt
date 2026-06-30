@@ -89,7 +89,11 @@ fun HomeTabContent(
                     item {
                         SearchBar(
                             value = query,
-                            onValueChanged = { query = it },
+                            onValueChanged = {},
+                            enabled = false,
+                            onClick = {
+                                onIntent(HomeContract.Intent.SearchBarClicked)
+                            },
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }

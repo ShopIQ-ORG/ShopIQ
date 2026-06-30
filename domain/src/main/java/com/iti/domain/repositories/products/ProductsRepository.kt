@@ -15,4 +15,6 @@ interface ProductsRepository {
     fun getProductsPaginated(count: Int, after: String? = null): Flow<Result<PaginatedProducts>>
     fun getProductDetails(productId: Long): Flow<Result<Product>>
     fun getMainCategories(): Flow<Result<List<Category>>>
+    fun searchProducts(query: String): Flow<Result<List<Product>>>
+    fun getPopularProducts(count: Int = 10): Flow<Result<List<Product>>>
 }

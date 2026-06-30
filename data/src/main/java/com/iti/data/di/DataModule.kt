@@ -17,9 +17,14 @@ import com.iti.data.sources.remote.auth.AuthRemoteDataSource
 import com.iti.data.sources.remote.auth.AuthRemoteDataSourceImpl
 import com.iti.data.repositories.AuthRepositoryImpl
 import com.iti.domain.repositories.auth.AuthRepository
+import com.google.gson.Gson
+import com.iti.domain.repositories.search.SearchHistoryRepository
+import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+
 val dataModule = module {
+    single { Gson() }
     single { ShopifyNetworkConfig.apolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
     single<ProductsRepository> { ProductsRepositoryImpl(get()) }
@@ -31,9 +36,8 @@ val dataModule = module {
         )
     }
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
-    single { ShopifyNetworkConfig.apolloClient }
-    single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get()) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get()) }
+    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get()) }
+    
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 

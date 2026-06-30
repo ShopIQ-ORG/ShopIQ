@@ -19,6 +19,8 @@ import com.iti.presentation.screens.splash.SplashDestination
 import com.iti.presentation.screens.splash.SplashScreen
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
+import com.iti.presentation.screens.search.SearchScreen
+import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -88,6 +90,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToAllBrands = { backStack.add(Screen.AllBrands) },
                     onNavigateToAllProducts = { brandName ->
                         backStack.add(Screen.AllProducts(brandName))
+                    },
+                    onNavigateToSearch = {
+                        backStack.add(Screen.Search)
                     }
                 )
             }
@@ -115,6 +120,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = productDetailsScreen.productId,
                     onBackClick = { backStack.removeLastOrNull() }
+                )
+            }
+
+            entry<Screen.Search> {
+                val searchViewModel: SearchViewModel = koinViewModel()
+                SearchScreen(
+                    viewModel = searchViewModel,
+                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateToProduct = { productId ->
+                        backStack.add(Screen.ProductDetails(productId = productId))
+                    }
                 )
             }
         }

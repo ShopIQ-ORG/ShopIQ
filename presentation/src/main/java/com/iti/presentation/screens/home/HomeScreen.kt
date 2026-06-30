@@ -39,6 +39,7 @@ fun HomeScreen(
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onNavigateToSearch: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -61,6 +62,10 @@ fun HomeScreen(
 
                 is HomeContract.Effect.NavigateToProducts -> {
                     onNavigateToAllProducts(effect.brandName)
+                }
+
+                HomeContract.Effect.NavigateToSearch -> {
+                    onNavigateToSearch()
                 }
 
                 HomeContract.Effect.NavigateToSplash -> {

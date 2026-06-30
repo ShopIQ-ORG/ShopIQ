@@ -1,6 +1,6 @@
 package com.iti.data.repositories
 
-import android.util.Log
+
 import com.iti.data.core.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainAd
@@ -13,8 +13,6 @@ import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
 import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Category
-import com.iti.domain.models.Money
-import com.iti.domain.models.ProductImage
 import com.iti.domain.models.Result
 import com.iti.domain.repositories.products.ProductsRepository
 import kotlinx.coroutines.flow.Flow
@@ -95,6 +93,29 @@ class ProductsRepositoryImpl(
             emit(Result.Success(categories))
         } catch (e: Exception) {
             emit(Result.Failure(e))
+        }
+    }
+
+    override fun searchProducts(query: String): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProducts(first = 20, query = query)
+            emit(Result.Success(response.toDomainProducts()))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
+    }
+
+    override fun getPopularProducts(count: Int): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProducts(
+                first = count,
+                sortKey = com.iti.data.type.ProductSortKeys.BEST_SELLING
+            )
+            emit(Result.Success(response.toDomainProducts()))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
         }
     }
 }
