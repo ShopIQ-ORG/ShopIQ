@@ -14,10 +14,11 @@ class ProductsRemoteDataSourceImpl(
     private val apolloClient: ApolloClient
 ) : ProductsRemoteDataSource {
 
-    override suspend fun getProductsByNumber(first: Int): ShopifyResponse {
+    override suspend fun getProductsByNumber(first: Int, after: String?): ShopifyResponse {
         val response = apolloClient.query(
             GetProductsQuery(
                 first = first,
+                after = com.apollographql.apollo.api.Optional.presentIfNotNull(after)
             )
         ).execute()
 
