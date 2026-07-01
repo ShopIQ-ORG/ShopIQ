@@ -10,6 +10,7 @@ import com.iti.domain.models.Product
 import com.iti.domain.models.ProductImage
 import com.iti.domain.models.ProductVariant
 import com.iti.domain.models.Category
+import com.iti.data.utils.BrandImageMapper
 
 fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
     val productEdges = this.products.edges.map { edge ->
@@ -256,7 +257,8 @@ fun BrandDto.toDomainBrand(): Brand {
     return Brand(
         id = this.id,
         name = this.name,
-        imageUrl = this.imageUrl
+        imageUrl = this.imageUrl,
+        mappedImageUrl = BrandImageMapper.getBrandImageUrl(this.name, this.imageUrl)
     )
 }
 

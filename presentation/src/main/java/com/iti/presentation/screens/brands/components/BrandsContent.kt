@@ -68,7 +68,7 @@ fun BrandsContent(
         ) { _, brand ->
             BrandBannerCard(
                 brandName = brand.name,
-                imageUrl = getBrandImageUrl(brand.name, brand.imageUrl),
+                imageUrl = brand.mappedImageUrl,
                 onClick = { onBrandClick(brand.name) },
                 modifier = Modifier.animateItem()
             )
@@ -81,11 +81,11 @@ fun BrandsContent(
 @Composable
 private fun BrandsContentPreview() {
     val mockBrands = listOf(
-        Brand("1", "Zara", ""),
-        Brand("2", "H&M", ""),
-        Brand("3", "Nike", ""),
-        Brand("4", "Adidas", ""),
-        Brand("5", "Puma", "")
+        Brand("1", "Zara", "", "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80"),
+        Brand("2", "H&M", "", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"),
+        Brand("3", "Nike", "", "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=800&q=80"),
+        Brand("4", "Adidas", "", "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80"),
+        Brand("5", "Puma", "", "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80")
     )
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     ShopIQTheme(darkTheme = false) {

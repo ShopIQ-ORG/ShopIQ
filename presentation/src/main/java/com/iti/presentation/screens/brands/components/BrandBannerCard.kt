@@ -34,17 +34,6 @@ import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
 import com.iti.presentation.ui.theme.ShopIQTheme
 
-internal fun getBrandImageUrl(brandName: String, fallbackUrl: String): String {
-    if (fallbackUrl.isNotEmpty()) return fallbackUrl
-    return when (brandName.uppercase().trim()) {
-        "ZARA" -> "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80"
-        "H&M", "H & M" -> "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
-        "NIKE" -> "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=800&q=80"
-        "ADIDAS" -> "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80"
-        "PUMA" -> "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80"
-        else -> "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80"
-    }
-}
 
 @Composable
 fun BrandBannerCard(
