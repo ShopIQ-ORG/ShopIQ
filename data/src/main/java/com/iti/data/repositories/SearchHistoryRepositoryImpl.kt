@@ -59,7 +59,7 @@ class SearchHistoryRepositoryImpl(
                 currentList.remove(query)
                 currentList.add(0, query)
 
-                if (currentList.size > 10) {
+                if (currentList.size > 5) {
                     currentList.removeAt(currentList.lastIndex)
                 }
 
