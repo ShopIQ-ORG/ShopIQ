@@ -14,4 +14,5 @@ interface AuthRepository {
     suspend fun getCurrentUser(): Result<User>
     suspend fun  validateAuthenticatedUser(): Result<Unit>
     fun logout(): Result<Unit>
+    fun getUserId(): String?
 }

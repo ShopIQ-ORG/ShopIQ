@@ -92,7 +92,21 @@ class AuthRemoteDataSourceImpl(
     override suspend fun getCurrentUser(): UserDto {
         val firebaseUser = auth.currentUser ?: throw AuthException.UserNotFound()
         if (firebaseUser.isAnonymous) return UserDto(id = firebaseUser.uid, isGuest = true)
-        return getUserDocument(firebaseUser.uid)
+        return try {
+            getUserDocument(firebaseUser.uid)
+        } catch (e: Exception) {
+            // Fallback to basic Firebase info if Firestore document is missing or error occurs
+            UserDto(
+                id = firebaseUser.uid,
+                fullName = firebaseUser.displayName.orEmpty(),
+                email = firebaseUser.email.orEmpty(),
+                isGuest = false
+            )
+        }
+    }
+
+    override fun getUserId(): String? {
+        return auth.currentUser?.uid
     }
 
     override fun logout() = auth.signOut()

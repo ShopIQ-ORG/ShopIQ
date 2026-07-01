@@ -4,6 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.GetCurrentUserUseCase
+import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
+import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
+import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
 import com.iti.presentation.R
 import com.iti.presentation.util.UiText
@@ -13,11 +19,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AllProductsViewModel(
+    private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
+    private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
+    private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val authRepository: AuthRepository,
     private val getProductsPaginatedUseCase: GetProductsPaginatedUseCase
 ) : ViewModel() {
 
@@ -27,8 +39,33 @@ class AllProductsViewModel(
     private val _effect = Channel<AllProductsContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    /** Master list – never filtered, used as source of truth for all client-side ops */
+    private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    private val allProductsStateFlow = MutableStateFlow<List<Product>>(emptyList())
     private var allProducts: List<Product> = emptyList()
+
+    init {
+        viewModelScope.launch {
+            combine(
+                allProductsStateFlow,
+                getFavoriteProductsUseCase(),
+                favoriteOverrides
+            ) { products, favoritesResult, overrides ->
+                val favoriteIds = if (favoritesResult is Result.Success) {
+                    favoritesResult.data.map { it.id }.toSet()
+                } else {
+                    emptySet()
+                }
+                products.map { product ->
+                    val isFavoriteInDb = product.id in favoriteIds
+                    val isFavorite = overrides[product.id] ?: isFavoriteInDb
+                    product.copy(isFavorite = isFavorite)
+                }
+            }.collect { updatedProducts ->
+                allProducts = updatedProducts
+                applyAll()
+            }
+        }
+    }
 
     // ─── Public API ──────────────────────────────────────────────────────────────
 
@@ -43,7 +80,7 @@ class AllProductsViewModel(
             is AllProductsContract.Intent.ProductClicked     -> emitEffect(
                 AllProductsContract.Effect.NavigateToProduct(intent.product.id)
             )
-            is AllProductsContract.Intent.ProductFavoriteClicked -> Unit
+            is AllProductsContract.Intent.ProductFavoriteClicked -> toggleFavorite(intent.product)
 
             // legacy brand chip
             is AllProductsContract.Intent.ClearFilter        -> clearLegacyBrandFilter()
@@ -87,9 +124,42 @@ class AllProductsViewModel(
         }
     }
 
+    private fun toggleFavorite(product: Product) {
+        // FAST check for guest status
+        val userId = authRepository.getUserId()
+        if (userId == null || userId == "guest") {
+            emitEffect(AllProductsContract.Effect.ShowAuthRequired)
+            return
+        }
+
+        viewModelScope.launch {
+            val productId = product.id
+            val isFavorite = product.isFavorite
+
+            try {
+                // Optimistic update via override map - IMMEDIATE
+                favoriteOverrides.update { it + (productId to !isFavorite) }
+
+                if (isFavorite) {
+                    removeProductFromFavoritesUseCase(productId)
+                } else {
+                    addProductToFavoritesUseCase(product)
+                }
+                
+                // Clear override after a short delay
+                kotlinx.coroutines.delay(1000)
+                favoriteOverrides.update { it - productId }
+            } catch (e: Exception) {
+                // Revert optimistic update
+                favoriteOverrides.update { it - productId }
+            }
+        }
+    }
+
     // ─── Private Helpers ─────────────────────────────────────────────────────────
 
     private fun load(brandName: String?) {
+        allProductsStateFlow.value = emptyList()
         allProducts = emptyList()
         _state.update {
             it.copy(
@@ -115,11 +185,10 @@ class AllProductsViewModel(
                         it.copy(screenState = AllProductsContract.ScreenState.Loading)
                     }
                     is Result.Success -> {
-                        allProducts = result.data.products
-                        // derive available options
-                        val categories = allProducts.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
-                        val subCategories = allProducts.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
-                        val brands = allProducts.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
+                        allProductsStateFlow.value = result.data.products
+                        val categories = result.data.products.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
+                        val subCategories = result.data.products.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
+                        val brands = result.data.products.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
                         _state.update {
                             it.copy(
                                 availableCategories = categories,
@@ -129,7 +198,6 @@ class AllProductsViewModel(
                                 endCursor = result.data.endCursor
                             )
                         }
-                        applyAll()
                     }
                     is Result.Failure -> _state.update {
                         it.copy(
@@ -155,10 +223,10 @@ class AllProductsViewModel(
                 when (result) {
                     is Result.Loading -> { /* Handled by isLoadingMore state */ }
                     is Result.Success -> {
-                        allProducts = allProducts + result.data.products
-                        val categories = allProducts.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
-                        val subCategories = allProducts.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
-                        val brands = allProducts.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
+                        allProductsStateFlow.value = allProductsStateFlow.value + result.data.products
+                        val categories = allProductsStateFlow.value.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
+                        val subCategories = allProductsStateFlow.value.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
+                        val brands = allProductsStateFlow.value.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
                         _state.update {
                             it.copy(
                                 availableCategories = categories,
@@ -169,7 +237,6 @@ class AllProductsViewModel(
                                 isLoadingMore = false
                             )
                         }
-                        applyAll()
                     }
                     is Result.Failure -> {
                         _state.update { it.copy(isLoadingMore = false) }

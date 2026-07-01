@@ -133,7 +133,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             navigate(Screen.Cart)
                         }
                     },
-                    onNavigateToSignIn = {
+                    onLogout = {
                         replaceRoot(Screen.SignIn)
                     }
                 )
@@ -154,6 +154,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateBack = ::navigateBack,
                     onNavigateToProduct = { productId ->
                         navigate(Screen.ProductDetails(productId))
+                    },
+                    onNavigateToAuth = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
@@ -162,9 +165,6 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = screen.productId,
                     onBackClick = ::navigateBack,
-                    onLogin = {
-                        replaceRoot(Screen.SignIn)
-                    }
                 )
             }
 

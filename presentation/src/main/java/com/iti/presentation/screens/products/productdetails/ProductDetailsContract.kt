@@ -26,4 +26,5 @@ sealed interface ProductDetailsIntent {
 
 sealed interface ProductDetailsSideEffect {
     data class ShowToast(val message: String) : ProductDetailsSideEffect
+    object NavigateToAuth : ProductDetailsSideEffect
 }

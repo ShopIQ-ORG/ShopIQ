@@ -97,5 +97,6 @@ object AllProductsContract {
     // ─── Effects ─────────────────────────────────────────────────────────────────
     sealed class Effect {
         data class NavigateToProduct(val productId: String) : Effect()
+        data object ShowAuthRequired : Effect()
     }
 }

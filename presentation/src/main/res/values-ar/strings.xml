@@ -23,4 +23,13 @@
     <string name="product_details">تفاصيل المنتج</string>
     <string name="sort_price_asc_label">↑ السعر</string>
     <string name="sort_price_desc_label">↓ السعر</string>
+    
+    <!-- Wishlist Screen -->
+    <string name="wishlist_title">المفضلة</string>
+    <string name="wishlist_empty_title">لا توجد منتجات مفضلة بعد</string>
+    <string name="wishlist_empty_subtitle">احفظ المنتجات التي تحبها بالضغط على أيقونة القلب على أي منتج.</string>
+    <string name="wishlist_explore_btn">استكشف المنتجات</string>
+    <string name="wishlist_locked_title">قائمة المفضلة مقفلة</string>
+    <string name="wishlist_locked_subtitle">يجب عليك تسجيل الدخول أو إنشاء حساب لحفظ منتجاتك المفضلة وعرضها هنا.</string>
+    <string name="wishlist_auth_btn">تسجيل الدخول / إنشاء حساب</string>
 </resources>

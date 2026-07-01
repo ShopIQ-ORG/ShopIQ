@@ -36,11 +36,11 @@ import org.koin.compose.koinInject
 
 @Composable
 fun HomeScreen(
-    onNavigateToSignIn: () -> Unit,
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
     onCartClick: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onLogout: () -> Unit,
     onNavigateToSearch: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
@@ -71,7 +71,10 @@ fun HomeScreen(
                 }
 
                 HomeContract.Effect.NavigateToSignIn -> {
-                    onNavigateToSignIn()
+                    onLogout()
+                }
+                HomeContract.Effect.ShowAuthRequired -> {
+                    onLogout()
                 }
             }
         }
@@ -79,6 +82,7 @@ fun HomeScreen(
 
     HomeScreenContent(
         state = state,
+        onNavigateToProduct = onNavigateToProduct,
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onCartClick = onCartClick
@@ -89,8 +93,9 @@ fun HomeScreen(
 fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
+    onNavigateToProduct: (Long) -> Unit,
     onLogout: () -> Unit,
-    onCartClick: () -> Unit,
+    onCartClick: () -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -171,11 +176,19 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.Wishlist -> {
-                WishlistTabContent()
+                WishlistTabContent(
+                    onProductClick = { productId ->
+                        val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
+                        onNavigateToProduct(idLong)
+                    },
+                    onExploreClick = { selectedIndex = 0 },
+                    onAuthClick = onLogout
+                )
             }
 
             BottomNavItem.Profile -> {
                 ProfileTabContent(
+                    user = state.currentUser,
                     onLogout = onLogout
                 )
             }

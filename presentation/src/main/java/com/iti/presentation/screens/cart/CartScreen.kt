@@ -119,8 +119,10 @@ fun CartScreen(
             dismissText = stringResource(R.string.cancel),
             onConfirm = {
                 viewModel.onEvent(CartContract.Event.RemoveItem(item.id))
+                deleteDialogState = null
             },
             onDismiss = {
+                deleteDialogState = null
             }
         )
     }

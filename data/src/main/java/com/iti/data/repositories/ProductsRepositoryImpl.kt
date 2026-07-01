@@ -1,6 +1,5 @@
 package com.iti.data.repositories
 
-
 import com.iti.data.core.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainAd
@@ -8,18 +7,24 @@ import com.iti.data.mappers.toDomainBrand
 import com.iti.data.mappers.toDomainProducts
 import com.iti.data.mappers.toDomainProduct
 import com.iti.data.mappers.toDomainCategories
+import com.iti.data.mappers.toFavoriteEntity
+import com.iti.data.sources.local.FavoriteDao
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
 import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Category
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
+import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class ProductsRepositoryImpl(
-    private val remoteDataSource: ProductsRemoteDataSource
+    private val remoteDataSource: ProductsRemoteDataSource,
+    private val favoriteDao: FavoriteDao,
+    private val authRepository: AuthRepository
 ) : ProductsRepository {
 
     override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
@@ -94,6 +99,37 @@ class ProductsRepositoryImpl(
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
+    }
+
+    override suspend fun addToFavorites(product: Product) {
+        val userId = getUserId()
+        favoriteDao.insertFavorite(product.toFavoriteEntity(userId))
+    }
+
+    override suspend fun removeFromFavorites(productId: String) {
+        val userId = getUserId()
+        favoriteDao.deleteFavorite(productId, userId)
+    }
+
+    override fun getFavorites(): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val userId = getUserId()
+            favoriteDao.getAllFavorites(userId).collect { list ->
+                emit(Result.Success(list.map { it.toDomainProduct() }))
+            }
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override suspend fun isFavorite(productId: String): Boolean {
+        val userId = getUserId()
+        return favoriteDao.isFavorite(productId, userId)
+    }
+
+    private fun getUserId(): String {
+        return authRepository.getUserId() ?: "guest"
     }
 
     override fun searchProducts(query: String): Flow<Result<List<Product>>> = flow {

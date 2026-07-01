@@ -194,5 +194,13 @@
         <item quantity="one">%d Item</item>
         <item quantity="other">%d Items</item>
     </plurals>
+    <!-- Wishlist Screen -->
+    <string name="wishlist_title">My Wishlist</string>
+    <string name="wishlist_empty_title">No favorites yet</string>
+    <string name="wishlist_empty_subtitle">Save items you love by tapping the heart icon on any product.</string>
+    <string name="wishlist_explore_btn">Explore Products</string>
+    <string name="wishlist_locked_title">Wishlist is locked</string>
+    <string name="wishlist_locked_subtitle">You need to sign in or sign up to save your favorite products and view them here.</string>
+    <string name="wishlist_auth_btn">Sign In / Sign Up</string>
 
 </resources>
