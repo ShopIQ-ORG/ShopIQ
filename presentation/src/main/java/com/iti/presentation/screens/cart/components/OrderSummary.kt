@@ -41,10 +41,21 @@ fun OrderSummary(
             )
         }
 
+        val shipping = cart.shippingAmount
+        val shippingValue = shipping?.amount?.toDoubleOrNull()
+
         SummaryRow(
             label = stringResource(R.string.cart_shipping),
-            value = stringResource(R.string.cart_shipping_free),
-            valueColor = MaterialTheme.colorScheme.tertiary
+            value = when {
+                shipping == null -> stringResource(R.string.cart_shipping_calculated_at_checkout)
+                shippingValue == 0.0 -> stringResource(R.string.cart_shipping_free)
+                else -> "$${shipping.amount}"
+            },
+            valueColor = if (shippingValue == 0.0) {
+                MaterialTheme.colorScheme.tertiary
+            } else {
+                MaterialTheme.colorScheme.onBackground
+            }
         )
 
         Spacer(Modifier.height(2.dp))

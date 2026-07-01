@@ -15,6 +15,7 @@ object CartContract {
         val promoInput: String = "",
         val isApplyingPromo: Boolean = false,
         val promoError: UiText? = null,
+        val removingCouponCode: String? = null,
         val itemBeingRemoved: String? = null
     ) {
         val isEmpty: Boolean
@@ -31,6 +32,7 @@ object CartContract {
         object TogglePromoExpanded : Event()
         data class PromoInputChanged(val value: String) : Event()
         object ApplyPromoCode : Event()
+        data class RemoveCoupon(val code: String) : Event()
         object ProceedToCheckout : Event()
         object Refresh : Event()
         object Retry : Event()
