@@ -10,7 +10,10 @@ sealed class Screen : NavKey {
     data object Home : Screen()
     data object AllBrands : Screen()
     data object Cart : Screen()
-    data class AllProducts(val brandName: String? = null) : Screen()
+    data class AllProducts(
+        val brandName: String? = null,
+        val subCategoryName: String? = null
+    ) : Screen()
     data class ProductDetails(val productId: Long) : Screen()
     data object Search : Screen()
 }

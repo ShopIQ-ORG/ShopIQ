@@ -73,8 +73,8 @@ class AllProductsViewModel(
     fun sendIntent(intent: AllProductsContract.Intent) {
         when (intent) {
             // load
-            is AllProductsContract.Intent.LoadData           -> load(intent.brandName)
-            is AllProductsContract.Intent.Retry              -> load(_state.value.activeBrand)
+            is AllProductsContract.Intent.LoadData           -> load(intent.brandName, intent.subCategoryName)
+            is AllProductsContract.Intent.Retry              -> load(_state.value.activeBrand, _state.value.activeSubCategory)
             is AllProductsContract.Intent.LoadMore           -> loadMore()
 
             // product interaction
@@ -85,6 +85,7 @@ class AllProductsViewModel(
 
             // legacy brand chip
             is AllProductsContract.Intent.ClearFilter        -> clearLegacyBrandFilter()
+            is AllProductsContract.Intent.ClearSubCategoryFilter -> clearLegacySubCategoryFilter()
 
             // direct category selection
             is AllProductsContract.Intent.SelectCategory     -> selectCategory(intent.category)
@@ -159,15 +160,19 @@ class AllProductsViewModel(
 
     // ─── Private Helpers ─────────────────────────────────────────────────────────
 
-    private fun load(brandName: String?) {
+    private fun load(brandName: String?, subCategoryName: String?) {
         isLoaded = false
         allProductsStateFlow.value = emptyList()
         allProducts = emptyList()
-        val initialFilter = FilterState(selectedBrands = if (brandName != null) setOf(brandName) else emptySet())
+        val initialFilter = FilterState(
+            selectedBrands = if (brandName != null) setOf(brandName) else emptySet(),
+            selectedSubCategory = subCategoryName
+        )
         _state.update {
             it.copy(
                 screenState = AllProductsContract.ScreenState.Loading,
                 activeBrand = brandName,
+                activeSubCategory = subCategoryName,
                 isFilterSheetOpen = false,
                 isSortSheetOpen = false,
                 isSearchActive = false,
@@ -318,6 +323,17 @@ class AllProductsViewModel(
         applyAll()
     }
 
+    private fun clearLegacySubCategoryFilter() {
+        _state.update {
+            it.copy(
+                activeSubCategory = null,
+                filterState = it.filterState.copy(selectedSubCategory = null),
+                pendingFilterState = it.pendingFilterState.copy(selectedSubCategory = null)
+            )
+        }
+        applyAll()
+    }
+
     private fun selectCategory(category: String?) {
         _state.update {
             it.copy(
@@ -339,11 +355,14 @@ class AllProductsViewModel(
             val isBrandStillActive = s.activeBrand != null &&
                     newFilterState.selectedBrands.contains(s.activeBrand) &&
                     newFilterState.selectedBrands.size == 1
+            val isSubCategoryStillActive = s.activeSubCategory != null &&
+                    newFilterState.selectedSubCategory == s.activeSubCategory
             s.copy(
                 filterState = newFilterState,
                 isFilterSheetOpen = false,
                 recentSearches = recent,
-                activeBrand = if (isBrandStillActive) s.activeBrand else null
+                activeBrand = if (isBrandStillActive) s.activeBrand else null,
+                activeSubCategory = if (isSubCategoryStillActive) s.activeSubCategory else null
             )
         }
         applyAll()

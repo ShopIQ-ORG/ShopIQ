@@ -122,8 +122,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToAllBrands = {
                         navigate(Screen.AllBrands)
                     },
-                    onNavigateToAllProducts = { brandName ->
-                        navigate(Screen.AllProducts(brandName))
+                    onNavigateToAllProducts = { brandName, subCategoryName ->
+                        navigate(Screen.AllProducts(brandName, subCategoryName))
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
@@ -143,7 +143,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AllBrandsScreen(
                     onNavigateBack = ::navigateBack,
                     onNavigateToAllProducts = { brandName ->
-                        navigate(Screen.AllProducts(brandName))
+                        navigate(Screen.AllProducts(brandName = brandName))
                     }
                 )
             }
@@ -151,6 +151,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.AllProducts> { screen ->
                 AllProductsScreen(
                     brandName = screen.brandName,
+                    subCategoryName = screen.subCategoryName,
                     onNavigateBack = ::navigateBack,
                     onNavigateToProduct = { productId ->
                         navigate(Screen.ProductDetails(productId))

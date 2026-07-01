@@ -31,6 +31,7 @@ object AllProductsContract {
         val screenState: ScreenState = ScreenState.Loading,
         // filtering / sorting
         val activeBrand: String? = null,          // legacy brand from Home navigation
+        val activeSubCategory: String? = null,    // legacy subcategory from Home navigation
         val searchQuery: String = "",
         val filterState: FilterState = FilterState(),
         val pendingFilterState: FilterState = FilterState(), // in-sheet draft
@@ -55,7 +56,7 @@ object AllProductsContract {
     // ─── Intents ─────────────────────────────────────────────────────────────────
     sealed class Intent {
         // load
-        data class LoadData(val brandName: String?) : Intent()
+        data class LoadData(val brandName: String?, val subCategoryName: String?) : Intent()
         data object Retry : Intent()
         data object LoadMore : Intent()
 
@@ -65,6 +66,7 @@ object AllProductsContract {
 
         // legacy brand filter chip
         data object ClearFilter : Intent()
+        data object ClearSubCategoryFilter : Intent()
 
         // direct category chip selection (bypasses pending state)
         data class SelectCategory(val category: String?) : Intent()

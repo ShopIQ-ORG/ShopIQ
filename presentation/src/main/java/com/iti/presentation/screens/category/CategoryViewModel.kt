@@ -31,7 +31,7 @@ class CategoryViewModel(
         when (intent) {
             is CategoryContract.Intent.LoadCategories -> handleLoadCategories()
             is CategoryContract.Intent.SearchQueryChanged -> handleSearchQueryChanged(intent.query)
-            is CategoryContract.Intent.CategoryClicked -> handleCategoryClicked(intent.categoryId)
+            is CategoryContract.Intent.CategoryClicked -> handleCategoryClicked(intent.categoryName)
         }
     }
 
@@ -75,9 +75,9 @@ class CategoryViewModel(
         _state.value = _state.value.copy(searchQuery = query)
     }
 
-    private fun handleCategoryClicked(categoryId: String) {
+    private fun handleCategoryClicked(categoryName: String) {
         viewModelScope.launch {
-            _effect.send(CategoryContract.Effect.NavigateToCategoryProducts(categoryId))
+            _effect.send(CategoryContract.Effect.NavigateToCategoryProducts(categoryName))
         }
     }
 }

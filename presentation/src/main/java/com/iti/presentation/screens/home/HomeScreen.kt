@@ -37,7 +37,7 @@ import org.koin.compose.koinInject
 @Composable
 fun HomeScreen(
     onNavigateToAllBrands: () -> Unit,
-    onNavigateToAllProducts: (String?) -> Unit,
+    onNavigateToAllProducts: (String?, String?) -> Unit,
     onCartClick: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     onLogout: () -> Unit,
@@ -55,7 +55,7 @@ fun HomeScreen(
                 }
 
                 HomeContract.Effect.NavigateToAllProducts -> {
-                    onNavigateToAllProducts(null)
+                    onNavigateToAllProducts(null, null)
                 }
 
                 is HomeContract.Effect.NavigateToProduct -> {
@@ -63,7 +63,7 @@ fun HomeScreen(
                 }
 
                 is HomeContract.Effect.NavigateToProducts -> {
-                    onNavigateToAllProducts(effect.brandName)
+                    onNavigateToAllProducts(effect.brandName, null)
                 }
 
                 HomeContract.Effect.NavigateToSearch -> {
@@ -83,6 +83,7 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onNavigateToProduct = onNavigateToProduct,
+        onNavigateToAllProducts = onNavigateToAllProducts,
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onCartClick = onCartClick
@@ -94,6 +95,7 @@ fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onNavigateToAllProducts: (String?, String?) -> Unit,
     onLogout: () -> Unit,
     onCartClick: () -> Unit
 ) {
@@ -169,6 +171,9 @@ fun HomeScreenContent(
             BottomNavItem.Category -> {
                 CategoryScreen(
                     viewModel = koinViewModel(),
+                    onCategoryClick = { subCategoryName ->
+                        onNavigateToAllProducts(null, subCategoryName)
+                    },
                     bottomPadding = padding.calculateBottomPadding(),
                     cartItemCount = cartItemCount,
                     onCartClick = onCartClick

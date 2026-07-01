@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -37,12 +38,23 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun CategoryScreen(
     viewModel: CategoryViewModel,
+    onCategoryClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     cartItemCount: Int = 0,
     onCartClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is CategoryContract.Effect.NavigateToCategoryProducts -> {
+                    onCategoryClick(effect.categoryName)
+                }
+            }
+        }
+    }
 
     val filteredCategories = remember(state.categories, state.searchQuery) {
         if (state.searchQuery.isEmpty()) state.categories
@@ -120,7 +132,7 @@ fun CategoryScreen(
                         CategoryCard(
                             category = category,
                             onClick = {
-                                viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.id))
+                                viewModel.sendIntent(CategoryContract.Intent.CategoryClicked(category.title))
                             }
                         )
                     }

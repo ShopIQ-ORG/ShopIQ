@@ -71,7 +71,8 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AllProductsScreen(
-    brandName: String? = null,
+    brandName: String?,
+    subCategoryName: String? = null,
     onNavigateBack: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     onNavigateToAuth: () -> Unit,
@@ -81,8 +82,8 @@ fun AllProductsScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val gridState = rememberLazyGridState()
 
-    LaunchedEffect(brandName) {
-        viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName))
+    LaunchedEffect(brandName, subCategoryName) {
+        viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName, subCategoryName))
     }
 
     LaunchedEffect(state.filterState, state.sortOption, state.activeBrand, state.searchQuery) {
@@ -133,7 +134,7 @@ fun AllProductsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
-                title = state.activeBrand ?: stringResource(R.string.all_products_title),
+                title = state.activeBrand ?: state.activeSubCategory ?: stringResource(R.string.all_products_title),
                 onBack = onNavigateBack,
                 scrollBehavior = scrollBehavior
             )
@@ -149,6 +150,15 @@ fun AllProductsScreen(
                 FilterBanner(
                     brandName = state.activeBrand ?: "",
                     onClear = { viewModel.sendIntent(AllProductsContract.Intent.ClearFilter) },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
+
+            // ── Legacy subcategory filter chip ─────────────────────────────────────
+            AnimatedVisibility(visible = state.activeSubCategory != null) {
+                FilterBanner(
+                    brandName = state.activeSubCategory ?: "",
+                    onClear = { viewModel.sendIntent(AllProductsContract.Intent.ClearSubCategoryFilter) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
