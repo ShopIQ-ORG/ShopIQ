@@ -11,5 +11,6 @@ interface AuthRemoteDataSource {
     suspend fun loginAsGuest(): UserDto
     suspend fun register(info: RegistrationInfo): UserDto
     suspend fun getCurrentUser(): UserDto
+    fun getUserId(): String?
     fun logout()
 }

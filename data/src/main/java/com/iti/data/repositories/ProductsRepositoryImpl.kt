@@ -84,11 +84,13 @@ class ProductsRepositoryImpl(
 
 
     override suspend fun addToFavorites(product: Product) {
-        favoriteDao.insertFavorite(product.toFavoriteEntity(getUserId()))
+        val userId = getUserId()
+        favoriteDao.insertFavorite(product.toFavoriteEntity(userId))
     }
 
     override suspend fun removeFromFavorites(productId: String) {
-        favoriteDao.deleteFavorite(productId, getUserId())
+        val userId = getUserId()
+        favoriteDao.deleteFavorite(productId, userId)
     }
 
     override fun getFavorites(): Flow<Result<List<Product>>> = flow {
@@ -104,18 +106,11 @@ class ProductsRepositoryImpl(
     }
 
     override suspend fun isFavorite(productId: String): Boolean {
-        return favoriteDao.isFavorite(productId, getUserId())
+        val userId = getUserId()
+        return favoriteDao.isFavorite(productId, userId)
     }
 
-    private suspend fun getUserId(): String {
-        return when (val result = authRepository.getCurrentUser()) {
-            is Result.Success -> {
-                when (val user = result.data) {
-                    is User.AuthenticatedUser -> user.uid
-                    User.GuestUser -> "guest"
-                }
-            }
-            else -> "guest"
-        }
+    private fun getUserId(): String {
+        return authRepository.getUserId() ?: "guest"
     }
 }
