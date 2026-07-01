@@ -53,6 +53,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.ui.theme.WarningLight
 import org.koin.androidx.compose.koinViewModel
 
@@ -61,7 +62,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ProductDetailsScreen(
     productId: Long = 9746399428843L,
     viewModel: ProductDetailsViewModel = koinViewModel(),
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onLogin: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -77,6 +79,16 @@ fun ProductDetailsScreen(
                     Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    if (state.showUnauthorizedDialog) {
+        UnauthorizedDialog(
+            onDismiss = { viewModel.handleIntent(ProductDetailsIntent.DismissUnauthorizedDialog) },
+            onLogin = {
+                viewModel.handleIntent(ProductDetailsIntent.DismissUnauthorizedDialog)
+                onLogin()
+            }
+        )
     }
 
     Scaffold(
@@ -140,8 +152,7 @@ private fun ProductDetailsContent(
         ) {
             item {
                 when {
-                    product.images.isEmpty() -> SingleProductImage(imageUrl = "",
-                    )
+                    product.images.isEmpty() -> SingleProductImage(imageUrl = "")
                     product.images.size == 1 -> SingleProductImage(
                         imageUrl = product.images.first().url
                     )
@@ -169,7 +180,6 @@ private fun ProductDetailsContent(
                     onColorSelect = { onIntent(ProductDetailsIntent.SelectColor(it)) }
                 )
             }
-
         }
 
         ShopIQButton(
@@ -179,7 +189,6 @@ private fun ProductDetailsContent(
             isLoading = state.isAddingToCart,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
-
     }
 }
 

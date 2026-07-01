@@ -8,8 +8,8 @@ import com.iti.domain.usecases.auth.LoginAsGuestUseCase
 import com.iti.domain.usecases.auth.LoginUseCase
 import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
-import com.iti.presentation.core.UiText
-import com.iti.presentation.core.toUiMessage
+import com.iti.presentation.util.UiText
+import com.iti.presentation.util.toUiMessage
 import com.iti.presentation.R
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

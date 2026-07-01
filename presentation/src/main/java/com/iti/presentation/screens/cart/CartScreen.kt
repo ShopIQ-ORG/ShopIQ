@@ -19,7 +19,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.screens.cart.components.CartBody
-import com.iti.presentation.screens.cart.components.CartCheckoutBar
+import com.iti.presentation.screens.cart.components.CartCheckoutButton
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +28,7 @@ fun CartScreen(
     onBackClick: () -> Unit,
     onCheckout: () -> Unit,
     onBrowseProducts: () -> Unit,
+    onLogin: () -> Unit,
     viewModel: CartViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -36,7 +37,7 @@ fun CartScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        if(!state.isLoading) {
+        if (!state.isLoading) {
             viewModel.onEvent(CartContract.Event.Refresh)
         }
     }
@@ -45,8 +46,17 @@ fun CartScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is CartContract.Effect.NavigateToCheckout -> onCheckout()
-                is CartContract.Effect.ShowError -> snackbarHostState.showSnackbar(effect.message.resolve(context))
-                is CartContract.Effect.ShowSuccess -> snackbarHostState.showSnackbar(effect.message.resolve(context))
+                is CartContract.Effect.ShowError -> snackbarHostState.showSnackbar(
+                    effect.message.resolve(
+                        context
+                    )
+                )
+
+                is CartContract.Effect.ShowSuccess -> snackbarHostState.showSnackbar(
+                    effect.message.resolve(
+                        context
+                    )
+                )
             }
         }
     }
@@ -63,8 +73,8 @@ fun CartScreen(
             ShopIQSnackBarHost(hostState = snackbarHostState)
         },
         bottomBar = {
-            CartCheckoutBar(
-                visible = !state.isLoading && !state.isEmpty && state.error == null,
+            CartCheckoutButton(
+                visible = state.canCheckout,
                 onCheckoutClick = { viewModel.onEvent(CartContract.Event.ProceedToCheckout) }
             )
         },
@@ -75,6 +85,7 @@ fun CartScreen(
             onRefresh = { viewModel.onEvent(CartContract.Event.Refresh) },
             onRetry = { viewModel.onEvent(CartContract.Event.Retry) },
             onBrowseProducts = onBrowseProducts,
+            onLogin = onLogin,
             onIncreaseQuantity = { viewModel.onEvent(CartContract.Event.IncreaseQuantity(it)) },
             onDecreaseQuantity = { viewModel.onEvent(CartContract.Event.DecreaseQuantity(it)) },
             onRemoveItem = { viewModel.onEvent(CartContract.Event.RemoveItem(it)) },

@@ -45,9 +45,9 @@ val domainModule = module {
     factory { com.iti.domain.usecases.search.AddSearchQueryUseCase(get()) }
     factory { com.iti.domain.usecases.search.DeleteSearchQueryUseCase(get()) }
     factory { com.iti.domain.usecases.search.ClearSearchHistoryUseCase(get()) }
-    factory { GetCartUseCase(get()) }
-    factory { UpdateCartItemQuantityUseCase(get()) }
-    factory { RemoveCartItemUseCase(get()) }
-    factory { ApplyDiscountCodesUseCase(get()) }
-    factory { AddCartItemUseCase(get()) }
+    factory { GetCartUseCase(get(), get()) }
+    factory { UpdateCartItemQuantityUseCase(get(), get()) }
+    factory { RemoveCartItemUseCase(get(), get()) }
+    factory { ApplyDiscountCodesUseCase(get(), get()) }
+    factory { AddCartItemUseCase(get(), get()) }
 }

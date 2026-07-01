@@ -10,7 +10,7 @@ import com.iti.domain.usecases.search.ClearSearchHistoryUseCase
 import com.iti.domain.usecases.search.DeleteSearchQueryUseCase
 import com.iti.domain.usecases.search.GetSearchHistoryUseCase
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay

@@ -1,7 +1,7 @@
 package com.iti.presentation.screens.brands
 
 import com.iti.domain.models.Brand
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 object AllBrandsContract {
 

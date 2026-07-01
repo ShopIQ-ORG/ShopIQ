@@ -1,6 +1,6 @@
 package com.iti.presentation.screens.auth.signup
 
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 data class SignUpState(
     val fullName: String = "",

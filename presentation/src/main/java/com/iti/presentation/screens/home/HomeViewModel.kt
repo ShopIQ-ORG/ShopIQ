@@ -8,7 +8,7 @@ import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

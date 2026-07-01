@@ -174,6 +174,12 @@
     <string name="cart_quantity_update_error">Failed to update quantity</string>
     <string name="cart_remove_item_error">Failed to remove item</string>
     <string name="cart_load_error">Unknown error</string>
+    <string name="login_required_title">Sign in required</string>
+    <string name="login_required_message">You need to sign in to add items to your cart.</string>
+    <string name="login_required_action">Sign In</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="cart_unauthorized_title">Sign in to view your cart</string>
+    <string name="cart_unauthorized_message">Create an account or sign in to see your saved items and continue checkout.</string>
 
     <!-- res/values/plurals.xml (or inside strings.xml, both work) -->
     <plurals name="cart_items_count">

@@ -2,6 +2,7 @@ package com.iti.presentation.screens.products.productdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iti.domain.exceptions.AuthException
 import com.iti.domain.models.Result
 import com.iti.domain.usecases.cart.AddCartItemUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
@@ -33,6 +34,7 @@ class ProductDetailsViewModel(
             is ProductDetailsIntent.SelectImage -> selectImage(intent.index)
             is ProductDetailsIntent.ToggleWishlist -> toggleWishlist()
             is ProductDetailsIntent.AddToCart -> addToCart()
+            is ProductDetailsIntent.DismissUnauthorizedDialog -> dismissUnauthorizedDialog()
         }
     }
 
@@ -88,7 +90,6 @@ class ProductDetailsViewModel(
     }
 
     private fun addToCart() {
-        // Guard against double taps / no selected variant
         if (_state.value.isAddingToCart) return
 
         val variantId = selectedVariantId()
@@ -109,15 +110,23 @@ class ProductDetailsViewModel(
                 }
                 is Result.Failure -> {
                     _state.update { it.copy(isAddingToCart = false) }
-                    _sideEffects.emit(
-                        ProductDetailsSideEffect.ShowToast(
-                            result.exception.message ?: "Failed to add to cart"
+                    if (result.exception is AuthException.UnauthorizedAccess) {
+                        _state.update { it.copy(showUnauthorizedDialog = true) }
+                    } else {
+                        _sideEffects.emit(
+                            ProductDetailsSideEffect.ShowToast(
+                                result.exception.message ?: "Failed to add to cart"
+                            )
                         )
-                    )
+                    }
                 }
                 is Result.Loading -> Unit
             }
         }
+    }
+
+    private fun dismissUnauthorizedDialog() {
+        _state.update { it.copy(showUnauthorizedDialog = false) }
     }
 
     private fun selectedVariantId(): String? {

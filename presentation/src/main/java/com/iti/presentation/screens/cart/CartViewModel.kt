@@ -2,6 +2,7 @@ package com.iti.presentation.screens.cart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iti.domain.exceptions.AuthException
 import com.iti.domain.models.Result
 import com.iti.domain.models.cart.Cart
 import com.iti.domain.models.cart.recalculatedAfterQuantityChange
@@ -10,8 +11,8 @@ import com.iti.domain.usecases.cart.GetCartUseCase
 import com.iti.domain.usecases.cart.RemoveCartItemUseCase
 import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
-import com.iti.presentation.core.toUiMessage
+import com.iti.presentation.util.UiText
+import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -68,13 +69,10 @@ class CartViewModel(
             getCartUseCase().collect { result ->
                 when (result) {
                     is Result.Success -> _state.update {
-                        it.copy(isLoading = false, isRefreshing = false, cart = result.data)
+                        it.copy(isLoading = false, isRefreshing = false, cart = result.data, accessRestricted = false)
                     }
-                    is Result.Failure -> {
-                        _state.update {
-                            it.copy(isLoading = false, isRefreshing = false, error = result.exception.toUiMessage())
-                        }
-                        _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
+                    is Result.Failure -> handleFailure(result.exception) { message ->
+                        _state.update { it.copy(error = message) }
                     }
                     else -> Unit
                 }
@@ -89,12 +87,9 @@ class CartViewModel(
             getCartUseCase().collect { result ->
                 when (result) {
                     is Result.Success -> _state.update {
-                        it.copy(isRefreshing = false, isLoading = false, cart = result.data)
+                        it.copy(isRefreshing = false, isLoading = false, cart = result.data, accessRestricted = false)
                     }
-                    is Result.Failure -> {
-                        _state.update { it.copy(isRefreshing = false) }
-                        _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
-                    }
+                    is Result.Failure -> handleFailure(result.exception)
                     else -> Unit
                 }
             }
@@ -122,7 +117,6 @@ class CartViewModel(
         debounceQuantityUpdate(itemId, newQuantity)
     }
 
-
     private fun captureRollbackSnapshotIfNeeded(itemId: String) {
         if (quantityUpdateJobs[itemId]?.isActive != true) {
             _state.value.cart?.let { quantityRollbackSnapshots[itemId] = it }
@@ -141,7 +135,7 @@ class CartViewModel(
                 }
                 is Result.Failure -> {
                     rollbackQuantityChange(itemId)
-                    _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
+                    handleFailure(result.exception)
                 }
                 else -> Unit
             }
@@ -180,7 +174,7 @@ class CartViewModel(
             when (val result = removeItemUseCase(itemId)) {
                 is Result.Failure -> {
                     _state.update { it.copy(cart = previousCart) }
-                    _effect.send(CartContract.Effect.ShowError(result.exception.toUiMessage()))
+                    handleFailure(result.exception)
                 }
                 else -> Unit
             }
@@ -200,12 +194,28 @@ class CartViewModel(
                     it.copy(isApplyingPromo = false, cart = result.data)
                 }
                 is Result.Failure -> {
-                    val message = result.exception.toUiMessage()
-                    _state.update { it.copy(isApplyingPromo = false, promoError = message) }
-                    _effect.send(CartContract.Effect.ShowError(message))
+                    _state.update { it.copy(isApplyingPromo = false) }
+                    handleFailure(result.exception) { message ->
+                        _state.update { it.copy(promoError = message) }
+                    }
                 }
                 else -> Unit
             }
+        }
+    }
+
+    private suspend fun handleFailure(
+        exception: Throwable,
+        onError: (UiText) -> Unit = {}
+    ) {
+        _state.update { it.copy(isLoading = false, isRefreshing = false) }
+
+        if (exception is AuthException.UnauthorizedAccess) {
+            _state.update { it.copy(accessRestricted = true) }
+        } else {
+            val message = exception.toUiMessage()
+            onError(message)
+            _effect.send(CartContract.Effect.ShowError(message))
         }
     }
 }
