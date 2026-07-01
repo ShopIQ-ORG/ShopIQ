@@ -202,5 +202,6 @@
     <string name="wishlist_locked_title">Wishlist is locked</string>
     <string name="wishlist_locked_subtitle">You need to sign in or sign up to save your favorite products and view them here.</string>
     <string name="wishlist_auth_btn">Sign In / Sign Up</string>
+    <string name="all_photos">All Photos</string>
 
 </resources>

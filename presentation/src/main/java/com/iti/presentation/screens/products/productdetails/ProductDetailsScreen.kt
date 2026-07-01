@@ -10,9 +10,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +56,8 @@ import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.UnauthorizedDialog
+import com.iti.presentation.screens.products.productdetails.components.ProductImageGallery
+import com.iti.presentation.screens.products.productdetails.components.SingleProductImage
 import com.iti.presentation.ui.theme.WarningLight
 import org.koin.androidx.compose.koinViewModel
 
@@ -191,150 +195,6 @@ private fun ProductDetailsContent(
             isLoading = state.isAddingToCart,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
-    }
-}
-
-@Composable
-private fun SingleProductImage(imageUrl: String) {
-    AsyncImage(
-        model = imageUrl,
-        contentDescription = null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f / 1f)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentScale = ContentScale.Crop,
-        error = painterResource(id = R.drawable.logo_light)
-    )
-}
-
-@Composable
-private fun ProductImageGallery(
-    images: List<String>,
-    selectedIndex: Int,
-    onSelectIndex: (Int) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .width(64.dp)
-                .aspectRatio(1f / 1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            val maxThumbnails = 3
-            val displayCount = images.size.coerceAtMost(maxThumbnails)
-
-            repeat(displayCount) { i ->
-                ThumbnailItem(
-                    imageUrl = images[i],
-                    isSelected = selectedIndex == i,
-                    onClick = { onSelectIndex(i) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            if (images.size > maxThumbnails) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(10.dp)
-                        )
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable { onSelectIndex(maxThumbnails) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "+${images.size - maxThumbnails}",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .aspectRatio(1f / 1f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            AsyncImage(
-                model = images.getOrNull(selectedIndex) ?: images.first(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-            ImageIndicatorDots(
-                count = images.size,
-                selectedIndex = selectedIndex,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 10.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun ThumbnailItem(
-    imageUrl: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AsyncImage(
-        model = imageUrl,
-        contentDescription = null,
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                BorderStroke(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.outlineVariant
-                ),
-                RoundedCornerShape(10.dp)
-            )
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(onClick = onClick),
-        contentScale = ContentScale.Crop
-    )
-}
-
-@Composable
-private fun ImageIndicatorDots(
-    count: Int,
-    selectedIndex: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        repeat(count) { index ->
-            val isSelected = index == selectedIndex
-            val width by animateDpAsState(targetValue = if (isSelected) 14.dp else 4.dp)
-            val color by animateColorAsState(
-                targetValue = if (isSelected) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-            )
-            Box(
-                modifier = Modifier
-                    .height(4.dp)
-                    .width(width)
-                    .background(color, CircleShape)
-            )
-        }
     }
 }
 
