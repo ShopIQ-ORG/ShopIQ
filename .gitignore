@@ -30,6 +30,7 @@ local.properties
 google-services.json
 *.keystore
 *.jks
+!app/shared_debug.jks
 key.properties
 *.hprof
 .kotlin
