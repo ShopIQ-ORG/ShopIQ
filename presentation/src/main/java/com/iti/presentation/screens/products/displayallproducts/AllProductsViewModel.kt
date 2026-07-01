@@ -163,6 +163,7 @@ class AllProductsViewModel(
         isLoaded = false
         allProductsStateFlow.value = emptyList()
         allProducts = emptyList()
+        val initialFilter = FilterState(selectedBrands = if (brandName != null) setOf(brandName) else emptySet())
         _state.update {
             it.copy(
                 screenState = AllProductsContract.ScreenState.Loading,
@@ -171,8 +172,8 @@ class AllProductsViewModel(
                 isSortSheetOpen = false,
                 isSearchActive = false,
                 searchQuery = "",
-                filterState = FilterState(),
-                pendingFilterState = FilterState(),
+                filterState = initialFilter,
+                pendingFilterState = initialFilter,
                 sortOption = SortOption.BEST_SELLING,
                 pendingSortOption = SortOption.BEST_SELLING,
                 hasNextPage = false,
@@ -249,16 +250,10 @@ class AllProductsViewModel(
         }
     }
 
-    /** Applies search query, filter state, and sort to `allProducts` and emits Success. */
     private fun applyAll() {
         if (!isLoaded) return
         val state = _state.value
         var result = allProducts
-
-        // legacy brand param from navigation
-        if (state.activeBrand != null) {
-            result = result.filter { it.vendor.equals(state.activeBrand, ignoreCase = true) }
-        }
 
         // text search
         val query = state.searchQuery.trim()
@@ -313,7 +308,13 @@ class AllProductsViewModel(
     }
 
     private fun clearLegacyBrandFilter() {
-        _state.update { it.copy(activeBrand = null) }
+        _state.update {
+            it.copy(
+                activeBrand = null,
+                filterState = it.filterState.copy(selectedBrands = emptySet()),
+                pendingFilterState = it.pendingFilterState.copy(selectedBrands = emptySet())
+            )
+        }
         applyAll()
     }
 
@@ -334,10 +335,15 @@ class AllProductsViewModel(
             val recent = if (query.isNotEmpty()) {
                 (listOf(query) + s.recentSearches).distinct().take(5)
             } else s.recentSearches
+            val newFilterState = s.pendingFilterState.copy(brandSearchQuery = "")
+            val isBrandStillActive = s.activeBrand != null &&
+                    newFilterState.selectedBrands.contains(s.activeBrand) &&
+                    newFilterState.selectedBrands.size == 1
             s.copy(
-                filterState = s.pendingFilterState.copy(brandSearchQuery = ""),
+                filterState = newFilterState,
                 isFilterSheetOpen = false,
-                recentSearches = recent
+                recentSearches = recent,
+                activeBrand = if (isBrandStillActive) s.activeBrand else null
             )
         }
         applyAll()
