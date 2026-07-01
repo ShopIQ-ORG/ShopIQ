@@ -1,5 +1,4 @@
 package com.iti.data.repositories
-
 import com.iti.data.core.handleException
 import com.iti.data.mappers.toDomain
 import com.iti.data.sources.remote.cart.CartIdDataSource
@@ -11,10 +10,7 @@ import com.iti.domain.repositories.cart.CartRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
     private val cartIdDataSource: CartIdDataSource
@@ -24,7 +20,6 @@ class CartRepositoryImpl(
 
     override fun getCart(): Flow<Result<Cart>> = cartState
         .onSubscription {
-            // only hit the network if we don't already have a value
             if (cartState.value !is Result.Success) refreshCart()
         }
 
@@ -34,7 +29,7 @@ class CartRepositoryImpl(
             Result.Success(fetchCart())
         } catch (e: CancellationException) {
             throw e
-        } catch (e: CartException.CartNotFound) {
+        } catch (_: CartException.CartNotFound) {
             Result.Success(recreateCart())
         } catch (e: Exception) {
             Result.Failure(e.handleException())
@@ -52,8 +47,8 @@ class CartRepositoryImpl(
 
     override suspend fun addItem(variantId: String, quantity: Int): Result<Unit> {
         return try {
-            cartRemoteDataSource.addLines(getOrCreateCartId(), variantId, quantity)
-            refreshCart() // <-- pushes new state to every collector
+            val cart = cartRemoteDataSource.addLines(getOrCreateCartId(), variantId, quantity)
+            cartState.value = Result.Success(cart.toDomain())
             Result.Success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -64,8 +59,8 @@ class CartRepositoryImpl(
 
     override suspend fun updateItemQuantity(lineId: String, newQuantity: Int): Result<Unit> {
         return try {
-            cartRemoteDataSource.updateLines(getOrCreateCartId(), lineId, newQuantity)
-            refreshCart()
+            val cart = cartRemoteDataSource.updateLines(getOrCreateCartId(), lineId, newQuantity)
+            cartState.value = Result.Success(cart.toDomain())
             Result.Success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -76,8 +71,8 @@ class CartRepositoryImpl(
 
     override suspend fun removeItem(lineId: String): Result<Unit> {
         return try {
-            cartRemoteDataSource.removeLines(getOrCreateCartId(), listOf(lineId))
-            refreshCart()
+            val cart = cartRemoteDataSource.removeLines(getOrCreateCartId(), listOf(lineId))
+            cartState.value = Result.Success(cart.toDomain())
             Result.Success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -91,7 +86,7 @@ class CartRepositoryImpl(
             val cartId = getOrCreateCartId()
             cartRemoteDataSource.updateDiscountCodes(cartId, codes)
             val updated = cartRemoteDataSource.getCart(cartId).toDomain()
-            cartState.value = Result.Success(updated) // keep shared state in sync too
+            cartState.value = Result.Success(updated)
             Result.Success(updated)
         } catch (e: CancellationException) {
             throw e
@@ -103,7 +98,7 @@ class CartRepositoryImpl(
     override suspend fun clearCart(): Result<Unit> {
         return try {
             cartIdDataSource.clearCartId()
-            cartState.value = Result.Loading // forces a refresh/recreate next getCart()
+            cartState.value = Result.Loading
             Result.Success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -117,5 +112,9 @@ class CartRepositoryImpl(
         val newCartId = cartRemoteDataSource.createCart()
         cartIdDataSource.saveCartId(newCartId)
         return newCartId
+    }
+
+    override suspend fun invalidate() {
+        cartState.value = Result.Loading
     }
 }

@@ -66,7 +66,7 @@ class HomeViewModel(
 
     private fun logout() {
         viewModelScope.launch {
-            //logoutUseCase()
+            logoutUseCase()
             emitEffect(HomeContract.Effect.NavigateToSignIn)
         }
     }

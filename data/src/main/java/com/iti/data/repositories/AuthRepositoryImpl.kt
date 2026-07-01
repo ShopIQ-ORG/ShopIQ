@@ -87,5 +87,13 @@ class AuthRepositoryImpl(
         }
     }
 
-    override fun logout() = remoteDataSource.logout()
-}
+    override fun logout(): Result<Unit> {
+        return try {
+            remoteDataSource.logout()
+            Result.Success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.Failure(e.handleException())
+        }
+    }}

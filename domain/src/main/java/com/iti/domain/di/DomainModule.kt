@@ -35,7 +35,7 @@ val domainModule = module {
     factory { LoginAsGuestUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { RegisterUseCase(get()) }
-    factory { LogoutUseCase(get()) }
+    factory { LogoutUseCase(get(), get()) }
     factory { GetProductsByNumberUseCase(get()) }
     factory { GetProductDetailsUseCase(get()) }
     factory { IsOnboardingCompletedUseCase(get()) }
@@ -53,5 +53,4 @@ val domainModule = module {
     factory { ApplyDiscountCodesUseCase(get(), get()) }
     factory { AddCartItemUseCase(get(), get()) }
     factoryOf(::ObserveCartItemCountUseCase)
-
 }

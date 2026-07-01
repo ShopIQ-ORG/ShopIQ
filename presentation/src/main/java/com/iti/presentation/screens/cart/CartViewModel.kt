@@ -1,5 +1,6 @@
 package com.iti.presentation.screens.cart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.exceptions.AuthException
@@ -14,6 +15,7 @@ import com.iti.presentation.R
 import com.iti.presentation.util.UiText
 import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +24,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.milliseconds
 
 class CartViewModel(
     private val getCartUseCase: GetCartUseCase,
@@ -53,10 +58,12 @@ class CartViewModel(
             is CartContract.Event.PromoInputChanged -> _state.update {
                 it.copy(promoInput = event.value, promoError = null)
             }
+
             is CartContract.Event.ApplyPromoCode -> applyPromo()
             is CartContract.Event.ProceedToCheckout -> viewModelScope.launch {
                 _effect.send(CartContract.Effect.NavigateToCheckout)
             }
+
             is CartContract.Event.Refresh -> refreshCart()
             is CartContract.Event.Retry -> loadCart()
         }
@@ -69,11 +76,18 @@ class CartViewModel(
             getCartUseCase().collect { result ->
                 when (result) {
                     is Result.Success -> _state.update {
-                        it.copy(isLoading = false, isRefreshing = false, cart = result.data, accessRestricted = false)
+                        it.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            cart = result.data,
+                            accessRestricted = false
+                        )
                     }
+
                     is Result.Failure -> handleFailure(result.exception) { message ->
                         _state.update { it.copy(error = message) }
                     }
+
                     else -> Unit
                 }
             }
@@ -87,8 +101,14 @@ class CartViewModel(
             getCartUseCase().collect { result ->
                 when (result) {
                     is Result.Success -> _state.update {
-                        it.copy(isRefreshing = false, isLoading = false, cart = result.data, accessRestricted = false)
+                        it.copy(
+                            isRefreshing = false,
+                            isLoading = false,
+                            cart = result.data,
+                            accessRestricted = false
+                        )
                     }
+
                     is Result.Failure -> handleFailure(result.exception)
                     else -> Unit
                 }
@@ -133,16 +153,20 @@ class CartViewModel(
         quantityUpdateJobs[itemId]?.cancel()
 
         quantityUpdateJobs[itemId] = viewModelScope.launch {
-            delay(500L)
-
-            when (val result = updateCartItemQuantityUseCase(itemId, newQuantity)) {
+            delay(500L.milliseconds)
+            val result = withContext(NonCancellable) {
+                updateCartItemQuantityUseCase(itemId, newQuantity)
+            }
+            when (result) {
                 is Result.Success -> {
                     quantityRollbackSnapshots.remove(itemId)
                 }
+
                 is Result.Failure -> {
                     rollbackQuantityChange(itemId)
                     handleFailure(result.exception)
                 }
+
                 else -> Unit
             }
         }
@@ -171,8 +195,14 @@ class CartViewModel(
 
         _state.update { it.copy(itemBeingRemoved = itemId) }
 
+
         viewModelScope.launch {
-            when (val result = removeItemUseCase(itemId)) {
+
+            val result = withContext(NonCancellable) {
+                removeItemUseCase(itemId)
+            }
+
+            when (result) {
                 is Result.Success -> {
                     _state.update { state ->
                         val cart = state.cart ?: return@update state.copy(itemBeingRemoved = null)
@@ -183,12 +213,15 @@ class CartViewModel(
                         )
                     }
                 }
+
                 is Result.Failure -> {
                     _state.update { it.copy(itemBeingRemoved = null) }
                     handleFailure(result.exception)
                 }
+
                 else -> Unit
             }
+
         }
     }
 
@@ -204,12 +237,14 @@ class CartViewModel(
                 is Result.Success -> _state.update {
                     it.copy(isApplyingPromo = false, cart = result.data)
                 }
+
                 is Result.Failure -> {
                     _state.update { it.copy(isApplyingPromo = false) }
                     handleFailure(result.exception) { message ->
                         _state.update { it.copy(promoError = message) }
                     }
                 }
+
                 else -> Unit
             }
         }
