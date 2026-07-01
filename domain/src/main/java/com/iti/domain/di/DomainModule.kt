@@ -15,11 +15,13 @@ import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.cart.AddCartItemUseCase
 import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
 import com.iti.domain.usecases.cart.GetCartUseCase
+import com.iti.domain.usecases.cart.ObserveCartItemCountUseCase
 import com.iti.domain.usecases.cart.RemoveCartItemUseCase
 import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -50,4 +52,6 @@ val domainModule = module {
     factory { RemoveCartItemUseCase(get(), get()) }
     factory { ApplyDiscountCodesUseCase(get(), get()) }
     factory { AddCartItemUseCase(get(), get()) }
+    factoryOf(::ObserveCartItemCountUseCase)
+
 }

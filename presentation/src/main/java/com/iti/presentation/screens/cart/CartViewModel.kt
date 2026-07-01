@@ -97,6 +97,8 @@ class CartViewModel(
     }
 
     private fun increaseQuantity(itemId: String) {
+        if (isItemBusy(itemId)) return
+
         val currentItem = _state.value.cart?.items?.find { it.id == itemId } ?: return
         val newQuantity = currentItem.quantity + 1
 
@@ -106,6 +108,8 @@ class CartViewModel(
     }
 
     private fun decreaseQuantity(itemId: String) {
+        if (isItemBusy(itemId)) return
+
         val currentItem = _state.value.cart?.items?.find { it.id == itemId } ?: return
 
         if (currentItem.quantity <= 1) return
@@ -116,6 +120,8 @@ class CartViewModel(
         updateQuantityOptimistically(itemId, newQuantity)
         debounceQuantityUpdate(itemId, newQuantity)
     }
+
+    private fun isItemBusy(itemId: String): Boolean = _state.value.itemBeingRemoved == itemId
 
     private fun captureRollbackSnapshotIfNeeded(itemId: String) {
         if (quantityUpdateJobs[itemId]?.isActive != true) {
@@ -158,22 +164,27 @@ class CartViewModel(
     }
 
     private fun removeItem(itemId: String) {
-        val previousCart = _state.value.cart ?: return
+        if (_state.value.itemBeingRemoved != null) return
+        quantityUpdateJobs[itemId]?.cancel()
+        quantityUpdateJobs.remove(itemId)
+        quantityRollbackSnapshots.remove(itemId)
 
         _state.update { it.copy(itemBeingRemoved = itemId) }
 
         viewModelScope.launch {
-            _state.update { state ->
-                val updatedItems = previousCart.items.filterNot { it.id == itemId }
-                state.copy(
-                    itemBeingRemoved = null,
-                    cart = previousCart.copy(items = updatedItems).recalculatedAfterQuantityChange()
-                )
-            }
-
             when (val result = removeItemUseCase(itemId)) {
+                is Result.Success -> {
+                    _state.update { state ->
+                        val cart = state.cart ?: return@update state.copy(itemBeingRemoved = null)
+                        val updatedItems = cart.items.filterNot { it.id == itemId }
+                        state.copy(
+                            itemBeingRemoved = null,
+                            cart = cart.copy(items = updatedItems).recalculatedAfterQuantityChange()
+                        )
+                    }
+                }
                 is Result.Failure -> {
-                    _state.update { it.copy(cart = previousCart) }
+                    _state.update { it.copy(itemBeingRemoved = null) }
                     handleFailure(result.exception)
                 }
                 else -> Unit

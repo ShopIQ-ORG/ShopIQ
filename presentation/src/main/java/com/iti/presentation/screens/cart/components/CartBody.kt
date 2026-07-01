@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.iti.domain.models.cart.CartItem
 import com.iti.presentation.R
 import com.iti.presentation.components.ErrorScreen
 import com.iti.presentation.components.UnauthorizedContent
@@ -23,7 +24,7 @@ fun CartBody(
     onLogin: () -> Unit,
     onIncreaseQuantity: (String) -> Unit,
     onDecreaseQuantity: (String) -> Unit,
-    onRemoveItem: (String) -> Unit,
+    onRemoveItem: (CartItem) -> Unit,
     onTogglePromoExpanded: () -> Unit,
     onPromoInputChanged: (String) -> Unit,
     onApplyPromoClick: () -> Unit,

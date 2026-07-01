@@ -21,14 +21,42 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.iti.presentation.R
+
+@Composable
+fun CartIconWithBadge(
+    count: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(onClick = onClick, modifier = modifier) {
+        BadgedBox(
+            badge = {
+                if (count > 0) {
+                    Badge(containerColor = MaterialTheme.colorScheme.error) {
+                        Text(text = if (count > 99) "99+" else count.toString())
+                    }
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.ShoppingCart,
+                contentDescription = stringResource(R.string.content_desc_cart),
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
     title: String = "ShopIQ",
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    cartItemCount: Int = 0,
     onMenuClick: () -> Unit = {},
     onCartClick: () -> Unit = {}
 ) {
@@ -55,17 +83,10 @@ fun AppTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onCartClick) {
-                BadgedBox(badge = {
-                    Badge(containerColor = MaterialTheme.colorScheme.error) { Text("3") }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            }
+            CartIconWithBadge(
+                count = cartItemCount,
+                onClick = onCartClick
+            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,

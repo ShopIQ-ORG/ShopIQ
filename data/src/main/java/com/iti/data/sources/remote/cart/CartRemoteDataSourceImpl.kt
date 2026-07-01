@@ -121,7 +121,7 @@ class CartRemoteDataSourceImpl(
         )
     }
 
-    override suspend fun removeLines(cartId: String, lineIds: List<String>) {
+    override suspend fun removeLines(cartId: String, lineIds: List<String>) : CartDto{
         val response = apolloClient.mutation(
             CartLinesRemoveMutation(
                 cartId = cartId,
@@ -139,7 +139,7 @@ class CartRemoteDataSourceImpl(
 
         val cart = getCart(cartId)
 
-        validator.validateLinesRemoved(cart = cart, removedIds = lineIds)
+        return validator.validateLinesRemoved(cart = cart, removedIds = lineIds)
     }
 
     override suspend fun updateDiscountCodes(cartId: String, codes: List<String>): CartDto {

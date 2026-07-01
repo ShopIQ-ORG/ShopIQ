@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.home
+package com.iti.presentation.screens.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +8,7 @@ import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.presentation.R
+import com.iti.presentation.screens.home.HomeContract
 import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

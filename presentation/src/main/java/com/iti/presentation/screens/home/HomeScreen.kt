@@ -7,30 +7,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.util.NetworkMonitor
-import org.koin.compose.koinInject
 import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
 import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.screens.home.components.HomeTabContent
+import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
+import com.iti.presentation.screens.home.viewmodel.HomeViewModel
+import com.iti.presentation.util.NetworkMonitor
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun HomeScreen(
@@ -89,12 +91,15 @@ fun HomeScreenContent(
     onIntent: (HomeContract.Intent) -> Unit,
     onLogout: () -> Unit,
     onCartClick: () -> Unit,
-    ) {
+) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
     val snackbarHostState = remember { SnackbarHostState() }
     var wasConnected by remember { mutableStateOf(isConnected) }
     val connectionLostMessage = stringResource(id = R.string.network_connection_lost)
+
+    val cartBadgeViewModel: CartBadgeViewModel = koinViewModel()
+    val cartItemCount by cartBadgeViewModel.cartItemCount.collectAsState()
 
     LaunchedEffect(isConnected) {
         if (!isConnected && wasConnected) {
@@ -151,6 +156,7 @@ fun HomeScreenContent(
                     state = state,
                     onIntent = onIntent,
                     bottomPadding = padding.calculateBottomPadding(),
+                    cartItemCount = cartItemCount,
                     onCartClick = onCartClick
                 )
             }
@@ -158,7 +164,9 @@ fun HomeScreenContent(
             BottomNavItem.Category -> {
                 CategoryScreen(
                     viewModel = koinViewModel(),
-                    bottomPadding = padding.calculateBottomPadding()
+                    bottomPadding = padding.calculateBottomPadding(),
+                    cartItemCount = cartItemCount,
+                    onCartClick = onCartClick
                 )
             }
 

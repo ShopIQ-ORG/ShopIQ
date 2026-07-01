@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,15 +22,17 @@ fun QuantitySelector(
     quantity: Int,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer),
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .alpha(if (enabled) 1f else 0.5f),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        StepperButton(symbol = "−", onClick = onDecrease)
+        StepperButton(symbol = "−", onClick = onDecrease, enabled = enabled)
         Box(
             modifier = Modifier.size(28.dp),
             contentAlignment = Alignment.Center
@@ -40,19 +43,20 @@ fun QuantitySelector(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        StepperButton(symbol = "+", onClick = onIncrease)
+        StepperButton(symbol = "+", onClick = onIncrease, enabled = enabled)
     }
 }
 
 @Composable
 private fun StepperButton(
     symbol: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
     Box(
         modifier = Modifier
             .size(28.dp)
-            .clickable(onClick = onClick),
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(

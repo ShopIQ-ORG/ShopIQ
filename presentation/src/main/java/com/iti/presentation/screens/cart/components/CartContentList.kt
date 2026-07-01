@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.iti.domain.models.cart.Cart
+import com.iti.domain.models.cart.CartItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,7 @@ fun CartContentList(
     onRefresh: () -> Unit,
     onIncreaseQuantity: (String) -> Unit,
     onDecreaseQuantity: (String) -> Unit,
-    onRemoveItem: (String) -> Unit,
+    onRemoveItem: (CartItem) -> Unit,
     onTogglePromoExpanded: () -> Unit,
     onPromoInputChanged: (String) -> Unit,
     onApplyPromoClick: () -> Unit,
@@ -69,7 +70,7 @@ fun CartContentList(
                     isBeingRemoved = itemBeingRemoved == item.id,
                     onIncrease = { onIncreaseQuantity(item.id) },
                     onDecrease = { onDecreaseQuantity(item.id) },
-                    onRemove = { onRemoveItem(item.id) },
+                    onRequestRemove = { onRemoveItem(item) },
                     modifier = Modifier.animateItem(
                         fadeOutSpec = tween(220),
                         placementSpec = tween(220)

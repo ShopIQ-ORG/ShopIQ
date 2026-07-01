@@ -10,130 +10,91 @@ import com.iti.domain.models.cart.Cart
 import com.iti.domain.repositories.cart.CartRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
     private val cartIdDataSource: CartIdDataSource
 ) : CartRepository {
 
-    override fun getCart(): Flow<Result<Cart>> = flow {
-        emit(Result.Loading)
+    private val cartState = MutableStateFlow<Result<Cart>>(Result.Loading)
 
-        try {
-            emit(Result.Success(fetchCart()))
+    override fun getCart(): Flow<Result<Cart>> = cartState
+        .onSubscription {
+            // only hit the network if we don't already have a value
+            if (cartState.value !is Result.Success) refreshCart()
+        }
+
+    private suspend fun refreshCart() {
+        cartState.value = Result.Loading
+        cartState.value = try {
+            Result.Success(fetchCart())
         } catch (e: CancellationException) {
             throw e
         } catch (e: CartException.CartNotFound) {
-            emit(Result.Success(recreateCart()))
+            Result.Success(recreateCart())
         } catch (e: Exception) {
-            emit(Result.Failure(e.handleException()))
+            Result.Failure(e.handleException())
         }
     }
 
-    private suspend fun fetchCart(): Cart {
-        return cartRemoteDataSource
-            .getCart(getOrCreateCartId())
-            .toDomain()
-    }
+    private suspend fun fetchCart(): Cart =
+        cartRemoteDataSource.getCart(getOrCreateCartId()).toDomain()
 
     private suspend fun recreateCart(): Cart {
         val cartId = cartRemoteDataSource.createCart()
-
         cartIdDataSource.saveCartId(cartId)
-
-        return cartRemoteDataSource
-            .getCart(cartId)
-            .toDomain()
+        return cartRemoteDataSource.getCart(cartId).toDomain()
     }
 
-    override suspend fun addItem(
-        variantId: String,
-        quantity: Int
-    ): Result<Unit> {
+    override suspend fun addItem(variantId: String, quantity: Int): Result<Unit> {
         return try {
-            val cartId = getOrCreateCartId()
-
-            cartRemoteDataSource.addLines(
-                cartId = cartId,
-                variantId = variantId,
-                quantity = quantity
-            )
-
+            cartRemoteDataSource.addLines(getOrCreateCartId(), variantId, quantity)
+            refreshCart() // <-- pushes new state to every collector
             Result.Success(Unit)
-
         } catch (e: CancellationException) {
             throw e
-
         } catch (e: Exception) {
             Result.Failure(e.handleException())
         }
     }
 
-    override suspend fun updateItemQuantity(
-        lineId: String,
-        newQuantity: Int
-    ): Result<Unit> {
+    override suspend fun updateItemQuantity(lineId: String, newQuantity: Int): Result<Unit> {
         return try {
-            val cartId = getOrCreateCartId()
-
-            cartRemoteDataSource.updateLines(
-                cartId = cartId,
-                lineId = lineId,
-                quantity = newQuantity
-            )
-
+            cartRemoteDataSource.updateLines(getOrCreateCartId(), lineId, newQuantity)
+            refreshCart()
             Result.Success(Unit)
-
         } catch (e: CancellationException) {
             throw e
-
         } catch (e: Exception) {
             Result.Failure(e.handleException())
         }
     }
 
-    override suspend fun removeItem(
-        lineId: String
-    ): Result<Unit> {
+    override suspend fun removeItem(lineId: String): Result<Unit> {
         return try {
-            val cartId = getOrCreateCartId()
-
-            cartRemoteDataSource.removeLines(
-                cartId = cartId,
-                lineIds = listOf(lineId)
-            )
-
+            cartRemoteDataSource.removeLines(getOrCreateCartId(), listOf(lineId))
+            refreshCart()
             Result.Success(Unit)
-
         } catch (e: CancellationException) {
             throw e
-
         } catch (e: Exception) {
             Result.Failure(e.handleException())
         }
     }
 
-    override suspend fun applyDiscountCodes(
-        codes: List<String>
-    ): Result<Cart> {
+    override suspend fun applyDiscountCodes(codes: List<String>): Result<Cart> {
         return try {
             val cartId = getOrCreateCartId()
-
-            cartRemoteDataSource.updateDiscountCodes(
-                cartId = cartId,
-                codes = codes
-            )
-
-            val updatedCart = cartRemoteDataSource
-                .getCart(cartId)
-                .toDomain()
-
-            Result.Success(updatedCart)
-
+            cartRemoteDataSource.updateDiscountCodes(cartId, codes)
+            val updated = cartRemoteDataSource.getCart(cartId).toDomain()
+            cartState.value = Result.Success(updated) // keep shared state in sync too
+            Result.Success(updated)
         } catch (e: CancellationException) {
             throw e
-
         } catch (e: Exception) {
             Result.Failure(e.handleException())
         }
@@ -142,9 +103,8 @@ class CartRepositoryImpl(
     override suspend fun clearCart(): Result<Unit> {
         return try {
             cartIdDataSource.clearCartId()
-
+            cartState.value = Result.Loading // forces a refresh/recreate next getCart()
             Result.Success(Unit)
-
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -153,14 +113,9 @@ class CartRepositoryImpl(
     }
 
     private suspend fun getOrCreateCartId(): String {
-        cartIdDataSource.getCartId()?.let {
-            return it
-        }
-
+        cartIdDataSource.getCartId()?.let { return it }
         val newCartId = cartRemoteDataSource.createCart()
-
         cartIdDataSource.saveCartId(newCartId)
-
         return newCartId
     }
 }

@@ -180,7 +180,15 @@
     <string name="action_cancel">Cancel</string>
     <string name="cart_unauthorized_title">Sign in to view your cart</string>
     <string name="cart_unauthorized_message">Create an account or sign in to see your saved items and continue checkout.</string>
+    <string name="remove_item">Remove item</string>
 
+    <string name="remove_item_message">
+    Are you sure you want to remove this item from your cart?
+</string>
+
+    <string name="delete">Delete</string>
+
+    <string name="cancel">Cancel</string>
     <!-- res/values/plurals.xml (or inside strings.xml, both work) -->
     <plurals name="cart_items_count">
         <item quantity="one">%d Item</item>

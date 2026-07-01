@@ -11,12 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.iti.domain.models.cart.CartItem
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
+import com.iti.presentation.components.ConfirmationDialog
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.screens.cart.components.CartBody
 import com.iti.presentation.screens.cart.components.CartCheckoutButton
@@ -34,13 +38,10 @@ fun CartScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        if (!state.isLoading) {
-            viewModel.onEvent(CartContract.Event.Refresh)
-        }
+    var deleteDialogState by remember {
+        mutableStateOf<CartItem?>(null)
     }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -88,12 +89,34 @@ fun CartScreen(
             onLogin = onLogin,
             onIncreaseQuantity = { viewModel.onEvent(CartContract.Event.IncreaseQuantity(it)) },
             onDecreaseQuantity = { viewModel.onEvent(CartContract.Event.DecreaseQuantity(it)) },
-            onRemoveItem = { viewModel.onEvent(CartContract.Event.RemoveItem(it)) },
+            onRemoveItem = {
+                deleteDialogState = it
+            },
             onTogglePromoExpanded = { viewModel.onEvent(CartContract.Event.TogglePromoExpanded) },
             onPromoInputChanged = { viewModel.onEvent(CartContract.Event.PromoInputChanged(it)) },
             onApplyPromoClick = { viewModel.onEvent(CartContract.Event.ApplyPromoCode) },
             promoErrorMessage = state.promoError?.resolve(context),
             modifier = Modifier.padding(innerPadding)
+        )
+    }
+
+    deleteDialogState?.let { item ->
+
+        ConfirmationDialog(
+            title = stringResource(R.string.remove_item),
+            message = stringResource(
+                R.string.remove_item_message,
+                item.title
+            ),
+            confirmText = stringResource(R.string.delete),
+            dismissText = stringResource(R.string.cancel),
+            onConfirm = {
+                viewModel.onEvent(CartContract.Event.RemoveItem(item.id))
+                deleteDialogState = null
+            },
+            onDismiss = {
+                deleteDialogState = null
+            }
         )
     }
 }
