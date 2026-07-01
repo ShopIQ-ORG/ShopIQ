@@ -1,6 +1,5 @@
 package com.iti.presentation.screens.cart
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.exceptions.AuthException
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.microseconds
 import kotlin.time.Duration.Companion.milliseconds
 
 class CartViewModel(
@@ -60,6 +58,7 @@ class CartViewModel(
             }
 
             is CartContract.Event.ApplyPromoCode -> applyPromo()
+            is CartContract.Event.RemoveCoupon -> removeCoupon(event.code)
             is CartContract.Event.ProceedToCheckout -> viewModelScope.launch {
                 _effect.send(CartContract.Effect.NavigateToCheckout)
             }
@@ -195,9 +194,7 @@ class CartViewModel(
 
         _state.update { it.copy(itemBeingRemoved = itemId) }
 
-
         viewModelScope.launch {
-
             val result = withContext(NonCancellable) {
                 removeItemUseCase(itemId)
             }
@@ -221,7 +218,6 @@ class CartViewModel(
 
                 else -> Unit
             }
-
         }
     }
 
@@ -231,20 +227,70 @@ class CartViewModel(
             _state.update { it.copy(promoError = UiText.StringResource(R.string.cart_promo_empty_error)) }
             return
         }
+
+        val currentCodes = _state.value.cart?.discountCodes.orEmpty()
+        if (currentCodes.any { it.equals(code, ignoreCase = true) }) {
+            _state.update { it.copy(promoError = UiText.StringResource(R.string.cart_promo_duplicate_error)) }
+            return
+        }
+
+        updateDiscountCodes(
+            updatedCodes = currentCodes + code,
+            onStart = { _state.update { it.copy(isApplyingPromo = true, promoError = null) } },
+            onSuccess = { cart ->
+                _state.update {
+                    it.copy(
+                        isApplyingPromo = false,
+                        cart = cart,
+                        promoInput = ""
+                    )
+                }
+            },
+            onError = { _state.update { it.copy(isApplyingPromo = false) } },
+            cancellable = true
+        )
+    }
+
+    private fun removeCoupon(code: String) {
+        if (_state.value.removingCouponCode != null) return
+        val currentCodes = _state.value.cart?.discountCodes.orEmpty()
+        val updatedCodes = currentCodes.filterNot { it.equals(code, ignoreCase = true) }
+
+        updateDiscountCodes(
+            updatedCodes = updatedCodes,
+            onStart = { _state.update { it.copy(removingCouponCode = code) } },
+            onSuccess = { cart ->
+                _state.update {
+                    it.copy(
+                        removingCouponCode = null,
+                        cart = cart
+                    )
+                }
+            },
+            onError = { _state.update { it.copy(removingCouponCode = null) } },
+            cancellable = false
+        )
+    }
+
+    private fun updateDiscountCodes(
+        updatedCodes: List<String>,
+        onStart: () -> Unit,
+        onSuccess: (Cart) -> Unit,
+        onError: (UiText) -> Unit,
+        cancellable: Boolean
+    ) {
         viewModelScope.launch {
-            _state.update { it.copy(isApplyingPromo = true, promoError = null) }
-            when (val result = applyPromoCodeUseCase(arrayListOf(code))) {
-                is Result.Success -> _state.update {
-                    it.copy(isApplyingPromo = false, cart = result.data)
-                }
+            onStart()
 
-                is Result.Failure -> {
-                    _state.update { it.copy(isApplyingPromo = false) }
-                    handleFailure(result.exception) { message ->
-                        _state.update { it.copy(promoError = message) }
-                    }
-                }
+            val result = if (cancellable) {
+                applyPromoCodeUseCase(ArrayList(updatedCodes))
+            } else {
+                withContext(NonCancellable) { applyPromoCodeUseCase(ArrayList(updatedCodes)) }
+            }
 
+            when (result) {
+                is Result.Success -> onSuccess(result.data)
+                is Result.Failure -> handleFailure(result.exception, onError)
                 else -> Unit
             }
         }

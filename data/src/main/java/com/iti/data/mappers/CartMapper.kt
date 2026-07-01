@@ -1,6 +1,8 @@
 package com.iti.data.mappers
 
 import com.iti.data.dto.cart.CartBuyerIdentityDto
+import com.iti.data.dto.cart.CartDeliveryGroupDto
+import com.iti.data.dto.cart.CartDeliveryOptionDto
 import com.iti.data.dto.cart.CartDto
 import com.iti.data.dto.cart.CartLineDto
 import com.iti.data.dto.cart.DiscountCodeDto
@@ -103,12 +105,39 @@ fun CartFields.toDto(): CartDto {
                 phone = it.phone,
                 countryCode = it.countryCode
             )
+        },
+
+        deliveryGroups = deliveryGroups.edges.map { edge ->
+            CartDeliveryGroupDto(
+                id = edge.node.id,
+                selectedDeliveryOption = edge.node.selectedDeliveryOption?.let {
+                    CartDeliveryOptionDto(
+                        handle = it.handle,
+                        title = it.title,
+                        estimatedCostAmount = MoneyDto(
+                            amount = it.estimatedCost.amount,
+                            currencyCode = it.estimatedCost.currencyCode.toString()
+                        )
+                    )
+                },
+                deliveryOptions = edge.node.deliveryOptions.map {
+                    CartDeliveryOptionDto(
+                        handle = it.handle,
+                        title = it.title,
+                        estimatedCostAmount = MoneyDto(
+                            amount = it.estimatedCost.amount,
+                            currencyCode = it.estimatedCost.currencyCode.toString()
+                        )
+                    )
+                }
+            )
         }
     )
 }
 
 fun CartDto.toDomain(): Cart {
     val discountAmount = computeDiscountAmount()
+    val shippingAmount = computeShippingAmount()
 
     return Cart(
         id = id,
@@ -117,27 +146,42 @@ fun CartDto.toDomain(): Cart {
         discountAmount = discountAmount,
         subtotal = Money(subtotalAmount.amount, subtotalAmount.currencyCode),
         total = Money(totalAmount.amount, totalAmount.currencyCode),
-        totalTax = totalTaxAmount?.let { Money(it.amount, it.currencyCode) }
+        totalTax = totalTaxAmount?.let { Money(it.amount, it.currencyCode) },
+        shippingAmount = shippingAmount
     )
 }
 
 private fun CartDto.computeDiscountAmount(): Money? {
     if (discountCodes.none { it.applicable }) return null
 
-    val totalDiscount = lines.sumOf { line ->
-        val perQuantity = line.amountPerQuantity.amount.toDoubleOrNull() ?: 0.0
-        val quantity = line.quantity
-        val lineTotal = line.totalAmount.amount.toDoubleOrNull() ?: 0.0
-        val expectedFullPrice = perQuantity * quantity
-        (expectedFullPrice - lineTotal).coerceAtLeast(0.0)
-    }
+    val subtotal = subtotalAmount.amount.toDoubleOrNull() ?: 0.0
+    val total = totalAmount.amount.toDoubleOrNull() ?: 0.0
+    val tax = totalTaxAmount?.amount?.toDoubleOrNull() ?: 0.0
+    val shipping = deliveryGroups
+        .mapNotNull { it.selectedDeliveryOption }
+        .sumOf { it.estimatedCostAmount.amount.toDoubleOrNull() ?: 0.0 }
 
-    if (totalDiscount <= 0.0) return null
+    val discount = subtotal + tax + shipping - total
+
+    if (discount <= 0.0) return null
 
     return Money(
-        "%.2f".format(totalDiscount),
+        "%.2f".format(discount),
         subtotalAmount.currencyCode
     )
+}
+
+private fun CartDto.computeShippingAmount(): Money? {
+    val selectedOptions = deliveryGroups.mapNotNull { it.selectedDeliveryOption }
+    if (selectedOptions.isEmpty()) return null
+
+    val totalShipping = selectedOptions.sumOf {
+        it.estimatedCostAmount.amount.toDoubleOrNull() ?: 0.0
+    }
+
+    val currency = selectedOptions.first().estimatedCostAmount.currencyCode
+
+    return Money("%.2f".format(totalShipping), currency)
 }
 
 fun CartLineDto.toDomain(): CartItem {

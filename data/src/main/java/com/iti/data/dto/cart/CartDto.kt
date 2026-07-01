@@ -8,7 +8,8 @@ data class CartDto(
     val totalAmount: MoneyDto,
     val totalTaxAmount: MoneyDto?,
     val totalDutyAmount: MoneyDto?,
-    val buyerIdentity: CartBuyerIdentityDto?
+    val buyerIdentity: CartBuyerIdentityDto?,
+    val deliveryGroups: List<CartDeliveryGroupDto>
 )
 
 data class CartLineDto(
@@ -51,4 +52,16 @@ data class CartBuyerIdentityDto(
     val email: String?,
     val phone: String?,
     val countryCode: String?
+)
+
+data class CartDeliveryGroupDto(
+    val id: String,
+    val selectedDeliveryOption: CartDeliveryOptionDto?,
+    val deliveryOptions: List<CartDeliveryOptionDto>
+)
+
+data class CartDeliveryOptionDto(
+    val handle: String,
+    val title: String?,
+    val estimatedCostAmount: MoneyDto
 )
