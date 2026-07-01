@@ -4,6 +4,7 @@ import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.GetAdsUseCase
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
+import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.auth.LoginAsGuestUseCase
 import com.iti.domain.usecases.auth.LoginUseCase
@@ -11,6 +12,11 @@ import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
 import com.iti.domain.usecases.auth.RegisterUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
+import com.iti.domain.usecases.cart.AddCartItemUseCase
+import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
+import com.iti.domain.usecases.cart.GetCartUseCase
+import com.iti.domain.usecases.cart.RemoveCartItemUseCase
+import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
@@ -22,6 +28,7 @@ import org.koin.dsl.module
 
 val domainModule = module {
     factory { GetProductsByNumberUseCase(get()) }
+    factory { GetProductsPaginatedUseCase(get()) }
     factory { GetBrandsUseCase(get()) }
     factory { GetAdsUseCase(get()) }
     factory { LoginUseCase(get()) }
@@ -35,9 +42,20 @@ val domainModule = module {
     factory { IsOnboardingCompletedUseCase(get()) }
     factory { SetOnboardingCompletedUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
-
     factory { AddProductToFavoritesUseCase(get()) }
     factory { RemoveProductFromFavoritesUseCase(get()) }
     factory { GetFavoriteProductsUseCase(get()) }
     factory { IsProductFavoriteUseCase(get()) }
+
+    factory { com.iti.domain.usecases.products.SearchProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetPopularProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.search.GetSearchHistoryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.AddSearchQueryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.DeleteSearchQueryUseCase(get()) }
+    factory { com.iti.domain.usecases.search.ClearSearchHistoryUseCase(get()) }
+    factory { GetCartUseCase(get()) }
+    factory { UpdateCartItemQuantityUseCase(get()) }
+    factory { RemoveCartItemUseCase(get()) }
+    factory { ApplyDiscountCodesUseCase(get()) }
+    factory { AddCartItemUseCase(get()) }
 }

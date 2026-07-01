@@ -1,8 +1,8 @@
 package com.iti.domain.exceptions
 
-sealed class AuthException : AppException() {
-    class InvalidCredentials : AuthException()
-    class UserNotFound : AuthException()
-    class EmailAlreadyInUse : AuthException()
-    class WeakPassword : AuthException()
+sealed class AuthException(message: String) : AppException(message) {
+    class InvalidCredentials : AuthException("Invalid email or password")
+    class UserNotFound : AuthException("User account not found")
+    class EmailAlreadyInUse : AuthException("Email is already registered")
+    class WeakPassword : AuthException("Password is too weak")
 }

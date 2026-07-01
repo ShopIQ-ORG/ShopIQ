@@ -1,0 +1,103 @@
+fragment CartFields on Cart {
+  id
+
+  lines(first: 100) {
+    edges {
+      node {
+        id
+        quantity
+
+        cost {
+          amountPerQuantity {
+            amount
+            currencyCode
+          }
+
+          subtotalAmount {
+            amount
+            currencyCode
+          }
+
+          totalAmount {
+            amount
+            currencyCode
+          }
+        }
+
+        merchandise {
+          ... on ProductVariant {
+
+            id
+            title
+
+            image {
+              url
+              altText
+            }
+
+            price {
+              amount
+              currencyCode
+            }
+
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+
+            selectedOptions {
+              name
+              value
+            }
+
+            product {
+              id
+              title
+              handle
+              vendor
+
+              featuredImage {
+                url
+                altText
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  buyerIdentity {
+    email
+    phone
+    countryCode
+  }
+
+  discountCodes {
+    code
+    applicable
+  }
+
+  cost {
+
+    subtotalAmount {
+      amount
+      currencyCode
+    }
+
+    totalAmount {
+      amount
+      currencyCode
+    }
+
+    totalTaxAmount {
+      amount
+      currencyCode
+    }
+
+    totalDutyAmount {
+      amount
+      currencyCode
+    }
+  }
+}

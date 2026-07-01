@@ -67,7 +67,7 @@ fun ProfileTabContent(
         )
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedButton(onClick = onLogout) {
-            Text(text = "Logout (Back to Splash)")
+            Text(text = "Back to Login")
         }
     }
 }

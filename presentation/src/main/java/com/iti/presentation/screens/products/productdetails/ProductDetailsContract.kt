@@ -9,7 +9,8 @@ data class ProductDetailsUiState(
     val selectedColor: String? = null,
     val selectedSize: String? = null,
     val selectedImageIndex: Int = 0,
-    val isWishlisted: Boolean = false
+    val isWishlisted: Boolean = false,
+    val isAddingToCart: Boolean = false
 )
 
 sealed interface ProductDetailsIntent {

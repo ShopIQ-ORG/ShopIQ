@@ -10,6 +10,15 @@ android {
         version = release(36)
     }
 
+    signingConfigs {
+        create("sharedDebug") {
+            storeFile = file("shared_debug.jks")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.iti.shopiq"
         minSdk = 26
@@ -24,6 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        debug {
+            signingConfig = signingConfigs.getByName("sharedDebug")
         }
     }
 

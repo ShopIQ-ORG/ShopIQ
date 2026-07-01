@@ -6,7 +6,9 @@ import com.iti.presentation.screens.onboarding.OnboardingViewModel
 import com.iti.presentation.screens.auth.signin.SignInViewModel
 import com.iti.presentation.screens.auth.signup.SignUpViewModel
 import com.iti.presentation.screens.brands.AllBrandsViewModel
+import com.iti.presentation.screens.cart.CartViewModel
 import com.iti.presentation.screens.category.CategoryViewModel
+import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.wishlist.WishlistViewModel
@@ -23,8 +25,9 @@ val presentationModule = module {
     viewModel { CategoryViewModel(get()) }
     viewModel { AllBrandsViewModel(get()) }
     viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { CartViewModel(get(), get(), get(), get()) }
     viewModel { SplashViewModel(get(), get()) }
-
+    viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
 }

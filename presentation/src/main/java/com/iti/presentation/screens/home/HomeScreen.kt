@@ -16,7 +16,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,11 +34,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    onNavigateToSplash: () -> Unit,
+    onNavigateToSignIn: () -> Unit,
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
+    onCartClick: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     onNavigateToAuth: () -> Unit,
+    onNavigateToSearch: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -64,12 +65,20 @@ fun HomeScreen(
                     onNavigateToAllProducts(effect.brandName)
                 }
 
-                HomeContract.Effect.NavigateToSplash -> {
-                    onNavigateToSplash()
+                HomeContract.Effect.NavigateToSearch -> {
+                    onNavigateToSearch()
+                }
+
+                HomeContract.Effect.NavigateToSignIn -> {
+                    onNavigateToSignIn()
                 }
 
                 HomeContract.Effect.ShowAuthRequired -> {
                     onNavigateToAuth()
+                }
+
+                HomeContract.Effect.NavigateToSplash -> {
+                    // No-op or fallback
                 }
             }
         }
@@ -80,7 +89,8 @@ fun HomeScreen(
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onNavigateToProduct = onNavigateToProduct,
-        onNavigateToAuth = onNavigateToAuth
+        onNavigateToAuth = onNavigateToAuth,
+        onCartClick = onCartClick
     )
 }
 
@@ -90,7 +100,8 @@ fun HomeScreenContent(
     onIntent: (HomeContract.Intent) -> Unit,
     onLogout: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
-    onNavigateToAuth: () -> Unit
+    onNavigateToAuth: () -> Unit,
+    onCartClick: () -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -152,7 +163,8 @@ fun HomeScreenContent(
                 HomeTabContent(
                     state = state,
                     onIntent = onIntent,
-                    bottomPadding = padding.calculateBottomPadding()
+                    bottomPadding = padding.calculateBottomPadding(),
+                    onCartClick = onCartClick
                 )
             }
 

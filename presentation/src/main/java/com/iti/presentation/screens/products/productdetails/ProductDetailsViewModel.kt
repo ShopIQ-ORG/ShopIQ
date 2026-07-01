@@ -6,6 +6,7 @@ import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
+import com.iti.domain.usecases.cart.AddCartItemUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
@@ -27,7 +28,8 @@ class ProductDetailsViewModel(
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val addToCartUseCase: AddCartItemUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -155,8 +157,47 @@ class ProductDetailsViewModel(
     }
 
     private fun addToCart() {
-        viewModelScope.launch {
-            _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Added to Cart!"))
+        // Guard against double taps / no selected variant
+        if (_state.value.isAddingToCart) return
+
+        val variantId = selectedVariantId()
+        if (variantId == null) {
+            viewModelScope.launch {
+                _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Please select options first"))
+            }
+            return
         }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isAddingToCart = true) }
+
+            when (val result = addToCartUseCase(variantId = variantId, quantity = 1)) {
+                is Result.Success -> {
+                    _state.update { it.copy(isAddingToCart = false) }
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Added to Cart!"))
+                }
+                is Result.Failure -> {
+                    _state.update { it.copy(isAddingToCart = false) }
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowToast(
+                            result.exception.message ?: "Failed to add to cart"
+                        )
+                    )
+                }
+                is Result.Loading -> Unit
+            }
+        }
+    }
+
+    private fun selectedVariantId(): String? {
+        val product = _state.value.product ?: return null
+        val color = _state.value.selectedColor
+        val size = _state.value.selectedSize
+
+        return product.variants.firstOrNull { variant ->
+            val matchesColor = color == null || variant.title.contains(color, ignoreCase = true)
+            val matchesSize = size == null || variant.title.contains(size, ignoreCase = true)
+            matchesColor && matchesSize
+        }?.id ?: product.variants.firstOrNull()?.id
     }
 }

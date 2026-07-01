@@ -1,0 +1,82 @@
+package com.iti.presentation.screens.cart.components
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.iti.presentation.components.ErrorScreen
+import com.iti.presentation.screens.cart.CartContract
+
+@Composable
+fun CartBody(
+    state: CartContract.State,
+    onRefresh: () -> Unit,
+    onRetry: () -> Unit,
+    onBrowseProducts: () -> Unit,
+    onIncreaseQuantity: (String) -> Unit,
+    onDecreaseQuantity: (String) -> Unit,
+    onRemoveItem: (String) -> Unit,
+    onTogglePromoExpanded: () -> Unit,
+    onPromoInputChanged: (String) -> Unit,
+    onApplyPromoClick: () -> Unit,
+    promoErrorMessage: String?,
+    modifier: Modifier = Modifier
+) {
+    if (state.isLoading) {
+        CartLoadingContent(modifier = modifier.fillMaxSize())
+        return
+    }
+
+    if (state.error != null) {
+        ErrorScreen(
+            message = state.error,
+            onRetry = onRetry,
+            modifier = modifier.fillMaxSize()
+        )
+        return
+    }
+
+    AnimatedContent(
+        targetState = state.isEmpty,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(250)) togetherWith
+                    fadeOut(animationSpec = tween(200))
+        },
+        modifier = modifier.fillMaxSize(),
+        label = "cart_empty_transition"
+    ) { isEmpty ->
+        if (isEmpty) {
+            if (state.isRefreshing) {
+                CartLoadingContent(modifier = Modifier.fillMaxSize())
+            } else {
+                EmptyCartContent(
+                    onBrowse = onBrowseProducts,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        } else {
+            val cart = state.cart!!
+            CartContentList(
+                cart = cart,
+                isRefreshing = state.isRefreshing,
+                itemBeingRemoved = state.itemBeingRemoved,
+                isPromoExpanded = state.isPromoExpanded,
+                promoInput = state.promoInput,
+                isApplyingPromo = state.isApplyingPromo,
+                promoErrorMessage = promoErrorMessage,
+                onRefresh = onRefresh,
+                onIncreaseQuantity = onIncreaseQuantity,
+                onDecreaseQuantity = onDecreaseQuantity,
+                onRemoveItem = onRemoveItem,
+                onTogglePromoExpanded = onTogglePromoExpanded,
+                onPromoInputChanged = onPromoInputChanged,
+                onApplyPromoClick = onApplyPromoClick,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}

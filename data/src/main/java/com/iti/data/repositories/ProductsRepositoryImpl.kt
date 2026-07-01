@@ -12,9 +12,8 @@ import com.iti.data.sources.local.FavoriteDao
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
+import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Category
-import com.iti.domain.models.Money
-import com.iti.domain.models.ProductImage
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.repositories.auth.AuthRepository
@@ -34,6 +33,27 @@ class ProductsRepositoryImpl(
             val shopifyResponse = remoteDataSource.getProductsByNumber(count)
             val domainProducts = shopifyResponse.toDomainProducts()
             emit(Result.Success(domainProducts))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
+    }
+
+    override fun getProductsPaginated(count: Int, after: String?): Flow<Result<PaginatedProducts>> = flow {
+        emit(Result.Loading)
+        try {
+            val shopifyResponse = remoteDataSource.getProductsByNumber(count, after)
+            val domainProducts = shopifyResponse.toDomainProducts()
+            val hasNextPage = shopifyResponse.data.products?.pageInfo?.hasNextPage ?: false
+            val endCursor = shopifyResponse.data.products?.pageInfo?.endCursor
+            emit(
+                Result.Success(
+                    PaginatedProducts(
+                        products = domainProducts,
+                        hasNextPage = hasNextPage,
+                        endCursor = endCursor
+                    )
+                )
+            )
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }
@@ -81,8 +101,6 @@ class ProductsRepositoryImpl(
         }
     }
 
-
-
     override suspend fun addToFavorites(product: Product) {
         val userId = getUserId()
         favoriteDao.insertFavorite(product.toFavoriteEntity(userId))
@@ -112,5 +130,28 @@ class ProductsRepositoryImpl(
 
     private fun getUserId(): String {
         return authRepository.getUserId() ?: "guest"
+    }
+
+    override fun searchProducts(query: String): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProducts(first = 20, query = query)
+            emit(Result.Success(response.toDomainProducts()))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
+    }
+
+    override fun getPopularProducts(count: Int): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProducts(
+                first = count,
+                sortKey = com.iti.data.type.ProductSortKeys.BEST_SELLING
+            )
+            emit(Result.Success(response.toDomainProducts()))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
     }
 }

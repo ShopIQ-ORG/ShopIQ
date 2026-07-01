@@ -67,6 +67,12 @@ kotlin {
 apollo {
     service("shopify") {
         packageName.set("com.iti.data")
+        srcDir("src/main/graphql/admin")
+    }
+
+    service("shopify-storefront") {
+        packageName.set("com.iti.data.storefront")
+        srcDir("src/main/graphql/storefront")
     }
 }
 
@@ -90,4 +96,5 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.logging.interceptor)
 }

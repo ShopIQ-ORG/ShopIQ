@@ -3,7 +3,6 @@ package com.iti.presentation.screens.home
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
-import com.iti.presentation.R
 import com.iti.presentation.core.UiText
 
 object HomeContract {
@@ -33,6 +32,7 @@ object HomeContract {
         data class BrandClicked(val brandName: String) : Intent()
         data object ViewAllBrandsClicked : Intent()
         data object ViewAllProductsClicked : Intent()
+        data object SearchBarClicked : Intent()
         data object Logout : Intent()
     }
 
@@ -44,5 +44,7 @@ object HomeContract {
         data object NavigateToAllProducts : Effect()
         data object NavigateToSplash : Effect()
         data object ShowAuthRequired : Effect()
+        data object NavigateToSearch : Effect()
+        data object NavigateToSignIn : Effect()
     }
 }

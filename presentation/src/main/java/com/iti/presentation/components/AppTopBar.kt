@@ -1,12 +1,14 @@
 package com.iti.presentation.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,14 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
     title: String = "ShopIQ",
-    cartCount: String = "3",
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onMenuClick: () -> Unit = {},
     onCartClick: () -> Unit = {}
@@ -49,16 +49,23 @@ fun AppTopBar(
             IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
         actions = {
-            CartIconWithBadge(
-                count = cartCount,
-                onClick = onCartClick
-            )
+            IconButton(onClick = onCartClick) {
+                BadgedBox(badge = {
+                    Badge(containerColor = MaterialTheme.colorScheme.error) { Text("3") }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -74,7 +81,7 @@ fun BackTopBar(
     title: String,
     onBack: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    actions: @Composable () -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -91,15 +98,13 @@ fun BackTopBar(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
-        actions = {
-            actions()
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        actions = actions,
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
             scrolledContainerColor = MaterialTheme.colorScheme.background
         ),

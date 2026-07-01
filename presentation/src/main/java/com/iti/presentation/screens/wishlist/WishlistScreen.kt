@@ -1,17 +1,9 @@
 package com.iti.presentation.screens.wishlist
 
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,13 +12,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.iti.domain.models.Product
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 import com.iti.presentation.components.ErrorScreen
-import com.iti.presentation.components.ProductCard
 import com.iti.presentation.core.UiText
 import com.iti.presentation.ui.theme.*
+import com.iti.presentation.screens.wishlist.components.EmptyWishlistState
+import com.iti.presentation.screens.wishlist.components.GuestWishlistState
+import com.iti.presentation.screens.wishlist.components.FavoritesGrid
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,12 +34,12 @@ fun WishlistScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
-    val isDark = isSystemInDarkTheme()
-    val backgroundColor = if (isDark) BackgroundDark else BackgroundLight
-    val textPrimaryColor = if (isDark) TextPrimaryDark else TextPrimaryLight
-    val textSecondaryColor = if (isDark) TextSecondaryDark else TextSecondaryLight
-    val buttonBgColor = if (isDark) ButtonPrimaryDark else ButtonPrimaryLight
-    val buttonTextColor = if (isDark) ButtonPrimaryTextDark else ButtonPrimaryTextLight
+    // Force Light Colors even in Dark Mode as requested
+    val backgroundColor = BackgroundLight
+    val textPrimaryColor = TextPrimaryLight
+    val textSecondaryColor = TextSecondaryLight
+    val buttonBgColor = ButtonPrimaryLight
+    val buttonTextColor = ButtonPrimaryTextLight
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEffect.collect { effect ->
@@ -64,7 +57,7 @@ fun WishlistScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "My Wishlist",
+                        text = stringResource(id = R.string.wishlist_title),
                         style = MaterialTheme.typography.titleLarge,
                         color = textPrimaryColor
                     )
@@ -92,7 +85,7 @@ fun WishlistScreen(
                 is WishlistUiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = if (isDark) PrimaryDark else PrimaryLight
+                        color = PrimaryLight
                     )
                 }
                 is WishlistUiState.Success -> {
@@ -106,7 +99,10 @@ fun WishlistScreen(
                     } else {
                         FavoritesGrid(
                             products = state.products,
-                            onProductClick = onProductClick
+                            onProductClick = onProductClick,
+                            onRemoveFromFavorites = { productId ->
+                                viewModel.handleIntent(WishlistIntent.RemoveFromFavorites(productId))
+                            }
                         )
                     }
                 }
@@ -125,165 +121,6 @@ fun WishlistScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun EmptyWishlistState(
-    textSecondaryColor: androidx.compose.ui.graphics.Color,
-    buttonBgColor: androidx.compose.ui.graphics.Color,
-    buttonTextColor: androidx.compose.ui.graphics.Color,
-    onExploreClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(
-                    color = ErrorLight.copy(alpha = 0.1f),
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = null,
-                modifier = Modifier.size(50.dp),
-                tint = ErrorLight
-            )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "No favorites yet",
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "Save items you love by tapping the heart icon on any product.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = textSecondaryColor,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = onExploreClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = buttonBgColor)
-        ) {
-            Text(
-                text = "Explore Products",
-                style = MaterialTheme.typography.labelLarge,
-                color = buttonTextColor
-            )
-        }
-    }
-}
-
-@Composable
-fun GuestWishlistState(
-    textSecondaryColor: androidx.compose.ui.graphics.Color,
-    buttonBgColor: androidx.compose.ui.graphics.Color,
-    buttonTextColor: androidx.compose.ui.graphics.Color,
-    onAuthClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(
-                    color = PrimaryLight.copy(alpha = 0.1f),
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = null,
-                modifier = Modifier.size(50.dp),
-                tint = PrimaryLight
-            )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "Wishlist is locked",
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = "You need to sign in or sign up to save your favorite products and view them here.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = textSecondaryColor,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = onAuthClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = buttonBgColor)
-        ) {
-            Text(
-                text = "Sign In / Sign Up",
-                style = MaterialTheme.typography.labelLarge,
-                color = buttonTextColor
-            )
-        }
-    }
-}
-
-@Composable
-fun FavoritesGrid(
-    products: List<Product>,
-    onProductClick: (String) -> Unit,
-    viewModel: WishlistViewModel = koinViewModel()
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(products, key = { it.id }) { product ->
-            ProductCard(
-                product = product,
-                onClick = { onProductClick(product.id) },
-                onFavoriteClick = { viewModel.handleIntent(WishlistIntent.RemoveFromFavorites(product.id)) }
-            )
         }
     }
 }

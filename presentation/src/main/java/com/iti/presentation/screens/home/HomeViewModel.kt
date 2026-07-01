@@ -80,14 +80,17 @@ class HomeViewModel(
             is HomeContract.Intent.ViewAllProductsClicked -> emitEffect(
                 HomeContract.Effect.NavigateToAllProducts
             )
+            is HomeContract.Intent.SearchBarClicked -> emitEffect(
+                HomeContract.Effect.NavigateToSearch
+            )
             is HomeContract.Intent.Logout -> logout()
         }
     }
 
     private fun logout() {
         viewModelScope.launch {
-            logoutUseCase()
-            emitEffect(HomeContract.Effect.NavigateToSplash)
+            //logoutUseCase()
+            emitEffect(HomeContract.Effect.NavigateToSignIn)
         }
     }
 
