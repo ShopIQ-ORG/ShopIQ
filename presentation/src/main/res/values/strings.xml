@@ -66,7 +66,9 @@
     <string name="error_loading_ads">Failed to load ads</string>
     <string name="retry">Retry</string>
     <string name="something_went_wrong">Something went wrong</string>
-    <string name="brands_title">Brands</string>
+    <string name="brands_title">All Brands</string>
+    <string name="brands_search_placeholder">Search for brands…</string>
+    <string name="brands_discover_collection">Discover Collection  →</string>
     <string name="all_products_title">All Products</string>
     <string name="no_products_found">No products found</string>
     <string name="clear_filter">Clear filter</string>
