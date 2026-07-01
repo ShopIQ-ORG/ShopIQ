@@ -25,6 +25,7 @@ type Cart {
   discountCodes: [CartDiscountCode!]!
   cost: CartCost!
   buyerIdentity: CartBuyerIdentity
+  deliveryGroups(first: Int): CartDeliveryGroupConnection!
 }
 
 type CartLineConnection {
@@ -162,7 +163,29 @@ type CartDiscountCodesUpdatePayload {
   userErrors: [UserError!]!
 }
 
+
+type CartDeliveryGroupConnection {
+  edges: [CartDeliveryGroupEdge!]!
+}
+
+type CartDeliveryGroupEdge {
+  node: CartDeliveryGroup!
+}
+
+type CartDeliveryGroup {
+  id: ID!
+  deliveryOptions: [CartDeliveryOption!]!
+  selectedDeliveryOption: CartDeliveryOption
+}
+
+type CartDeliveryOption {
+  handle: String!
+  title: String
+  estimatedCost: MoneyV2!
+}
+
 type UserError {
   field: [String!]
   message: String!
 }
+

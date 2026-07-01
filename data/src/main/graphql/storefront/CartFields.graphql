@@ -100,4 +100,32 @@ fragment CartFields on Cart {
       currencyCode
     }
   }
+
+  deliveryGroups(first: 10) {
+    edges {
+      node {
+        id
+
+        selectedDeliveryOption {
+          handle
+          title
+
+          estimatedCost {
+            amount
+            currencyCode
+          }
+        }
+
+        deliveryOptions {
+          handle
+          title
+
+          estimatedCost {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
 }

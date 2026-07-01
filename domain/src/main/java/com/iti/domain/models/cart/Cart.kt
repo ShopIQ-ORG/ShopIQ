@@ -9,7 +9,8 @@ data class Cart(
     val discountAmount: Money?,
     val subtotal: Money,
     val total: Money,
-    val totalTax: Money?
+    val totalTax: Money?,
+    val shippingAmount: Money?
 )
 
 fun Cart.recalculatedAfterQuantityChange(): Cart {
@@ -19,7 +20,8 @@ fun Cart.recalculatedAfterQuantityChange(): Cart {
 
     val discountValue = discountAmount?.amount?.toDoubleOrNull() ?: 0.0
     val taxValue = totalTax?.amount?.toDoubleOrNull() ?: 0.0
-    val newTotal = (newSubtotal - discountValue + taxValue).coerceAtLeast(0.0)
+    val shippingValue = shippingAmount?.amount?.toDoubleOrNull() ?: 0.0
+    val newTotal = (newSubtotal - discountValue + taxValue + shippingValue).coerceAtLeast(0.0)
 
     val currency = subtotal.currencyCode
 

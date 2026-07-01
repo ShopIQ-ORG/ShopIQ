@@ -27,6 +27,7 @@ fun CartContentList(
     isPromoExpanded: Boolean,
     promoInput: String,
     isApplyingPromo: Boolean,
+    removingCouponCode: String?,
     promoErrorMessage: String?,
     onRefresh: () -> Unit,
     onIncreaseQuantity: (String) -> Unit,
@@ -35,6 +36,7 @@ fun CartContentList(
     onTogglePromoExpanded: () -> Unit,
     onPromoInputChanged: (String) -> Unit,
     onApplyPromoClick: () -> Unit,
+    onRemoveCoupon: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
@@ -84,12 +86,15 @@ fun CartContentList(
             item {
                 PromoCodeSection(
                     isExpanded = isPromoExpanded,
+                    appliedCoupons = cart.discountCodes,
                     promoInput = promoInput,
                     isApplying = isApplyingPromo,
+                    removingCouponCode = removingCouponCode,
                     errorMessage = promoErrorMessage,
                     onToggleExpand = onTogglePromoExpanded,
                     onInputChanged = onPromoInputChanged,
-                    onApplyClick = onApplyPromoClick
+                    onApplyClick = onApplyPromoClick,
+                    onRemoveCoupon = onRemoveCoupon
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OrderSummary(cart = cart)
