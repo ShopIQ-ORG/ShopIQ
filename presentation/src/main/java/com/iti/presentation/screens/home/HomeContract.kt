@@ -30,6 +30,7 @@ object HomeContract {
         data class ProductFavoriteClicked(val product: Product) : Intent()
         data class ProductClicked(val product: Product) : Intent()
         data class BrandClicked(val brandName: String) : Intent()
+        data class AdClicked(val ad: Ad) : Intent()
         data object ViewAllBrandsClicked : Intent()
         data object ViewAllProductsClicked : Intent()
         data object SearchBarClicked : Intent()

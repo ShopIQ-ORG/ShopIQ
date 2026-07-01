@@ -32,7 +32,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
 
 @Composable
-fun AdsSection(ads: List<Ad>) {
+fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
     val filteredAds = ads.filter { it.imageUrl.isNotEmpty() }
     if (filteredAds.isEmpty()) return
 
@@ -94,7 +94,7 @@ fun AdsSection(ads: List<Ad>) {
                     )
                     Spacer(modifier = Modifier.height(14.dp))
                     Button(
-                        onClick = {},
+                        onClick = { onAdClick(ad) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surface,
                             contentColor = MaterialTheme.colorScheme.onSurface
