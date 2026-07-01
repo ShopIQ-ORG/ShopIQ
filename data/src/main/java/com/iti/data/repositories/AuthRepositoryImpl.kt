@@ -3,6 +3,7 @@ package com.iti.data.repositories
 import com.iti.data.core.handleException
 import com.iti.data.mappers.toDomain
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
+import com.iti.domain.exceptions.AuthException
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.models.auth.LoginCredentials
@@ -71,6 +72,17 @@ class AuthRepositoryImpl(
             throw e
         } catch (e: Exception) {
             Result.Failure(e.handleException())
+        }
+    }
+
+    override suspend fun validateAuthenticatedUser(): Result<Unit> {
+        return when (val userResult = getCurrentUser()) {
+            Result.Loading ->   Result.Loading
+            is Result.Failure -> userResult
+            is Result.Success -> when (userResult.data) {
+                User.GuestUser -> Result.Failure(AuthException.UnauthorizedAccess())
+                is User.AuthenticatedUser -> Result.Success(Unit)
+            }
         }
     }
 

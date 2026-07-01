@@ -12,5 +12,6 @@ interface AuthRepository {
     suspend fun loginAsGuest(): Result<User>
     suspend fun register(info: RegistrationInfo): Result<User>
     suspend fun getCurrentUser(): Result<User>
+    suspend fun  validateAuthenticatedUser(): Result<Unit>
     fun logout()
 }
