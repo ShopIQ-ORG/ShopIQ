@@ -13,9 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.iti.domain.models.User
 
 @Composable
-fun ProfileTabContent(onLogout: () -> Unit) {
+fun ProfileTabContent(
+    user: User?,
+    onLogout: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,12 +31,34 @@ fun ProfileTabContent(onLogout: () -> Unit) {
             text = "👤",
             style = MaterialTheme.typography.displayLarge
         )
+        
+        val displayName = when (user) {
+            is User.AuthenticatedUser -> user.fullName
+            User.GuestUser -> "Guest User"
+            null -> "Loading..."
+        }
+        
+        val displayEmail = when (user) {
+            is User.AuthenticatedUser -> user.email
+            else -> ""
+        }
+
         Text(
-            text = "Profile",
+            text = displayName,
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 16.dp)
         )
+        
+        if (displayEmail.isNotEmpty()) {
+            Text(
+                text = displayEmail,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
         Text(
             text = "Manage your account",
             style = MaterialTheme.typography.bodyMedium,

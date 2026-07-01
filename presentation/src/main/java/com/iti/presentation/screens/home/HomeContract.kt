@@ -20,7 +20,8 @@ object HomeContract {
     }
 
     data class State(
-        val screenState: ScreenState = ScreenState.Loading
+        val screenState: ScreenState = ScreenState.Loading,
+        val currentUser: com.iti.domain.models.User? = null
     )
 
     sealed class Intent {
@@ -41,6 +42,8 @@ object HomeContract {
         data class NavigateToProducts(val brandName: String? = null) : Effect()
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
+        data object NavigateToSplash : Effect()
+        data object ShowAuthRequired : Effect()
         data object NavigateToSearch : Effect()
         data object NavigateToSignIn : Effect()
     }

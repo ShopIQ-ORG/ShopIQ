@@ -11,21 +11,23 @@ import com.iti.presentation.screens.category.CategoryViewModel
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.splash.SplashViewModel
+import com.iti.presentation.screens.wishlist.WishlistViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
     single { NetworkMonitor(get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { CategoryViewModel(get()) }
     viewModel { AllBrandsViewModel(get()) }
-    viewModel { AllProductsViewModel(get()) }
-    viewModel { ProductDetailsViewModel(get(), get()) }
+    viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CartViewModel(get(), get(), get(), get()) }
     viewModel { SplashViewModel(get(), get()) }
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { WishlistViewModel(get(), get(), get(), get()) }
 }

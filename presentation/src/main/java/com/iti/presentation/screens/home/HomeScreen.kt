@@ -39,6 +39,7 @@ fun HomeScreen(
     onNavigateToAllProducts: (String?) -> Unit,
     onCartClick: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onNavigateToAuth: () -> Unit,
     onNavigateToSearch: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
@@ -71,6 +72,14 @@ fun HomeScreen(
                 HomeContract.Effect.NavigateToSignIn -> {
                     onNavigateToSignIn()
                 }
+
+                HomeContract.Effect.ShowAuthRequired -> {
+                    onNavigateToAuth()
+                }
+
+                HomeContract.Effect.NavigateToSplash -> {
+                    // No-op or fallback
+                }
             }
         }
     }
@@ -79,6 +88,8 @@ fun HomeScreen(
         state = state,
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
+        onNavigateToProduct = onNavigateToProduct,
+        onNavigateToAuth = onNavigateToAuth,
         onCartClick = onCartClick
     )
 }
@@ -88,8 +99,10 @@ fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
     onLogout: () -> Unit,
-    onCartClick: () -> Unit,
-    ) {
+    onNavigateToProduct: (Long) -> Unit,
+    onNavigateToAuth: () -> Unit,
+    onCartClick: () -> Unit
+) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
     val snackbarHostState = remember { SnackbarHostState() }
@@ -163,11 +176,19 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.Wishlist -> {
-                WishlistTabContent()
+                WishlistTabContent(
+                    onProductClick = { productId ->
+                        val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
+                        onNavigateToProduct(idLong)
+                    },
+                    onExploreClick = { selectedIndex = 0 },
+                    onAuthClick = onNavigateToAuth
+                )
             }
 
             BottomNavItem.Profile -> {
                 ProfileTabContent(
+                    user = state.currentUser,
                     onLogout = onLogout
                 )
             }

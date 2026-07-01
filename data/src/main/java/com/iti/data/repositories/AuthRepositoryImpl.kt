@@ -74,5 +74,7 @@ class AuthRepositoryImpl(
         }
     }
 
+    override fun getUserId(): String? = remoteDataSource.getUserId()
+
     override fun logout() = remoteDataSource.logout()
 }

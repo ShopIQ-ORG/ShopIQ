@@ -129,6 +129,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToSignIn = {
                         replaceRoot(Screen.SignIn)
+                    },
+                    onNavigateToAuth = {
+                        navigate(Screen.SignIn)
                     }
                 )
             }
@@ -148,6 +151,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateBack = ::navigateBack,
                     onNavigateToProduct = { productId ->
                         navigate(Screen.ProductDetails(productId))
+                    },
+                    onNavigateToAuth = {
+                        navigate(Screen.SignIn)
                     }
                 )
             }
@@ -155,7 +161,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.ProductDetails> { screen ->
                 ProductDetailsScreen(
                     productId = screen.productId,
-                    onBackClick = ::navigateBack
+                    onBackClick = ::navigateBack,
+                    onNavigateToAuth = {
+                        navigate(Screen.SignIn)
+                    }
                 )
             }
 
