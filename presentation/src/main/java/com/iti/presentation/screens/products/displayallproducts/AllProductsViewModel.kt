@@ -42,6 +42,7 @@ class AllProductsViewModel(
     private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     private val allProductsStateFlow = MutableStateFlow<List<Product>>(emptyList())
     private var allProducts: List<Product> = emptyList()
+    private var isLoaded = false
 
     init {
         viewModelScope.launch {
@@ -159,6 +160,7 @@ class AllProductsViewModel(
     // ─── Private Helpers ─────────────────────────────────────────────────────────
 
     private fun load(brandName: String?) {
+        isLoaded = false
         allProductsStateFlow.value = emptyList()
         allProducts = emptyList()
         _state.update {
@@ -185,6 +187,7 @@ class AllProductsViewModel(
                         it.copy(screenState = AllProductsContract.ScreenState.Loading)
                     }
                     is Result.Success -> {
+                        isLoaded = true
                         allProductsStateFlow.value = result.data.products
                         val categories = result.data.products.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
                         val subCategories = result.data.products.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
@@ -248,6 +251,7 @@ class AllProductsViewModel(
 
     /** Applies search query, filter state, and sort to `allProducts` and emits Success. */
     private fun applyAll() {
+        if (!isLoaded) return
         val state = _state.value
         var result = allProducts
 
