@@ -18,6 +18,7 @@ import com.iti.presentation.screens.cart.CartContract
 @Composable
 fun CartBody(
     state: CartContract.State,
+    onCartItemClicked: (Long) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
     onBrowseProducts: () -> Unit,
@@ -77,6 +78,7 @@ fun CartBody(
             val cart = state.cart!!
             CartContentList(
                 cart = cart,
+                onItemClicked = onCartItemClicked,
                 isRefreshing = state.isRefreshing,
                 itemBeingRemoved = state.itemBeingRemoved,
                 isPromoExpanded = state.isPromoExpanded,

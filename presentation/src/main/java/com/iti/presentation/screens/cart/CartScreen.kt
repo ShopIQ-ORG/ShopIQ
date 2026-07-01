@@ -33,6 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 fun CartScreen(
     onBackClick: () -> Unit,
     onCheckout: () -> Unit,
+    onCartItemClicked: (Long) -> Unit,
     onBrowseProducts: () -> Unit,
     onLogin: () -> Unit,
     viewModel: CartViewModel = koinViewModel()
@@ -88,6 +89,7 @@ fun CartScreen(
     ) { innerPadding ->
         CartBody(
             state = state,
+            onCartItemClicked = onCartItemClicked,
             onRefresh = { viewModel.onEvent(CartContract.Event.Refresh) },
             onRetry = { viewModel.onEvent(CartContract.Event.Retry) },
             onBrowseProducts = onBrowseProducts,
@@ -117,10 +119,8 @@ fun CartScreen(
             dismissText = stringResource(R.string.cancel),
             onConfirm = {
                 viewModel.onEvent(CartContract.Event.RemoveItem(item.id))
-                deleteDialogState = null
             },
             onDismiss = {
-                deleteDialogState = null
             }
         )
     }

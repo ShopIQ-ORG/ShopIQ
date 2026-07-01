@@ -22,6 +22,7 @@ import com.iti.domain.models.cart.CartItem
 fun CartContentList(
     cart: Cart,
     isRefreshing: Boolean,
+    onItemClicked: (Long) -> Unit,
     itemBeingRemoved: String?,
     isPromoExpanded: Boolean,
     promoInput: String,
@@ -71,6 +72,7 @@ fun CartContentList(
                     onIncrease = { onIncreaseQuantity(item.id) },
                     onDecrease = { onDecreaseQuantity(item.id) },
                     onRequestRemove = { onRemoveItem(item) },
+                    onClick = onItemClicked,
                     modifier = Modifier.animateItem(
                         fadeOutSpec = tween(220),
                         placementSpec = tween(220)

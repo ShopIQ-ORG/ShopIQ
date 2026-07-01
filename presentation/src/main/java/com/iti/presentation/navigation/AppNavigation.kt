@@ -171,6 +171,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.Cart> {
                 CartScreen(
                     onBackClick = ::navigateBack,
+                    onCartItemClicked = {
+                        navigate(
+                            Screen.ProductDetails(it)
+                        )
+                    },
                     onCheckout = {},
                     onLogin = {
                         replaceRoot(Screen.SignIn)

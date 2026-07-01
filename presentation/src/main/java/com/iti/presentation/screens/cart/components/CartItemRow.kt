@@ -1,6 +1,7 @@
 package com.iti.presentation.screens.cart.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.iti.domain.models.cart.CartItem
 import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
+import kotlin.text.substringAfterLast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +45,7 @@ fun CartItemRow(
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
     onRequestRemove: () -> Unit,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
@@ -70,7 +73,11 @@ fun CartItemRow(
                     .fillMaxSize()
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.errorContainer)
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 20.dp)
+                    .clickable(
+                        enabled = !isBeingRemoved,
+                        onClick = { onClick(item.productId.substringAfterLast("/").toLong()) }
+                    ),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 if (isBeingRemoved) {
