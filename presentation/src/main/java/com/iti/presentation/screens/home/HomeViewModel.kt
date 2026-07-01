@@ -12,6 +12,7 @@ import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.core.UiText
 import kotlinx.coroutines.channels.Channel
@@ -31,7 +32,8 @@ class HomeViewModel(
     private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeContract.State())
@@ -44,7 +46,17 @@ class HomeViewModel(
     private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     init {
+        loadCurrentUser()
         sendIntent(HomeContract.Intent.LoadData)
+    }
+
+    private fun loadCurrentUser() {
+        viewModelScope.launch {
+            val result = getCurrentUserUseCase()
+            if (result is Result.Success) {
+                _state.update { it.copy(currentUser = result.data) }
+            }
+        }
     }
 
     fun sendIntent(intent: HomeContract.Intent) {
@@ -80,18 +92,19 @@ class HomeViewModel(
     }
 
     private fun toggleFavorite(product: com.iti.domain.models.Product) {
-        viewModelScope.launch {
-            val userResult = getCurrentUserUseCase()
-            if (userResult is Result.Success && userResult.data is User.GuestUser) {
-                emitEffect(HomeContract.Effect.ShowAuthRequired)
-                return@launch
-            }
+        // FAST check for guest status using cached UID
+        val userId = authRepository.getUserId()
+        if (userId == null || userId == "guest") {
+            emitEffect(HomeContract.Effect.ShowAuthRequired)
+            return
+        }
 
+        viewModelScope.launch {
             val productId = product.id
             val isFavorite = product.isFavorite
             
             try {
-                // Optimistic update via override map
+                // Optimistic update via override map - happens IMMEDIATELY
                 favoriteOverrides.update { it + (productId to !isFavorite) }
 
                 if (isFavorite) {
@@ -100,9 +113,8 @@ class HomeViewModel(
                     addProductToFavoritesUseCase(product)
                 }
                 
-                // Clear override after a short delay to ensure DB flow has emitted the new state
-                // This prevents the heart from "jumping" back and forth
-                kotlinx.coroutines.delay(500)
+                // Keep the override for a bit to ensure the flow collection has caught up
+                kotlinx.coroutines.delay(1000)
                 favoriteOverrides.update { it - productId }
             } catch (e: Exception) {
                 // Revert optimistic update

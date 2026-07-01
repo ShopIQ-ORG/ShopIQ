@@ -9,7 +9,7 @@ import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import kotlinx.coroutines.channels.Channel
+import com.iti.domain.repositories.auth.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,7 +26,8 @@ class ProductDetailsViewModel(
     private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -58,8 +59,9 @@ class ProductDetailsViewModel(
                     is Result.Success -> {
                         val product = result.data
                         
-                        val userResult = getCurrentUserUseCase()
-                        if (userResult is Result.Success && userResult.data is User.AuthenticatedUser) {
+                        // Start observing favorites immediately if user is signed in
+                        val userId = authRepository.getUserId()
+                        if (userId != null && userId != "guest") {
                             observeFavoriteStatus(product.id)
                         }
 
@@ -114,19 +116,22 @@ class ProductDetailsViewModel(
     }
 
     private fun toggleWishlist() {
+        // FAST check for guest status
+        val userId = authRepository.getUserId()
+        if (userId == null || userId == "guest") {
+            viewModelScope.launch {
+                _sideEffects.emit(ProductDetailsSideEffect.NavigateToAuth)
+            }
+            return
+        }
+
         val currentProduct = _state.value.product ?: return
         val currentlyWishlisted = _state.value.isWishlisted
         
         viewModelScope.launch {
-            val userResult = getCurrentUserUseCase()
-            if (userResult is Result.Success && userResult.data is User.GuestUser) {
-                _sideEffects.emit(ProductDetailsSideEffect.NavigateToAuth)
-                return@launch
-            }
-
             try {
                 val newStatus = !currentlyWishlisted
-                // Optimistic update via override
+                // Optimistic update via override - happens IMMEDIATELY
                 favoriteOverride.value = newStatus
 
                 if (currentlyWishlisted) {
@@ -138,8 +143,8 @@ class ProductDetailsViewModel(
                 val message = if (newStatus) "Added to Wishlist" else "Removed from Wishlist"
                 _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
                 
-                // Clear override after short delay
-                kotlinx.coroutines.delay(500)
+                // Keep the override for a bit
+                kotlinx.coroutines.delay(1000)
                 favoriteOverride.value = null
             } catch (e: Exception) {
                 // Revert optimistic update

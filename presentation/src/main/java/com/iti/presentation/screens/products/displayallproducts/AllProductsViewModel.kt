@@ -10,6 +10,7 @@ import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.core.UiText
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +27,8 @@ class AllProductsViewModel(
     private val addProductToFavoritesUseCase: AddProductToFavoritesUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AllProductsContract.State())
@@ -59,18 +61,19 @@ class AllProductsViewModel(
     }
 
     private fun toggleFavorite(product: Product) {
-        viewModelScope.launch {
-            val userResult = getCurrentUserUseCase()
-            if (userResult is Result.Success && userResult.data is User.GuestUser) {
-                emitEffect(AllProductsContract.Effect.ShowAuthRequired)
-                return@launch
-            }
+        // FAST check for guest status
+        val userId = authRepository.getUserId()
+        if (userId == null || userId == "guest") {
+            emitEffect(AllProductsContract.Effect.ShowAuthRequired)
+            return
+        }
 
+        viewModelScope.launch {
             val productId = product.id
             val isFavorite = product.isFavorite
 
             try {
-                // Optimistic update via override map
+                // Optimistic update via override map - IMMEDIATE
                 favoriteOverrides.update { it + (productId to !isFavorite) }
 
                 if (isFavorite) {
@@ -80,7 +83,7 @@ class AllProductsViewModel(
                 }
                 
                 // Clear override after a short delay
-                kotlinx.coroutines.delay(500)
+                kotlinx.coroutines.delay(1000)
                 favoriteOverrides.update { it - productId }
             } catch (e: Exception) {
                 // Revert optimistic update

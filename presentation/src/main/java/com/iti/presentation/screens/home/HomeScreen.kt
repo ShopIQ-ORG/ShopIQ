@@ -176,6 +176,7 @@ fun HomeScreenContent(
 
             BottomNavItem.Profile -> {
                 ProfileTabContent(
+                    user = state.currentUser,
                     onLogout = onLogout
                 )
             }

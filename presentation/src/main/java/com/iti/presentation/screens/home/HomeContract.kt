@@ -21,7 +21,8 @@ object HomeContract {
     }
 
     data class State(
-        val screenState: ScreenState = ScreenState.Loading
+        val screenState: ScreenState = ScreenState.Loading,
+        val currentUser: com.iti.domain.models.User? = null
     )
 
     sealed class Intent {

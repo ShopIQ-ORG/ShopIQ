@@ -7,6 +7,7 @@ import com.iti.domain.models.User
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import com.iti.domain.repositories.auth.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 class WishlistViewModel(
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
-    private val getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WishlistUiState>(WishlistUiState.Loading)
@@ -38,13 +40,13 @@ class WishlistViewModel(
     }
 
     private fun loadFavorites() {
-        viewModelScope.launch {
-            val userResult = getCurrentUserUseCase()
-            if (userResult is Result.Success && userResult.data is User.GuestUser) {
-                _uiState.value = WishlistUiState.RequireAuth
-                return@launch
-            }
+        val userId = authRepository.getUserId()
+        if (userId == null || userId == "guest") {
+            _uiState.value = WishlistUiState.RequireAuth
+            return
+        }
 
+        viewModelScope.launch {
             getFavoriteProductsUseCase().collect { result ->
                 when (result) {
                     is Result.Loading -> _uiState.value = WishlistUiState.Loading
