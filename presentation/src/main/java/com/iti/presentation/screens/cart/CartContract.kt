@@ -1,7 +1,7 @@
 package com.iti.presentation.screens.cart
 
 import com.iti.domain.models.cart.Cart
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 object CartContract {
 
@@ -10,13 +10,18 @@ object CartContract {
         val isLoading: Boolean = false,
         val isRefreshing: Boolean = false,
         val error: UiText? = null,
+        val accessRestricted: Boolean = false,
         val isPromoExpanded: Boolean = false,
         val promoInput: String = "",
         val isApplyingPromo: Boolean = false,
         val promoError: UiText? = null,
         val itemBeingRemoved: String? = null
     ) {
-        val isEmpty: Boolean get() = cart?.items.isNullOrEmpty()
+        val isEmpty: Boolean
+            get() = cart?.items.isNullOrEmpty()
+
+        val canCheckout: Boolean
+            get() = !isLoading && !accessRestricted && !isEmpty && error == null
     }
 
     sealed class Event {

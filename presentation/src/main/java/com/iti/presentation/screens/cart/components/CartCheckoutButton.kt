@@ -13,7 +13,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
 
 @Composable
-fun CartCheckoutBar(
+fun CartCheckoutButton(
     visible: Boolean,
     onCheckoutClick: () -> Unit,
     modifier: Modifier = Modifier

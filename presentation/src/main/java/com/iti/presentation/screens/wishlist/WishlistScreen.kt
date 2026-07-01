@@ -15,11 +15,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.iti.presentation.R
 import com.iti.presentation.components.ErrorScreen
-import com.iti.presentation.core.UiText
 import com.iti.presentation.ui.theme.*
 import com.iti.presentation.screens.wishlist.components.EmptyWishlistState
 import com.iti.presentation.screens.wishlist.components.GuestWishlistState
 import com.iti.presentation.screens.wishlist.components.FavoritesGrid
+import com.iti.presentation.util.UiText
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

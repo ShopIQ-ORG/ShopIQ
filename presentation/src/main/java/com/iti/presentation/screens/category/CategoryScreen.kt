@@ -13,10 +13,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,10 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.components.AppTopBar
 import com.iti.presentation.components.SearchBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.NoResultsFeedback
+import com.iti.presentation.components.ShopIQScaffold
 import com.iti.presentation.screens.category.components.CategoryCard
 import com.iti.presentation.screens.category.components.CategoryCardShimmer
 import com.valentinilk.shimmer.shimmer
@@ -41,10 +38,11 @@ import com.valentinilk.shimmer.shimmer
 fun CategoryScreen(
     viewModel: CategoryViewModel,
     modifier: Modifier = Modifier,
-    bottomPadding: Dp = 0.dp
+    bottomPadding: Dp = 0.dp,
+    cartItemCount: Int = 0,
+    onCartClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     val filteredCategories = remember(state.categories, state.searchQuery) {
         if (state.searchQuery.isEmpty()) state.categories
@@ -53,18 +51,12 @@ fun CategoryScreen(
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopBar(
-                title = stringResource(R.string.categories_title),
-                scrollBehavior = scrollBehavior,
-                onMenuClick = {},
-                onCartClick = {}
-            )
-        }
-    ) { innerPadding ->
+    ShopIQScaffold(
+        modifier = modifier,
+        title = stringResource(R.string.categories_title),
+        cartItemCount = cartItemCount,
+        onCartClick = onCartClick
+    ) { innerPadding, scrollBehavior ->
         if (state.errorMessage != null) {
             NoInternetScreen(
                 onRetry = { viewModel.sendIntent(CategoryContract.Intent.LoadCategories) },

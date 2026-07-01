@@ -6,8 +6,8 @@ import com.iti.domain.models.Result
 import com.iti.domain.models.auth.RegistrationInfo
 import com.iti.domain.usecases.auth.RegisterUseCase
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
-import com.iti.presentation.core.toUiMessage
+import com.iti.presentation.util.UiText
+import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow

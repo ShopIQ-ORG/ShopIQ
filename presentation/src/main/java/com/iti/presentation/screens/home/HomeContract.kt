@@ -3,7 +3,7 @@ package com.iti.presentation.screens.home
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 object HomeContract {
 
@@ -42,7 +42,6 @@ object HomeContract {
         data class NavigateToProducts(val brandName: String? = null) : Effect()
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
-        data object NavigateToSplash : Effect()
         data object ShowAuthRequired : Effect()
         data object NavigateToSearch : Effect()
         data object NavigateToSignIn : Effect()

@@ -1,7 +1,7 @@
 package com.iti.presentation.screens.products.displayallproducts
 
 import com.iti.domain.models.Product
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 object AllProductsContract {
 

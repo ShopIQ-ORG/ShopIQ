@@ -7,7 +7,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.iti.presentation.screens.products.productdetails.ProductDetailsScreen
 import com.iti.presentation.screens.home.HomeScreen
@@ -48,6 +50,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         modifier = modifier,
         backStack = backStack,
         onBack = ::navigateBack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
         entryProvider = entryProvider {
 
             entry<Screen.Splash> {
@@ -93,7 +99,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         navigate(Screen.SignUp)
                     },
                     onNavigateToHome = {
-                        navigate(Screen.Home)
+                        replaceRoot(Screen.Home)
                     },
                     onNavigateToForgotPassword = { }
                 )
@@ -102,7 +108,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.SignUp> {
                 SignUpScreen(
                     onNavigateToHome = {
-                        navigate(Screen.Home)
+                        replaceRoot(Screen.Home)
                     },
                     onNavigateToSignIn = ::navigateBack
                 )
@@ -127,11 +133,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             navigate(Screen.Cart)
                         }
                     },
-                    onNavigateToSignIn = {
+                    onLogout = {
                         replaceRoot(Screen.SignIn)
-                    },
-                    onNavigateToAuth = {
-                        navigate(Screen.SignIn)
                     }
                 )
             }
@@ -153,7 +156,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         navigate(Screen.ProductDetails(productId))
                     },
                     onNavigateToAuth = {
-                        navigate(Screen.SignIn)
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
@@ -162,16 +165,21 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = screen.productId,
                     onBackClick = ::navigateBack,
-                    onNavigateToAuth = {
-                        navigate(Screen.SignIn)
-                    }
                 )
             }
 
             entry<Screen.Cart> {
                 CartScreen(
                     onBackClick = ::navigateBack,
+                    onCartItemClicked = {
+                        navigate(
+                            Screen.ProductDetails(it)
+                        )
+                    },
                     onCheckout = {},
+                    onLogin = {
+                        replaceRoot(Screen.SignIn)
+                    },
                     onBrowseProducts = ::navigateBack
                 )
             }

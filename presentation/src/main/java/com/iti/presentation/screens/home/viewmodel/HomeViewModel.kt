@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.home
+package com.iti.presentation.screens.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,8 @@ import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
+import com.iti.presentation.screens.home.HomeContract
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -89,7 +90,7 @@ class HomeViewModel(
 
     private fun logout() {
         viewModelScope.launch {
-            //logoutUseCase()
+            logoutUseCase()
             emitEffect(HomeContract.Effect.NavigateToSignIn)
         }
     }

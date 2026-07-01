@@ -10,7 +10,8 @@ data class ProductDetailsUiState(
     val selectedSize: String? = null,
     val selectedImageIndex: Int = 0,
     val isWishlisted: Boolean = false,
-    val isAddingToCart: Boolean = false
+    val isAddingToCart: Boolean = false,
+    val showUnauthorizedDialog: Boolean = false
 )
 
 sealed interface ProductDetailsIntent {
@@ -20,6 +21,7 @@ sealed interface ProductDetailsIntent {
     data class SelectImage(val index: Int) : ProductDetailsIntent
     object ToggleWishlist : ProductDetailsIntent
     object AddToCart : ProductDetailsIntent
+    object DismissUnauthorizedDialog : ProductDetailsIntent
 }
 
 sealed interface ProductDetailsSideEffect {

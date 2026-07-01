@@ -13,11 +13,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,10 +27,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.components.AppTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ProductCard
 import com.iti.presentation.components.SearchBar
+import com.iti.presentation.components.ShopIQScaffold
 import com.iti.presentation.screens.home.HomeContract
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,22 +39,15 @@ fun HomeTabContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
     bottomPadding: Dp = 0.dp,
+    cartItemCount: Int = 0,
     onCartClick: () -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var query by remember { mutableStateOf("") }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopBar(
-                scrollBehavior = scrollBehavior,
-                onMenuClick = {},
-                onCartClick = onCartClick
-            )
-        }
-    ) { innerPadding ->
+    ShopIQScaffold(
+        cartItemCount = cartItemCount,
+        onCartClick = onCartClick
+    ) { innerPadding, scrollBehavior ->
         when (val screenState = state.screenState) {
             is HomeContract.ScreenState.Loading -> {
                 HomeShimmer(
@@ -142,10 +132,6 @@ fun HomeTabContent(
         }
     }
 }
-
-
-
-
 
 @Composable
 fun SectionHeader(title: String, onViewAllClick: () -> Unit) {

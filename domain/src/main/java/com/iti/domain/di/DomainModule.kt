@@ -15,11 +15,13 @@ import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.cart.AddCartItemUseCase
 import com.iti.domain.usecases.cart.ApplyDiscountCodesUseCase
 import com.iti.domain.usecases.cart.GetCartUseCase
+import com.iti.domain.usecases.cart.ObserveCartItemCountUseCase
 import com.iti.domain.usecases.cart.RemoveCartItemUseCase
 import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
+import org.koin.core.module.dsl.factoryOf
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.IsProductFavoriteUseCase
@@ -37,7 +39,8 @@ val domainModule = module {
     factory { LoginAsGuestUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
     factory { RegisterUseCase(get()) }
-    factory { LogoutUseCase(get()) }
+    factory { LogoutUseCase(get(), get()) }
+    factory { GetProductsByNumberUseCase(get()) }
     factory { GetProductDetailsUseCase(get()) }
     factory { IsOnboardingCompletedUseCase(get()) }
     factory { SetOnboardingCompletedUseCase(get()) }
@@ -46,16 +49,16 @@ val domainModule = module {
     factory { RemoveProductFromFavoritesUseCase(get()) }
     factory { GetFavoriteProductsUseCase(get()) }
     factory { IsProductFavoriteUseCase(get()) }
-
     factory { com.iti.domain.usecases.products.SearchProductsUseCase(get()) }
     factory { com.iti.domain.usecases.products.GetPopularProductsUseCase(get()) }
     factory { com.iti.domain.usecases.search.GetSearchHistoryUseCase(get()) }
     factory { com.iti.domain.usecases.search.AddSearchQueryUseCase(get()) }
     factory { com.iti.domain.usecases.search.DeleteSearchQueryUseCase(get()) }
     factory { com.iti.domain.usecases.search.ClearSearchHistoryUseCase(get()) }
-    factory { GetCartUseCase(get()) }
-    factory { UpdateCartItemQuantityUseCase(get()) }
-    factory { RemoveCartItemUseCase(get()) }
-    factory { ApplyDiscountCodesUseCase(get()) }
-    factory { AddCartItemUseCase(get()) }
+    factory { GetCartUseCase(get(), get()) }
+    factory { UpdateCartItemQuantityUseCase(get(), get()) }
+    factory { RemoveCartItemUseCase(get(), get()) }
+    factory { ApplyDiscountCodesUseCase(get(), get()) }
+    factory { AddCartItemUseCase(get(), get()) }
+    factoryOf(::ObserveCartItemCountUseCase)
 }

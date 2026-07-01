@@ -12,7 +12,7 @@ import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.FilterState
 import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.SortOption
 import kotlinx.coroutines.channels.Channel

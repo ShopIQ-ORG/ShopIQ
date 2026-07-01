@@ -29,9 +29,13 @@ import com.iti.domain.repositories.cart.CartRepository
 import com.iti.domain.repositories.onboarding.OnboardingRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
+import com.iti.domain.util.CacheInvalidator
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+
+import org.koin.core.qualifier.named
+import org.koin.dsl.bind
 
 val dataModule = module {
     single { Gson() }
@@ -69,5 +73,8 @@ val dataModule = module {
             get()
         )
     }
-    single<CartRepository> { CartRepositoryImpl(get(), get()) }
+    single<CartRepository> {
+        CartRepositoryImpl(get(), get())
+    } bind CartRepository::class bind CacheInvalidator::class
+
 }

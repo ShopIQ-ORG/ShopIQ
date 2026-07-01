@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError

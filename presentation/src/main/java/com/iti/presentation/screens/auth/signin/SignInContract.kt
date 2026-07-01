@@ -1,6 +1,6 @@
 package com.iti.presentation.screens.auth.signin
 
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 data class SignInState(
     val email: String = "",

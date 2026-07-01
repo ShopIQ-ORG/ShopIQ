@@ -1,11 +1,11 @@
-package com.iti.presentation.core
+package com.iti.presentation.util
 
 import com.iti.domain.exceptions.AppException
 import com.iti.domain.exceptions.AuthException
 import com.iti.domain.exceptions.CartException
 import com.iti.domain.exceptions.NetworkException
 import com.iti.presentation.R
-import com.iti.presentation.core.UiText.*
+import com.iti.presentation.util.UiText.*
 
 fun Throwable.toUiMessage(): UiText = when (this) {
     is AppException -> when (this) {
@@ -47,7 +47,9 @@ fun Throwable.toUiMessage(): UiText = when (this) {
 
         is AppException.Unknown ->
             StringResource(R.string.error_unknown)
+
+        is AuthException.UnauthorizedAccess -> StringResource(R.string.login_required_title)
     }
 
-    else -> StringResource(R.string.error_unknown)
+    else -> UiText.StringResource(R.string.error_unknown)
 }

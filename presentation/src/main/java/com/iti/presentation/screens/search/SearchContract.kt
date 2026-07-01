@@ -1,7 +1,7 @@
 package com.iti.presentation.screens.search
 
 import com.iti.domain.models.Product
-import com.iti.presentation.core.UiText
+import com.iti.presentation.util.UiText
 
 object SearchContract {
 
