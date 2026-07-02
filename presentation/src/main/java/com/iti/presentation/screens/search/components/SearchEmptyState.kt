@@ -37,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 import com.iti.domain.models.Product
 import com.iti.presentation.components.ProductsStaticGrid
 
@@ -69,13 +71,13 @@ fun SearchEmptyState(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Recent Searches",
+                        text = stringResource(id = R.string.search_recent_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "Clear all",
+                        text = stringResource(id = R.string.search_clear_all),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.clickable { onClearAllRecentSearches() }
@@ -110,7 +112,7 @@ fun SearchEmptyState(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "Delete",
+                            contentDescription = stringResource(id = R.string.delete),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp)
                         )
@@ -128,7 +130,7 @@ fun SearchEmptyState(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "🔥 Trending",
+                        text = stringResource(id = R.string.search_trending_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -174,7 +176,7 @@ fun SearchEmptyState(
         if (popularProducts.isNotEmpty()) {
             item {
                 Text(
-                    text = "Popular Now",
+                    text = stringResource(id = R.string.search_popular_now_label),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
