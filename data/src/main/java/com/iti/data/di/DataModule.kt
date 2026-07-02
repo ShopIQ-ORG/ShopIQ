@@ -5,11 +5,13 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.iti.data.repositories.AuthRepositoryImpl
 import com.iti.data.repositories.CartRepositoryImpl
+import com.iti.data.repositories.LocationTrackerImpl
 import com.iti.data.repositories.OnboardingRepositoryImpl
 import com.iti.data.repositories.ProductsRepositoryImpl
 import com.iti.data.repositories.SearchHistoryRepositoryImpl
@@ -26,9 +28,12 @@ import com.iti.data.sources.remote.cart.CartResponseValidator
 import com.iti.data.utils.ShopifyNetworkConfig
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
+import com.iti.domain.repositories.location.LocationTracker
 import com.iti.domain.repositories.onboarding.OnboardingRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
+import com.iti.data.repositories.AddressRepositoryImpl
+import com.iti.domain.repositories.address.AddressRepository
 import com.iti.domain.util.CacheInvalidator
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
@@ -77,4 +82,8 @@ val dataModule = module {
         CartRepositoryImpl(get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
 
+    single { LocationServices.getFusedLocationProviderClient(androidContext()) }
+
+    single<LocationTracker> { LocationTrackerImpl(get(), androidContext()) }
+    single<AddressRepository> { AddressRepositoryImpl() }
 }

@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
+    implementation(libs.google.play.services.location)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.apollo.runtime)
     implementation(libs.okhttp)

@@ -21,6 +21,10 @@ import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
+import com.iti.domain.usecases.location.GetCurrentLocationUseCase
+import com.iti.domain.usecases.address.GetSavedAddressesUseCase
+import com.iti.domain.usecases.address.SaveAddressUseCase
+import com.iti.domain.usecases.address.DeleteAddressUseCase
 import org.koin.core.module.dsl.factoryOf
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
@@ -60,5 +64,9 @@ val domainModule = module {
     factory { RemoveCartItemUseCase(get(), get()) }
     factory { ApplyDiscountCodesUseCase(get(), get()) }
     factory { AddCartItemUseCase(get(), get()) }
+    factory { GetCurrentLocationUseCase(get()) }
+    factory { GetSavedAddressesUseCase(get()) }
+    factory { SaveAddressUseCase(get()) }
+    factory { DeleteAddressUseCase(get()) }
     factoryOf(::ObserveCartItemCountUseCase)
 }

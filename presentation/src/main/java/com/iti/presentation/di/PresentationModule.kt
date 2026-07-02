@@ -13,6 +13,7 @@ import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.wishlist.WishlistViewModel
+import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -33,4 +34,5 @@ val presentationModule = module {
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
     viewModelOf(::CartBadgeViewModel)
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
+    viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
 }
