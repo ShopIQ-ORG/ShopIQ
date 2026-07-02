@@ -24,6 +24,7 @@ type QueryRoot {
     before: String
     query: String
   ): CollectionConnection!
+  collection(id: ID!): Collection
 }
 
 enum ProductSortKeys {
@@ -57,6 +58,7 @@ type Product {
   vendor: String!
   tags: [String!]!
   priceRange: ProductPriceRange!
+  priceRangeV2: ProductPriceRange!
   images(first: Int, after: String): ImageConnection!
   variants(first: Int, after: String): ProductVariantConnection!
   createdAt: DateTime!
@@ -142,6 +144,7 @@ enum CollectionSortKeys {
 
 type CollectionConnection {
   edges: [CollectionEdge!]!
+  nodes: [Collection!]!
   pageInfo: PageInfo!
 }
 
@@ -156,6 +159,7 @@ type Collection {
   handle: String!
   image: Image
   productsCount: CollectionProductsCount!
+  products(first: Int, after: String): ProductConnection!
 }
 
 type CollectionProductsCount {

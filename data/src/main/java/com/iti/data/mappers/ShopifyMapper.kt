@@ -1,8 +1,9 @@
 package com.iti.data.mappers
 
-import com.iti.data.GetProductsQuery
+import com.iti.data.GetAllCategoriesQuery
 import com.iti.data.GetProductDetailsQuery
-import com.iti.data.GetMainCategoriesQuery
+import com.iti.data.GetProductsInCollectionQuery
+import com.iti.data.GetProductsQuery
 import com.iti.data.dto.*
 import com.iti.domain.models.*
 import com.iti.domain.models.Money
@@ -60,27 +61,6 @@ fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
             )
         )
     }
-
-    val s = ShopifyResponse(
-        data = ShopifyData(
-            products = ProductConnection(
-                edges = productEdges,
-                pageInfo = PageInfo(
-                    hasNextPage = this.products.pageInfo.hasNextPage,
-                    endCursor = this.products.pageInfo.endCursor
-                )
-            )
-        ),
-        extensions = Extensions(
-            cost = QueryCost(
-                requestedQueryCost = 0,
-                actualQueryCost = 0,
-                throttleStatus = ThrottleStatus(0.0, 0, 0.0)
-            )
-        )
-    )
-
-    println(s)
 
     return ShopifyResponse(
         data = ShopifyData(
@@ -240,16 +220,43 @@ fun ShopifyResponse.toDomainProduct(): Product {
     )
 }
 
-fun GetMainCategoriesQuery.Data.toDomainCategories(): List<Category> {
-    return this.collections.edges.map { edge ->
-        val node = edge.node
+fun GetAllCategoriesQuery.Data.toDomainCategories(): List<Category> {
+    return this.collections.nodes.map { node ->
         Category(
             id = node.id,
             title = node.title,
-            itemCount = node.productsCount.count,
+            itemCount = 0,
             imageAssetPath = node.image?.url?.toString() ?: ""
         )
     }
+}
+
+fun GetProductsInCollectionQuery.Data.toDomainProducts(): List<Product> {
+    return this.collection?.products?.edges?.map { edge ->
+        val node = edge.node
+        val minPrice = Money(
+            amount = node.priceRangeV2.minVariantPrice.amount,
+            currencyCode = node.priceRangeV2.minVariantPrice.currencyCode.name
+        )
+        Product(
+            id = node.id,
+            title = node.title,
+            description = "",
+            handle = "",
+            productType = node.productType,
+            vendor = "",
+            tags = emptyList(),
+            minPrice = minPrice,
+            maxPrice = minPrice,
+            images = node.images.edges.map { imageEdge ->
+                ProductImage(
+                    url = imageEdge.node.url.toString(),
+                    altText = null
+                )
+            },
+            variants = emptyList()
+        )
+    } ?: emptyList()
 }
 
 fun BrandDto.toDomainBrand(): Brand {

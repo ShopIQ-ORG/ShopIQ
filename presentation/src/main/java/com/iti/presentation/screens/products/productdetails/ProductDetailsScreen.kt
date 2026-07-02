@@ -51,10 +51,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
-import com.iti.presentation.components.NoInternetScreen
+import com.iti.presentation.components.ErrorScreen
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.ui.theme.WarningLight
+import com.iti.presentation.util.UiText
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,7 +119,8 @@ fun ProductDetailsScreen(
                     .padding(innerPadding)
             )
 
-            state.error != null -> NoInternetScreen(
+            state.error != null -> ErrorScreen(
+                message = UiText.Plain(state.error!!),
                 onRetry = { viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId)) },
                 modifier = Modifier
                     .fillMaxSize()

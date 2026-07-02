@@ -39,6 +39,7 @@ fun HomeScreen(
     onNavigateToAllBrands: () -> Unit,
     onNavigateToAllProducts: (String?) -> Unit,
     onCartClick: () -> Unit,
+    onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     onLogout: () -> Unit,
     onNavigateToSearch: () -> Unit,
@@ -85,7 +86,8 @@ fun HomeScreen(
         onNavigateToProduct = onNavigateToProduct,
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
-        onCartClick = onCartClick
+        onCartClick = onCartClick,
+        onCategoryClick = onCategoryClick
     )
 }
 
@@ -94,6 +96,7 @@ fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onLogout: () -> Unit,
     onCartClick: () -> Unit
 ) {
@@ -171,7 +174,8 @@ fun HomeScreenContent(
                     viewModel = koinViewModel(),
                     bottomPadding = padding.calculateBottomPadding(),
                     cartItemCount = cartItemCount,
-                    onCartClick = onCartClick
+                    onCartClick = onCartClick,
+                    onCategoryClick = onCategoryClick,
                 )
             }
 

@@ -1,10 +1,12 @@
 package com.iti.data.sources.remote
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
+import com.iti.data.GetAllCategoriesQuery
 import com.iti.data.GetCollectionsQuery
-import com.iti.data.GetMainCategoriesQuery
-import com.iti.data.GetProductsQuery
 import com.iti.data.GetProductDetailsQuery
+import com.iti.data.GetProductsInCollectionQuery
+import com.iti.data.GetProductsQuery
 import com.iti.data.dto.AdDto
 import com.iti.data.dto.BrandDto
 import com.iti.data.dto.ShopifyResponse
@@ -19,14 +21,12 @@ class ProductsRemoteDataSourceImpl(
         val response = apolloClient.query(
             GetProductsQuery(
                 first = first,
-                after = com.apollographql.apollo.api.Optional.presentIfNotNull(after)
+                after = Optional.presentIfNotNull(after)
             )
         ).execute()
 
         if (response.hasErrors()) {
-            throw Exception(
-                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-            )
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
         }
 
         val data = response.data ?: throw Exception("Response data is null")
@@ -42,16 +42,14 @@ class ProductsRemoteDataSourceImpl(
         val response = apolloClient.query(
             GetProductsQuery(
                 first = first,
-                query = com.apollographql.apollo.api.Optional.presentIfNotNull(query),
-                sortKey = com.apollographql.apollo.api.Optional.presentIfNotNull(sortKey),
-                reverse = com.apollographql.apollo.api.Optional.presentIfNotNull(reverse)
+                query = Optional.presentIfNotNull(query),
+                sortKey = Optional.presentIfNotNull(sortKey),
+                reverse = Optional.presentIfNotNull(reverse)
             )
         ).execute()
 
         if (response.hasErrors()) {
-            throw Exception(
-                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-            )
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
         }
 
         val data = response.data ?: throw Exception("Response data is null")
@@ -63,9 +61,7 @@ class ProductsRemoteDataSourceImpl(
         val response = apolloClient.query(GetProductDetailsQuery(globalId)).execute()
 
         if (response.hasErrors()) {
-            throw Exception(
-                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-            )
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
         }
 
         val productData = response.data?.product ?: throw Exception("Product details data is null")
@@ -75,9 +71,7 @@ class ProductsRemoteDataSourceImpl(
     override suspend fun getBrands(): List<BrandDto> {
         val response = apolloClient.query(GetCollectionsQuery(100)).execute()
         if (response.hasErrors()) {
-            throw Exception(
-                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-            )
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
         }
         val collections = response.data?.collections?.edges?.map { it.node } ?: emptyList()
         return collections.map { node ->
@@ -92,9 +86,7 @@ class ProductsRemoteDataSourceImpl(
     override suspend fun getAds(): List<AdDto> {
         val response = apolloClient.query(GetCollectionsQuery(5)).execute()
         if (response.hasErrors()) {
-            throw Exception(
-                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-            )
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
         }
         val collections = response.data?.collections?.edges?.map { it.node } ?: emptyList()
         return collections.map { node ->
@@ -107,15 +99,23 @@ class ProductsRemoteDataSourceImpl(
         }
     }
 
-    override suspend fun getMainCategories(): GetMainCategoriesQuery.Data {
-        val response = apolloClient.query(GetMainCategoriesQuery()).execute()
+    override suspend fun getMainCategories(): GetAllCategoriesQuery.Data {
+        val response = apolloClient.query(GetAllCategoriesQuery()).execute()
 
         if (response.hasErrors()) {
-            throw Exception(
-                response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-            )
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
         }
 
         return response.data ?: throw Exception("Response data is null")
+    }
+
+    override suspend fun getProductsByCategory(categoryId: String): GetProductsInCollectionQuery.Data {
+        val response = apolloClient.query(GetProductsInCollectionQuery(categoryId)).execute()
+
+        if (response.hasErrors()) {
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
+        }
+
+        return response.data ?: throw Exception("Collection data is null")
     }
 }
