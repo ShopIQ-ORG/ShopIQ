@@ -206,5 +206,6 @@
     <string name="wishlist_auth_btn">Sign In / Sign Up</string>
     <string name="cart_shipping_calculated_at_checkout">Calculated at checkout</string>
     <string name="cart_promo_duplicate_error">This code is already applied</string>
+    <string name="all_photos">All Photos</string>
 
 </resources>
