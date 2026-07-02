@@ -11,10 +11,13 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.ui.graphics.vector.ImageVector
 
+import com.iti.presentation.R
+
 enum class BottomNavItem(
     val label: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val selectedIcon: ImageVector? = null,
+    val unselectedIcon: ImageVector? = null,
+    val iconResId: Int? = null
 ) {
     Home(
         label = "Home",
@@ -25,6 +28,10 @@ enum class BottomNavItem(
         label = "Categories",
         selectedIcon = Icons.Rounded.GridView,
         unselectedIcon = Icons.Outlined.GridView
+    ),
+    AI(
+        label = "AI",
+        iconResId = R.drawable.ic_ai
     ),
     Wishlist(
         label = "Wishlist",
