@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.iti.domain.models.cart.Cart
 import com.iti.domain.models.cart.CartItem
+import com.iti.presentation.screens.cart.components.cartitem.CartItemRow
+import com.iti.presentation.screens.cart.components.promocode.PromoCodeSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +29,7 @@ fun CartContentList(
     isPromoExpanded: Boolean,
     promoInput: String,
     isApplyingPromo: Boolean,
-    removingCouponCode: String?,
+    isRemovingPromo: Boolean,
     promoErrorMessage: String?,
     onRefresh: () -> Unit,
     onIncreaseQuantity: (String) -> Unit,
@@ -36,7 +38,7 @@ fun CartContentList(
     onTogglePromoExpanded: () -> Unit,
     onPromoInputChanged: (String) -> Unit,
     onApplyPromoClick: () -> Unit,
-    onRemoveCoupon: (String) -> Unit,
+    onRemoveCoupon: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
@@ -86,15 +88,15 @@ fun CartContentList(
             item {
                 PromoCodeSection(
                     isExpanded = isPromoExpanded,
-                    appliedCoupons = cart.discountCodes,
+                    appliedCode = cart.appliedPromoCode,
                     promoInput = promoInput,
                     isApplying = isApplyingPromo,
-                    removingCouponCode = removingCouponCode,
+                    isRemoving = isRemovingPromo,
                     errorMessage = promoErrorMessage,
                     onToggleExpand = onTogglePromoExpanded,
                     onInputChanged = onPromoInputChanged,
                     onApplyClick = onApplyPromoClick,
-                    onRemoveCoupon = onRemoveCoupon
+                    onRemoveClick = onRemoveCoupon,
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 OrderSummary(cart = cart)
