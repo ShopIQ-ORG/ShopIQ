@@ -11,7 +11,13 @@ data class Cart(
     val total: Money,
     val totalTax: Money?,
     val shippingAmount: Money?
-)
+) {
+    val hasOutOfStockItems: Boolean
+        get() = items.any { !it.isAvailableForSale }
+
+    val appliedPromoCode: String?
+        get() = discountCodes.firstOrNull()
+}
 
 fun Cart.recalculatedAfterQuantityChange(): Cart {
     val newSubtotal = items.sumOf { item ->

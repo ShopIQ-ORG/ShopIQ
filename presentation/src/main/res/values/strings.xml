@@ -209,5 +209,10 @@
     <string name="cart_shipping_calculated_at_checkout">Calculated at checkout</string>
     <string name="cart_promo_duplicate_error">This code is already applied</string>
     <string name="all_photos">All Photos</string>
-
+    <string name="cart_max_quantity_reached">You have reached the maximum available quantity for this item.</string>
+    <string name="cart_promo_applied_badge">Applied</string>
+    <string name="cart_out_of_stock">This item is out of stock.</string>
+    <string name="cart_promo_remove_cd">Remove Prompo Code</string>
+    <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
+    <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
 </resources>

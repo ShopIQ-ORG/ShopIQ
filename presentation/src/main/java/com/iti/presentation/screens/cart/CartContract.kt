@@ -14,14 +14,14 @@ object CartContract {
         val isPromoExpanded: Boolean = false,
         val promoInput: String = "",
         val isApplyingPromo: Boolean = false,
+        val isRemovingPromoCode: Boolean = false,
         val promoError: UiText? = null,
-        val removingCouponCode: String? = null,
         val itemBeingRemoved: String? = null
     ) {
         val isEmpty: Boolean
             get() = cart?.items.isNullOrEmpty()
 
-        val canCheckout: Boolean
+        val isCheckoutVisible: Boolean
             get() = !isLoading && !accessRestricted && !isEmpty && error == null
     }
 
@@ -32,7 +32,7 @@ object CartContract {
         object TogglePromoExpanded : Event()
         data class PromoInputChanged(val value: String) : Event()
         object ApplyPromoCode : Event()
-        data class RemoveCoupon(val code: String) : Event()
+        object RemovePromoCode : Event()
         object ProceedToCheckout : Event()
         object Refresh : Event()
         object Retry : Event()
