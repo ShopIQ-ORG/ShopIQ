@@ -26,6 +26,11 @@ import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
+import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
+import com.iti.presentation.screens.products.checkout.CODPaymentScreen
+import com.iti.presentation.screens.products.checkout.OnlinePaymentScreen
+import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
+import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -199,7 +204,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             Screen.ProductDetails(it)
                         )
                     },
-                    onCheckout = {},
+                    onCheckout = {
+                        navigate(Screen.PaymentMethod)
+                    },
                     onLogin = {
                         replaceRoot(Screen.SignIn)
                     },
@@ -217,6 +224,33 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         navigate(Screen.ProductDetails(productId))
                     }
                 )
+            }
+
+            entry<Screen.PaymentMethod> {
+                val paymentViewModel: PaymentMethodViewModel = koinViewModel()
+
+                PaymentMethodScreen(
+                    viewModel = paymentViewModel,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToNextStep = { methodType ->
+                        when (methodType) {
+                            PaymentMethodType.COD -> {
+                                navigate(Screen.CODPayment)
+                            }
+                            PaymentMethodType.ONLINE -> {
+                                navigate(Screen.OnlinePayment)
+                            }
+                        }
+                    }
+                )
+            }
+
+            entry<Screen.CODPayment> {
+                CODPaymentScreen(onNavigateBack = ::navigateBack)
+            }
+
+            entry<Screen.OnlinePayment> {
+                OnlinePaymentScreen(onNavigateBack = ::navigateBack)
             }
         }
     )
