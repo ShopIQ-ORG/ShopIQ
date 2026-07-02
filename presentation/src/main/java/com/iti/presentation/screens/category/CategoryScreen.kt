@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -40,7 +41,8 @@ fun CategoryScreen(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     cartItemCount: Int = 0,
-    onCartClick: () -> Unit
+    onCartClick: () -> Unit,
+    onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -48,6 +50,16 @@ fun CategoryScreen(
         if (state.searchQuery.isEmpty()) state.categories
         else state.categories.filter {
             it.title.contains(state.searchQuery, ignoreCase = true)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is CategoryContract.Effect.NavigateToCategoryProducts -> {
+                    onCategoryClick(effect.categoryId, effect.categoryTitle)
+                }
+            }
         }
     }
 

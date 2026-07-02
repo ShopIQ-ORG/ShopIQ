@@ -1,0 +1,32 @@
+query GetProductsInCollection($id: ID!) {
+  collection(id: $id) {
+    id
+    title
+    products(first: 50) {
+      edges {
+        node {
+          id
+          title
+          productType
+          priceRangeV2 {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          images(first: 1) {
+            edges {
+              node {
+                url
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}

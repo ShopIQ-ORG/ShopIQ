@@ -12,5 +12,6 @@ sealed class Screen : NavKey {
     data object Cart : Screen()
     data class AllProducts(val brandName: String? = null) : Screen()
     data class ProductDetails(val productId: Long) : Screen()
+    data class CategoryDetails(val categoryId: String, val categoryTitle: String) : Screen()
     data object Search : Screen()
 }

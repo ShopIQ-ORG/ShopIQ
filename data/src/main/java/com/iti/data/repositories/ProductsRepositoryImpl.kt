@@ -166,4 +166,14 @@ class ProductsRepositoryImpl(
             emit(Result.Failure(e.handleException()))
         }
     }
+
+    override fun getProductsByCategory(categoryId: String): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProductsByCategory(categoryId)
+            emit(Result.Success(response.toDomainProducts()))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
+    }
 }

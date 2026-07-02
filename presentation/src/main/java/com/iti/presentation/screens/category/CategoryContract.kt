@@ -17,6 +17,7 @@ interface CategoryContract {
     }
 
     sealed interface Effect {
-        data class NavigateToCategoryProducts(val categoryId: String) : Effect
+        data class NavigateToCategoryProducts(val categoryId: String, val categoryTitle: String) : Effect
     }
 }
+
