@@ -8,58 +8,29 @@ fragment CartFields on Cart {
         quantity
 
         cost {
-          amountPerQuantity {
-            amount
-            currencyCode
-          }
-
-          subtotalAmount {
-            amount
-            currencyCode
-          }
-
-          totalAmount {
-            amount
-            currencyCode
-          }
+          amountPerQuantity { amount currencyCode }
+          subtotalAmount { amount currencyCode }
+          totalAmount { amount currencyCode }
         }
 
         merchandise {
           ... on ProductVariant {
-
             id
             title
+            availableForSale
+            quantityAvailable
 
-            image {
-              url
-              altText
-            }
-
-            price {
-              amount
-              currencyCode
-            }
-
-            compareAtPrice {
-              amount
-              currencyCode
-            }
-
-            selectedOptions {
-              name
-              value
-            }
+            image { url altText }
+            price { amount currencyCode }
+            compareAtPrice { amount currencyCode }
+            selectedOptions { name value }
 
             product {
               id
               title
               handle
               vendor
-
-              featuredImage {
-                url
-                altText
-              }
+              featuredImage { url altText }
             }
           }
         }
@@ -67,63 +38,29 @@ fragment CartFields on Cart {
     }
   }
 
-  buyerIdentity {
-    email
-    phone
-    countryCode
-  }
-
-  discountCodes {
-    code
-    applicable
-  }
+  buyerIdentity { email phone countryCode }
+  discountCodes { code applicable }
 
   cost {
-
-    subtotalAmount {
-      amount
-      currencyCode
-    }
-
-    totalAmount {
-      amount
-      currencyCode
-    }
-
-    totalTaxAmount {
-      amount
-      currencyCode
-    }
-
-    totalDutyAmount {
-      amount
-      currencyCode
-    }
+    subtotalAmount { amount currencyCode }
+    totalAmount { amount currencyCode }
+    totalTaxAmount { amount currencyCode }
+    totalDutyAmount { amount currencyCode }
   }
 
   deliveryGroups(first: 10) {
     edges {
       node {
         id
-
         selectedDeliveryOption {
           handle
           title
-
-          estimatedCost {
-            amount
-            currencyCode
-          }
+          estimatedCost { amount currencyCode }
         }
-
         deliveryOptions {
           handle
           title
-
-          estimatedCost {
-            amount
-            currencyCode
-          }
+          estimatedCost { amount currencyCode }
         }
       }
     }

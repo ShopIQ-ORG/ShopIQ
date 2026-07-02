@@ -18,7 +18,6 @@ fun CartFields.toDto(): CartDto {
         id = id,
         lines = lines.edges.mapNotNull { edge ->
             val variant = edge.node.merchandise.onProductVariant ?: return@mapNotNull null
-
             CartLineDto(
                 id = edge.node.id,
                 quantity = edge.node.quantity,
@@ -64,7 +63,9 @@ fun CartFields.toDto(): CartDto {
                 productTitle = variant.product.title,
                 productHandle = variant.product.handle,
                 productFeaturedImageUrl = variant.product.featuredImage?.url?.toString(),
-                vendor = variant.product.vendor.orEmpty()
+                vendor = variant.product.vendor.orEmpty(),
+                isAvailableForSale = variant.availableForSale,
+                quantityAvailable = variant.quantityAvailable ?: 0,
             )
         },
 
@@ -196,6 +197,8 @@ fun CartLineDto.toDomain(): CartItem {
         variant = variantLabel,
         price = Money(priceAmount, priceCurrencyCode),
         imageUrl = imageUrl,
-        quantity = quantity
+        quantity = quantity,
+        isAvailableForSale = isAvailableForSale,
+        quantityAvailable = quantityAvailable ?: 0,
     )
 }

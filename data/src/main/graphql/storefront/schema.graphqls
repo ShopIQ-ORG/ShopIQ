@@ -67,6 +67,8 @@ type ProductVariant implements CartLineMerchandise {
   compareAtPrice: MoneyV2
   selectedOptions: [SelectedOption!]!
   product: Product!
+  availableForSale: Boolean!
+  quantityAvailable: Int
 }
 
 type Product {

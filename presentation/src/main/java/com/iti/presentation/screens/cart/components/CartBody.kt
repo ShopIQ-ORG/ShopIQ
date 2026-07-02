@@ -29,7 +29,7 @@ fun CartBody(
     onTogglePromoExpanded: () -> Unit,
     onPromoInputChanged: (String) -> Unit,
     onApplyPromoClick: () -> Unit,
-    onRemoveCoupon: (String) -> Unit,
+    onRemoveCoupon: () -> Unit,
     promoErrorMessage: String?,
     modifier: Modifier = Modifier
 ) {
@@ -82,10 +82,10 @@ fun CartBody(
                 onItemClicked = onCartItemClicked,
                 isRefreshing = state.isRefreshing,
                 itemBeingRemoved = state.itemBeingRemoved,
+                isRemovingPromo = state.isRemovingPromoCode,
                 isPromoExpanded = state.isPromoExpanded,
                 promoInput = state.promoInput,
                 isApplyingPromo = state.isApplyingPromo,
-                removingCouponCode = state.removingCouponCode,
                 promoErrorMessage = promoErrorMessage,
                 onRefresh = onRefresh,
                 onIncreaseQuantity = onIncreaseQuantity,
@@ -94,8 +94,7 @@ fun CartBody(
                 onTogglePromoExpanded = onTogglePromoExpanded,
                 onPromoInputChanged = onPromoInputChanged,
                 onApplyPromoClick = onApplyPromoClick,
-                onRemoveCoupon = onRemoveCoupon,
-                modifier = Modifier.fillMaxSize()
+                onRemoveCoupon = onRemoveCoupon
             )
         }
     }
