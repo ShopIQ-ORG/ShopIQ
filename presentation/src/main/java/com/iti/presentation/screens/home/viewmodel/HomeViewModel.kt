@@ -75,6 +75,9 @@ class HomeViewModel(
             is HomeContract.Intent.BrandClicked -> emitEffect(
                 HomeContract.Effect.NavigateToProducts(intent.brandName)
             )
+            is HomeContract.Intent.AdClicked -> {
+                emitEffect(HomeContract.Effect.NavigateToProducts(intent.ad.subtitle))
+            }
             is HomeContract.Intent.ViewAllBrandsClicked -> emitEffect(
                 HomeContract.Effect.NavigateToAllBrands()
             )

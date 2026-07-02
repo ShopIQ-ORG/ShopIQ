@@ -89,7 +89,12 @@ fun HomeTabContent(
                         )
                     }
 
-                    item { AdsSection(data.ads) }
+                    item {
+                        AdsSection(
+                            ads = data.ads,
+                            onAdClick = { ad -> onIntent(HomeContract.Intent.AdClicked(ad)) }
+                        )
+                    }
 
                     item {
                         SectionHeader(

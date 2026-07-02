@@ -85,6 +85,12 @@ fun AllProductsScreen(
         viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName))
     }
 
+    LaunchedEffect(state.filterState, state.sortOption, state.activeBrand, state.searchQuery) {
+        if (gridState.firstVisibleItemIndex > 0 || gridState.firstVisibleItemScrollOffset > 0) {
+            gridState.scrollToItem(0)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {

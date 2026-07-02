@@ -4,13 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,9 +31,8 @@ import com.iti.domain.models.Ad
 import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
 
-
 @Composable
-fun AdsSection(ads: List<Ad>) {
+fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
     val filteredAds = ads.filter { it.imageUrl.isNotEmpty() }
     if (filteredAds.isEmpty()) return
 
@@ -39,7 +41,10 @@ fun AdsSection(ads: List<Ad>) {
     LaunchedEffect(pagerState) {
         while (true) {
             kotlinx.coroutines.delay(4000)
-            pagerState.animateScrollToPage((pagerState.currentPage + 1) % filteredAds.size)
+            if (filteredAds.isNotEmpty()) {
+                val nextPage = (pagerState.currentPage + 1) % filteredAds.size
+                pagerState.animateScrollToPage(nextPage)
+            }
         }
     }
 
@@ -89,7 +94,7 @@ fun AdsSection(ads: List<Ad>) {
                     )
                     Spacer(modifier = Modifier.height(14.dp))
                     Button(
-                        onClick = {},
+                        onClick = { onAdClick(ad) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surface,
                             contentColor = MaterialTheme.colorScheme.onSurface
@@ -103,6 +108,26 @@ fun AdsSection(ads: List<Ad>) {
                         )
                     }
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(filteredAds.size) { index ->
+                val isSelected = pagerState.currentPage == index
+                Box(
+                    modifier = Modifier
+                        .size(if (isSelected) 8.dp else 6.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isSelected) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                        )
+                )
             }
         }
     }

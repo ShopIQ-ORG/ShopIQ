@@ -1,7 +1,14 @@
+//
+//  AllBrandsViewModel.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 01/07/2026.
+//
 package com.iti.presentation.screens.brands
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iti.domain.models.Brand
 import com.iti.domain.models.Result
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.presentation.R
@@ -24,6 +31,8 @@ class AllBrandsViewModel(
     private val _effect = Channel<AllBrandsContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    private var allBrands: List<Brand> = emptyList()
+
     init {
         sendIntent(AllBrandsContract.Intent.LoadData)
     }
@@ -35,6 +44,7 @@ class AllBrandsViewModel(
             is AllBrandsContract.Intent.BrandClicked -> emitEffect(
                 AllBrandsContract.Effect.NavigateToProducts(intent.brandName)
             )
+            is AllBrandsContract.Intent.QueryChanged -> filterBrands(intent.query)
         }
     }
 
@@ -43,20 +53,41 @@ class AllBrandsViewModel(
         viewModelScope.launch {
             getBrandsUseCase().collect { result ->
                 _state.update {
-                    it.copy(
-                        screenState = when (result) {
-                            is Result.Loading -> AllBrandsContract.ScreenState.Loading
-                            is Result.Success -> AllBrandsContract.ScreenState.Success(result.data)
-                            is Result.Failure -> AllBrandsContract.ScreenState.Failure(
+                    when (result) {
+                        is Result.Loading -> it.copy(
+                            screenState = AllBrandsContract.ScreenState.Loading
+                        )
+                        is Result.Success -> {
+                            allBrands = result.data
+                            val filtered = applyFilter(result.data, it.query)
+                            it.copy(
+                                screenState = AllBrandsContract.ScreenState.Success(result.data),
+                                filteredBrands = filtered
+                            )
+                        }
+                        is Result.Failure -> it.copy(
+                            screenState = AllBrandsContract.ScreenState.Failure(
                                 result.exception.message
                                     ?.let { msg -> UiText.Plain(msg) }
                                     ?: UiText.StringResource(R.string.error_loading_brands)
                             )
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
+    }
+
+    private fun filterBrands(query: String) {
+        val filtered = applyFilter(allBrands, query)
+        _state.update {
+            it.copy(query = query, filteredBrands = filtered)
+        }
+    }
+
+    private fun applyFilter(brands: List<Brand>, query: String): List<Brand> {
+        if (query.isBlank()) return brands
+        return brands.filter { it.name.contains(query, ignoreCase = true) }
     }
 
     private fun emitEffect(effect: AllBrandsContract.Effect) {

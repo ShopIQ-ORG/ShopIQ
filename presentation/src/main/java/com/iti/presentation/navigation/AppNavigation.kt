@@ -25,7 +25,6 @@ import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
-import com.iti.presentation.screens.categorydetails.CategoryDetailsViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -125,7 +124,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         navigate(Screen.AllBrands)
                     },
                     onNavigateToAllProducts = { brandName ->
-                        navigate(Screen.AllProducts(brandName = brandName))
+                        navigate(Screen.AllProducts(brandName))
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
@@ -148,7 +147,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AllBrandsScreen(
                     onNavigateBack = ::navigateBack,
                     onNavigateToAllProducts = { brandName ->
-                        navigate(Screen.AllProducts(brandName = brandName))
+                        navigate(Screen.AllProducts(brandName))
+                    },
+                    onCartClick = {
+                        if (backStack.lastOrNull() !is Screen.Cart) {
+                            navigate(Screen.Cart)
+                        }
                     }
                 )
             }
