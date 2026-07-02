@@ -1,6 +1,6 @@
 package com.iti.data.mappers
 
-import com.iti.data.sources.local.FavoriteEntity
+import com.iti.data.sources.local.room.FavoriteEntity
 import com.iti.domain.models.Product
 import com.iti.domain.models.Money
 import com.iti.domain.models.ProductImage
