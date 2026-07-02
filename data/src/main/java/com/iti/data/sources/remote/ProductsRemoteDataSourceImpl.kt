@@ -90,21 +90,25 @@ class ProductsRemoteDataSourceImpl(
     }
 
     override suspend fun getAds(): List<AdDto> {
-        val response = apolloClient.query(GetCollectionsQuery(5)).execute()
+        // Fetch more to ensure we have enough ads after filtering for images
+        val response = apolloClient.query(GetCollectionsQuery(15)).execute()
         if (response.hasErrors()) {
             throw Exception(
                 response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
             )
         }
         val collections = response.data?.collections?.edges?.map { it.node } ?: emptyList()
-        return collections.map { node ->
-            AdDto(
-                id = node.id,
-                imageUrl = node.image?.url?.toString() ?: "",
-                title = "NEW COLLECTION",
-                subtitle = node.title.uppercase()
-            )
-        }
+        return collections
+            .filter { it.image != null }
+            .take(5)
+            .map { node ->
+                AdDto(
+                    id = node.id,
+                    imageUrl = node.image?.url?.toString() ?: "",
+                    title = "NEW COLLECTION",
+                    subtitle = node.title.uppercase()
+                )
+            }
     }
 
     override suspend fun getMainCategories(): GetMainCategoriesQuery.Data {
