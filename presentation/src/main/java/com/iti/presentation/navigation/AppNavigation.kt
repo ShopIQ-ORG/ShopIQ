@@ -144,6 +144,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateBack = ::navigateBack,
                     onNavigateToAllProducts = { brandName ->
                         navigate(Screen.AllProducts(brandName))
+                    },
+                    onCartClick = {
+                        if (backStack.lastOrNull() !is Screen.Cart) {
+                            navigate(Screen.Cart)
+                        }
                     }
                 )
             }

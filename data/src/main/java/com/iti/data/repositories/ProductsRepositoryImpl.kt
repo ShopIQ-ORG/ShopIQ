@@ -15,7 +15,6 @@ import com.iti.domain.models.Product
 import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Category
 import com.iti.domain.models.Result
-import com.iti.domain.models.User
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import kotlinx.coroutines.flow.Flow
@@ -59,10 +58,23 @@ class ProductsRepositoryImpl(
         }
     }
 
+    companion object {
+        private val EXCLUDED_CATEGORIES = setOf(
+            "WOMEN", "MEN", "KID", "KIDS", "SALE", "HOME",
+            "ACCESSORIES", "NEW ARRIVALS", "BEST SELLERS",
+            "FEATURED", "ALL", "COLLECTION", "COLLECTIONS",
+            "HYDROGEN", "AUTOMATED COLLECTION", "HOME PAGE"
+        )
+    }
+
     override fun getBrands(): Flow<Result<List<Brand>>> = flow {
         emit(Result.Loading)
         try {
-            val brands = remoteDataSource.getBrands().map { it.toDomainBrand() }
+            val brands = remoteDataSource.getBrands()
+                .map { it.toDomainBrand() }
+                .filter { brand ->
+                    brand.name.uppercase().trim() !in EXCLUDED_CATEGORIES
+                }
             emit(Result.Success(brands))
         } catch (e: Exception) {
             emit(Result.Failure(e))

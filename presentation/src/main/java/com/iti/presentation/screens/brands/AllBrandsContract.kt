@@ -1,3 +1,9 @@
+//
+//  AllBrandsContract.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 01/07/2026.
+//
 package com.iti.presentation.screens.brands
 
 import com.iti.domain.models.Brand
@@ -11,12 +17,17 @@ object AllBrandsContract {
         data class Failure(val message: UiText) : ScreenState()
     }
 
-    data class State(val screenState: ScreenState = ScreenState.Loading)
+    data class State(
+        val screenState: ScreenState = ScreenState.Loading,
+        val query: String = "",
+        val filteredBrands: List<Brand> = emptyList()
+    )
 
     sealed class Intent {
         data object LoadData : Intent()
         data object Retry : Intent()
         data class BrandClicked(val brandName: String) : Intent()
+        data class QueryChanged(val query: String) : Intent()
     }
 
     sealed class Effect {
