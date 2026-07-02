@@ -26,7 +26,7 @@ val presentationModule = module {
     viewModel { SignInViewModel(get(), get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { CategoryViewModel(get()) }
-    viewModel { com.iti.presentation.screens.categorydetails.CategoryDetailsViewModel(get(), get(), get(), get(), get()) }
+    viewModel { CategoryDetailsViewModel(get(), get(), get(), get(), get()) }
     viewModel { AllBrandsViewModel(get()) }
     viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
