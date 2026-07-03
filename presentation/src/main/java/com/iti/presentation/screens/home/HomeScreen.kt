@@ -38,6 +38,7 @@ import com.iti.presentation.R
 import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
+import com.iti.presentation.screens.ai.AiChatScreen
 import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.screens.home.components.HomeTabContent
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
@@ -299,61 +300,12 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.AI -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(160.dp)
-                        ) {
-
-                            Box(
-                                modifier = Modifier
-                                    .size(160.dp)
-                                    .background(
-                                        color = if (isDark) Color(0xFF3B1E78).copy(alpha = 0.15f) else Color(0xFFE8DDFF).copy(alpha = 0.4f),
-                                        shape = CircleShape
-                                    )
-                            )
-                           
-                            Box(
-                                modifier = Modifier
-                                    .size(120.dp)
-                                    .shadow(
-                                        elevation = 12.dp,
-                                        shape = CircleShape,
-                                        ambientColor = Color(0xFF6F32E5),
-                                        spotColor = Color(0xFF6F32E5)
-                                    )
-                                    .background(
-                                        brush = Brush.linearGradient(listOf(Color(0xFF8B5CF6), Color(0xFF4F46E5))),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_ai),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(64.dp)
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            text = "AI Chat Assistant",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        Text(
-                            text = "Coming Soon",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                AiChatScreen(
+                    onBackClick = { selectedIndex = 0 },
+                    currentUser = state.currentUser,
+                    onAuthClick = onLogout,
+                    bottomPadding = padding.calculateBottomPadding()
+                )
             }
 
             BottomNavItem.Wishlist -> {

@@ -10,10 +10,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.iti.data.repositories.AuthRepositoryImpl
 import com.iti.data.repositories.CartRepositoryImpl
+import com.iti.data.repositories.ChatbotRepositoryImpl
 import com.iti.data.repositories.OnboardingRepositoryImpl
 import com.iti.data.repositories.ProductsRepositoryImpl
 import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import com.iti.data.sources.local.AppDatabase
+import com.iti.domain.repositories.ai.ChatbotRepository
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
@@ -58,6 +60,7 @@ val dataModule = module {
 
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
+    single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get(), get()) }
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)
