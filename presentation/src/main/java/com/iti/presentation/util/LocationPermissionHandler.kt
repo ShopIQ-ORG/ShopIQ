@@ -1,11 +1,3 @@
-//
-//  LocationPermissionHandler.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.util
 
 import android.Manifest
@@ -25,7 +17,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import com.iti.presentation.R
 
 @Composable
 fun LocationPermissionHandler(
@@ -92,8 +86,8 @@ fun LocationPermissionHandler(
     if (showRationaleDialog) {
         AlertDialog(
             onDismissRequest = { showRationaleDialog = false },
-            title = { Text(text = "Location Permission Required") },
-            text = { Text(text = "This app requires location permission to detect your current address for shipping and delivery. Please grant the permission.") },
+            title = { Text(text = stringResource(R.string.address_permission_required_title)) },
+            text = { Text(text = stringResource(R.string.address_permission_required_msg)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -106,12 +100,12 @@ fun LocationPermissionHandler(
                         )
                     }
                 ) {
-                    Text("Retry")
+                    Text(stringResource(R.string.address_permission_retry_btn))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRationaleDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -120,8 +114,8 @@ fun LocationPermissionHandler(
     if (showSettingsDialog) {
         AlertDialog(
             onDismissRequest = { showSettingsDialog = false },
-            title = { Text(text = "Permission Permanently Denied") },
-            text = { Text(text = "Location permissions are permanently denied. Please enable them in app settings to use GPS detection.") },
+            title = { Text(text = stringResource(R.string.address_permission_denied_title)) },
+            text = { Text(text = stringResource(R.string.address_permission_denied_msg)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -132,12 +126,12 @@ fun LocationPermissionHandler(
                         context.startActivity(intent)
                     }
                 ) {
-                    Text("Go to Settings")
+                    Text(stringResource(R.string.address_permission_settings_btn))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSettingsDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

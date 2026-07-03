@@ -1,18 +1,10 @@
-//
-//  AddressLocationDetected.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.address.components
 
 import com.iti.presentation.ui.theme.LocalDarkTheme
-import androidx.compose.foundation.Canvas
+import com.iti.presentation.ui.theme.SuccessDark
+import com.iti.presentation.ui.theme.SuccessLight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,16 +20,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.EditLocation
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -50,24 +39,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Address
+import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.ui.theme.ShopIQTheme
 
 @Composable
 fun AddressLocationDetected(
     address: Address,
     onConfirmClick: (name: String, isDefault: Boolean) -> Unit,
-    onCancelClick: () -> Unit,
+    onEditLocationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedTag by remember { mutableStateOf("Home") }
     var customTag by remember { mutableStateOf("") }
     var isDefaultAddress by remember { mutableStateOf(false) }
+
+    val isDark = LocalDarkTheme.current
+    val successColor = if (isDark) SuccessDark else SuccessLight
+
+    val homeText = stringResource(R.string.address_tag_home)
+    val workText = stringResource(R.string.address_tag_work)
+    val otherText = stringResource(R.string.address_tag_other)
 
     Column(
         modifier = modifier
@@ -85,7 +83,32 @@ fun AddressLocationDetected(
                 .clip(RoundedCornerShape(16.dp))
                 .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
         ) {
-            MapPreviewPlaceholder()
+            OsmMapView(
+                latitude = address.latitude,
+                longitude = address.longitude,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        // Change location trigger button
+        TextButton(
+            onClick = onEditLocationClick,
+            modifier = Modifier.align(Alignment.Start)
+        ) {
+            Icon(
+                imageVector = Icons.Default.EditLocation,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.address_btn_select_on_map),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
         // Address Details Card
@@ -106,21 +129,21 @@ fun AddressLocationDetected(
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = successColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Detected Address",
+                        text = stringResource(R.string.address_detected_label),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = Color(0xFF4CAF50)
+                        color = successColor
                     )
                 }
 
                 Text(
-                    text = address.street,
+                    text = address.street.ifBlank { stringResource(R.string.address_location_detected_title) },
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -149,7 +172,7 @@ fun AddressLocationDetected(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Save Address As",
+                text = stringResource(R.string.address_save_as_label),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -161,17 +184,17 @@ fun AddressLocationDetected(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 TagChip(
-                    label = "Home",
+                    label = homeText,
                     isSelected = selectedTag == "Home",
                     onClick = { selectedTag = "Home" }
                 )
                 TagChip(
-                    label = "Work",
+                    label = workText,
                     isSelected = selectedTag == "Work",
                     onClick = { selectedTag = "Work" }
                 )
                 TagChip(
-                    label = "Other",
+                    label = otherText,
                     isSelected = selectedTag == "Other",
                     onClick = { selectedTag = "Other" }
                 )
@@ -181,7 +204,7 @@ fun AddressLocationDetected(
                 OutlinedTextField(
                     value = customTag,
                     onValueChange = { customTag = it },
-                    label = { Text("Custom Tag Name (e.g. Gym, Friend's House)") },
+                    label = { Text(stringResource(R.string.address_tag_custom_placeholder)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
@@ -203,14 +226,14 @@ fun AddressLocationDetected(
             ) {
                 Column {
                     Text(
-                        text = "Set as default address",
+                        text = stringResource(R.string.address_set_default_label),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold
                         ),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "Use this address for default delivery",
+                        text = stringResource(R.string.address_set_default_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -221,7 +244,7 @@ fun AddressLocationDetected(
                     onCheckedChange = { isDefaultAddress = it },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = Color(0xFF4CAF50),
+                        checkedTrackColor = successColor,
                         uncheckedThumbColor = MaterialTheme.colorScheme.outline,
                         uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
@@ -232,199 +255,63 @@ fun AddressLocationDetected(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Confirmation Actions
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            ShopIQButton(
-                text = "Confirm Address",
-                onClick = {
-                    val finalTagName = if (selectedTag == "Other") {
-                        customTag.ifBlank { "Other" }
-                    } else {
-                        selectedTag
+        ShopIQButton(
+            text = stringResource(R.string.address_btn_confirm),
+            onClick = {
+                val finalTagName = if (selectedTag == "Other") {
+                    customTag.ifBlank { otherText }
+                } else {
+                    when (selectedTag) {
+                        "Home" -> homeText
+                        "Work" -> workText
+                        else -> otherText
                     }
-                    onConfirmClick(finalTagName, isDefaultAddress)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            TextButton(
-                onClick = onCancelClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Use This Location Instead",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun TagChip(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-    val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-    val borderColor = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outlineVariant
-
-    Surface(
-        modifier = Modifier
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        color = containerColor,
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    tint = contentColor,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-            } else {
-                val icon = when (label) {
-                    "Home" -> Icons.Default.Home
-                    "Work" -> Icons.Default.Work
-                    else -> Icons.Default.LocationOn
                 }
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = contentColor.copy(alpha = 0.6f),
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-            }
-            Text(
-                text = label,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = contentColor
-            )
-        }
+                onConfirmClick(finalTagName, isDefaultAddress)
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
+@Preview(name = "Light Mode")
 @Composable
-fun MapPreviewPlaceholder() {
-    val isDark = LocalDarkTheme.current
-    val gridColor = if (isDark) Color(0xFF232A34) else Color(0xFFE5E9EE)
-    val mapBackground = if (isDark) Color(0xFF1A1F26) else Color(0xFFF0F3F6)
-    val streetColor = if (isDark) Color(0xFF2C3542) else Color(0xFFFFFFFF)
-    
-    Canvas(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Draw Map Background
-        drawRect(color = mapBackground)
+private fun AddressLocationDetectedLightPreview() {
+    ShopIQTheme(darkTheme = false) {
+        AddressLocationDetected(
+            address = Address(
+                id = "1",
+                name = "Home",
+                street = "9 Athar An Nabi Street",
+                city = "Cairo",
+                postalCode = "11511",
+                country = "Egypt",
+                latitude = 30.0054,
+                longitude = 31.2332
+            ),
+            onConfirmClick = { _, _ -> },
+            onEditLocationClick = {}
+        )
+    }
+}
 
-        // Draw street grid (horizontal, vertical, diagonal)
-        val numLines = 8
-        val spacingW = size.width / numLines
-        val spacingH = size.height / numLines
-
-        // Major street lines (white/light grey roads)
-        // Horizontal main road
-        drawRect(
-            color = streetColor,
-            topLeft = Offset(0f, size.height * 0.4f),
-            size = androidx.compose.ui.geometry.Size(size.width, 18.dp.toPx())
-        )
-        // Vertical main road
-        drawRect(
-            color = streetColor,
-            topLeft = Offset(size.width * 0.5f - 9.dp.toPx(), 0f),
-            size = androidx.compose.ui.geometry.Size(18.dp.toPx(), size.height)
-        )
-        // Diagonal main road
-        drawLine(
-            color = streetColor,
-            start = Offset(0f, 0f),
-            end = Offset(size.width, size.height),
-            strokeWidth = 14.dp.toPx()
-        )
-
-        // Grid overlay lines (subtle lines)
-        for (i in 1..numLines) {
-            drawLine(
-                color = gridColor,
-                start = Offset(i * spacingW, 0f),
-                end = Offset(i * spacingW, size.height),
-                strokeWidth = 1.dp.toPx()
-            )
-            drawLine(
-                color = gridColor,
-                start = Offset(0f, i * spacingH),
-                end = Offset(size.width, i * spacingH),
-                strokeWidth = 1.dp.toPx()
-            )
-        }
-
-        // Draw GPS location center point (Blue dot)
-        val center = Offset(size.width * 0.5f, size.height * 0.5f)
-        
-        // Draw accuracy circle
-        drawCircle(
-            color = Color(0xFF2196F3).copy(alpha = 0.15f),
-            radius = 60.dp.toPx(),
-            center = center
-        )
-        drawCircle(
-            color = Color(0xFF2196F3).copy(alpha = 0.3f),
-            radius = 30.dp.toPx(),
-            center = center
-        )
-        drawCircle(
-            color = Color.White,
-            radius = 6.dp.toPx(),
-            center = center
-        )
-        drawCircle(
-            color = Color(0xFF2196F3),
-            radius = 4.dp.toPx(),
-            center = center
-        )
-
-        // Draw Marker Pin (Green Pin above the center)
-        val pinCenter = Offset(size.width * 0.5f, size.height * 0.5f - 24.dp.toPx())
-        val pinPath = androidx.compose.ui.graphics.Path().apply {
-            moveTo(pinCenter.x, pinCenter.y + 12.dp.toPx())
-            cubicTo(
-                pinCenter.x - 10.dp.toPx(), pinCenter.y - 4.dp.toPx(),
-                pinCenter.x - 10.dp.toPx(), pinCenter.y - 16.dp.toPx(),
-                pinCenter.x, pinCenter.y - 16.dp.toPx()
-            )
-            cubicTo(
-                pinCenter.x + 10.dp.toPx(), pinCenter.y - 16.dp.toPx(),
-                pinCenter.x + 10.dp.toPx(), pinCenter.y - 4.dp.toPx(),
-                pinCenter.x, pinCenter.y + 12.dp.toPx()
-            )
-            close()
-        }
-        
-        drawPath(
-            path = pinPath,
-            color = Color(0xFF4CAF50)
-        )
-        // Marker inner dot
-        drawCircle(
-            color = Color.White,
-            radius = 3.dp.toPx(),
-            center = Offset(pinCenter.x, pinCenter.y - 5.dp.toPx())
+@Preview(name = "Dark Mode")
+@Composable
+private fun AddressLocationDetectedDarkPreview() {
+    ShopIQTheme(darkTheme = true) {
+        AddressLocationDetected(
+            address = Address(
+                id = "1",
+                name = "Home",
+                street = "9 Athar An Nabi Street",
+                city = "Cairo",
+                postalCode = "11511",
+                country = "Egypt",
+                latitude = 30.0054,
+                longitude = 31.2332
+            ),
+            onConfirmClick = { _, _ -> },
+            onEditLocationClick = {}
         )
     }
 }

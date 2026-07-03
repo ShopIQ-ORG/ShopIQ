@@ -1,14 +1,7 @@
-//
-//  AddressScreen.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.address
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,13 +23,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ErrorScreen
 import com.iti.presentation.screens.address.components.AddressEmptyState
 import com.iti.presentation.screens.address.components.AddressGPSOnboarding
 import com.iti.presentation.screens.address.components.AddressListView
 import com.iti.presentation.screens.address.components.AddressLocationDetected
+import com.iti.presentation.screens.address.components.AddressMapPicker
 import com.iti.presentation.util.LocationPermissionHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,9 +76,9 @@ fun AddressScreen(
 
     // Determine titles and top bar actions dynamically based on state
     val topBarTitle = when (state.screenState) {
-        AddressContract.ScreenState.GPSOnboarding -> "Add New Address"
-        is AddressContract.ScreenState.LocationDetected -> "Location Detected"
-        else -> "Manage Addresses"
+        AddressContract.ScreenState.GPSOnboarding -> stringResource(R.string.address_add_new_title)
+        is AddressContract.ScreenState.LocationDetected -> stringResource(R.string.address_location_detected_title)
+        else -> stringResource(R.string.address_title)
     }
 
     val topBarNavigationAction = {
@@ -102,32 +98,39 @@ fun AddressScreen(
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            BackTopBar(
-                title = topBarTitle,
-                onBack = topBarNavigationAction,
-                actions = {
-                    val showAddIcon = when (state.screenState) {
-                        AddressContract.ScreenState.Empty,
-                        is AddressContract.ScreenState.Success -> true
-                        else -> false
-                    }
-                    if (showAddIcon) {
-                        IconButton(onClick = { viewModel.sendIntent(AddressContract.Intent.AddAddressClicked) }) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add Address",
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
+            if (state.screenState !is AddressContract.ScreenState.MapPicker) {
+                BackTopBar(
+                    title = topBarTitle,
+                    onBack = topBarNavigationAction,
+                    actions = {
+                        val showAddIcon = when (state.screenState) {
+                            AddressContract.ScreenState.Empty,
+                            is AddressContract.ScreenState.Success -> true
+                            else -> false
+                        }
+                        if (showAddIcon) {
+                            IconButton(onClick = { viewModel.sendIntent(AddressContract.Intent.AddAddressClicked) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = stringResource(R.string.address_action_add),
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
+        val contentPadding = if (state.screenState is AddressContract.ScreenState.MapPicker) {
+            PaddingValues(0.dp)
+        } else {
+            innerPadding
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(contentPadding)
         ) {
             when (val screenState = state.screenState) {
                 AddressContract.ScreenState.Loading -> {
@@ -167,9 +170,25 @@ fun AddressScreen(
                                 AddressContract.Intent.ConfirmAddress(tagName, isDefault)
                             )
                         },
-                        onCancelClick = {
-                            viewModel.sendIntent(AddressContract.Intent.RequestGPSLocation)
+                        onEditLocationClick = {
+                            viewModel.sendIntent(AddressContract.Intent.OpenMapPicker)
                         }
+                    )
+                }
+
+                is AddressContract.ScreenState.MapPicker -> {
+                    AddressMapPicker(
+                        initialLatitude = screenState.initialLatitude,
+                        initialLongitude = screenState.initialLongitude,
+                        onLocationConfirmed = { lat, lng ->
+                            viewModel.sendIntent(
+                                AddressContract.Intent.LocationSelectedFromMap(lat, lng)
+                            )
+                        },
+                        onBackClick = {
+                            viewModel.sendIntent(AddressContract.Intent.CancelMapPicker)
+                        },
+                        viewModel = viewModel
                     )
                 }
 

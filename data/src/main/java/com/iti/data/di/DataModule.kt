@@ -38,8 +38,6 @@ import com.iti.domain.util.CacheInvalidator
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-
-import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 
 val dataModule = module {
@@ -66,9 +64,11 @@ val dataModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)
+            .fallbackToDestructiveMigration(true)
             .build()
     }
     single { get<AppDatabase>().favoriteDao() }
+    single { get<AppDatabase>().addressDao() }
 
     single<CartResponseValidator> { CartResponseValidator() }
     single<CartIdDataSource> { CartIdRemoteDataSourceImpl(get(), get()) }
@@ -84,6 +84,6 @@ val dataModule = module {
 
     single { LocationServices.getFusedLocationProviderClient(androidContext()) }
 
-    single<LocationTracker> { LocationTrackerImpl(get(), androidContext()) }
-    single<AddressRepository> { AddressRepositoryImpl() }
+    single<LocationTracker> { LocationTrackerImpl(get()) }
+    single<AddressRepository> { AddressRepositoryImpl(get()) }
 }

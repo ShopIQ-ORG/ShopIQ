@@ -1,8 +1,9 @@
 package com.iti.data.repositories
 
 import android.annotation.SuppressLint
-import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.iti.domain.models.LocationCoordinates
 import com.iti.domain.repositories.location.LocationTracker
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -10,13 +11,13 @@ import kotlin.coroutines.resume
 
 class LocationTrackerImpl(
     private val locationClient: FusedLocationProviderClient,
-    private val context: Context
 ) : LocationTracker {
 
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): LocationCoordinates? {
         return suspendCancellableCoroutine { continuation ->
-            locationClient.lastLocation
+            val cts = CancellationTokenSource()
+            locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token)
                 .addOnSuccessListener { location ->
                     if (location != null) {
                         continuation.resume(LocationCoordinates(location.latitude, location.longitude))
@@ -30,6 +31,10 @@ class LocationTrackerImpl(
                 .addOnCanceledListener {
                     continuation.cancel()
                 }
+
+            continuation.invokeOnCancellation {
+                cts.cancel()
+            }
         }
     }
 }

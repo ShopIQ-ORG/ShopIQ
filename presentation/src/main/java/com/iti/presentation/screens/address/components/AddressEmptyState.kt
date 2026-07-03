@@ -1,11 +1,3 @@
-//
-//  AddressEmptyState.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.address.components
 
 import androidx.compose.foundation.background
@@ -29,11 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.ui.theme.ShopIQTheme
 
 @Composable
 fun AddressEmptyState(
@@ -82,7 +78,7 @@ fun AddressEmptyState(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "No addresses yet",
+                text = stringResource(R.string.address_empty_title),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp
@@ -93,7 +89,7 @@ fun AddressEmptyState(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Add your first address to make checkout faster and easier.",
+                text = stringResource(R.string.address_empty_subtitle),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     lineHeight = 22.sp
                 ),
@@ -105,10 +101,26 @@ fun AddressEmptyState(
 
         // Action Button
         ShopIQButton(
-            text = "Add New Address",
+            text = stringResource(R.string.address_btn_add_new),
             onClick = onAddNewAddressClick,
             leadingIcon = Icons.Default.AddLocationAlt,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Preview(name = "Light Mode")
+@Composable
+private fun AddressEmptyStateLightPreview() {
+    ShopIQTheme(darkTheme = false) {
+        AddressEmptyState(onAddNewAddressClick = {})
+    }
+}
+
+@Preview(name = "Dark Mode")
+@Composable
+private fun AddressEmptyStateDarkPreview() {
+    ShopIQTheme(darkTheme = true) {
+        AddressEmptyState(onAddNewAddressClick = {})
     }
 }

@@ -31,7 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
-    val backStack = remember { mutableStateListOf<Screen>(Screen.Splash) }
+    val backStack = remember { mutableStateListOf<Screen>(Screen.ManageAddresses) }
 
     fun navigate(screen: Screen) {
         backStack.add(screen)

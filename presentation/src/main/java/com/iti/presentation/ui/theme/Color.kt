@@ -56,3 +56,9 @@ val ButtonSecondaryBorderDark = Color(0xFF4A535F)
 val SuccessDark = Color(0xFF4CAF50)
 val WarningDark = Color(0xFFFFC107)
 val ErrorDark = Color(0xFFEF5350)
+
+// Success badge backgrounds and borders
+val SuccessContainerLight = Color(0xFFE8F5E9)
+val SuccessContainerBorderLight = Color(0xFFC8E6C9)
+val SuccessContainerDark = Color(0xFF1B3A1F)
+val SuccessContainerBorderDark = Color(0xFF2E5233)

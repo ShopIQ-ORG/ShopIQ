@@ -1,11 +1,3 @@
-//
-//  AddressGPSOnboarding.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.address.components
 
 import androidx.compose.animation.core.LinearEasing
@@ -41,13 +33,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.ui.theme.LocalDarkTheme
+import com.iti.presentation.ui.theme.ShopIQTheme
+import com.iti.presentation.ui.theme.SuccessDark
+import com.iti.presentation.ui.theme.SuccessLight
 
 @Composable
 fun AddressGPSOnboarding(
@@ -96,6 +94,10 @@ fun AddressGPSOnboarding(
         label = "alpha2"
     )
 
+    val isDark = LocalDarkTheme.current
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val successColor = if (isDark) SuccessDark else SuccessLight
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -121,7 +123,7 @@ fun AddressGPSOnboarding(
                         .fillMaxSize()
                         .scale(scale1)
                         .graphicsLayer { alpha = alpha1 }
-                        .border(2.dp, Color(0xFF4CAF50), CircleShape)
+                        .border(2.dp, primaryColor, CircleShape)
                 )
 
                 // Outer Pulse Ring 2
@@ -130,7 +132,7 @@ fun AddressGPSOnboarding(
                         .fillMaxSize()
                         .scale(scale2)
                         .graphicsLayer { alpha = alpha2 }
-                        .border(1.5.dp, Color(0xFF4CAF50).copy(alpha = 0.6f), CircleShape)
+                        .border(1.5.dp, primaryColor.copy(alpha = 0.6f), CircleShape)
                 )
 
                 // Main circular container
@@ -139,12 +141,12 @@ fun AddressGPSOnboarding(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFE8F5E9))
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
                 ) {
                     Icon(
                         imageVector = Icons.Default.Navigation,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = primaryColor,
                         modifier = Modifier
                             .size(48.dp)
                             .graphicsLayer { rotationZ = 45f }
@@ -155,7 +157,7 @@ fun AddressGPSOnboarding(
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(
-                text = if (isDetecting) "Detecting your location..." else "Search GPS Location",
+                text = if (isDetecting) stringResource(R.string.address_gps_detecting) else stringResource(R.string.address_gps_search),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp
@@ -166,7 +168,7 @@ fun AddressGPSOnboarding(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Please allow location access to add your address.",
+                text = stringResource(R.string.address_gps_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -185,12 +187,12 @@ fun AddressGPSOnboarding(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = successColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = "Accurate location detection",
+                        text = stringResource(R.string.address_gps_feature_accuracy),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -199,12 +201,12 @@ fun AddressGPSOnboarding(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = successColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = "Secure & private",
+                        text = stringResource(R.string.address_gps_feature_secure),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -214,11 +216,33 @@ fun AddressGPSOnboarding(
 
         // Action CTA
         ShopIQButton(
-            text = if (isDetecting) "Searching Location..." else "Use GPS Location",
+            text = if (isDetecting) stringResource(R.string.address_gps_searching_btn) else stringResource(R.string.address_gps_use_btn),
             onClick = onUseGPSClick,
             leadingIcon = Icons.Default.MyLocation,
             isLoading = isDetecting,
             modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Preview(name = "Light Mode")
+@Composable
+private fun AddressGPSOnboardingLightPreview() {
+    ShopIQTheme(darkTheme = false) {
+        AddressGPSOnboarding(
+            onUseGPSClick = {},
+            isDetecting = false
+        )
+    }
+}
+
+@Preview(name = "Dark Mode - Detecting")
+@Composable
+private fun AddressGPSOnboardingDetectingDarkPreview() {
+    ShopIQTheme(darkTheme = true) {
+        AddressGPSOnboarding(
+            onUseGPSClick = {},
+            isDetecting = true
         )
     }
 }
