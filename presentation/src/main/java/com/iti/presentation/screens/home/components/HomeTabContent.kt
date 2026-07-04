@@ -67,6 +67,7 @@ fun HomeTabContent(
 
             is HomeContract.ScreenState.Success -> {
                 val data = screenState.data
+                val stableShuffled = remember(data.products) { data.products.shuffled() }
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -117,6 +118,23 @@ fun HomeTabContent(
                         )
                     }
 
+                    // Show Suggestions Section only if the user is authenticated (not a guest) and has history in Firestore
+                    if (!isGuest && state.hasChatHistory) {
+                        item {
+                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
+                                state.aiRecommendedProducts
+                            } else {
+                                stableShuffled
+                            }
+                            SuggestionsSection(
+                                products = suggestionsProducts,
+                                isLoading = state.isLoadingRecommendations,
+                                isPersonalized = state.aiRecommendedProducts.isNotEmpty(),
+                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) }
+                            )
+                        }
+                    }
+
                     item {
                         SectionHeader(
                             title = stringResource(R.string.featured_products),
@@ -138,24 +156,6 @@ fun HomeTabContent(
                                     modifier = Modifier.width(160.dp)
                                 )
                             }
-                        }
-                    }
-
-                    // Show Suggestions Section only if the user is authenticated (not a guest)
-                    if (!isGuest) {
-                        item {
-                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
-                                state.aiRecommendedProducts
-                            } else {
-                                // Fallback to other products in the catalog
-                                data.products.drop(6).take(6)
-                            }
-                            SuggestionsSection(
-                                products = suggestionsProducts,
-                                isLoading = state.isLoadingRecommendations,
-                                isPersonalized = state.aiRecommendedProducts.isNotEmpty(),
-                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) }
-                            )
                         }
                     }
                 }

@@ -81,43 +81,11 @@ fun SuggestionsHeader(isPersonalized: Boolean) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .background(
-                    brush = Brush.linearGradient(
-                        listOf(Color(0xFF8B5CF6), Color(0xFF4F46E5))
-                    ),
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ai_assistent),
-                contentDescription = null,
-                modifier = Modifier.size(22.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(10.dp))
-
-        Column {
-            Text(
-                text = stringResource(R.string.suggestions_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            val subtitleRes = if (isPersonalized) {
-                R.string.ai_recommended_subtitle
-            } else {
-                R.string.suggestions_general_subtitle
-            }
-            Text(
-                text = stringResource(subtitleRes),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        Text(
+            text = stringResource(R.string.suggestions_title),
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 

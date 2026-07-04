@@ -23,6 +23,8 @@ object HomeContract {
         val screenState: ScreenState = ScreenState.Loading,
         val currentUser: com.iti.domain.models.User? = null,
         val aiRecommendedProducts: List<Product> = emptyList(),
+        // true only when Firestore chat history is found — hides the section until data is ready
+        val hasChatHistory: Boolean = false,
         val isLoadingRecommendations: Boolean = false
     )
 

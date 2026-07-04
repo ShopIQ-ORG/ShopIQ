@@ -13,11 +13,13 @@ import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.products.ProductsRepository
+import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.screens.home.HomeContract
 import com.iti.presentation.util.UiText
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,6 +50,14 @@ class HomeViewModel(
     private val _effect = Channel<HomeContract.Effect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    data class AiRecommendationsState(
+        val recommendedProducts: List<Product> = emptyList(),
+        val hasChatHistory: Boolean = false,
+        val isLoaded: Boolean = false
+    )
+
+    private val aiRecommendationsFlow = MutableStateFlow<AiRecommendationsState?>(null)
+
     // To track local favorite overrides during async DB updates to prevent flickering
     private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
@@ -63,61 +73,166 @@ class HomeViewModel(
                 val user = result.data
                 _state.update { it.copy(currentUser = user) }
                 if (user is com.iti.domain.models.User.AuthenticatedUser) {
-                    loadAiRecommendations(user.uid)
+                    observeChatHistory(user.uid)
+                } else {
+                    // Guest user - recommendations ready immediately (empty)
+                    aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
                 }
+            } else {
+                // User loading failed - treat as guest immediately to unblock screen loading
+                aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
             }
         }
     }
 
-    private fun loadAiRecommendations(userId: String) {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoadingRecommendations = true) }
+    private fun observeChatHistory(userId: String) {
+        android.util.Log.d("SuggestionsDebug", "observeChatHistory started for userId=$userId")
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                // Take the first emission (snapshot) of chat history
-                val historyResult = getChatHistoryUseCase(userId).first {
-                    it !is Result.Loading
-                }
-
-                if (historyResult !is Result.Success) {
-                    _state.update { it.copy(isLoadingRecommendations = false) }
-                    return@launch
-                }
-
-                // Collect unique recommended product IDs from last 30 AI messages
-                val recommendedIds = historyResult.data
-                    .filter { it.sender == "ai" && it.recommendedProductIds.isNotEmpty() }
-                    .takeLast(30)
-                    .flatMap { it.recommendedProductIds }
-                    .distinct()
-                    .take(10) // Cap at 10 recommendations
-
-                if (recommendedIds.isEmpty()) {
-                    _state.update { it.copy(isLoadingRecommendations = false) }
-                    return@launch
-                }
-
-                // Resolve IDs to Product objects
-                val resolvedProducts = mutableListOf<Product>()
-                for (rawId in recommendedIds) {
-                    try {
-                        val numericId = rawId.substringAfterLast("/").toLongOrNull() ?: continue
-                        val productResult = productsRepository.getProductDetails(numericId).first {
-                            it !is Result.Loading
+                getChatHistoryUseCase(userId).collect { historyResult ->
+                    when (historyResult) {
+                        is Result.Loading -> {
+                            android.util.Log.d("SuggestionsDebug", "Chat history: Loading...")
                         }
-                        if (productResult is Result.Success) {
-                            resolvedProducts.add(productResult.data)
+                        is Result.Failure -> {
+                            android.util.Log.e("SuggestionsDebug", "Chat history FAILED: ${historyResult.exception.message}", historyResult.exception)
+                            aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
                         }
-                    } catch (_: Exception) { /* skip failed product */ }
-                }
+                        is Result.Success -> {
+                            val messages = historyResult.data
+                            android.util.Log.d("SuggestionsDebug", "Chat history loaded. Total messages: ${messages.size}")
+                            
+                            // Check if the user has any chat history (at least one user message exists)
+                            val hasHistory = messages.any { it.sender == "user" }
+                            android.util.Log.d("SuggestionsDebug", "hasChatHistory determined: $hasHistory")
 
-                _state.update {
-                    it.copy(
-                        aiRecommendedProducts = resolvedProducts,
-                        isLoadingRecommendations = false
-                    )
+                            // Sort messages so that the latest chats are processed first
+                            val sortedMessages = messages.sortedByDescending { it.timestamp }
+
+                            sortedMessages.forEachIndexed { i, msg ->
+                                android.util.Log.d("SuggestionsDebug", "  msg[$i] sender=${msg.sender} | text='${msg.text.take(60)}' | recommendedIds=${msg.recommendedProductIds}")
+                            }
+
+                            // 1. Collect unique product IDs that Eslam AI explicitly recommended (latest first)
+                            val recommendedIds = sortedMessages
+                                .filter { it.sender == "ai" && it.recommendedProductIds.isNotEmpty() }
+                                .flatMap { it.recommendedProductIds }
+                                .distinct()
+                                .take(10)
+
+                            android.util.Log.d("SuggestionsDebug", "Recommended IDs extracted: $recommendedIds")
+
+                            // 2. Extract meaningful search keywords from user messages only (latest first)
+                            val stopwords = setOf(
+                                // Arabic stopwords
+                                "أريد", "عن", "من", "في", "أبحث", "اريد", "ابحث", "هل",
+                                "عندكم", "عندك", "عاوز", "عايز", "محتاج", "موجود", "يا",
+                                "ما", "ماذا", "فيه", "ده", "دي", "هو", "هي", "انا",
+                                // English stopwords
+                                "i", "want", "search", "looking", "for", "do", "you",
+                                "have", "need", "please", "the", "a", "an", "is", "are",
+                                "to", "in", "of", "and", "that", "can", "get", "show",
+                                "me", "any", "some", "find", "with", "like"
+                            )
+
+                            val keywords = sortedMessages
+                                .filter { it.sender == "user" }
+                                .flatMap { msg ->
+                                    msg.text.lowercase()
+                                        .replace(Regex("[.,?!()\\-\"\\/]"), " ")
+                                        .split("\\s+".toRegex())
+                                        .map { it.trim() }
+                                        .filter { word -> word.length > 2 && word !in stopwords }
+                                }
+                                .distinct()
+
+                            android.util.Log.d("SuggestionsDebug", "Search keywords extracted: $keywords")
+
+                            val resolvedProducts = mutableListOf<Product>()
+
+                            kotlinx.coroutines.coroutineScope {
+                                // Resolve explicit ID recommendations in parallel
+                                val recommendationJobs = if (recommendedIds.isNotEmpty()) {
+                                    recommendedIds.map { rawId ->
+                                        async {
+                                            try {
+                                                val numericId = rawId.substringAfterLast("/").toLongOrNull()
+                                                if (numericId == null) {
+                                                    android.util.Log.e("SuggestionsDebug", "  Cannot parse numeric ID from: $rawId")
+                                                    return@async null
+                                                }
+                                                android.util.Log.d("SuggestionsDebug", "  Fetching product by ID numericId=$numericId (from $rawId)")
+                                                val res = productsRepository.getProductDetails(numericId)
+                                                    .first { it !is Result.Loading }
+                                                when (res) {
+                                                    is Result.Success -> {
+                                                        android.util.Log.d("SuggestionsDebug", "  SUCCESS product title=${res.data.title}")
+                                                        res.data
+                                                    }
+                                                    is Result.Failure -> {
+                                                        android.util.Log.e("SuggestionsDebug", "  FAILED to fetch id=$numericId: ${res.exception.message}")
+                                                        null
+                                                    }
+                                                    else -> null
+                                                }
+                                            } catch (e: Exception) {
+                                                android.util.Log.e("SuggestionsDebug", "  Exception fetching product $rawId: ${e.message}", e)
+                                                null
+                                            }
+                                        }
+                                    }
+                                } else emptyList()
+
+                                // Search by keywords in parallel
+                                val searchJobs = if (keywords.isNotEmpty()) {
+                                    keywords.takeLast(3).map { keyword ->
+                                        async {
+                                            try {
+                                                android.util.Log.d("SuggestionsDebug", "  Searching by keyword='$keyword'")
+                                                val res = productsRepository.searchProducts(keyword)
+                                                    .first { it !is Result.Loading }
+                                                when (res) {
+                                                    is Result.Success -> {
+                                                        android.util.Log.d("SuggestionsDebug", "  Search '$keyword' found ${res.data.size} products: ${res.data.map { it.title }}")
+                                                        res.data
+                                                    }
+                                                    is Result.Failure -> {
+                                                        android.util.Log.e("SuggestionsDebug", "  Search '$keyword' FAILED: ${res.exception.message}")
+                                                        emptyList()
+                                                    }
+                                                    else -> emptyList()
+                                                }
+                                            } catch (e: Exception) {
+                                                android.util.Log.e("SuggestionsDebug", "  Exception searching '$keyword': ${e.message}", e)
+                                                emptyList()
+                                            }
+                                        }
+                                    }
+                                } else emptyList()
+
+                                // Wait and merge results
+                                val recommendedList = recommendationJobs.awaitAll().filterNotNull()
+                                resolvedProducts.addAll(recommendedList)
+
+                                val searchList = searchJobs.awaitAll().flatten()
+                                resolvedProducts.addAll(searchList)
+                            }
+
+                            // Remove duplicates and limit to 10
+                            val finalProducts = resolvedProducts.distinctBy { it.id }.take(10)
+                            android.util.Log.d("SuggestionsDebug", "Final resolved suggestions (${finalProducts.size}): ${finalProducts.map { it.title }}")
+
+                            aiRecommendationsFlow.value = AiRecommendationsState(
+                                recommendedProducts = finalProducts,
+                                hasChatHistory = hasHistory,
+                                isLoaded = true
+                            )
+                        }
+                    }
                 }
-            } catch (_: Exception) {
-                _state.update { it.copy(isLoadingRecommendations = false) }
+            } catch (e: Exception) {
+                android.util.Log.e("SuggestionsDebug", "observeChatHistory outer exception: ${e.message}", e)
+                aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
             }
         }
     }
@@ -193,64 +308,85 @@ class HomeViewModel(
         }
     }
 
+    private data class MainDataHolder(
+        val productsResult: Result<List<Product>>,
+        val brandsResult: Result<List<com.iti.domain.models.Brand>>,
+        val adsResult: Result<List<com.iti.domain.models.Ad>>,
+        val favoritesResult: Result<List<Product>>,
+        val overrides: Map<String, Boolean>
+    )
+
     private fun loadAll() {
         _state.update { it.copy(screenState = HomeContract.ScreenState.Loading) }
         viewModelScope.launch {
-            combine(
+            val mainDataFlow = combine(
                 getProductsByNumberUseCase(),
                 getBrandsUseCase(),
                 getAdsUseCase(),
                 getFavoriteProductsUseCase(),
                 favoriteOverrides
             ) { productsResult, brandsResult, adsResult, favoritesResult, overrides ->
-                val anyLoading = productsResult is Result.Loading
-                        || brandsResult is Result.Loading
-                        || adsResult is Result.Loading
+                MainDataHolder(productsResult, brandsResult, adsResult, favoritesResult, overrides)
+            }
 
-                when {
+            combine(mainDataFlow, aiRecommendationsFlow) { mainData, recommendationsState ->
+                val anyLoading = mainData.productsResult is Result.Loading
+                        || mainData.brandsResult is Result.Loading
+                        || mainData.adsResult is Result.Loading
+                        || recommendationsState == null
+
+                val screenState = when {
                     anyLoading -> HomeContract.ScreenState.Loading
 
-                    productsResult is Result.Failure -> HomeContract.ScreenState.Failure(
-                        productsResult.exception.message
+                    mainData.productsResult is Result.Failure -> HomeContract.ScreenState.Failure(
+                        mainData.productsResult.exception.message
                             ?.let { UiText.Plain(it) }
                             ?: UiText.StringResource(R.string.error_loading_products)
                     )
 
-                    brandsResult is Result.Failure -> HomeContract.ScreenState.Failure(
-                        brandsResult.exception.message
+                    mainData.brandsResult is Result.Failure -> HomeContract.ScreenState.Failure(
+                        mainData.brandsResult.exception.message
                             ?.let { UiText.Plain(it) }
                             ?: UiText.StringResource(R.string.error_loading_brands)
                     )
 
-                    adsResult is Result.Failure -> HomeContract.ScreenState.Failure(
-                        adsResult.exception.message
+                    mainData.adsResult is Result.Failure -> HomeContract.ScreenState.Failure(
+                        mainData.adsResult.exception.message
                             ?.let { UiText.Plain(it) }
                             ?: UiText.StringResource(R.string.error_loading_ads)
                     )
 
                     else -> {
-                        val products = (productsResult as Result.Success).data
-                        val favoriteIds = if (favoritesResult is Result.Success) {
-                            favoritesResult.data.map { it.id }.toSet()
+                        val products = (mainData.productsResult as Result.Success).data
+                        val favoriteIds = if (mainData.favoritesResult is Result.Success) {
+                            mainData.favoritesResult.data.map { it.id }.toSet()
                         } else {
                             emptySet()
                         }
                         val updatedProducts = products.map { product ->
                             val isFavoriteInDb = product.id in favoriteIds
-                            val isFavorite = overrides[product.id] ?: isFavoriteInDb
+                            val isFavorite = mainData.overrides[product.id] ?: isFavoriteInDb
                             product.copy(isFavorite = isFavorite)
                         }
+
                         HomeContract.ScreenState.Success(
                             HomeContract.HomeData(
                                 products = updatedProducts,
-                                brands = (brandsResult as Result.Success).data,
-                                ads = (adsResult as Result.Success).data
+                                brands = (mainData.brandsResult as Result.Success).data,
+                                ads = (mainData.adsResult as Result.Success).data
                             )
                         )
                     }
                 }
-            }.collect { screenState ->
-                _state.update { it.copy(screenState = screenState) }
+                Pair(screenState, recommendationsState)
+            }.collect { (screenState, recommendationsState) ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        screenState = screenState,
+                        aiRecommendedProducts = recommendationsState?.recommendedProducts ?: emptyList(),
+                        hasChatHistory = recommendationsState?.hasChatHistory ?: false
+                    )
+                }
             }
         }
     }
