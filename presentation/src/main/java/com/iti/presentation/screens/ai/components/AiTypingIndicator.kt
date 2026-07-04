@@ -1,6 +1,7 @@
 package com.iti.presentation.screens.ai.components
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -36,11 +37,10 @@ fun AiTypingIndicator(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_ai),
-                contentDescription = "AI",
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
+            Image(
+                painter = painterResource(id = R.drawable.ai_assistent),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
             )
         }
         

@@ -23,6 +23,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AiChatScreen(
     onBackClick: () -> Unit,
+    onHistoryClick: () -> Unit,
     currentUser: User?,
     onAuthClick: () -> Unit,
     bottomPadding: Dp = 0.dp,
@@ -85,7 +86,7 @@ fun AiChatScreen(
     ) {
         AiChatHeader(
             onBackClick = onBackClick,
-            onResetClick = { /* Optional reset chat logic */ }
+            onHistoryClick = onHistoryClick
         )
         
         Column(

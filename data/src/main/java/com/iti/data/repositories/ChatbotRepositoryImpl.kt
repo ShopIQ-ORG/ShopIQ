@@ -44,14 +44,14 @@ class ChatbotRepositoryImpl(
                         text = "Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.",
                         timestamp = System.currentTimeMillis()
                     )
-                    collectionRef.add(greetingMsg)
+                    collectionRef.document("greeting_message").set(greetingMsg)
                     return@addSnapshotListener
                 }
                 val messages = snapshot.documents.mapNotNull { doc ->
                     val sender = doc.getString("sender") ?: ""
                     val text = doc.getString("text") ?: ""
                     val timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis()
-                    val recommendedProductIds = doc.get("recommendedProductIds") as? List<String> ?: emptyList()
+                    val recommendedProductIds = (doc.get("recommendedProductIds") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
                     val voiceDuration = doc.getString("voiceDuration")
                     val attachedImageUrl = doc.getString("attachedImageUrl")
                     ChatMessage(
@@ -145,7 +145,7 @@ class ChatbotRepositoryImpl(
                 val sender = doc.getString("sender") ?: ""
                 val text = doc.getString("text") ?: ""
                 val timestamp = doc.getLong("timestamp") ?: 0L
-                val recommendedProductIds = doc.get("recommendedProductIds") as? List<String> ?: emptyList()
+                val recommendedProductIds = (doc.get("recommendedProductIds") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
                 
                 if (timestamp >= userMessage.timestamp) return@forEach
                 
@@ -243,6 +243,27 @@ class ChatbotRepositoryImpl(
                 .await()
 
             emit(Result.Success(errorMsg.copy(id = addedDoc.id)))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun clearChatHistory(userId: String): Flow<Result<Unit>> = flow {
+        emit(Result.Loading)
+        try {
+            val batch = firestore.batch()
+            val querySnapshot = firestore.collection("users")
+                .document(userId)
+                .collection("chats")
+                .get()
+                .await()
+            
+            for (document in querySnapshot.documents) {
+                batch.delete(document.reference)
+            }
+            batch.commit().await()
+            
+            emit(Result.Success(Unit))
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
         }
     }.flowOn(Dispatchers.IO)
 

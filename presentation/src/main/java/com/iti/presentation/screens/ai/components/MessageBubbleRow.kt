@@ -1,5 +1,6 @@
 package com.iti.presentation.screens.ai.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -38,23 +39,7 @@ fun MessageBubbleRow(
         verticalAlignment = Alignment.Top
     ) {
         if (!isUser) {
-            Box(
-                modifier = Modifier
-                    .padding(end = 8.dp, top = 4.dp)
-                    .size(28.dp)
-                    .background(
-                        brush = Brush.linearGradient(listOf(Color(0xFF8B5CF6), Color(0xFF4F46E5))),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_ai),
-                    contentDescription = "AI",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+            AiAvatar(modifier = Modifier.padding(end = 8.dp, top = 4.dp))
         }
         
         Column(

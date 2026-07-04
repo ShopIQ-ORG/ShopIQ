@@ -128,6 +128,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 )
             }
 
+            entry<Screen.AiHistory> {
+                val viewModel: com.iti.presentation.screens.ai.history.AiHistoryViewModel = org.koin.androidx.compose.koinViewModel()
+                com.iti.presentation.screens.ai.history.AiHistoryScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
             entry<Screen.Home> {
                 HomeScreen(
                     onNavigateToProduct = { productId ->
@@ -141,6 +149,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
+                    },
+                    onNavigateToAiHistory = {
+                        navigate(Screen.AiHistory)
                     },
                     onCategoryClick = { categoryId, categoryTitle ->
                         navigate(Screen.CategoryDetails(categoryId, categoryTitle))

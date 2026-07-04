@@ -11,4 +11,5 @@ interface ChatbotRepository {
         userMessage: ChatMessage,
         imageBytes: ByteArray? = null
     ): Flow<Result<ChatMessage>>
+    fun clearChatHistory(userId: String): Flow<Result<Unit>>
 }

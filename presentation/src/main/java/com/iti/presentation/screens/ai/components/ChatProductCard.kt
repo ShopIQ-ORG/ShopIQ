@@ -94,7 +94,9 @@ fun SingleProductCard(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
-                border = ButtonDefaults.outlinedButtonBorder.copy(
+                border = ButtonDefaults.outlinedButtonBorder(
+                    enabled = true
+                ).copy(
                     brush = Brush.linearGradient(listOf(borderColor, borderColor))
                 )
             ) {

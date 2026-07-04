@@ -57,6 +57,7 @@ fun HomeScreen(
     onNavigateToProduct: (Long) -> Unit,
     onLogout: () -> Unit,
     onNavigateToSearch: () -> Unit,
+    onNavigateToAiHistory: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -101,7 +102,8 @@ fun HomeScreen(
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onCartClick = onCartClick,
-        onCategoryClick = onCategoryClick
+        onCategoryClick = onCategoryClick,
+        onNavigateToAiHistory = onNavigateToAiHistory
     )
 }
 
@@ -112,7 +114,8 @@ fun HomeScreenContent(
     onNavigateToProduct: (Long) -> Unit,
     onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onLogout: () -> Unit,
-    onCartClick: () -> Unit
+    onCartClick: () -> Unit,
+    onNavigateToAiHistory: () -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -309,6 +312,7 @@ fun HomeScreenContent(
             BottomNavItem.AI -> {
                 AiChatScreen(
                     onBackClick = { selectedIndex = 0 },
+                    onHistoryClick = onNavigateToAiHistory,
                     currentUser = state.currentUser,
                     onAuthClick = onLogout,
                     bottomPadding = 0.dp,

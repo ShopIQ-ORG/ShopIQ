@@ -235,5 +235,15 @@
     <string name="ai_error_quota_exceeded">The assistant is currently busy with too many requests. Please try again in a moment.</string>
     <string name="ai_error_network">Please check your internet connection and try again.</string>
     <string name="ai_error_image_processing">There was an issue processing the uploaded image. Please ensure it is a valid format (JPEG/PNG) and try again.</string>
-    <string name="ai_error_unknown">I\'m sorry, I\'m having trouble connecting to my brain right now. Please try sending your message again.</string>
+    <string name="ai_error_unknown">I\'m sorry, I\'m having trouble connecting to my brain right now. Please try sending your message again.</string>    <!-- AI History -->
+    <string name="history_title">History</string>
+    <string name="delete_all">Delete All</string>
+    <string name="search_conversations_hint">Search your conversations...</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="older">Older</string>
+    <string name="history_empty">No conversation history found.</string>
+    <string name="delete_history_confirm_title">Delete History</string>
+    <string name="delete_history_confirm_message">Are you sure you want to delete all chat history?</string>
+    
 </resources>

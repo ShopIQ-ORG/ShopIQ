@@ -13,7 +13,7 @@ import com.iti.presentation.R
 @Composable
 fun AiChatHeader(
     onBackClick: () -> Unit,
-    onResetClick: () -> Unit
+    onHistoryClick: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -31,10 +31,10 @@ fun AiChatHeader(
             }
         },
         actions = {
-            IconButton(onClick = onResetClick) {
+            IconButton(onClick = onHistoryClick) {
                 Icon(
                     imageVector = Icons.Default.History,
-                    contentDescription = stringResource(id = R.string.ai_reset_chat_desc)
+                    contentDescription = "History"
                 )
             }
         },

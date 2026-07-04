@@ -27,7 +27,7 @@ fun AuthRequiredScreen(
         topBar = {
             AiChatHeader(
                 onBackClick = onBackClick,
-                onResetClick = {}
+                onHistoryClick = {}
             )
         }
     ) { padding ->
