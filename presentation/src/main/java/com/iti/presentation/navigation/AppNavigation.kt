@@ -26,6 +26,8 @@ import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
+import com.iti.presentation.screens.products.checkout.OnlinePaymentScreen
+import com.iti.presentation.screens.payment.PaymentScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
 import com.iti.presentation.screens.products.checkout.CODPaymentScreen
 import com.iti.presentation.screens.products.checkout.OnlinePaymentScreen
@@ -250,7 +252,22 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
 
             entry<Screen.OnlinePayment> {
-                OnlinePaymentScreen(onNavigateBack = ::navigateBack)
+                OnlinePaymentScreen(
+                    onNavigateBack = ::navigateBack,
+                    onPaySecurely = {
+                        navigate(Screen.PaymentWebView)
+                    }
+                )
+            }
+
+            entry<Screen.PaymentWebView> {
+                PaymentScreen(
+                    onNavigateBack = ::navigateBack,
+                    onPaymentSuccess = {
+                        // Handle success, maybe navigate to a success screen or home
+                        replaceRoot(Screen.Home)
+                    }
+                )
             }
         }
     )
