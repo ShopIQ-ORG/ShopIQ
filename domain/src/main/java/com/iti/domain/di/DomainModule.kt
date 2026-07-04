@@ -22,6 +22,8 @@ import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
+import com.iti.domain.usecases.orders.GetOrderDetailsUseCase
+import com.iti.domain.usecases.orders.GetOrdersUseCase
 import org.koin.core.module.dsl.factoryOf
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
@@ -63,4 +65,8 @@ val domainModule = module {
     factory { ApplyDiscountCodesUseCase(get(), get()) }
     factory { AddCartItemUseCase(get(), get()) }
     factoryOf(::ObserveCartItemCountUseCase)
+    factoryOf(::GetOrdersUseCase)
+    factoryOf(::GetOrderDetailsUseCase)
+
+
 }

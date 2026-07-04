@@ -218,4 +218,22 @@
     <string name="cart_promo_remove_cd">Remove Prompo Code</string>
     <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
     <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
+    <string name="orders_title">My Orders</string>
+    <string name="orders_empty_title">No orders yet</string>
+    <string name="orders_empty_message">You haven\'t placed any orders yet. Once you make your first purchase, your orders will appear here.</string>
+    <string name="order_card_title">Order %1$s</string>
+    <string name="order_products_label">Products</string>
+    <string name="order_total_label">Total</string>
+    <string name="order_status_label">Status</string>
+    <string name="order_view_details">View Details</string>
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_completed">Completed</string>
+    <string name="order_status_cancelled">Cancelled</string>
+    <string name="order_status_unknown">Unknown</string>
+
+    <plurals name="order_items_count">
+        <item quantity="one">%d Item</item>
+        <item quantity="other">%d Items</item>
+    </plurals>
 </resources>

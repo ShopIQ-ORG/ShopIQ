@@ -16,6 +16,7 @@ import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import com.iti.data.sources.local.room.AppDatabase
 import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSource
 import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSourceImpl
+import com.iti.data.repositories.OrdersRepositoryImpl
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
@@ -33,6 +34,7 @@ import com.iti.data.utils.ShopifyNetworkConfig
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
 import com.iti.domain.repositories.onboarding.OnboardingRepository
+import com.iti.domain.repositories.orders.OrdersRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
@@ -85,5 +87,8 @@ val dataModule = module {
     single<CartRepository> {
         CartRepositoryImpl(get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
+
+    single<OrdersRepository> { OrdersRepositoryImpl() }
+
 
 }
