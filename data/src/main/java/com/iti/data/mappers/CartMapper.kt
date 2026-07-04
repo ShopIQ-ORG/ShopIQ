@@ -11,11 +11,13 @@ import com.iti.data.dto.cart.SelectedOptionDto
 import com.iti.data.storefront.fragment.CartFields
 import com.iti.domain.models.Money
 import com.iti.domain.models.cart.Cart
+import com.iti.domain.models.cart.CartBuyerIdentity
 import com.iti.domain.models.cart.CartItem
 
 fun CartFields.toDto(): CartDto {
     return CartDto(
         id = id,
+        checkoutUrl = this.checkoutUrl.toString(),
         lines = lines.edges.mapNotNull { edge ->
             val variant = edge.node.merchandise.onProductVariant ?: return@mapNotNull null
             CartLineDto(
@@ -142,13 +144,23 @@ fun CartDto.toDomain(): Cart {
 
     return Cart(
         id = id,
+        checkoutUrl = checkoutUrl,
         items = lines.map { it.toDomain() },
         discountCodes = discountCodes.filter { it.applicable }.map { it.code },
         discountAmount = discountAmount,
         subtotal = Money(subtotalAmount.amount, subtotalAmount.currencyCode),
         total = Money(totalAmount.amount, totalAmount.currencyCode),
         totalTax = totalTaxAmount?.let { Money(it.amount, it.currencyCode) },
-        shippingAmount = shippingAmount
+        shippingAmount = shippingAmount,
+        buyerIdentity = buyerIdentity?.toDomain()
+    )
+}
+
+fun CartBuyerIdentityDto.toDomain(): CartBuyerIdentity {
+    return CartBuyerIdentity(
+        email = email,
+        phone = phone,
+        countryCode = countryCode
     )
 }
 
