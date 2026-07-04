@@ -18,7 +18,8 @@ import com.iti.domain.models.User
 @Composable
 fun ProfileTabContent(
     user: User?,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNavigateToOrders: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -68,6 +69,10 @@ fun ProfileTabContent(
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedButton(onClick = onLogout) {
             Text(text = "Back to Login")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedButton(onClick = onNavigateToOrders) {
+            Text(text = "Go To Orders")
         }
     }
 }

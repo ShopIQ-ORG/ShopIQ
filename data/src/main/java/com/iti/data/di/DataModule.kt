@@ -12,6 +12,7 @@ import com.iti.data.repositories.*
 import com.iti.data.sources.local.room.AppDatabase
 import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSource
 import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSourceImpl
+import com.iti.data.repositories.OrdersRepositoryImpl
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
@@ -26,6 +27,7 @@ import com.iti.domain.repositories.ai.ChatbotRepository
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
 import com.iti.domain.repositories.onboarding.OnboardingRepository
+import com.iti.domain.repositories.orders.OrdersRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
@@ -37,11 +39,8 @@ import org.koin.dsl.module
 val dataModule = module {
 
     single { Gson() }
-
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
-
-    // Products
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
     single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get()) }
 
@@ -54,11 +53,9 @@ val dataModule = module {
 
     single<ShopifyTokenLocalDataSource> { ShopifyTokenLocalDataSourceImpl(get()) }
 
-    // Firebase
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 
-    // Remote Sources
     single<ShopifyCustomerRemoteDataSource> {
         ShopifyCustomerRemoteDataSourceImpl(get(named("storefrontApolloClient")))
     }
@@ -95,6 +92,9 @@ val dataModule = module {
     single<CartRepository> {
         CartRepositoryImpl(get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
+
+    single<OrdersRepository> { OrdersRepositoryImpl() }
+
 
     // Other repos
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }

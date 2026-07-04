@@ -249,5 +249,50 @@
     <string name="history_empty">No conversation history found.</string>
     <string name="delete_history_confirm_title">Delete History</string>
     <string name="delete_history_confirm_message">Are you sure you want to delete all chat history?</string>
-    
+
+    <string name="orders_title">My Orders</string>
+    <string name="orders_empty_title">No orders yet</string>
+    <string name="orders_empty_message">You haven\'t placed any orders yet. Once you make your first purchase, your orders will appear here.</string>
+    <string name="order_card_title">Order %1$s</string>
+    <string name="order_products_label">Products</string>
+    <string name="order_total_label">Total</string>
+    <string name="order_status_label">Status</string>
+    <string name="order_view_details">View Details</string>
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_completed">Completed</string>
+    <string name="order_status_cancelled">Cancelled</string>
+    <string name="order_status_unknown">Unknown</string>
+
+    <plurals name="order_items_count">
+        <item quantity="one">%d Item</item>
+        <item quantity="other">%d Items</item>
+    </plurals>
+
+    <string name="order_details_title">Order Details</string>
+    <string name="order_details_support_cd">Contact support</string>
+    <string name="back_cd">Back</string>
+
+    <string name="order_status_banner_pending_title">Your order is being processed</string>
+    <string name="order_status_banner_pending_message">We are preparing your items for shipping.</string>
+    <string name="order_status_banner_processing_title">Your order is on its way</string>
+    <string name="order_status_banner_processing_message">Your package has been shipped and is heading to you.</string>
+    <string name="order_status_banner_completed_title">Your order has been delivered</string>
+    <string name="order_status_banner_completed_message">We hope you enjoy your purchase!</string>
+    <string name="order_status_banner_cancelled_title">Your order was cancelled</string>
+    <string name="order_status_banner_cancelled_message">This order has been cancelled and will not be processed.</string>
+    <string name="order_status_banner_unknown_title">Order status unavailable</string>
+    <string name="order_status_banner_unknown_message">We couldn\'t determine the current status of this order.</string>
+
+    <string name="order_items_section_title">Order Items</string>
+    <string name="order_item_qty">Qty: %1$d</string>
+
+    <string name="order_summary_title">Order Summary</string>
+    <string name="order_summary_subtotal">Subtotal</string>
+    <string name="order_summary_shipping_fee">Shipping Fee</string>
+    <string name="order_summary_discount">Discount</string>
+    <string name="order_summary_total">Total</string>
+
+    <string name="order_shipping_address_title">Shipping Address</string>
+    <string name="order_contact_support">Need Help? Contact Support</string>
 </resources>
