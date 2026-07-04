@@ -1,5 +1,6 @@
 fragment CartFields on Cart {
   id
+  checkoutUrl
 
   lines(first: 100) {
     edges {
