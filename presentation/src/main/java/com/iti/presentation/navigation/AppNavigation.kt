@@ -25,6 +25,7 @@ import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
+import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
@@ -241,6 +242,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             PaymentMethodType.COD -> {
                                 navigate(Screen.CODPayment)
                             }
+
                             PaymentMethodType.ONLINE -> {
                                 navigate(Screen.OnlinePayment)
                             }
@@ -260,7 +262,17 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.Orders> {
                 OrdersScreen(
                     onNavigateBack = ::navigateBack,
-                    onOrderClick = {},
+                    onOrderClick = {
+                        navigate(Screen.OrderDetails(it))
+                    },
+                )
+            }
+
+            entry<Screen.OrderDetails> {
+                OrderDetailsScreen(
+                    orderId = it.orderId,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToSupport = {}
                 )
             }
         }
