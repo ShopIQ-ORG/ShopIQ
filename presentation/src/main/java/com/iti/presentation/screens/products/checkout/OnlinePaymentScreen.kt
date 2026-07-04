@@ -23,7 +23,10 @@ import com.iti.presentation.ui.theme.SearchFieldLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OnlinePaymentScreen(onNavigateBack: () -> Unit) {
+fun OnlinePaymentScreen(
+    onNavigateBack: () -> Unit,
+    onPaySecurely: () -> Unit
+) {
     var selectedOption by remember { mutableStateOf("Card") }
 
     Scaffold(
@@ -104,7 +107,7 @@ fun OnlinePaymentScreen(onNavigateBack: () -> Unit) {
             }
 
             Button(
-                onClick = { /* Process Payment */ },
+                onClick = onPaySecurely,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
