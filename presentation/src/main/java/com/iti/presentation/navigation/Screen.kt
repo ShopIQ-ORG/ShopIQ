@@ -18,5 +18,10 @@ sealed class Screen : NavKey {
     data object PaymentMethod : Screen()
     data object CODPayment : Screen()
     data object OnlinePayment : Screen()
+
+    data object Orders : Screen()
+    data class OrderDetails(val orderId: String) : Screen()
+
+
     data object AiHistory : Screen()
 }
