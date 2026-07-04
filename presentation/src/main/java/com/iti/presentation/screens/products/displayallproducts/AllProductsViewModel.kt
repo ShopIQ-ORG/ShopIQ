@@ -228,8 +228,8 @@ class AllProductsViewModel(
                     is Result.Success -> {
                         isLoaded = true
                         allProductsStateFlow.value = result.data.products
-                        val categories = result.data.products.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
-                        val subCategories = result.data.products.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
+                        val categories = result.data.products.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
+                        val subCategories = result.data.products.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
                         val brands = result.data.products.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
                         _state.update {
                             it.copy(

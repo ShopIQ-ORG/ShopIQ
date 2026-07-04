@@ -24,19 +24,19 @@ class AllProductsFilterManager {
             }
         }
 
-        // Category (productType)
+        // Category (tags) - as it matches NavItem Collections
         val categories = filterState.selectedCategories
         if (categories.isNotEmpty()) {
             result = result.filter { product -> 
-                categories.any { it.equals(product.productType, ignoreCase = true) } 
+                product.tags.any { tag -> categories.any { it.equals(tag, ignoreCase = true) } }
             }
         }
 
-        // Sub-category (tags)
+        // Sub-category / Tag Name (productType)
         val subCategories = filterState.selectedSubCategories
         if (subCategories.isNotEmpty()) {
             result = result.filter { product ->
-                product.tags.any { tag -> subCategories.any { it.equals(tag, ignoreCase = true) } }
+                subCategories.any { it.equals(product.productType, ignoreCase = true) } 
             }
         }
 
