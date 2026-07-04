@@ -13,8 +13,10 @@ import com.iti.data.repositories.CartRepositoryImpl
 import com.iti.data.repositories.OnboardingRepositoryImpl
 import com.iti.data.repositories.ProductsRepositoryImpl
 import com.iti.data.repositories.SearchHistoryRepositoryImpl
+import com.iti.data.sources.local.room.AppDatabase
+import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSource
+import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSourceImpl
 import com.iti.data.repositories.OrdersRepositoryImpl
-import com.iti.data.sources.local.AppDatabase
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
@@ -24,6 +26,10 @@ import com.iti.data.sources.remote.cart.CartIdRemoteDataSourceImpl
 import com.iti.data.sources.remote.cart.CartRemoteDataSource
 import com.iti.data.sources.remote.cart.CartRemoteDataSourceImpl
 import com.iti.data.sources.remote.cart.CartResponseValidator
+import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSource
+import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSourceImpl
+import com.iti.data.sources.remote.user.UserRemoteDataSource
+import com.iti.data.sources.remote.user.UserRemoteDataSourceImpl
 import com.iti.data.utils.ShopifyNetworkConfig
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
@@ -57,8 +63,12 @@ val dataModule = module {
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 
-    single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get(), get()) }
-    single<AuthRepository> { AuthRepositoryImpl(get()) }
+    single<ShopifyTokenLocalDataSource> { ShopifyTokenLocalDataSourceImpl(get()) }
+    single<ShopifyCustomerRemoteDataSource> { ShopifyCustomerRemoteDataSourceImpl(get(named("storefrontApolloClient"))) }
+    single<UserRemoteDataSource> { UserRemoteDataSourceImpl(get()) }
+
+    single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get()) }
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)

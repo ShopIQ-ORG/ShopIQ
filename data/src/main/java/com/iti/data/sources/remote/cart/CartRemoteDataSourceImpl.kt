@@ -1,7 +1,7 @@
 package com.iti.data.sources.remote.cart
 
 import com.apollographql.apollo.ApolloClient
-import com.iti.data.core.executeOrThrow
+import com.iti.data.utils.executeOrThrow
 import com.iti.data.dto.cart.CartDto
 import com.iti.data.mappers.toDto
 import com.iti.data.storefront.CartCreateMutation
