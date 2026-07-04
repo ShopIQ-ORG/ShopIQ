@@ -1,9 +1,11 @@
 package com.iti.presentation.screens.address.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,44 +47,44 @@ fun TagChip(
 
     Surface(
         modifier = modifier
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .height(48.dp),
         shape = RoundedCornerShape(12.dp),
         color = containerColor,
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+        border = BorderStroke(1.dp, borderColor)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    tint = contentColor,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-            } else {
-                val icon = when (label) {
-                    homeText -> Icons.Default.Home
-                    workText -> Icons.Default.Work
-                    else -> Icons.Default.LocationOn
-                }
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = contentColor.copy(alpha = 0.6f),
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
+            val icon = when (label) {
+                homeText -> Icons.Default.Home
+                workText -> Icons.Default.Work
+                else -> Icons.Default.LocationOn
             }
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = contentColor.copy(alpha = if (isSelected) 1f else 0.6f),
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = label,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = contentColor
             )
+            if (isSelected) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

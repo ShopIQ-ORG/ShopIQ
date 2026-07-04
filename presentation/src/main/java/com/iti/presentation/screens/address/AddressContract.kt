@@ -16,8 +16,7 @@ object AddressContract {
     sealed class ScreenState {
         data object Loading : ScreenState()
         data object Empty : ScreenState()
-        data object GPSOnboarding : ScreenState()
-        data class LocationDetected(val address: Address) : ScreenState()
+        data class LocationDetected(val address: Address, val isFromGps: Boolean) : ScreenState()
         data class MapPicker(val initialLatitude: Double, val initialLongitude: Double) : ScreenState()
         data class Success(val addresses: List<Address>) : ScreenState()
         data class Failure(val message: UiText) : ScreenState()
@@ -35,7 +34,8 @@ object AddressContract {
         val showSuccessBadge: Boolean = false,
         val triggerPermissionRequest: Boolean = false,
         val isDetectingLocation: Boolean = false,
-        val searchSuggestions: List<PlaceSuggestion> = emptyList()
+        val searchSuggestions: List<PlaceSuggestion> = emptyList(),
+        val errorText: UiText? = null
     )
 
     sealed class Intent {
@@ -54,11 +54,13 @@ object AddressContract {
         data object CancelMapPicker : Intent()
         data class SearchQueryChanged(val query: String) : Intent()
         data object ClearSuggestions : Intent()
+        data object ClearError : Intent()
         data object NavigateBack : Intent()
     }
 
     sealed class Effect {
         data object NavigateBack : Effect()
         data class ShowMessage(val message: UiText) : Effect()
+        data class MoveCameraToLocation(val latitude: Double, val longitude: Double) : Effect()
     }
 }

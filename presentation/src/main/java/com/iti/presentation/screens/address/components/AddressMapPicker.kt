@@ -23,12 +23,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +40,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,23 +59,20 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.screens.address.AddressContract
 import com.iti.presentation.screens.address.AddressViewModel
-import com.iti.presentation.ui.theme.LocalDarkTheme
+import com.iti.presentation.ui.theme.BackgroundDark
 import com.iti.presentation.ui.theme.ShopIQTheme
-import com.iti.presentation.ui.theme.SuccessDark
-import com.iti.presentation.ui.theme.SuccessLight
 import kotlinx.coroutines.launch
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,39 +93,27 @@ fun AddressMapPicker(
     var isSearching by remember { mutableStateOf(false) }
     var searchError by remember { mutableStateOf<String?>(null) }
 
-    val isDark = LocalDarkTheme.current
-    val successColor = if (isDark) SuccessDark else SuccessLight
-
     val state = viewModel?.state?.collectAsState()?.value ?: AddressContract.State()
 
-    // Configure user agent for osmdroid
-    LaunchedEffect(Unit) {
-        Configuration.getInstance().userAgentValue = context.packageName
+    // Setup camera position state
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(initialLatitude, initialLongitude), 17f)
     }
 
-    val mapView = remember {
-        MapView(context).apply {
-            setTileSource(TileSourceFactory.MAPNIK)
-            setMultiTouchControls(true)
-            controller.setZoom(17.0)
-            controller.setCenter(GeoPoint(initialLatitude, initialLongitude))
-        }
-    }
-
-    // Handle MapView lifecycles
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle, mapView) {
-        val lifecycleObserver = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+    // Collect effects from ViewModel (e.g. MoveCameraToLocation when GPS finishes fetching)
+    LaunchedEffect(viewModel) {
+        viewModel?.effect?.collect { effect ->
+            when (effect) {
+                is AddressContract.Effect.MoveCameraToLocation -> {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(effect.latitude, effect.longitude),
+                            17f
+                        )
+                    )
+                }
                 else -> {}
             }
-        }
-        lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
-            mapView.onDetach()
         }
     }
 
@@ -140,7 +127,12 @@ fun AddressMapPicker(
                 val resultCoords = viewModel.searchLocationByName(searchQuery)
                 isSearching = false
                 if (resultCoords != null) {
-                    mapView.controller.animateTo(GeoPoint(resultCoords.latitude, resultCoords.longitude))
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(resultCoords.latitude, resultCoords.longitude),
+                            17f
+                        )
+                    )
                 } else {
                     searchError = context.getString(R.string.address_error_location_not_found)
                 }
@@ -157,21 +149,29 @@ fun AddressMapPicker(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Interactive Map
-            AndroidView(
-                factory = { mapView },
-                modifier = Modifier.fillMaxSize()
+            // Google Map View
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    zoomControlsEnabled = false,
+                    myLocationButtonEnabled = false,
+                    compassEnabled = true
+                ),
+                properties = MapProperties(
+                    isMyLocationEnabled = false
+                )
             )
 
-            // Center Pin Overlay (Map pans beneath this pin)
+            // Center Pin Overlay (map pans beneath this pin)
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Drop Shadow/Circle at target point
+                // Drop Shadow / Small Circle
                 Box(
                     modifier = Modifier
-                        .size(12.dp)
+                        .size(10.dp)
                         .clip(CircleShape)
                         .background(Color.Black.copy(alpha = 0.2f))
                 )
@@ -179,14 +179,14 @@ fun AddressMapPicker(
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = null,
-                    tint = successColor,
+                    tint = BackgroundDark,
                     modifier = Modifier
                         .size(48.dp)
                         .offset(y = (-24).dp)
                 )
             }
 
-            // Top Search Bar & Back Actions & Autocomplete suggestions
+            // Top Search Bar & Suggestions Overlay
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -253,7 +253,7 @@ fun AddressMapPicker(
                     }
                 }
 
-                // Autocomplete Suggestions Card
+                // Suggestions List
                 val suggestions = state.searchSuggestions
                 if (suggestions.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -279,7 +279,14 @@ fun AddressMapPicker(
                                         ) 
                                     },
                                     onClick = {
-                                        mapView.controller.animateTo(GeoPoint(suggestion.latitude, suggestion.longitude))
+                                        coroutineScope.launch {
+                                            cameraPositionState.animate(
+                                                CameraUpdateFactory.newLatLngZoom(
+                                                    LatLng(suggestion.latitude, suggestion.longitude),
+                                                    17f
+                                                )
+                                            )
+                                        }
                                         searchQuery = suggestion.displayName
                                         viewModel?.sendIntent(AddressContract.Intent.ClearSuggestions)
                                         keyboardController?.hide()
@@ -307,6 +314,35 @@ fun AddressMapPicker(
                 }
             }
 
+            // GPS Floating Circular Button (Bottom Right, above confirmation button)
+            FloatingActionButton(
+                onClick = {
+                    viewModel?.sendIntent(AddressContract.Intent.RequestGPSLocation)
+                },
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
+                elevation = FloatingActionButtonDefaults.elevation(4.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 96.dp, end = 24.dp)
+                    .size(56.dp)
+            ) {
+                if (state.isDetectingLocation) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Current Location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
             // Bottom Confirmation Button
             Box(
                 modifier = Modifier
@@ -318,7 +354,7 @@ fun AddressMapPicker(
                     text = stringResource(R.string.address_btn_confirm_location),
                     onClick = {
                         viewModel?.sendIntent(AddressContract.Intent.ClearSuggestions)
-                        val centerPoint = mapView.mapCenter
+                        val centerPoint = cameraPositionState.position.target
                         onLocationConfirmed(centerPoint.latitude, centerPoint.longitude)
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -332,20 +368,6 @@ fun AddressMapPicker(
 @Composable
 private fun AddressMapPickerLightPreview() {
     ShopIQTheme(darkTheme = false) {
-        AddressMapPicker(
-            initialLatitude = 30.0444,
-            initialLongitude = 31.2357,
-            onLocationConfirmed = { _, _ -> },
-            onBackClick = {},
-            viewModel = null
-        )
-    }
-}
-
-@Preview(name = "Dark Mode")
-@Composable
-private fun AddressMapPickerDarkPreview() {
-    ShopIQTheme(darkTheme = true) {
         AddressMapPicker(
             initialLatitude = 30.0444,
             initialLongitude = 31.2357,

@@ -268,4 +268,17 @@
     <string name="address_btn_confirm_location">Confirm Selected Location</string>
     <string name="address_error_location_not_found">Location not found. Please try a different search query.</string>
 
+    <!-- Redesigned Location Detected screen -->
+    <string name="address_heading_detected">We found your location!</string>
+    <string name="address_heading_selected">Location Selected</string>
+    <string name="address_subheading">Please confirm or adjust your address.</string>
+    <string name="address_btn_detect_automatically">Detect location automatically via GPS</string>
+    <string name="address_label_detected">Detected Address</string>
+    <string name="address_label_selected">Selected Address</string>
+    <string name="address_tap_to_select_location">Tap map to select location</string>
+    <string name="address_edit_on_map">Edit on map</string>
+    <string name="address_success_added">Address added successfully.</string>
+    <string name="address_accurate_badge">Accurate</string>
+    <string name="address_error_location_missing">Please select a location on the map first.</string>
+
 </resources>

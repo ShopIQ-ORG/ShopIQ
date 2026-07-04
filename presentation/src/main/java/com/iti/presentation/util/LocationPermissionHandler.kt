@@ -26,7 +26,6 @@ fun LocationPermissionHandler(
     onPermissionGranted: () -> Unit,
     onPermissionDenied: () -> Unit,
     triggerRequest: Boolean,
-    onRequestHandled: () -> Unit
 ) {
     val context = LocalContext.current
     var showRationaleDialog by remember { mutableStateOf(false) }
@@ -35,7 +34,6 @@ fun LocationPermissionHandler(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        onRequestHandled()
         val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
         val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
         
@@ -70,7 +68,6 @@ fun LocationPermissionHandler(
             ) == PackageManager.PERMISSION_GRANTED
 
             if (fineGranted || coarseGranted) {
-                onRequestHandled()
                 onPermissionGranted()
             } else {
                 permissionLauncher.launch(

@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +28,6 @@ import com.iti.presentation.ui.theme.ShopIQTheme
 @Composable
 fun AddressListView(
     addresses: List<Address>,
-    showSuccessBadge: Boolean,
-    onDismissSuccessBadge: () -> Unit,
     onDeleteAddress: (String) -> Unit,
     onSetDefaultAddress: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -41,14 +40,6 @@ fun AddressListView(
             contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (showSuccessBadge) {
-                item {
-                    SuccessBadge(
-                        onDismiss = onDismissSuccessBadge
-                    )
-                }
-            }
-
             item {
                 Text(
                     text = stringResource(R.string.address_saved_list_title),
@@ -64,7 +55,8 @@ fun AddressListView(
                 AddressItem(
                     address = address,
                     onDelete = { addressToDeleteId = address.id },
-                    onSetDefault = { onSetDefaultAddress(address.id) }
+                    onSetDefault = { onSetDefaultAddress(address.id) },
+                    modifier = Modifier.animateItem()
                 )
             }
         }
@@ -98,8 +90,6 @@ private fun AddressListViewLightPreview() {
     ShopIQTheme(darkTheme = false) {
         AddressListView(
             addresses = sampleAddresses,
-            showSuccessBadge = true,
-            onDismissSuccessBadge = {},
             onDeleteAddress = {},
             onSetDefaultAddress = {}
         )
@@ -116,8 +106,6 @@ private fun AddressListViewDarkPreview() {
     ShopIQTheme(darkTheme = true) {
         AddressListView(
             addresses = sampleAddresses,
-            showSuccessBadge = false,
-            onDismissSuccessBadge = {},
             onDeleteAddress = {},
             onSetDefaultAddress = {}
         )

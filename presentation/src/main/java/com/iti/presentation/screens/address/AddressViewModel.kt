@@ -2,8 +2,6 @@ package com.iti.presentation.screens.address
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Geocoder
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Address
@@ -14,8 +12,8 @@ import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.location.GetCurrentLocationUseCase
 import com.iti.presentation.R
+import com.iti.presentation.util.LocationHelper
 import com.iti.presentation.util.UiText
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -25,25 +23,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
-import java.util.Locale
 import java.util.UUID
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
-class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
+class AddressViewModel (
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
     private val getSavedAddressesUseCase: GetSavedAddressesUseCase,
     private val saveAddressUseCase: SaveAddressUseCase,
     private val deleteAddressUseCase: DeleteAddressUseCase,
-    @SuppressLint("StaticFieldLeak") private val context: Context
+    @param:SuppressLint("StaticFieldLeak") private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddressContract.State())
@@ -65,7 +52,12 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
                 loadAddresses()
             }
             AddressContract.Intent.AddAddressClicked -> {
-                _state.update { it.copy(screenState = AddressContract.ScreenState.GPSOnboarding) }
+                temporaryDetectedAddress = null
+                _state.update {
+                    it.copy(
+                        screenState = AddressContract.ScreenState.MapPicker(30.0444, 31.2357)
+                    )
+                }
             }
             AddressContract.Intent.RequestGPSLocation -> {
                 _state.update { it.copy(triggerPermissionRequest = true, isDetectingLocation = true) }
@@ -78,14 +70,22 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
                 _state.update { 
                     it.copy(
                         triggerPermissionRequest = false,
-                        isDetectingLocation = false,
-                        screenState = AddressContract.ScreenState.GPSOnboarding
+                        isDetectingLocation = false
                     )
                 }
                 emitEffect(AddressContract.Effect.ShowMessage(UiText.StringResource(R.string.error_network)))
             }
             is AddressContract.Intent.ConfirmAddress -> {
-                saveDetectedAddress(intent.name, intent.isDefault)
+                val currentAddress = temporaryDetectedAddress
+                if (currentAddress == null || currentAddress.latitude == 0.0 || currentAddress.longitude == 0.0) {
+                    _state.update {
+                        it.copy(
+                            errorText = UiText.StringResource(R.string.address_error_location_missing)
+                        )
+                    }
+                } else {
+                    saveDetectedAddress(intent.name, intent.isDefault)
+                }
             }
             is AddressContract.Intent.DeleteAddress -> {
                 deleteAddress(intent.addressId)
@@ -121,11 +121,11 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
                 _state.update { it.copy(screenState = AddressContract.ScreenState.Loading) }
                 viewModelScope.launch {
                     try {
-                        val detected = getAddressFromCoordinates(intent.latitude, intent.longitude)
+                        val detected = LocationHelper.getAddressFromCoordinates(context, intent.latitude, intent.longitude)
                         temporaryDetectedAddress = detected
                         _state.update {
                             it.copy(
-                                screenState = AddressContract.ScreenState.LocationDetected(detected)
+                                screenState = AddressContract.ScreenState.LocationDetected(detected, isFromGps = false)
                             )
                         }
                     } catch (_: Exception) {
@@ -142,8 +142,8 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
                 _state.update {
                     it.copy(
                         screenState = when (val current = temporaryDetectedAddress) {
-                            null -> AddressContract.ScreenState.GPSOnboarding
-                            else -> AddressContract.ScreenState.LocationDetected(current)
+                            null -> if (it.addresses.isEmpty()) AddressContract.ScreenState.Empty else AddressContract.ScreenState.Success(it.addresses)
+                            else -> AddressContract.ScreenState.LocationDetected(current, isFromGps = false)
                         }
                     )
                 }
@@ -153,6 +153,9 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
             }
             AddressContract.Intent.ClearSuggestions -> {
                 clearSuggestions()
+            }
+            AddressContract.Intent.ClearError -> {
+                _state.update { it.copy(errorText = null) }
             }
             AddressContract.Intent.NavigateBack -> {
                 emitEffect(AddressContract.Effect.NavigateBack)
@@ -195,34 +198,35 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
         viewModelScope.launch {
             val coords = getCurrentLocationUseCase()
             if (coords != null) {
-                try {
-                    val detected = getAddressFromCoordinates(coords.latitude, coords.longitude)
-                    temporaryDetectedAddress = detected
-                    _state.update {
-                        it.copy(
-                            isDetectingLocation = false,
-                            screenState = AddressContract.ScreenState.LocationDetected(detected)
-                        )
-                    }
-                } catch (_: Exception) {
-                    _state.update {
-                        it.copy(
-                            isDetectingLocation = false,
-                            screenState = AddressContract.ScreenState.Failure(
-                                UiText.StringResource(R.string.address_error_geocoding_failed)
+                if (_state.value.screenState is AddressContract.ScreenState.MapPicker) {
+                    _state.update { it.copy(isDetectingLocation = false) }
+                    emitEffect(AddressContract.Effect.MoveCameraToLocation(coords.latitude, coords.longitude))
+                } else {
+                    try {
+                        val detected = LocationHelper.getAddressFromCoordinates(context, coords.latitude, coords.longitude)
+                        temporaryDetectedAddress = detected
+                        _state.update {
+                            it.copy(
+                                isDetectingLocation = false,
+                                screenState = AddressContract.ScreenState.LocationDetected(detected, isFromGps = true)
                             )
-                        )
+                        }
+                    } catch (_: Exception) {
+                        _state.update {
+                            it.copy(
+                                isDetectingLocation = false,
+                                screenState = AddressContract.ScreenState.Failure(
+                                    UiText.StringResource(R.string.address_error_geocoding_failed)
+                                )
+                            )
+                        }
                     }
                 }
             } else {
                 _state.update {
-                    it.copy(
-                        isDetectingLocation = false,
-                        screenState = AddressContract.ScreenState.Failure(
-                            UiText.StringResource(R.string.address_error_gps_failed)
-                        )
-                    )
+                    it.copy(isDetectingLocation = false)
                 }
+                emitEffect(AddressContract.Effect.ShowMessage(UiText.StringResource(R.string.address_error_gps_failed)))
             }
         }
     }
@@ -270,59 +274,6 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
         }
     }
 
-    private suspend fun getAddressFromCoordinates(lat: Double, lng: Double): Address {
-        return withContext(Dispatchers.IO) {
-            val geocoder = Geocoder(context, Locale.getDefault())
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                suspendCancellableCoroutine { continuation ->
-                    geocoder.getFromLocation(lat, lng, 1, object : Geocoder.GeocodeListener {
-                        override fun onGeocode(addresses: MutableList<android.location.Address>) {
-                            if (addresses.isNotEmpty()) {
-                                continuation.resume(mapAndroidAddressToDomain(addresses[0], lat, lng))
-                            } else {
-                                continuation.resumeWithException(Exception("No address found"))
-                            }
-                        }
-
-                        override fun onError(errorMessage: String?) {
-                            continuation.resumeWithException(Exception(errorMessage ?: "Geocoding error"))
-                        }
-                    })
-                }
-            } else {
-                @Suppress("DEPRECATION")
-                val addresses = geocoder.getFromLocation(lat, lng, 1)
-                if (!addresses.isNullOrEmpty()) {
-                    mapAndroidAddressToDomain(addresses[0], lat, lng)
-                } else {
-                    throw Exception("No address found")
-                }
-            }
-        }
-    }
-
-    private fun mapAndroidAddressToDomain(
-        addressObj: android.location.Address,
-        lat: Double,
-        lng: Double
-    ): Address {
-        val street = addressObj.thoroughfare ?: addressObj.subThoroughfare ?: addressObj.getAddressLine(0) ?: ""
-        val city = addressObj.locality ?: addressObj.subAdminArea ?: ""
-        val postalCode = addressObj.postalCode ?: ""
-        val country = addressObj.countryName ?: ""
-        return Address(
-            id = UUID.randomUUID().toString(),
-            name = "",
-            street = street,
-            city = city,
-            postalCode = postalCode,
-            country = country,
-            latitude = lat,
-            longitude = lng,
-            isDefault = false
-        )
-    }
-
     private fun onSearchQueryChanged(query: String) {
         searchJob?.cancel()
         if (query.isBlank()) {
@@ -331,7 +282,7 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
         }
         searchJob = viewModelScope.launch {
             delay(500) // Debounce 500ms
-            val suggestions = getSuggestionsFromNominatim(query)
+            val suggestions = LocationHelper.getSuggestions(context, query, com.iti.presentation.BuildConfig.MAPS_API_KEY)
             _state.update { it.copy(searchSuggestions = suggestions) }
         }
     }
@@ -342,93 +293,7 @@ class AddressViewModel @SuppressLint("StaticFieldLeak") constructor(
     }
 
     suspend fun searchLocationByName(query: String): LocationCoordinates? {
-        // Try system Geocoder first
-        val systemResult = searchLocationByNameWithGeocoder(query)
-        if (systemResult != null) return systemResult
-
-        // Fallback to Nominatim search
-        val suggestions = getSuggestionsFromNominatim(query)
-        if (suggestions.isNotEmpty()) {
-            return LocationCoordinates(suggestions[0].latitude, suggestions[0].longitude)
-        }
-        return null
-    }
-
-    private suspend fun searchLocationByNameWithGeocoder(query: String): LocationCoordinates? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    suspendCancellableCoroutine { continuation ->
-                        geocoder.getFromLocationName(query, 1, object : Geocoder.GeocodeListener {
-                            override fun onGeocode(addresses: MutableList<android.location.Address>) {
-                                if (addresses.isNotEmpty()) {
-                                    val addressObj = addresses[0]
-                                    continuation.resume(LocationCoordinates(addressObj.latitude, addressObj.longitude))
-                                } else {
-                                    continuation.resume(null)
-                                }
-                            }
-
-                            override fun onError(errorMessage: String?) {
-                                continuation.resume(null)
-                            }
-                        })
-                    }
-                } else {
-                    @Suppress("DEPRECATION")
-                    val addresses = geocoder.getFromLocationName(query, 1)
-                    if (!addresses.isNullOrEmpty()) {
-                        val addressObj = addresses[0]
-                        LocationCoordinates(addressObj.latitude, addressObj.longitude)
-                    } else {
-                        null
-                    }
-                }
-            } catch (_: Exception) {
-                null
-            }
-        }
-    }
-
-    private suspend fun getSuggestionsFromNominatim(query: String): List<AddressContract.PlaceSuggestion> {
-        return withContext(Dispatchers.IO) {
-            val suggestions = mutableListOf<AddressContract.PlaceSuggestion>()
-            var connection: HttpURLConnection? = null
-            try {
-                val encodedQuery = URLEncoder.encode(query, "UTF-8")
-                val url = URL("https://nominatim.openstreetmap.org/search?q=$encodedQuery&format=json&limit=5&accept-language=en")
-                connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.setRequestProperty("User-Agent", "ShopIQ-Android-App")
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
-
-                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val reader = BufferedReader(InputStreamReader(connection.inputStream))
-                    val response = StringBuilder()
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        response.append(line)
-                    }
-                    reader.close()
-
-                    val jsonArray = JSONArray(response.toString())
-                    for (i in 0 until jsonArray.length()) {
-                        val jsonObject = jsonArray.getJSONObject(i)
-                        val displayName = jsonObject.getString("display_name")
-                        val lat = jsonObject.getDouble("lat")
-                        val lon = jsonObject.getDouble("lon")
-                        suggestions.add(AddressContract.PlaceSuggestion(displayName, lat, lon))
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                connection?.disconnect()
-            }
-            suggestions
-        }
+        return LocationHelper.searchLocationByName(context, query, com.iti.presentation.BuildConfig.MAPS_API_KEY)
     }
 
     private fun emitEffect(effect: AddressContract.Effect) {
