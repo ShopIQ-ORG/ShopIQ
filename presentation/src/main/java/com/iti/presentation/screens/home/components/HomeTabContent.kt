@@ -129,7 +129,6 @@ fun HomeTabContent(
                             SuggestionsSection(
                                 products = suggestionsProducts,
                                 isLoading = state.isLoadingRecommendations,
-                                isPersonalized = state.aiRecommendedProducts.isNotEmpty(),
                                 onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) }
                             )
                         }

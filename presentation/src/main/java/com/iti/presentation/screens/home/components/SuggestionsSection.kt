@@ -44,13 +44,12 @@ import com.iti.presentation.components.ProductCard
 fun SuggestionsSection(
     products: List<Product>,
     isLoading: Boolean,
-    isPersonalized: Boolean,
     onProductClick: (Product) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        SuggestionsHeader(isPersonalized = isPersonalized)
-
+        SuggestionsHeader()
+ 
         when {
             isLoading -> SuggestionsShimmer()
             products.isNotEmpty() -> {
@@ -72,9 +71,9 @@ fun SuggestionsSection(
         }
     }
 }
-
+ 
 @Composable
-fun SuggestionsHeader(isPersonalized: Boolean) {
+fun SuggestionsHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()

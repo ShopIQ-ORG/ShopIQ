@@ -18,6 +18,7 @@ import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.screens.home.HomeContract
 import com.iti.presentation.util.UiText
+import com.iti.presentation.util.Stopwords
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
@@ -86,152 +87,92 @@ class HomeViewModel(
     }
 
     private fun observeChatHistory(userId: String) {
-        android.util.Log.d("SuggestionsDebug", "observeChatHistory started for userId=$userId")
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
                 getChatHistoryUseCase(userId).collect { historyResult ->
-                    when (historyResult) {
-                        is Result.Loading -> {
-                            android.util.Log.d("SuggestionsDebug", "Chat history: Loading...")
-                        }
-                        is Result.Failure -> {
-                            android.util.Log.e("SuggestionsDebug", "Chat history FAILED: ${historyResult.exception.message}", historyResult.exception)
-                            aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
-                        }
-                        is Result.Success -> {
-                            val messages = historyResult.data
-                            android.util.Log.d("SuggestionsDebug", "Chat history loaded. Total messages: ${messages.size}")
-                            
-                            // Check if the user has any chat history (at least one user message exists)
-                            val hasHistory = messages.any { it.sender == "user" }
-                            android.util.Log.d("SuggestionsDebug", "hasChatHistory determined: $hasHistory")
+                    if (historyResult is Result.Success) {
+                        val messages = historyResult.data
 
-                            // Sort messages so that the latest chats are processed first
-                            val sortedMessages = messages.sortedByDescending { it.timestamp }
+                        // Check if the user has any chat history (at least one user message exists)
+                        val hasHistory = messages.any { it.sender == "user" }
 
-                            sortedMessages.forEachIndexed { i, msg ->
-                                android.util.Log.d("SuggestionsDebug", "  msg[$i] sender=${msg.sender} | text='${msg.text.take(60)}' | recommendedIds=${msg.recommendedProductIds}")
+                        // Sort messages so that the latest chats are processed first
+                        val sortedMessages = messages.sortedByDescending { it.timestamp }
+
+                        // 1. Collect unique product IDs that Eslam AI explicitly recommended (latest first)
+                        val recommendedIds = sortedMessages
+                            .filter { it.sender == "ai" && it.recommendedProductIds.isNotEmpty() }
+                            .flatMap { it.recommendedProductIds }
+                            .distinct()
+                            .take(10)
+
+                        // 2. Extract meaningful search keywords from user messages only (latest first)
+                        val keywords = sortedMessages
+                            .filter { it.sender == "user" }
+                            .flatMap { msg ->
+                                msg.text.lowercase()
+                                    .replace(Regex("[.,?!()\\-\"\\/]"), " ")
+                                    .split("\\s+".toRegex())
+                                    .map { it.trim() }
+                                    .filter { word -> word.length > 2 && word !in Stopwords.set }
                             }
+                            .distinct()
 
-                            // 1. Collect unique product IDs that Eslam AI explicitly recommended (latest first)
-                            val recommendedIds = sortedMessages
-                                .filter { it.sender == "ai" && it.recommendedProductIds.isNotEmpty() }
-                                .flatMap { it.recommendedProductIds }
-                                .distinct()
-                                .take(10)
+                        val resolvedProducts = mutableListOf<Product>()
 
-                            android.util.Log.d("SuggestionsDebug", "Recommended IDs extracted: $recommendedIds")
-
-                            // 2. Extract meaningful search keywords from user messages only (latest first)
-                            val stopwords = setOf(
-                                // Arabic stopwords
-                                "أريد", "عن", "من", "في", "أبحث", "اريد", "ابحث", "هل",
-                                "عندكم", "عندك", "عاوز", "عايز", "محتاج", "موجود", "يا",
-                                "ما", "ماذا", "فيه", "ده", "دي", "هو", "هي", "انا",
-                                // English stopwords
-                                "i", "want", "search", "looking", "for", "do", "you",
-                                "have", "need", "please", "the", "a", "an", "is", "are",
-                                "to", "in", "of", "and", "that", "can", "get", "show",
-                                "me", "any", "some", "find", "with", "like"
-                            )
-
-                            val keywords = sortedMessages
-                                .filter { it.sender == "user" }
-                                .flatMap { msg ->
-                                    msg.text.lowercase()
-                                        .replace(Regex("[.,?!()\\-\"\\/]"), " ")
-                                        .split("\\s+".toRegex())
-                                        .map { it.trim() }
-                                        .filter { word -> word.length > 2 && word !in stopwords }
+                        kotlinx.coroutines.coroutineScope {
+                            // Resolve explicit ID recommendations in parallel
+                            val recommendationJobs = if (recommendedIds.isNotEmpty()) {
+                                recommendedIds.map { rawId ->
+                                    async {
+                                        try {
+                                            val numericId = rawId.substringAfterLast("/").toLongOrNull() ?: return@async null
+                                            val res = productsRepository.getProductDetails(numericId)
+                                                .first { it !is Result.Loading }
+                                            if (res is Result.Success) res.data else null
+                                        } catch (_: Exception) {
+                                            null
+                                        }
+                                    }
                                 }
-                                .distinct()
+                            } else emptyList()
 
-                            android.util.Log.d("SuggestionsDebug", "Search keywords extracted: $keywords")
-
-                            val resolvedProducts = mutableListOf<Product>()
-
-                            kotlinx.coroutines.coroutineScope {
-                                // Resolve explicit ID recommendations in parallel
-                                val recommendationJobs = if (recommendedIds.isNotEmpty()) {
-                                    recommendedIds.map { rawId ->
-                                        async {
-                                            try {
-                                                val numericId = rawId.substringAfterLast("/").toLongOrNull()
-                                                if (numericId == null) {
-                                                    android.util.Log.e("SuggestionsDebug", "  Cannot parse numeric ID from: $rawId")
-                                                    return@async null
-                                                }
-                                                android.util.Log.d("SuggestionsDebug", "  Fetching product by ID numericId=$numericId (from $rawId)")
-                                                val res = productsRepository.getProductDetails(numericId)
-                                                    .first { it !is Result.Loading }
-                                                when (res) {
-                                                    is Result.Success -> {
-                                                        android.util.Log.d("SuggestionsDebug", "  SUCCESS product title=${res.data.title}")
-                                                        res.data
-                                                    }
-                                                    is Result.Failure -> {
-                                                        android.util.Log.e("SuggestionsDebug", "  FAILED to fetch id=$numericId: ${res.exception.message}")
-                                                        null
-                                                    }
-                                                    else -> null
-                                                }
-                                            } catch (e: Exception) {
-                                                android.util.Log.e("SuggestionsDebug", "  Exception fetching product $rawId: ${e.message}", e)
-                                                null
-                                            }
+                            // Search by keywords in parallel
+                            val searchJobs = if (keywords.isNotEmpty()) {
+                                keywords.takeLast(3).map { keyword ->
+                                    async {
+                                        try {
+                                            val res = productsRepository.searchProducts(keyword)
+                                                .first { it !is Result.Loading }
+                                            if (res is Result.Success) res.data else emptyList()
+                                        } catch (_: Exception) {
+                                            emptyList()
                                         }
                                     }
-                                } else emptyList()
+                                }
+                            } else emptyList()
 
-                                // Search by keywords in parallel
-                                val searchJobs = if (keywords.isNotEmpty()) {
-                                    keywords.takeLast(3).map { keyword ->
-                                        async {
-                                            try {
-                                                android.util.Log.d("SuggestionsDebug", "  Searching by keyword='$keyword'")
-                                                val res = productsRepository.searchProducts(keyword)
-                                                    .first { it !is Result.Loading }
-                                                when (res) {
-                                                    is Result.Success -> {
-                                                        android.util.Log.d("SuggestionsDebug", "  Search '$keyword' found ${res.data.size} products: ${res.data.map { it.title }}")
-                                                        res.data
-                                                    }
-                                                    is Result.Failure -> {
-                                                        android.util.Log.e("SuggestionsDebug", "  Search '$keyword' FAILED: ${res.exception.message}")
-                                                        emptyList()
-                                                    }
-                                                    else -> emptyList()
-                                                }
-                                            } catch (e: Exception) {
-                                                android.util.Log.e("SuggestionsDebug", "  Exception searching '$keyword': ${e.message}", e)
-                                                emptyList()
-                                            }
-                                        }
-                                    }
-                                } else emptyList()
+                            // Wait and merge results
+                            val recommendedList = recommendationJobs.awaitAll().filterNotNull()
+                            resolvedProducts.addAll(recommendedList)
 
-                                // Wait and merge results
-                                val recommendedList = recommendationJobs.awaitAll().filterNotNull()
-                                resolvedProducts.addAll(recommendedList)
-
-                                val searchList = searchJobs.awaitAll().flatten()
-                                resolvedProducts.addAll(searchList)
-                            }
-
-                            // Remove duplicates and limit to 10
-                            val finalProducts = resolvedProducts.distinctBy { it.id }.take(10)
-                            android.util.Log.d("SuggestionsDebug", "Final resolved suggestions (${finalProducts.size}): ${finalProducts.map { it.title }}")
-
-                            aiRecommendationsFlow.value = AiRecommendationsState(
-                                recommendedProducts = finalProducts,
-                                hasChatHistory = hasHistory,
-                                isLoaded = true
-                            )
+                            val searchList = searchJobs.awaitAll().flatten()
+                            resolvedProducts.addAll(searchList)
                         }
+
+                        // Remove duplicates and limit to 10
+                        val finalProducts = resolvedProducts.distinctBy { it.id }.take(10)
+
+                        aiRecommendationsFlow.value = AiRecommendationsState(
+                            recommendedProducts = finalProducts,
+                            hasChatHistory = hasHistory,
+                            isLoaded = true
+                        )
+                    } else if (historyResult is Result.Failure) {
+                        aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
                     }
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("SuggestionsDebug", "observeChatHistory outer exception: ${e.message}", e)
+            } catch (_: Exception) {
                 aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
             }
         }
