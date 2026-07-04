@@ -2,7 +2,7 @@ package com.iti.data.sources.remote.user
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.iti.data.core.FirebaseConstants
+import com.iti.data.utils.FirebaseConstants
 import com.iti.data.dto.auth.UserDto
 import com.iti.data.dto.shopifycustomer.ShopifyFieldsDto
 import com.iti.domain.exceptions.AuthException

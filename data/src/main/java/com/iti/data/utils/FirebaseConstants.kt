@@ -1,4 +1,4 @@
-package com.iti.data.core
+package com.iti.data.utils
 
 object FirebaseConstants {
 

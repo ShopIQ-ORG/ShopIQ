@@ -1,7 +1,7 @@
 package com.iti.data.sources.remote.shopifycustomer
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
-import com.iti.data.core.executeOrThrow
+import com.iti.data.utils.executeOrThrow
 import com.iti.data.dto.shopifycustomer.ShopifyCustomerDto
 import com.iti.data.dto.shopifycustomer.ShopifyCustomerTokenDto
 import com.iti.data.storefront.CustomerAccessTokenCreateMutation

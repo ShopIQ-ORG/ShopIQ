@@ -5,12 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.iti.data.dto.shopifycustomer.ShopifyFieldsDto
+import com.iti.data.utils.DataStoreKeys
 import kotlinx.coroutines.flow.first
-
-private val KEY_CUSTOMER_ID = stringPreferencesKey("shopify_customer_id")
-private val KEY_ACCESS_TOKEN = stringPreferencesKey("shopify_access_token")
-private val KEY_EXPIRES_AT = stringPreferencesKey("shopify_expires_at")
-private val KEY_PASSWORD = stringPreferencesKey("shopify_password")
 
 class ShopifyTokenLocalDataSourceImpl(
     private val dataStore: DataStore<Preferences>
@@ -18,22 +14,22 @@ class ShopifyTokenLocalDataSourceImpl(
 
     override suspend fun getCachedFields(): ShopifyFieldsDto? {
         val prefs = dataStore.data.first()
-        val accessToken = prefs[KEY_ACCESS_TOKEN] ?: return null
-        val expiresAt = prefs[KEY_EXPIRES_AT] ?: return null
+        val accessToken = prefs[DataStoreKeys.SHOPIFY_ACCESS_TOKEN] ?: return null
+        val expiresAt = prefs[DataStoreKeys.SHOPIFY_EXPIRES_AT] ?: return null
         return ShopifyFieldsDto(
-            customerId = prefs[KEY_CUSTOMER_ID],
+            customerId = prefs[DataStoreKeys.SHOPIFY_CUSTOMER_ID],
             accessToken = accessToken,
             expiresAt = expiresAt,
-            password = prefs[KEY_PASSWORD]
+            password = prefs[DataStoreKeys.SHOPIFY_PASSWORD]
         )
     }
 
     override suspend fun saveFields(fields: ShopifyFieldsDto) {
         dataStore.edit { prefs ->
-            fields.customerId?.let { prefs[KEY_CUSTOMER_ID] = it }
-            prefs[KEY_ACCESS_TOKEN] = fields.accessToken
-            prefs[KEY_EXPIRES_AT] = fields.expiresAt
-            fields.password?.let { prefs[KEY_PASSWORD] = it }
+            fields.customerId?.let { prefs[DataStoreKeys.SHOPIFY_CUSTOMER_ID] = it }
+            prefs[DataStoreKeys.SHOPIFY_ACCESS_TOKEN] = fields.accessToken
+            prefs[DataStoreKeys.SHOPIFY_EXPIRES_AT] = fields.expiresAt
+            fields.password?.let { prefs[DataStoreKeys.SHOPIFY_PASSWORD] = it }
         }
     }
 

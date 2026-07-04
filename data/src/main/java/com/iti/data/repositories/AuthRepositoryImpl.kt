@@ -5,7 +5,7 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.GoogleAuthProvider
-import com.iti.data.core.handleException
+import com.iti.data.utils.handleException
 import com.iti.data.dto.auth.CredentialAuthResult
 import com.iti.data.dto.auth.UserDto
 import com.iti.data.dto.shopifycustomer.ShopifyFieldsDto
