@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import com.iti.presentation.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -188,8 +188,8 @@ fun ChatInputFooter(
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add attachment",
+                            imageVector = Icons.Default.PhotoCamera,
+                            contentDescription = "Add photo or attachment",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

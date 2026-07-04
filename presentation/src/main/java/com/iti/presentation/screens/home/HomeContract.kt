@@ -3,6 +3,8 @@ package com.iti.presentation.screens.home
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
+import com.iti.domain.models.Result
+import com.iti.domain.models.User
 import com.iti.presentation.util.UiText
 
 object HomeContract {
@@ -21,11 +23,17 @@ object HomeContract {
 
     data class State(
         val screenState: ScreenState = ScreenState.Loading,
-        val currentUser: com.iti.domain.models.User? = null,
+        val currentUser: User? = null,
         val aiRecommendedProducts: List<Product> = emptyList(),
-        // true only when Firestore chat history is found — hides the section until data is ready
         val hasChatHistory: Boolean = false,
         val isLoadingRecommendations: Boolean = false
+    )
+    data class MainDataHolder(
+        val productsResult: Result<List<Product>>,
+        val brandsResult: Result<List<Brand>>,
+        val adsResult: Result<List<Ad>>,
+        val favoritesResult: Result<List<Product>>,
+        val overrides: Map<String, Boolean>
     )
 
     sealed class Intent {

@@ -39,6 +39,7 @@ import com.valentinilk.shimmer.shimmer
 import com.iti.domain.models.Product
 import com.iti.presentation.R
 import com.iti.presentation.components.ProductCard
+import com.iti.presentation.screens.ai.components.AiAvatar
 
 @Composable
 fun SuggestionsSection(
@@ -150,23 +151,10 @@ fun TryEslamCard(onTryEslamClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .background(
-                            brush = Brush.linearGradient(
-                                listOf(Color(0xFF8B5CF6), Color(0xFF4F46E5))
-                            ),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ai_assistent),
-                        contentDescription = null,
-                        modifier = Modifier.size(52.dp)
-                    )
-                }
+                AiAvatar(
+                    size = 84.dp,
+                    iconSize = 64.dp
+                )
             }
         }
     }

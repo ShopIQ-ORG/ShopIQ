@@ -208,13 +208,17 @@ fun HomeScreenContent(
                                             spotColor = Color(0xFF6F32E5)
                                         )
                                         .background(
-                                            brush = if (isSelected) {
-                                                Brush.linearGradient(listOf(Color(0xFF8B5CF6), Color(0xFF4F46E5)))
-                                            } else {
-                                                if (isDark) {
-                                                    Brush.linearGradient(listOf(Color(0xFF2A3038), Color(0xFF1E242B)))
+                                            brush = if (isDark) {
+                                                if (isSelected) {
+                                                    Brush.linearGradient(listOf(Color(0xFF3B1E78), Color(0xFF2C145C)))
                                                 } else {
-                                                    Brush.linearGradient(listOf(Color(0xFFF3F4F6), Color(0xFFE5E7EB)))
+                                                    Brush.linearGradient(listOf(Color(0xFF2A1B4E), Color(0xFF20103E)))
+                                                }
+                                            } else {
+                                                if (isSelected) {
+                                                    Brush.linearGradient(listOf(Color(0xFFF0E8FF), Color(0xFFE8DDFF)))
+                                                } else {
+                                                    Brush.linearGradient(listOf(Color(0xFFF6F1FF), Color(0xFFECE0FF)))
                                                 }
                                             },
                                             shape = CircleShape
@@ -227,7 +231,11 @@ fun HomeScreenContent(
                                     Icon(
                                         painter = painterResource(id = item.iconResId!!),
                                         contentDescription = item.label,
-                                        tint = if (isSelected) Color.White else iconColor,
+                                        tint = if (isDark) {
+                                            if (isSelected) Color(0xFFD4BFFF) else Color(0xFF9E80E5)
+                                        } else {
+                                            if (isSelected) Color(0xFF6F32E5) else Color(0xFF8C52FF)
+                                        },
                                         modifier = Modifier.size(28.dp) // Large sparkle icon
                                     )
                                 }

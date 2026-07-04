@@ -22,6 +22,7 @@ import com.iti.presentation.util.Stopwords
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,7 +60,6 @@ class HomeViewModel(
 
     private val aiRecommendationsFlow = MutableStateFlow<AiRecommendationsState?>(null)
 
-    // To track local favorite overrides during async DB updates to prevent flickering
     private val favoriteOverrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     init {
@@ -93,20 +93,16 @@ class HomeViewModel(
                     if (historyResult is Result.Success) {
                         val messages = historyResult.data
 
-                        // Check if the user has any chat history (at least one user message exists)
                         val hasHistory = messages.any { it.sender == "user" }
 
-                        // Sort messages so that the latest chats are processed first
                         val sortedMessages = messages.sortedByDescending { it.timestamp }
 
-                        // 1. Collect unique product IDs that Eslam AI explicitly recommended (latest first)
                         val recommendedIds = sortedMessages
                             .filter { it.sender == "ai" && it.recommendedProductIds.isNotEmpty() }
                             .flatMap { it.recommendedProductIds }
                             .distinct()
                             .take(10)
 
-                        // 2. Extract meaningful search keywords from user messages only (latest first)
                         val keywords = sortedMessages
                             .filter { it.sender == "user" }
                             .flatMap { msg ->
@@ -120,8 +116,8 @@ class HomeViewModel(
 
                         val resolvedProducts = mutableListOf<Product>()
 
-                        kotlinx.coroutines.coroutineScope {
-                            // Resolve explicit ID recommendations in parallel
+                        coroutineScope {
+
                             val recommendationJobs = if (recommendedIds.isNotEmpty()) {
                                 recommendedIds.map { rawId ->
                                     async {
@@ -137,7 +133,6 @@ class HomeViewModel(
                                 }
                             } else emptyList()
 
-                            // Search by keywords in parallel
                             val searchJobs = if (keywords.isNotEmpty()) {
                                 keywords.takeLast(3).map { keyword ->
                                     async {
@@ -224,7 +219,7 @@ class HomeViewModel(
         }
     }
 
-    private fun toggleFavorite(product: com.iti.domain.models.Product) {
+    private fun toggleFavorite(product: Product) {
         val userId = authRepository.getUserId()
         if (userId == null || userId == "guest") {
             emitEffect(HomeContract.Effect.ShowAuthRequired)
@@ -249,13 +244,6 @@ class HomeViewModel(
         }
     }
 
-    private data class MainDataHolder(
-        val productsResult: Result<List<Product>>,
-        val brandsResult: Result<List<com.iti.domain.models.Brand>>,
-        val adsResult: Result<List<com.iti.domain.models.Ad>>,
-        val favoritesResult: Result<List<Product>>,
-        val overrides: Map<String, Boolean>
-    )
 
     private fun loadAll() {
         _state.update { it.copy(screenState = HomeContract.ScreenState.Loading) }
@@ -267,7 +255,13 @@ class HomeViewModel(
                 getFavoriteProductsUseCase(),
                 favoriteOverrides
             ) { productsResult, brandsResult, adsResult, favoritesResult, overrides ->
-                MainDataHolder(productsResult, brandsResult, adsResult, favoritesResult, overrides)
+                HomeContract.MainDataHolder(
+                    productsResult,
+                    brandsResult,
+                    adsResult,
+                    favoritesResult,
+                    overrides
+                )
             }
 
             combine(mainDataFlow, aiRecommendationsFlow) { mainData, recommendationsState ->
