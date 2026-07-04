@@ -249,5 +249,14 @@
     <string name="history_empty">No conversation history found.</string>
     <string name="delete_history_confirm_title">Delete History</string>
     <string name="delete_history_confirm_message">Are you sure you want to delete all chat history?</string>
+
+    <!-- Home AI Recommendations -->
+    <string name="recommended_for_you">Recommended For You</string>
+    <string name="ai_recommended_subtitle">Based on your chat with Eslam</string>
+    <string name="try_eslam_title">Chat with Eslam 🤖</string>
+    <string name="try_eslam_subtitle">Ask our AI assistant about products you love — personalized picks will appear right here.</string>
+    <string name="try_eslam_btn">Start Chatting</string>
+    <string name="suggestions_title">Suggestions</string>
+    <string name="suggestions_general_subtitle">Products you might like</string>
     
 </resources>

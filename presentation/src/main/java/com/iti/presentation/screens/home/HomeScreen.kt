@@ -60,12 +60,12 @@ fun HomeScreen(
     onNavigateToAiHistory: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
+    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-
                 is HomeContract.Effect.NavigateToAllBrands -> {
                     onNavigateToAllBrands()
                 }
@@ -92,6 +92,10 @@ fun HomeScreen(
                 HomeContract.Effect.ShowAuthRequired -> {
                     onLogout()
                 }
+
+                HomeContract.Effect.NavigateToAiChat -> {
+                    selectedIndex = 2 // AI tab index
+                }
             }
         }
     }
@@ -103,7 +107,9 @@ fun HomeScreen(
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onCartClick = onCartClick,
         onCategoryClick = onCategoryClick,
-        onNavigateToAiHistory = onNavigateToAiHistory
+        onNavigateToAiHistory = onNavigateToAiHistory,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChanged = { selectedIndex = it }
     )
 }
 
@@ -115,7 +121,9 @@ fun HomeScreenContent(
     onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onLogout: () -> Unit,
     onCartClick: () -> Unit,
-    onNavigateToAiHistory: () -> Unit
+    onNavigateToAiHistory: () -> Unit,
+    selectedIndex: Int,
+    onSelectedIndexChanged: (Int) -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -137,12 +145,10 @@ fun HomeScreenContent(
         wasConnected = isConnected
     }
 
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
-
     val navItems = BottomNavItem.entries
 
     BackHandler(enabled = selectedIndex != 0) {
-        selectedIndex = 0
+        onSelectedIndexChanged(0)
     }
 
     Scaffold(
@@ -214,7 +220,7 @@ fun HomeScreenContent(
                                             shape = CircleShape
                                         )
                                         .clickable {
-                                            selectedIndex = index
+                                            onSelectedIndexChanged(index)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -252,7 +258,7 @@ fun HomeScreenContent(
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                selectedIndex = index
+                                onSelectedIndexChanged(index)
                             },
                             icon = {
                                 Icon(
@@ -311,7 +317,7 @@ fun HomeScreenContent(
 
             BottomNavItem.AI -> {
                 AiChatScreen(
-                    onBackClick = { selectedIndex = 0 },
+                    onBackClick = { onSelectedIndexChanged(0) },
                     onHistoryClick = onNavigateToAiHistory,
                     currentUser = state.currentUser,
                     onAuthClick = onLogout,
@@ -326,7 +332,7 @@ fun HomeScreenContent(
                         val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
                         onNavigateToProduct(idLong)
                     },
-                    onExploreClick = { selectedIndex = 0 },
+                    onExploreClick = { onSelectedIndexChanged(0) },
                     onAuthClick = onLogout
                 )
             }

@@ -54,6 +54,15 @@
     <string name="ai_error_unknown">عذراً، أواجه صعوبة في الاتصال بخادمي حالياً. يرجى محاولة إرسال رسالتك مرة أخرى.</string>
     <string name="clear_history">مسح المحادثات</string>
 
+    <!-- Home AI Recommendations -->
+    <string name="recommended_for_you">موصى به لك</string>
+    <string name="ai_recommended_subtitle">بناءً على محادثتك مع إسلام</string>
+    <string name="try_eslam_title">تحدث مع إسلام 🤖</string>
+    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها — ستظهر اقتراحاتك الشخصية هنا.</string>
+    <string name="try_eslam_btn">ابدأ المحادثة</string>
+    <string name="suggestions_title">اقتراحات لك</string>
+    <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>
+
     <!-- Filter Screen -->
     <string name="filter_title">الفلاتر</string>
     <string name="filter_reset">مسح</string>

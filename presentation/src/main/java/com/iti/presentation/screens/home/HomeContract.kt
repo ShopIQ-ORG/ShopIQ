@@ -21,7 +21,9 @@ object HomeContract {
 
     data class State(
         val screenState: ScreenState = ScreenState.Loading,
-        val currentUser: com.iti.domain.models.User? = null
+        val currentUser: com.iti.domain.models.User? = null,
+        val aiRecommendedProducts: List<Product> = emptyList(),
+        val isLoadingRecommendations: Boolean = false
     )
 
     sealed class Intent {
@@ -29,22 +31,24 @@ object HomeContract {
         data object Retry : Intent()
         data class ProductFavoriteClicked(val product: Product) : Intent()
         data class ProductClicked(val product: Product) : Intent()
+        data class AiRecommendedProductClicked(val product: Product) : Intent()
         data class BrandClicked(val brandName: String) : Intent()
         data class AdClicked(val ad: Ad) : Intent()
         data object ViewAllBrandsClicked : Intent()
         data object ViewAllProductsClicked : Intent()
         data object SearchBarClicked : Intent()
+        data object NavigateToAiChat : Intent()
         data object Logout : Intent()
     }
 
     sealed class Effect {
         data class NavigateToAllBrands(val brandName: String? = null) : Effect()
-
         data class NavigateToProducts(val brandName: String? = null) : Effect()
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
         data object ShowAuthRequired : Effect()
         data object NavigateToSearch : Effect()
         data object NavigateToSignIn : Effect()
+        data object NavigateToAiChat : Effect()
     }
 }

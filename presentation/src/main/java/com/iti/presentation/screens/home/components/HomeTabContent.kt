@@ -96,6 +96,14 @@ fun HomeTabContent(
                         )
                     }
 
+                    // Show Eslam card below Ads only if the user is a guest (not logged in)
+                    val isGuest = state.currentUser == null || state.currentUser is com.iti.domain.models.User.GuestUser
+                    if (isGuest) {
+                        item {
+                            TryEslamCard(onTryEslamClick = { onIntent(HomeContract.Intent.NavigateToAiChat) })
+                        }
+                    }
+
                     item {
                         SectionHeader(
                             title = stringResource(R.string.top_brands),
@@ -130,6 +138,24 @@ fun HomeTabContent(
                                     modifier = Modifier.width(160.dp)
                                 )
                             }
+                        }
+                    }
+
+                    // Show Suggestions Section only if the user is authenticated (not a guest)
+                    if (!isGuest) {
+                        item {
+                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
+                                state.aiRecommendedProducts
+                            } else {
+                                // Fallback to other products in the catalog
+                                data.products.drop(6).take(6)
+                            }
+                            SuggestionsSection(
+                                products = suggestionsProducts,
+                                isLoading = state.isLoadingRecommendations,
+                                isPersonalized = state.aiRecommendedProducts.isNotEmpty(),
+                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) }
+                            )
                         }
                     }
                 }
