@@ -21,7 +21,8 @@ object AiChatContract {
         val timestamp: Long,
         val recommendedProducts: List<ChatProductUi> = emptyList(),
         val voiceDuration: String? = null,
-        val attachedImageUrl: String? = null
+        val attachedImageUrl: String? = null,
+        val isResolvingProducts: Boolean = false
     )
 
     data class State(
@@ -33,7 +34,12 @@ object AiChatContract {
 
     sealed class Intent {
         data class SetUser(val user: User?) : Intent()
-        data class SendMessage(val text: String, val imageBytes: ByteArray? = null, val attachedImageUrl: String? = null) : Intent()
+        data class SendMessage(
+            val text: String,
+            val imageBytes: ByteArray? = null,
+            val attachedImageUrl: String? = null,
+            val voiceDuration: String? = null
+        ) : Intent()
         data object ClearChat : Intent()
     }
 }

@@ -32,4 +32,25 @@
     <string name="wishlist_locked_title">قائمة المفضلة مقفلة</string>
     <string name="wishlist_locked_subtitle">يجب عليك تسجيل الدخول أو إنشاء حساب لحفظ منتجاتك المفضلة وعرضها هنا.</string>
     <string name="wishlist_auth_btn">تسجيل الدخول / إنشاء حساب</string>
+
+    <!-- AI Chatbot Strings -->
+    <string name="ai_assistant_title">المساعد الذكي</string>
+    <string name="ai_auth_required_title">مطلوب تسجيل الدخول</string>
+    <string name="ai_auth_required_subtitle">يرجى تسجيل الدخول للوصول إلى إسلام، مساعدك الشخصي للتسوق، ومزامنة سجل الدردشة، والحصول على اقتراحات مخصصة.</string>
+    <string name="ai_auth_btn_signin">تسجيل الدخول للمتابعة</string>
+    <string name="ai_input_placeholder">اسأل عن أي شيء...</string>
+    <string name="ai_input_listening">جاري الاستماع...</string>
+    <string name="ai_permission_record_audio_required">إذن الصوت مطلوب لإدخال الصوت</string>
+    <string name="ai_image_description">البحث باستخدام هذه الصورة.</string>
+    <string name="ai_image_picker_error">فشل قراءة ملف الصورة.</string>
+    <string name="ai_product_view">عرض المنتج</string>
+    <string name="ai_reset_chat_desc">إعادة تعيين المحادثة</string>
+    <string name="ai_greeting_message">مرحباً! أنا إسلام، مساعدك الشخصي للتسوق. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
+
+    <!-- Chatbot error messages -->
+    <string name="ai_error_invalid_key">مفتاح اتصال المساعد غير صالح. يرجى الاتصال بالدعم أو التحقق من الإعدادات.</string>
+    <string name="ai_error_quota_exceeded">المساعد مشغول حالياً بالعديد من الطلبات. يرجى المحاولة مرة أخرى بعد قليل.</string>
+    <string name="ai_error_network">يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</string>
+    <string name="ai_error_image_processing">حدثت مشكلة أثناء معالجة الصورة المرفوعة. يرجى التأكد من أنها بصيغة صالحة (JPEG/PNG) والمحاولة مرة أخرى.</string>
+    <string name="ai_error_unknown">عذراً، أواجه صعوبة في الاتصال بخادمي حالياً. يرجى محاولة إرسال رسالتك مرة أخرى.</string>
 </resources>

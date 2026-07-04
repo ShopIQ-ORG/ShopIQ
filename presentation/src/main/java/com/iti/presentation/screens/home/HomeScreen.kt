@@ -2,6 +2,7 @@ package com.iti.presentation.screens.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -137,13 +138,18 @@ fun HomeScreenContent(
 
     val navItems = BottomNavItem.entries
 
+    BackHandler(enabled = selectedIndex != 0) {
+        selectedIndex = 0
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier.navigationBarsPadding(),
+            if (navItems[selectedIndex] != BottomNavItem.AI) {
+                NavigationBar(
+                    modifier = Modifier.navigationBarsPadding(),
                 containerColor = MaterialTheme.colorScheme.background,
                 tonalElevation = 0.dp
             ) {
@@ -273,7 +279,8 @@ fun HomeScreenContent(
                 }
             }
         }
-    ) { padding ->
+    }
+) { padding ->
 
         val isDark = LocalDarkTheme.current
 
@@ -304,7 +311,8 @@ fun HomeScreenContent(
                     onBackClick = { selectedIndex = 0 },
                     currentUser = state.currentUser,
                     onAuthClick = onLogout,
-                    bottomPadding = padding.calculateBottomPadding()
+                    bottomPadding = 0.dp,
+                    onNavigateToProduct = onNavigateToProduct
                 )
             }
 

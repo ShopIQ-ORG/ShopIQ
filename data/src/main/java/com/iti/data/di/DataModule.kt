@@ -60,7 +60,7 @@ val dataModule = module {
 
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get(), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get()) }
-    single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get(), get()) }
+    single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get()) }
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)

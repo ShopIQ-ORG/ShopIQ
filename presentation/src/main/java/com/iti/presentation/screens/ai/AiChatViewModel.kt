@@ -2,6 +2,7 @@ package com.iti.presentation.screens.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.facebook.appevents.codeless.internal.UnityReflection.sendMessage
 import com.iti.domain.models.ChatMessage
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
@@ -43,7 +44,13 @@ class AiChatViewModel(
             is AiChatContract.Intent.SendMessage -> {
                 val user = _state.value.currentUser
                 if (user is User.AuthenticatedUser) {
-                    sendMessage(user.uid, intent.text, intent.imageBytes, intent.attachedImageUrl)
+                    sendMessage(
+                        user.uid,
+                        intent.text,
+                        intent.imageBytes,
+                        intent.attachedImageUrl,
+                        intent.voiceDuration
+                    )
                 }
             }
             is AiChatContract.Intent.ClearChat -> {
@@ -61,7 +68,7 @@ class AiChatViewModel(
                         _state.update { it.copy(isLoading = true) }
                     }
                     is Result.Success -> {
-                        _state.update { it.copy(isLoading = false, error = null) }
+                        _state.update { it.copy(error = null) }
                         resolveProductsAndEmit(result.data)
                     }
                     is Result.Failure -> {
@@ -74,6 +81,7 @@ class AiChatViewModel(
 
     private fun resolveProductsAndEmit(messages: List<ChatMessage>) {
         viewModelScope.launch {
+            // Perform background API calls to fetch product details before emitting
             val mappedMessages = messages.map { msg ->
                 val productsUi = msg.recommendedProductIds.mapNotNull { id ->
                     if (productCache.containsKey(id)) {
@@ -115,20 +123,30 @@ class AiChatViewModel(
                     timestamp = msg.timestamp,
                     recommendedProducts = productsUi,
                     voiceDuration = msg.voiceDuration,
-                    attachedImageUrl = msg.attachedImageUrl
+                    attachedImageUrl = msg.attachedImageUrl,
+                    isResolvingProducts = false
                 )
             }
-            _state.update { it.copy(messages = mappedMessages) }
+            val isLastMessageFromUser = mappedMessages.lastOrNull()?.sender == "user"
+            val shouldBeLoading = mappedMessages.isEmpty() || isLastMessageFromUser
+            _state.update { it.copy(messages = mappedMessages, isLoading = shouldBeLoading) }
         }
     }
 
-    private fun sendMessage(userId: String, text: String, imageBytes: ByteArray?, attachedImageUrl: String?) {
+    private fun sendMessage(
+        userId: String,
+        text: String,
+        imageBytes: ByteArray?,
+        attachedImageUrl: String?,
+        voiceDuration: String?
+    ) {
         viewModelScope.launch {
             val userMsg = ChatMessage(
                 sender = "user",
                 text = text,
                 timestamp = System.currentTimeMillis(),
-                attachedImageUrl = attachedImageUrl
+                attachedImageUrl = attachedImageUrl,
+                voiceDuration = voiceDuration
             )
             
             sendChatMessageUseCase(userId, userMsg, imageBytes).collect { result ->
