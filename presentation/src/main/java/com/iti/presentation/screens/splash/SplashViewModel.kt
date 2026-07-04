@@ -29,14 +29,19 @@ class SplashViewModel(
     fun checkDestination() {
         _destination.value = null
         viewModelScope.launch {
-            val isOnboardingDone = isOnboardingCompletedUseCase().first()
-            if (!isOnboardingDone) {
-                _destination.value = SplashDestination.OnBoarding
-                return@launch
-            }
-            when (getCurrentUserUseCase()) {
-                is Result.Success -> _destination.value = SplashDestination.Home
-                else -> _destination.value = SplashDestination.SignIn
+            try {
+                val isOnboardingDone = isOnboardingCompletedUseCase().first()
+                if (!isOnboardingDone) {
+                    _destination.value = SplashDestination.OnBoarding
+                    return@launch
+                }
+                when (getCurrentUserUseCase()) {
+                    is Result.Success -> _destination.value = SplashDestination.Home
+                    else -> _destination.value = SplashDestination.SignIn
+                }
+            } catch (e: Exception) {
+                // If any error (like Firebase/GMS SecurityException) occurs, fallback to SignIn so the app never hangs
+                _destination.value = SplashDestination.SignIn
             }
         }
     }

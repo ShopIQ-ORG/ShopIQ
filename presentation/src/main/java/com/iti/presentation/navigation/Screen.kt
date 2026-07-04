@@ -23,4 +23,5 @@ sealed class Screen : NavKey {
     data class OrderDetails(val orderId: String) : Screen()
 
 
+    data object AiHistory : Screen()
 }

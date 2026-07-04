@@ -6,6 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -67,25 +69,31 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.Splash> {
                 val viewModel: SplashViewModel = koinViewModel()
                 val destination by viewModel.destination.collectAsState()
+                var isAnimationDone by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     viewModel.checkDestination()
                 }
 
+                LaunchedEffect(destination, isAnimationDone) {
+                    val dest = destination
+                    if (isAnimationDone && dest != null) {
+                        when (dest) {
+                            is SplashDestination.OnBoarding ->
+                                replaceRoot(Screen.OnBoarding)
+
+                            is SplashDestination.SignIn ->
+                                replaceRoot(Screen.SignIn)
+
+                            is SplashDestination.Home ->
+                                replaceRoot(Screen.Home)
+                        }
+                    }
+                }
+
                 SplashScreen(
                     onAnimationComplete = {
-                        destination?.let {
-                            when (it) {
-                                is SplashDestination.OnBoarding ->
-                                    replaceRoot(Screen.OnBoarding)
-
-                                is SplashDestination.SignIn ->
-                                    replaceRoot(Screen.SignIn)
-
-                                is SplashDestination.Home ->
-                                    replaceRoot(Screen.Home)
-                            }
-                        }
+                        isAnimationDone = true
                     }
                 )
             }
@@ -122,6 +130,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 )
             }
 
+            entry<Screen.AiHistory> {
+                val viewModel: com.iti.presentation.screens.ai.history.AiHistoryViewModel = org.koin.androidx.compose.koinViewModel()
+                com.iti.presentation.screens.ai.history.AiHistoryScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
             entry<Screen.Home> {
                 HomeScreen(
                     onNavigateToProduct = { productId ->
@@ -135,6 +151,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
+                    },
+                    onNavigateToAiHistory = {
+                        navigate(Screen.AiHistory)
                     },
                     onCategoryClick = { categoryId, categoryTitle ->
                         navigate(Screen.CategoryDetails(categoryId, categoryTitle))

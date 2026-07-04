@@ -18,6 +18,10 @@ import com.iti.presentation.screens.products.displayallproducts.AllProductsViewM
 import com.iti.presentation.screens.products.displayallproducts.AllProductsFilterManager
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.wishlist.WishlistViewModel
+import com.iti.domain.usecases.ai.GetChatHistoryUseCase
+import com.iti.domain.usecases.ai.SendChatMessageUseCase
+import com.iti.presentation.screens.ai.AiChatViewModel
+import com.iti.presentation.screens.ai.history.AiHistoryViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -25,6 +29,11 @@ import org.koin.dsl.module
 
 val presentationModule = module {
     single { NetworkMonitor(get()) }
+    single { GetChatHistoryUseCase(get()) }
+    single { SendChatMessageUseCase(get()) }
+    single { com.iti.domain.usecases.ai.ClearChatHistoryUseCase(get()) }
+    viewModel { AiChatViewModel(get(), get(), get()) }
+    viewModel { AiHistoryViewModel(get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get(), get()) }

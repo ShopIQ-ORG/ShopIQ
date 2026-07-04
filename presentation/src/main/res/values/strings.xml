@@ -218,6 +218,38 @@
     <string name="cart_promo_remove_cd">Remove Prompo Code</string>
     <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
     <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
+    <string name="clear_history">Clear Chat</string>
+
+    <!-- AI Chatbot Strings -->
+    <string name="ai_assistant_title">AI Assistant</string>
+    <string name="ai_auth_required_title">Authentication Required</string>
+    <string name="ai_auth_required_subtitle">Please sign in to access Eslam, your AI shopping assistant, sync your chat history, and get personalized recommendations.</string>
+    <string name="ai_auth_btn_signin">Sign In to Continue</string>
+    <string name="ai_input_placeholder">Ask anything...</string>
+    <string name="ai_input_listening">Listening...</string>
+    <string name="ai_permission_record_audio_required">Audio permission is required for voice input</string>
+    <string name="ai_image_description">Search by this image.</string>
+    <string name="ai_image_picker_error">Failed to read image file.</string>
+    <string name="ai_product_view">View Product</string>
+    <string name="ai_reset_chat_desc">Reset Chat</string>
+    <string name="ai_greeting_message">Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.</string>
+
+    <!-- Chatbot error messages -->
+    <string name="ai_error_invalid_key">The assistant\'s connection key is invalid. Please contact support or verify your settings.</string>
+    <string name="ai_error_quota_exceeded">The assistant is currently busy with too many requests. Please try again in a moment.</string>
+    <string name="ai_error_network">Please check your internet connection and try again.</string>
+    <string name="ai_error_image_processing">There was an issue processing the uploaded image. Please ensure it is a valid format (JPEG/PNG) and try again.</string>
+    <string name="ai_error_unknown">I\'m sorry, I\'m having trouble connecting to my brain right now. Please try sending your message again.</string>    <!-- AI History -->
+    <string name="history_title">History</string>
+    <string name="delete_all">Delete All</string>
+    <string name="search_conversations_hint">Search your conversations...</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="older">Older</string>
+    <string name="history_empty">No conversation history found.</string>
+    <string name="delete_history_confirm_title">Delete History</string>
+    <string name="delete_history_confirm_message">Are you sure you want to delete all chat history?</string>
+
     <string name="orders_title">My Orders</string>
     <string name="orders_empty_title">No orders yet</string>
     <string name="orders_empty_message">You haven\'t placed any orders yet. Once you make your first purchase, your orders will appear here.</string>

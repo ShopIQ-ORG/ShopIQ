@@ -38,3 +38,13 @@ fun Throwable.handleException(): Throwable {
     
     return result
 }
+fun Throwable.toFriendlyError(): String {
+    val msg = this.message ?: ""
+    return when {
+        msg.contains("API key not valid", ignoreCase = true) -> "ERROR_INVALID_KEY"
+        msg.contains("quota", ignoreCase = true) || msg.contains("429") -> "ERROR_QUOTA"
+        msg.contains("network", ignoreCase = true) || this is IOException -> "ERROR_NETWORK"
+        msg.contains("image", ignoreCase = true) || msg.contains("multimodal", ignoreCase = true) -> "ERROR_IMAGE"
+        else -> "ERROR_UNKNOWN"
+    }
+}
