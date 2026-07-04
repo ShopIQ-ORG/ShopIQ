@@ -4,13 +4,15 @@ import com.iti.domain.models.Money
 
 data class Cart(
     val id: String,
+    val checkoutUrl: String?,
     val items: List<CartItem>,
     val discountCodes: List<String>,
     val discountAmount: Money?,
     val subtotal: Money,
     val total: Money,
     val totalTax: Money?,
-    val shippingAmount: Money?
+    val shippingAmount: Money?,
+    val buyerIdentity: CartBuyerIdentity? = null
 ) {
     val hasOutOfStockItems: Boolean
         get() = items.any { !it.isAvailableForSale }
@@ -18,6 +20,12 @@ data class Cart(
     val appliedPromoCode: String?
         get() = discountCodes.firstOrNull()
 }
+
+data class CartBuyerIdentity(
+    val email: String?,
+    val phone: String?,
+    val countryCode: String?
+)
 
 fun Cart.recalculatedAfterQuantityChange(): Cart {
     val newSubtotal = items.sumOf { item ->
