@@ -10,6 +10,7 @@ import com.iti.presentation.screens.cart.CartViewModel
 import com.iti.presentation.screens.category.CategoryViewModel
 import com.iti.presentation.screens.categorydetails.CategoryDetailsViewModel
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
+import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsFilterManager
@@ -37,4 +38,5 @@ val presentationModule = module {
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
     viewModelOf(::CartBadgeViewModel)
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
+    viewModel { PaymentMethodViewModel() }
 }

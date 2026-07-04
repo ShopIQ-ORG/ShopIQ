@@ -1,3 +1,11 @@
+//
+//  SearchBar.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 package com.iti.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -37,7 +47,10 @@ fun SearchBar(
     placeholderText: String = stringResource(id = R.string.search_placeholder),
     onValueChanged: (String) -> Unit = {},
     enabled: Boolean = true,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val conditionalModifier = if (onClick != null) {
@@ -61,6 +74,8 @@ fun SearchBar(
             color = MaterialTheme.colorScheme.onSurface,
             fontSize = 13.sp
         ),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier
@@ -80,7 +95,7 @@ fun SearchBar(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Box {
+                    Box(modifier = Modifier.weight(1f)) {
                         if (value.isEmpty()) {
                             Text(
                                 text = placeholderText,
@@ -89,6 +104,9 @@ fun SearchBar(
                             )
                         }
                         innerTextField()
+                    }
+                    if (trailingIcon != null) {
+                        trailingIcon()
                     }
                 }
             }

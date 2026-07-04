@@ -1,7 +1,6 @@
-package com.iti.data.sources.local
+package com.iti.data.sources.local.room
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "favorites",

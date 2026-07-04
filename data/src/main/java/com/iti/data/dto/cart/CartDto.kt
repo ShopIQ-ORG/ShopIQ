@@ -20,6 +20,8 @@ data class CartLineDto(
     val totalAmount: MoneyDto,
     val variantId: String,
     val variantTitle: String,
+    val isAvailableForSale: Boolean,
+    val quantityAvailable: Int?,
     val imageUrl: String,
     val imageAltText: String?,
     val priceAmount: String,

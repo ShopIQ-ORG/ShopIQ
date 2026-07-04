@@ -111,6 +111,8 @@
     <string name="search_empty_hint">Search for products, brands\nor categories</string>
     <string name="search_cd_close">Close search</string>
     <string name="search_cd_clear">Clear text</string>
+    <string name="search_trending_label">🔥 Trending</string>
+    <string name="search_popular_now_label">Popular Now</string>
 
     <!-- All Products – Filter -->
     <string name="filter_title">Filters</string>
@@ -210,4 +212,10 @@
     <string name="filter_show_less">Show less</string>
     <string name="filter_show_more">+ %1$d more</string>
 
+    <string name="cart_max_quantity_reached">You have reached the maximum available quantity for this item.</string>
+    <string name="cart_promo_applied_badge">Applied</string>
+    <string name="cart_out_of_stock">This item is out of stock.</string>
+    <string name="cart_promo_remove_cd">Remove Prompo Code</string>
+    <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
+    <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
 </resources>

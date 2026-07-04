@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.cart.components
+package com.iti.presentation.screens.cart.components.cartitem
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +23,7 @@ fun QuantitySelector(
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
     enabled: Boolean = true,
+    canIncrease: Boolean = enabled,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -43,7 +44,7 @@ fun QuantitySelector(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        StepperButton(symbol = "+", onClick = onIncrease, enabled = enabled)
+        StepperButton(symbol = "+", onClick = onIncrease, enabled = enabled && canIncrease)
     }
 }
 
