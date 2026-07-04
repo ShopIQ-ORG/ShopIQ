@@ -48,9 +48,12 @@ class AllBrandsViewModel(
         }
     }
 
+    private var fetchJob: kotlinx.coroutines.Job? = null
+
     private fun loadBrands() {
+        fetchJob?.cancel()
         _state.update { it.copy(screenState = AllBrandsContract.ScreenState.Loading) }
-        viewModelScope.launch {
+        fetchJob = viewModelScope.launch {
             getBrandsUseCase().collect { result ->
                 _state.update {
                     when (result) {

@@ -25,7 +25,9 @@ import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.screens.brands.components.AllBrandsShimmer
 import com.iti.presentation.screens.brands.components.BrandsContent
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
+import com.iti.presentation.util.NetworkMonitor
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +41,8 @@ fun AllBrandsScreen(
     val state by viewModel.state.collectAsState()
     val cartItemCount by cartBadgeViewModel.cartItemCount.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val networkMonitor: NetworkMonitor = koinInject()
+    val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -46,6 +50,12 @@ fun AllBrandsScreen(
                 is AllBrandsContract.Effect.NavigateToProducts ->
                     onNavigateToAllProducts(effect.brandName)
             }
+        }
+    }
+
+    LaunchedEffect(isConnected) {
+        if (isConnected && state.screenState is AllBrandsContract.ScreenState.Failure) {
+            viewModel.sendIntent(AllBrandsContract.Intent.Retry)
         }
     }
 
@@ -66,35 +76,53 @@ fun AllBrandsScreen(
             )
         }
     ) { innerPadding ->
-        when (val screenState = state.screenState) {
-            is AllBrandsContract.ScreenState.Loading -> {
-                AllBrandsShimmer(
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
+        if (!isConnected) {
+            NoInternetScreen(
+                onRetry = { viewModel.sendIntent(AllBrandsContract.Intent.Retry) },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            )
+        } else {
+            when (val screenState = state.screenState) {
+                is AllBrandsContract.ScreenState.Loading -> {
+                    AllBrandsShimmer(
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
 
-            is AllBrandsContract.ScreenState.Failure -> {
-                NoInternetScreen(
-                    onRetry = { viewModel.sendIntent(AllBrandsContract.Intent.Retry) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                )
-            }
+                is AllBrandsContract.ScreenState.Failure -> {
+                    NoInternetScreen(
+                        onRetry = { viewModel.sendIntent(AllBrandsContract.Intent.Retry) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    )
+                }
 
-            is AllBrandsContract.ScreenState.Success -> {
-                BrandsContent(
-                    brands = state.filteredBrands,
-                    query = state.query,
-                    onQueryChanged = {
-                        viewModel.sendIntent(AllBrandsContract.Intent.QueryChanged(it))
-                    },
-                    onBrandClick = { brandName ->
-                        viewModel.sendIntent(AllBrandsContract.Intent.BrandClicked(brandName))
-                    },
-                    scrollBehavior = scrollBehavior,
-                    modifier = Modifier.padding(innerPadding)
-                )
+                is AllBrandsContract.ScreenState.Success -> {
+                    if (state.filteredBrands.isEmpty() && state.query.isEmpty()) {
+                        NoInternetScreen(
+                            onRetry = { viewModel.sendIntent(AllBrandsContract.Intent.Retry) },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        )
+                    } else {
+                        BrandsContent(
+                            brands = state.filteredBrands,
+                            query = state.query,
+                            onQueryChanged = {
+                                viewModel.sendIntent(AllBrandsContract.Intent.QueryChanged(it))
+                            },
+                            onBrandClick = { brandName ->
+                                viewModel.sendIntent(AllBrandsContract.Intent.BrandClicked(brandName))
+                            },
+                            scrollBehavior = scrollBehavior,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                }
             }
         }
     }

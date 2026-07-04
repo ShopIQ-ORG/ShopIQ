@@ -1,6 +1,6 @@
 package com.iti.data.repositories
 
-import com.iti.data.core.handleException
+import com.iti.data.utils.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
@@ -8,7 +8,7 @@ import com.iti.data.mappers.toDomainProducts
 import com.iti.data.mappers.toDomainProduct
 import com.iti.data.mappers.toDomainCategories
 import com.iti.data.mappers.toFavoriteEntity
-import com.iti.data.sources.local.FavoriteDao
+import com.iti.data.sources.local.room.FavoriteDao
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product

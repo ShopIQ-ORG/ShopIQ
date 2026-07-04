@@ -1,9 +1,9 @@
 package com.iti.domain.repositories.auth
 
+import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.models.auth.LoginCredentials
 import com.iti.domain.models.auth.RegistrationInfo
-import com.iti.domain.models.Result
 
 interface AuthRepository {
     suspend fun login(credentials: LoginCredentials): Result<User>
@@ -12,7 +12,7 @@ interface AuthRepository {
     suspend fun loginAsGuest(): Result<User>
     suspend fun register(info: RegistrationInfo): Result<User>
     suspend fun getCurrentUser(): Result<User>
-    suspend fun  validateAuthenticatedUser(): Result<Unit>
+    suspend fun validateAuthenticatedUser(): Result<Unit>
     fun logout(): Result<Unit>
     fun getUserId(): String?
 }
