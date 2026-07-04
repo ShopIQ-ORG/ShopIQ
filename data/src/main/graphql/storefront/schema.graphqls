@@ -21,6 +21,7 @@ type Mutation {
 
 type Cart {
   id: ID!
+  checkoutUrl: URL!
   lines(first: Int): CartLineConnection!
   discountCodes: [CartDiscountCode!]!
   cost: CartCost!
@@ -50,7 +51,7 @@ type CartLineCost {
 }
 
 interface CartLineMerchandise {
-  __typename: String!
+  id: ID!
 }
 
 type ProductVariant implements CartLineMerchandise {
@@ -82,6 +83,7 @@ type Image {
 type SelectedOption {
   name: String!
   value: String!
+  id: ID
 }
 
 type CartDiscountCode {
@@ -190,4 +192,3 @@ type UserError {
   field: [String!]
   message: String!
 }
-
