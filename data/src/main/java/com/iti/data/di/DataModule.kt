@@ -71,7 +71,7 @@ val dataModule = module {
     }
 
     // Chatbot
-    single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get()) }
+    single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get(), androidContext()) }
 
     // Room
     single {

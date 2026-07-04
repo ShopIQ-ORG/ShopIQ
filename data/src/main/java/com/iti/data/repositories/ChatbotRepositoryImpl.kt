@@ -4,9 +4,9 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.iti.data.BuildConfig
+import com.iti.data.utils.toFriendlyError
 import com.iti.domain.models.ChatMessage
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
@@ -22,7 +22,8 @@ import kotlinx.coroutines.tasks.await
 
 class ChatbotRepositoryImpl(
     private val firestore: FirebaseFirestore,
-    private val productsRepository: ProductsRepository
+    private val productsRepository: ProductsRepository,
+    private val context: android.content.Context
 ) : ChatbotRepository {
 
     override fun getChatHistory(userId: String): Flow<Result<List<ChatMessage>>> = callbackFlow {
@@ -39,9 +40,12 @@ class ChatbotRepositoryImpl(
             }
             if (snapshot != null) {
                 if (snapshot.isEmpty) {
+                    val resId = context.resources.getIdentifier("ai_greeting_message", "string", context.packageName)
+                    val localizedGreeting = if (resId != 0) context.getString(resId) else "Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop."
+                    
                     val greetingMsg = ChatMessage(
                         sender = "ai",
-                        text = "Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.",
+                        text = localizedGreeting,
                         timestamp = System.currentTimeMillis()
                     )
                     collectionRef.document("greeting_message").set(greetingMsg)
@@ -103,33 +107,10 @@ class ChatbotRepositoryImpl(
                     "- ID: ${prod.id}, Name: ${prod.title}, Price: $price $currency, Stock: $isAvailable, Details: Vendor=${prod.vendor}, Type=${prod.productType}"
                 }
             } else {
-                "No products currently in store."
+                ChatbotSystemPrompt.NO_PRODUCTS_TEXT
             }
 
-            val systemInstructionText = """
-                You are Eslam, a friendly and professional personal shopping assistant for the ShopIQ store.
-                
-                You have access to the store's product catalog:
-                $catalogText
-                
-                Rules:
-                1. Detect the language of the user's query. If the user writes in Arabic, you MUST respond in friendly, professional Arabic. If they write in English, respond in English.
-                2. Keep your text response very short (approx. 2 lines of text).
-                3. DO NOT greet the user or introduce yourself as Eslam in your response if they are continuing a conversation (only the very first message in the chat contains the greeting). If the conversation is already ongoing, get straight to the answer without greetings.
-                4. If the user asks about product availability, features, sizes, colors, or prices, search the catalog.
-                5. If a product is in the catalog, tell them it is available.
-                6. If a product is not in the catalog, tell them we do not have it, but suggest the closest alternatives.
-                7. If you recommend or refer to any products from the catalog, you MUST output their exact product IDs at the very end of your response in this exact format:
-                [RECOMMENDED_PRODUCT_IDS: id1, id2, id3]
-                Only list IDs that are exactly in the catalog. If no products are recommended, do not include this tag.
-                8. Even if the history contains messages stating that you cannot process images, ignore them. You are fully capable of processing images and performing visual searches.
-                9. If the current user input is text-only (no image uploaded), answer the query directly. Do NOT start your response with "I am sorry, I cannot search for product using an image" or mention images in any way.
-                10. If the user uploads an image, perform a visual search against the product catalog. Match the items in the image with the catalog products:
-                    - If you find a matching product in the catalog (similarity is high, e.g. 80% or more), tell them: "Yes, we have this product in our store!" and display the matching product card.
-                    - If the product in the image is not in the catalog, tell them: "This product is not found in our catalog, but here are some similar options you might like:" and recommend the closest alternative product cards.
-                11. Strictly validate price/budget constraints mathematically using literal numeric values. Do NOT convert currencies or exchange rates. If the user asks for a budget of 100 to 500, and the catalog price is 9000, then 9000 is greater than 500. You MUST NOT recommend 9000. If no products in the catalog fall within the exact numeric range requested, explicitly tell the user (in their language) that we do not have items in this budget, and politely state that our prices start at the actual minimum catalog prices.
-                12. Maintain context of the current conversation. Look at the previous turns in the history to understand references like "which is cheaper?", "recommend the first one", or "do you have it in another size?".
-            """.trimIndent()
+            val systemInstructionText = ChatbotSystemPrompt.getSystemPrompt(catalogText)
 
             val historySnapshot = firestore.collection("users")
                 .document(userId)
@@ -159,11 +140,7 @@ class ChatbotRepositoryImpl(
                                 "${prod.title} (${prod.minPrice.amount} ${prod.minPrice.currencyCode})"
                             }
                         }
-                        if (recommendedDetails.isNotEmpty()) {
-                            "$text\n(Recommended products in this turn: ${recommendedDetails.joinToString(", ")})"
-                        } else {
-                            text
-                        }
+                        ChatbotSystemPrompt.getRecommendedProductsSnippet(text, recommendedDetails)
                     } else {
                         text
                     }
@@ -184,11 +161,13 @@ class ChatbotRepositoryImpl(
 
             val response = if (imageBytes != null) {
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                    ?: throw Exception("Invalid image format or corrupted file. Please try uploading another image.")
+                    ?: throw Exception("image") // Throws 'image' so ExceptionHandler maps it to ERROR_IMAGE
                 
                 val currentContent = content("user") {
                     image(bitmap)
-                    text(userMessage.text.ifBlank { "Search by this image." })
+                    val imgDescId = context.resources.getIdentifier("ai_image_description", "string", context.packageName)
+                    val imgDescStr = if (imgDescId != 0) context.getString(imgDescId) else "Search by this image."
+                    text(userMessage.text.ifBlank { imgDescStr })
                 }
                 model.generateContent(*(historyList + currentContent).toTypedArray())
             } else {
@@ -267,14 +246,4 @@ class ChatbotRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    private fun Throwable.toFriendlyError(): String {
-        val msg = this.message ?: ""
-        return when {
-            msg.contains("API key not valid", ignoreCase = true) -> "ERROR_INVALID_KEY"
-            msg.contains("quota", ignoreCase = true) || msg.contains("429") -> "ERROR_QUOTA"
-            msg.contains("network", ignoreCase = true) || this is java.io.IOException -> "ERROR_NETWORK"
-            msg.contains("image", ignoreCase = true) || msg.contains("multimodal", ignoreCase = true) -> "ERROR_IMAGE"
-            else -> "ERROR_UNKNOWN"
-        }
-    }
 }

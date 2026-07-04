@@ -26,6 +26,8 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.height
+import com.valentinilk.shimmer.shimmer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -62,6 +64,7 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
+import com.iti.presentation.screens.ai.components.AiAvatar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,9 +158,7 @@ fun AiHistoryScreen(
             }
 
             if (state.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+                HistoryShimmerEffect()
             } else if (state.conversations.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(text = stringResource(id = R.string.history_empty), color = Color.Gray)
@@ -288,9 +289,9 @@ fun ConversationCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            com.iti.presentation.screens.ai.components.AiAvatar(
-                size = 48.dp,
-                iconSize = 36.dp
+            AiAvatar(
+                size = 50.dp,
+                iconSize = 45.dp
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -330,6 +331,67 @@ fun ConversationCard(
                     tint = Color.Gray,
                     modifier = Modifier.padding(start = 4.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun HistoryShimmerEffect() {
+    val shimmerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shimmer(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        repeat(5) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(shimmerColor, shape = CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .height(14.dp)
+                                .background(shimmerColor, shape = RoundedCornerShape(4.dp))
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.4f)
+                                .height(12.dp)
+                                .background(shimmerColor, shape = RoundedCornerShape(4.dp))
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(12.dp)
+                            .background(shimmerColor, shape = RoundedCornerShape(4.dp))
+                    )
+                }
             }
         }
     }
