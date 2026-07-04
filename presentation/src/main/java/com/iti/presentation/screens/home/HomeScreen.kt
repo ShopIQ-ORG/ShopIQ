@@ -43,6 +43,7 @@ fun HomeScreen(
     onNavigateToProduct: (Long) -> Unit,
     onLogout: () -> Unit,
     onNavigateToSearch: () -> Unit,
+    onNavigateToOrders: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -87,7 +88,8 @@ fun HomeScreen(
         onIntent = viewModel::sendIntent,
         onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onCartClick = onCartClick,
-        onCategoryClick = onCategoryClick
+        onCategoryClick = onCategoryClick,
+        onNavigateToOrders = onNavigateToOrders
     )
 }
 
@@ -96,6 +98,7 @@ fun HomeScreenContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
+    onNavigateToOrders: () -> Unit,
     onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onLogout: () -> Unit,
     onCartClick: () -> Unit
@@ -193,7 +196,8 @@ fun HomeScreenContent(
             BottomNavItem.Profile -> {
                 ProfileTabContent(
                     user = state.currentUser,
-                    onLogout = onLogout
+                    onLogout = onLogout,
+                    onNavigateToOrders = onNavigateToOrders
                 )
             }
         }

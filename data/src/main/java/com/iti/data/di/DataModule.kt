@@ -13,6 +13,7 @@ import com.iti.data.repositories.CartRepositoryImpl
 import com.iti.data.repositories.OnboardingRepositoryImpl
 import com.iti.data.repositories.ProductsRepositoryImpl
 import com.iti.data.repositories.SearchHistoryRepositoryImpl
+import com.iti.data.repositories.OrdersRepositoryImpl
 import com.iti.data.sources.local.AppDatabase
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
@@ -27,6 +28,7 @@ import com.iti.data.utils.ShopifyNetworkConfig
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
 import com.iti.domain.repositories.onboarding.OnboardingRepository
+import com.iti.domain.repositories.orders.OrdersRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
@@ -34,7 +36,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 
 val dataModule = module {
@@ -76,5 +77,8 @@ val dataModule = module {
     single<CartRepository> {
         CartRepositoryImpl(get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
+
+    single<OrdersRepository> { OrdersRepositoryImpl() }
+
 
 }

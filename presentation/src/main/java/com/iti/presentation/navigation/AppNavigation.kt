@@ -25,6 +25,7 @@ import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
+import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
 import com.iti.presentation.screens.products.checkout.CODPaymentScreen
@@ -144,6 +145,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onLogout = {
                         replaceRoot(Screen.SignIn)
+                    },
+                    onNavigateToOrders = {
+                        navigate(Screen.Orders)
                     }
                 )
             }
@@ -251,6 +255,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.OnlinePayment> {
                 OnlinePaymentScreen(onNavigateBack = ::navigateBack)
+            }
+
+            entry<Screen.Orders> {
+                OrdersScreen(
+                    onNavigateBack = ::navigateBack,
+                    onOrderClick = {},
+                )
             }
         }
     )
