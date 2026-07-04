@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.iti.data.core.FirebaseConstants
+import com.iti.data.utils.FirebaseConstants
 import kotlinx.coroutines.tasks.await
 
 class CartIdRemoteDataSourceImpl(
