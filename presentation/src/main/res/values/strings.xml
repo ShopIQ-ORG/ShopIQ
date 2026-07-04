@@ -215,6 +215,7 @@
     <string name="cart_promo_remove_cd">Remove Prompo Code</string>
     <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
     <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
+    <string name="clear_history">Clear Chat</string>
 
     <!-- AI Chatbot Strings -->
     <string name="ai_assistant_title">AI Assistant</string>
