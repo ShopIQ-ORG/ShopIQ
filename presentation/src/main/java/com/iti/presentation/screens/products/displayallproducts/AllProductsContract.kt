@@ -15,15 +15,14 @@ object AllProductsContract {
         data class Failure(val message: UiText) : ScreenState()
     }
 
-    // ─── Filter State (what the user has selected) ───────────────────────────────
     data class FilterState(
-        val selectedCategory: String? = null,
-        val selectedSubCategory: String? = null,
+        val selectedCategories: Set<String> = emptySet(),
+        val selectedSubCategories: Set<String> = emptySet(),
         val selectedBrands: Set<String> = emptySet(),
         val brandSearchQuery: String = ""
     ) {
         val isActive: Boolean
-            get() = selectedCategory != null || selectedSubCategory != null || selectedBrands.isNotEmpty()
+            get() = selectedCategories.isNotEmpty() || selectedSubCategories.isNotEmpty() || selectedBrands.isNotEmpty()
     }
 
     // ─── UI State ───────────────────────────────────────────────────────────────
@@ -31,6 +30,7 @@ object AllProductsContract {
         val screenState: ScreenState = ScreenState.Loading,
         // filtering / sorting
         val activeBrand: String? = null,          // legacy brand from Home navigation
+        val activeSubCategory: String? = null,    // legacy subcategory from Home navigation
         val searchQuery: String = "",
         val filterState: FilterState = FilterState(),
         val pendingFilterState: FilterState = FilterState(), // in-sheet draft
@@ -55,7 +55,7 @@ object AllProductsContract {
     // ─── Intents ─────────────────────────────────────────────────────────────────
     sealed class Intent {
         // load
-        data class LoadData(val brandName: String?) : Intent()
+        data class LoadData(val brandName: String?, val subCategoryName: String? = null) : Intent()
         data object Retry : Intent()
         data object LoadMore : Intent()
 
@@ -80,10 +80,15 @@ object AllProductsContract {
         // filter sheet
         data object OpenFilterSheet : Intent()
         data object CloseFilterSheet : Intent()
-        data class PendingCategoryChanged(val category: String?) : Intent()
-        data class PendingSubCategoryChanged(val subCategory: String?) : Intent()
+        data class PendingCategoryToggled(val category: String) : Intent()
+        data object PendingClearCategories : Intent()
+        data object PendingSelectAllCategories : Intent()
+        data class PendingSubCategoryToggled(val subCategory: String) : Intent()
+        data object PendingClearSubCategories : Intent()
+        data object PendingSelectAllSubCategories : Intent()
         data class PendingBrandToggled(val brand: String) : Intent()
         data class PendingBrandSearchChanged(val query: String) : Intent()
+        data object PendingSelectAllBrands : Intent()
         data object ApplyFilters : Intent()
         data object ResetFilters : Intent()
 

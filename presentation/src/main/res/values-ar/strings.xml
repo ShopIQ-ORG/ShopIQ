@@ -30,7 +30,6 @@
     <string name="wishlist_empty_subtitle">احفظ المنتجات التي تحبها بالضغط على أيقونة القلب على أي منتج.</string>
     <string name="wishlist_explore_btn">استكشف المنتجات</string>
     <string name="wishlist_locked_title">قائمة المفضلة مقفلة</string>
-    <string name="wishlist_locked_subtitle">يجب عليك تسجيل الدخول أو إنشاء حساب لحفظ منتجاتك المفضلة وعرضها هنا.</string>
     <string name="wishlist_auth_btn">تسجيل الدخول / إنشاء حساب</string>
 
     <!-- AI Chatbot Strings -->
@@ -55,4 +54,16 @@
     <string name="ai_error_unknown">عذراً، أواجه صعوبة في الاتصال بخادمي حالياً. يرجى محاولة إرسال رسالتك مرة أخرى.</string>
     <string name="clear_history">مسح المحادثات</string>
 
+    <!-- Filter Screen -->
+    <string name="filter_title">الفلاتر</string>
+    <string name="filter_reset">مسح</string>
+    <string name="filter_by_category">الفئات</string>
+    <string name="filter_by_subcategory">الفئات الفرعية</string>
+    <string name="filter_by_brand">العلامات التجارية</string>
+    <string name="filter_select_category">اختر فئة</string>
+    <string name="filter_select_subcategory">اختر فئة فرعية</string>
+    <string name="filter_search_brand">ابحث عن علامة تجارية</string>
+    <string name="filter_apply">تطبيق الفلاتر</string>
+    <string name="filter_show_less">عرض أقل</string>
+    <string name="filter_show_more">+ %1$d المزيد</string>
 </resources>

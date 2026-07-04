@@ -13,6 +13,7 @@ import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
 import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
+import com.iti.presentation.screens.products.displayallproducts.AllProductsFilterManager
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.wishlist.WishlistViewModel
 import com.iti.domain.usecases.ai.GetChatHistoryUseCase
@@ -38,7 +39,8 @@ val presentationModule = module {
     viewModel { CategoryViewModel(get()) }
     viewModel { CategoryDetailsViewModel(get(), get(), get(), get(), get()) }
     viewModel { AllBrandsViewModel(get()) }
-    viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get()) }
+    factory { AllProductsFilterManager() }
+    viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CartViewModel(get(), get(), get(), get()) }
     viewModel { SplashViewModel(get(), get()) }

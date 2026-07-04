@@ -118,10 +118,10 @@
     <string name="filter_title">Filters</string>
     <string name="filter_reset">Reset</string>
     <string name="filter_by_category">Filter By Category</string>
-    <string name="filter_by_subcategory">Filter By Sub Category</string>
+    <string name="filter_by_subcategory">Filter By Tag Name</string>
     <string name="filter_by_brand">Filter By Brand</string>
     <string name="filter_select_category">Select Category</string>
-    <string name="filter_select_subcategory">Select Sub Category</string>
+    <string name="filter_select_subcategory">Select Tag Name</string>
     <string name="filter_search_brand">Search Brand</string>
     <string name="filter_apply">Apply Filters</string>
     <string name="filter_cd_expand">Expand section</string>
@@ -209,6 +209,9 @@
     <string name="cart_shipping_calculated_at_checkout">Calculated at checkout</string>
     <string name="cart_promo_duplicate_error">This code is already applied</string>
     <string name="all_photos">All Photos</string>
+    <string name="filter_show_less">Show less</string>
+    <string name="filter_show_more">+ %1$d more</string>
+
     <string name="cart_max_quantity_reached">You have reached the maximum available quantity for this item.</string>
     <string name="cart_promo_applied_badge">Applied</string>
     <string name="cart_out_of_stock">This item is out of stock.</string>

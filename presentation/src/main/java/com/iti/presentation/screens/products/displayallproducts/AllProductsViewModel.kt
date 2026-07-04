@@ -30,7 +30,8 @@ class AllProductsViewModel(
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val authRepository: AuthRepository,
-    private val getProductsPaginatedUseCase: GetProductsPaginatedUseCase
+    private val getProductsPaginatedUseCase: GetProductsPaginatedUseCase,
+    private val filterManager: AllProductsFilterManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AllProductsContract.State())
@@ -73,8 +74,8 @@ class AllProductsViewModel(
     fun sendIntent(intent: AllProductsContract.Intent) {
         when (intent) {
             // load
-            is AllProductsContract.Intent.LoadData           -> load(intent.brandName)
-            is AllProductsContract.Intent.Retry              -> load(_state.value.activeBrand)
+            is AllProductsContract.Intent.LoadData           -> load(intent.brandName, intent.subCategoryName)
+            is AllProductsContract.Intent.Retry              -> load(_state.value.activeBrand, _state.value.activeSubCategory)
             is AllProductsContract.Intent.LoadMore           -> loadMore()
 
             // product interaction
@@ -102,15 +103,48 @@ class AllProductsViewModel(
                 it.copy(isFilterSheetOpen = true, pendingFilterState = it.filterState)
             }
             is AllProductsContract.Intent.CloseFilterSheet   -> _state.update { it.copy(isFilterSheetOpen = false) }
-            is AllProductsContract.Intent.PendingCategoryChanged    -> _state.update {
-                it.copy(pendingFilterState = it.pendingFilterState.copy(selectedCategory = intent.category))
+            is AllProductsContract.Intent.PendingCategoryToggled -> {
+                _state.update { s ->
+                    val current = s.pendingFilterState.selectedCategories.toMutableSet()
+                    if (current.contains(intent.category)) current.remove(intent.category) else current.add(intent.category)
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedCategories = current))
+                }
             }
-            is AllProductsContract.Intent.PendingSubCategoryChanged -> _state.update {
-                it.copy(pendingFilterState = it.pendingFilterState.copy(selectedSubCategory = intent.subCategory))
+            is AllProductsContract.Intent.PendingClearCategories -> {
+                _state.update { s ->
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedCategories = emptySet()))
+                }
+            }
+            is AllProductsContract.Intent.PendingSelectAllCategories -> {
+                _state.update { s ->
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedCategories = s.availableCategories.toSet()))
+                }
+            }
+            is AllProductsContract.Intent.PendingSubCategoryToggled -> {
+                _state.update { s ->
+                    val current = s.pendingFilterState.selectedSubCategories.toMutableSet()
+                    if (current.contains(intent.subCategory)) current.remove(intent.subCategory) else current.add(intent.subCategory)
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedSubCategories = current))
+                }
+            }
+            is AllProductsContract.Intent.PendingClearSubCategories -> {
+                _state.update { s ->
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedSubCategories = emptySet()))
+                }
+            }
+            is AllProductsContract.Intent.PendingSelectAllSubCategories -> {
+                _state.update { s ->
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedSubCategories = s.availableSubCategories.toSet()))
+                }
             }
             is AllProductsContract.Intent.PendingBrandToggled -> onPendingBrandToggled(intent.brand)
-            is AllProductsContract.Intent.PendingBrandSearchChanged -> _state.update {
-                it.copy(pendingFilterState = it.pendingFilterState.copy(brandSearchQuery = intent.query))
+            is AllProductsContract.Intent.PendingBrandSearchChanged -> {
+                _state.update { it.copy(pendingFilterState = it.pendingFilterState.copy(brandSearchQuery = intent.query)) }
+            }
+            is AllProductsContract.Intent.PendingSelectAllBrands -> {
+                _state.update { s ->
+                    s.copy(pendingFilterState = s.pendingFilterState.copy(selectedBrands = s.availableBrands.toSet()))
+                }
             }
             is AllProductsContract.Intent.ApplyFilters       -> applyFilters()
             is AllProductsContract.Intent.ResetFilters       -> resetFilters()
@@ -159,15 +193,19 @@ class AllProductsViewModel(
 
     // ─── Private Helpers ─────────────────────────────────────────────────────────
 
-    private fun load(brandName: String?) {
+    private fun load(brandName: String?, subCategoryName: String? = null) {
         isLoaded = false
         allProductsStateFlow.value = emptyList()
         allProducts = emptyList()
-        val initialFilter = FilterState(selectedBrands = if (brandName != null) setOf(brandName) else emptySet())
+        val initialFilter = FilterState(
+            selectedBrands = if (brandName != null) setOf(brandName) else emptySet(),
+            selectedSubCategories = if (subCategoryName != null) setOf(subCategoryName) else emptySet()
+        )
         _state.update {
             it.copy(
                 screenState = AllProductsContract.ScreenState.Loading,
                 activeBrand = brandName,
+                activeSubCategory = subCategoryName,
                 isFilterSheetOpen = false,
                 isSortSheetOpen = false,
                 isSearchActive = false,
@@ -190,8 +228,8 @@ class AllProductsViewModel(
                     is Result.Success -> {
                         isLoaded = true
                         allProductsStateFlow.value = result.data.products
-                        val categories = result.data.products.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
-                        val subCategories = result.data.products.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
+                        val categories = result.data.products.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
+                        val subCategories = result.data.products.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
                         val brands = result.data.products.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
                         _state.update {
                             it.copy(
@@ -253,45 +291,13 @@ class AllProductsViewModel(
     private fun applyAll() {
         if (!isLoaded) return
         val state = _state.value
-        var result = allProducts
-
-        // text search
-        val query = state.searchQuery.trim()
-        if (query.isNotEmpty()) {
-            result = result.filter { product ->
-                product.title.contains(query, ignoreCase = true) ||
-                product.vendor.contains(query, ignoreCase = true) ||
-                product.productType.contains(query, ignoreCase = true) ||
-                product.tags.any { it.contains(query, ignoreCase = true) }
-            }
-        }
-
-        // category (productType)
-        val category = state.filterState.selectedCategory
-        if (!category.isNullOrBlank()) {
-            result = result.filter { it.productType.equals(category, ignoreCase = true) }
-        }
-
-        // sub-category (tags)
-        val subCategory = state.filterState.selectedSubCategory
-        if (!subCategory.isNullOrBlank()) {
-            result = result.filter { product -> product.tags.any { it.equals(subCategory, ignoreCase = true) } }
-        }
-
-        // brands
-        val brands = state.filterState.selectedBrands
-        if (brands.isNotEmpty()) {
-            result = result.filter { product -> brands.any { it.equals(product.vendor, ignoreCase = true) } }
-        }
-
-        // sort
-        result = when (state.sortOption) {
-            SortOption.BEST_SELLING -> result // already ordered by Shopify best-selling
-            SortOption.PRICE_ASC    -> result.sortedBy { it.minPrice.amount.toDoubleOrNull() ?: 0.0 }
-            SortOption.PRICE_DESC   -> result.sortedByDescending { it.minPrice.amount.toDoubleOrNull() ?: 0.0 }
-        }
-
-        _state.update { it.copy(screenState = AllProductsContract.ScreenState.Success(result)) }
+        val filteredProducts = filterManager.apply(
+            products = allProducts,
+            query = state.searchQuery,
+            filterState = state.filterState,
+            sortOption = state.sortOption
+        )
+        _state.update { it.copy(screenState = AllProductsContract.ScreenState.Success(filteredProducts)) }
     }
 
     private fun onSearchQueryChanged(query: String) {
@@ -320,9 +326,10 @@ class AllProductsViewModel(
 
     private fun selectCategory(category: String?) {
         _state.update {
+            val cats = if (category != null) setOf(category) else emptySet()
             it.copy(
-                filterState = it.filterState.copy(selectedCategory = category),
-                pendingFilterState = it.pendingFilterState.copy(selectedCategory = category)
+                filterState = it.filterState.copy(selectedCategories = cats),
+                pendingFilterState = it.pendingFilterState.copy(selectedCategories = cats)
             )
         }
         applyAll()
@@ -339,11 +346,15 @@ class AllProductsViewModel(
             val isBrandStillActive = s.activeBrand != null &&
                     newFilterState.selectedBrands.contains(s.activeBrand) &&
                     newFilterState.selectedBrands.size == 1
+            val isSubCategoryStillActive = s.activeSubCategory != null &&
+                    newFilterState.selectedSubCategories.contains(s.activeSubCategory) &&
+                    newFilterState.selectedSubCategories.size == 1
             s.copy(
                 filterState = newFilterState,
                 isFilterSheetOpen = false,
                 recentSearches = recent,
-                activeBrand = if (isBrandStillActive) s.activeBrand else null
+                activeBrand = if (isBrandStillActive) s.activeBrand else null,
+                activeSubCategory = if (isSubCategoryStillActive) s.activeSubCategory else null
             )
         }
         applyAll()

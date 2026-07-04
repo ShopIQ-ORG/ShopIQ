@@ -152,7 +152,7 @@ fun ProductsHeaderControls(
         ) {
             // "All" chip
             item {
-                val isAllSelected = state.filterState.selectedCategory == null
+                val isAllSelected = state.filterState.selectedCategories.isEmpty()
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50.dp))
@@ -182,7 +182,7 @@ fun ProductsHeaderControls(
 
             // Subcategory chips
             items(state.availableCategories) { category ->
-                val isSelected = state.filterState.selectedCategory == category
+                val isSelected = state.filterState.selectedCategories.contains(category)
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50.dp))
