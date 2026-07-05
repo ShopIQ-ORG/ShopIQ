@@ -15,7 +15,9 @@ class AuthRemoteDataSourceImpl(
 
     override suspend fun signInWithEmail(email: String, password: String): String {
         auth.signInWithEmailAndPassword(email, password).await()
-        return auth.currentUser?.uid ?: throw AuthException.UserNotFound()
+        val user = auth.currentUser
+        user?.reload()?.await()
+        return user?.uid ?: throw AuthException.UserNotFound()
     }
 
     override suspend fun signInAnonymously(): String {

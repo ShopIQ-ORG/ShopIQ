@@ -2,25 +2,34 @@ package com.iti.presentation.screens.auth.signin
 
 import com.iti.presentation.util.UiText
 
-data class SignInState(
-    val email: String = "",
-    val password: String = "",
-    val isLoading: Boolean = false,
-    val error: UiText? = null
-)
+object SignInContract {
 
-sealed class SignInIntent {
-    data class EmailChanged(val email: String) : SignInIntent()
-    data class PasswordChanged(val password: String) : SignInIntent()
-    data class LoginWithGoogle(val idToken: String) : SignInIntent()
-    data class LoginWithFacebook(val accessToken: String) : SignInIntent()
-    object Login : SignInIntent()
-    object LoginAsGuest : SignInIntent()
-    object ForgotPassword : SignInIntent()
-}
+    data class State(
+        val email: String = "",
+        val password: String = "",
+        val isLoading: Boolean = false,
+        val error: UiText? = null
+    ) {
+        val canLogin: Boolean
+            get() = email.isNotBlank() &&
+                    password.isNotBlank() &&
+                    !isLoading
+    }
 
-sealed class SignInEffect {
-    object NavigateToHome : SignInEffect()
-    object NavigateToForgotPassword : SignInEffect()
-    data class ShowError(val message: UiText) : SignInEffect()
+    sealed class Event {
+        data class EmailChanged(val email: String) : Event()
+        data class PasswordChanged(val password: String) : Event()
+        data class LoginWithGoogle(val idToken: String) : Event()
+        data class LoginWithFacebook(val accessToken: String) : Event()
+        object Login : Event()
+        object LoginAsGuest : Event()
+        object ForgotPassword : Event()
+    }
+
+    sealed class Effect {
+        object NavigateToHome : Effect()
+        object NavigateToForgotPassword : Effect()
+        class NavigateToEmailVerification(val email: String): Effect()
+        data class ShowError(val message: UiText) : Effect()
+    }
 }

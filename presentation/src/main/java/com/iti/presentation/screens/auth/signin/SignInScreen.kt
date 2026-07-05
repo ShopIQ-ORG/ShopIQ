@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
-import com.iti.presentation.util.UiText
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError
@@ -40,65 +40,100 @@ import com.iti.presentation.screens.auth.components.AuthHeader
 import com.iti.presentation.screens.auth.components.AuthSocialSection
 import com.iti.presentation.screens.auth.components.EmailField
 import com.iti.presentation.screens.auth.components.PasswordField
-import com.iti.presentation.ui.theme.ShopIQTheme
-import org.koin.androidx.compose.koinViewModel
-import androidx.compose.runtime.rememberCoroutineScope
-import com.iti.presentation.screens.auth.rememberGoogleSignInHelper
 import com.iti.presentation.screens.auth.rememberFacebookSignInHelper
+import com.iti.presentation.screens.auth.rememberGoogleSignInHelper
+import com.iti.presentation.ui.theme.ShopIQTheme
+import com.iti.presentation.util.UiText
+import com.iti.presentation.util.rememberSubmitAction
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignInScreen(
     onNavigateToSignUp: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
+    onNavigateToEmailVerification: (String) -> Unit,
     viewModel: SignInViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val onSocialError: (String) -> Unit = { msg -> scope.launch { snackBarHostState.showError(msg) } }
+
+    val onSocialError: (String) -> Unit = { message ->
+        scope.launch {
+            snackBarHostState.showError(message)
+        }
+    }
 
     val googleHelper = rememberGoogleSignInHelper(
-        onSuccess = { idToken -> viewModel.onIntent(SignInIntent.LoginWithGoogle(idToken)) },
+        onSuccess = { idToken ->
+            viewModel.onEvent(
+                SignInContract.Event.LoginWithGoogle(idToken)
+            )
+        },
         onError = onSocialError
     )
 
     val facebookHelper = rememberFacebookSignInHelper(
-        onSuccess = { token -> viewModel.onIntent(SignInIntent.LoginWithFacebook(token)) },
+        onSuccess = { token ->
+            viewModel.onEvent(
+                SignInContract.Event.LoginWithFacebook(token)
+            )
+        },
         onError = onSocialError
     )
-
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is SignInEffect.NavigateToHome -> onNavigateToHome()
-                is SignInEffect.NavigateToForgotPassword -> onNavigateToForgotPassword()
-                is SignInEffect.ShowError -> {
+                SignInContract.Effect.NavigateToHome -> onNavigateToHome()
+
+                SignInContract.Effect.NavigateToForgotPassword -> {
+                    onNavigateToForgotPassword()
+                }
+
+                is SignInContract.Effect.ShowError -> {
                     if (!effect.message.isFieldError()) {
                         snackBarHostState.showError(effect.message.resolve(context))
                     }
                 }
+
+                is SignInContract.Effect.NavigateToEmailVerification -> onNavigateToEmailVerification(
+                    effect.email
+                )
             }
         }
     }
 
     val emailRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_email_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_email_required
+        }
         ?.resolve(context)
 
     val passwordRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_password_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_password_required
+        }
         ?.resolve(context)
 
     val otherFieldError = state.error
-        ?.takeIf { it.isFieldError() && (it !is UiText.StringResource || (it.resId != R.string.error_email_required && it.resId != R.string.error_password_required)) }
+        ?.takeIf {
+            it.isFieldError() &&
+                    (it !is UiText.StringResource ||
+                            (it.resId != R.string.error_email_required &&
+                                    it.resId != R.string.error_password_required))
+        }
         ?.resolve(context)
 
     Scaffold(
-        snackbarHost = { ShopIQSnackBarHost(hostState = snackBarHostState) },
+        snackbarHost = {
+            ShopIQSnackBarHost(hostState = snackBarHostState)
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
@@ -126,22 +161,33 @@ fun SignInScreen(
 
                 EmailField(
                     value = state.email,
-                    onValueChange = { viewModel.onIntent(SignInIntent.EmailChanged(it)) },
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignInContract.Event.EmailChanged(it)
+                        )
+                    },
                     placeholder = stringResource(R.string.email_address),
-                    errorMessage = otherFieldError ?: emailRequiredError,
+                    errorMessage = otherFieldError ?: emailRequiredError
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 PasswordField(
                     value = state.password,
-                    onValueChange = { viewModel.onIntent(SignInIntent.PasswordChanged(it)) },
-                    errorMessage = otherFieldError ?: passwordRequiredError,
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignInContract.Event.PasswordChanged(it)
+                        )
+                    },
+                    errorMessage = otherFieldError ?: passwordRequiredError
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
                     Text(
                         text = stringResource(R.string.forgot_password),
                         color = MaterialTheme.colorScheme.onBackground,
@@ -149,7 +195,11 @@ fun SignInScreen(
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .clickable { viewModel.onIntent(SignInIntent.ForgotPassword) }
+                            .clickable {
+                                viewModel.onEvent(
+                                    SignInContract.Event.ForgotPassword
+                                )
+                            }
                             .padding(8.dp)
                     )
                 }
@@ -158,7 +208,11 @@ fun SignInScreen(
 
                 ShopIQButton(
                     text = stringResource(R.string.login),
-                    onClick = { viewModel.onIntent(SignInIntent.Login) },
+                    onClick = rememberSubmitAction {
+                        viewModel.onEvent(
+                            SignInContract.Event.Login
+                        )
+                    },
                     isLoading = state.isLoading
                 )
 
@@ -167,7 +221,11 @@ fun SignInScreen(
                 AuthSocialSection(
                     onGoogleClick = { googleHelper.signIn() },
                     onFacebookClick = { facebookHelper.signIn() },
-                    onGuestClick = { viewModel.onIntent(SignInIntent.LoginAsGuest) },
+                    onGuestClick = {
+                        viewModel.onEvent(
+                            SignInContract.Event.LoginAsGuest
+                        )
+                    },
                     enabled = !state.isLoading
                 )
 
@@ -190,7 +248,8 @@ private fun SignInScreenPreview() {
         SignInScreen(
             onNavigateToSignUp = {},
             onNavigateToHome = {},
-            onNavigateToForgotPassword = {}
+            onNavigateToForgotPassword = {},
+            onNavigateToEmailVerification = {}
         )
     }
 }
@@ -202,7 +261,8 @@ private fun SignInScreenDarkPreview() {
         SignInScreen(
             onNavigateToSignUp = {},
             onNavigateToHome = {},
-            onNavigateToForgotPassword = {}
+            onNavigateToForgotPassword = {},
+            onNavigateToEmailVerification = {}
         )
     }
 }

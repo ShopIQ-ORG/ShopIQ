@@ -62,6 +62,8 @@ fun Throwable.toUiMessage(): UiText = when (this) {
             StringResource(R.string.error_unknown)
 
         is AuthException.UnauthorizedAccess -> StringResource(R.string.login_required_title)
+        is AuthException.EmailNotVerified -> StringResource(R.string.verify_your_email)
+        is AuthException.ShopifyTokenUnavailable -> StringResource(R.string.login_required_title)
     }
 
     else -> UiText.StringResource(R.string.error_unknown)

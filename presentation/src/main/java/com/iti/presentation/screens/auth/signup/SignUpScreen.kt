@@ -27,7 +27,6 @@ import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError
-import com.iti.presentation.util.UiText
 import com.iti.presentation.screens.auth.components.AuthFooter
 import com.iti.presentation.screens.auth.components.AuthHeader
 import com.iti.presentation.screens.auth.components.EmailField
@@ -36,12 +35,15 @@ import com.iti.presentation.screens.auth.components.PasswordField
 import com.iti.presentation.screens.auth.components.PhoneField
 import com.iti.presentation.screens.auth.components.TermsCheckbox
 import com.iti.presentation.ui.theme.ShopIQTheme
+import com.iti.presentation.util.UiText
+import com.iti.presentation.util.rememberSubmitAction
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignUpScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToSignIn: () -> Unit,
+    onNavigateToEmailVerification: (String) -> Unit,
     viewModel: SignUpViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -51,48 +53,78 @@ fun SignUpScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is SignUpEffect.NavigateToHome -> onNavigateToHome()
-                is SignUpEffect.NavigateToTerms -> {}
-                is SignUpEffect.NavigateToPrivacyPolicy -> {}
-                is SignUpEffect.ShowError -> {
+                SignUpContract.Effect.NavigateToHome -> onNavigateToHome()
+
+                SignUpContract.Effect.NavigateToTerms -> {}
+
+                SignUpContract.Effect.NavigateToPrivacyPolicy -> {}
+
+                is SignUpContract.Effect.ShowError -> {
                     if (!effect.message.isFieldError()) {
                         snackBarHostState.showError(effect.message.resolve(context))
                     }
                 }
+
+                is SignUpContract.Effect.NavigateToEmailVerification -> onNavigateToEmailVerification(
+                    effect.email
+                )
             }
         }
     }
 
     val passwordMismatchError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_passwords_do_not_match }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_passwords_do_not_match
+        }
         ?.resolve(context)
 
     val termsError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_agree_to_terms }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_agree_to_terms
+        }
         ?.resolve(context)
 
     val fullNameRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_full_name_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_full_name_required
+        }
         ?.resolve(context)
 
     val emailRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_email_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_email_required
+        }
         ?.resolve(context)
 
     val phoneRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_phone_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_phone_required
+        }
         ?.resolve(context)
 
     val passwordRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_password_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_password_required
+        }
         ?.resolve(context)
 
     val confirmPasswordRequiredError = state.error
-        ?.takeIf { it is UiText.StringResource && it.resId == R.string.error_confirm_password_required }
+        ?.takeIf {
+            it is UiText.StringResource &&
+                    it.resId == R.string.error_confirm_password_required
+        }
         ?.resolve(context)
 
     Scaffold(
-        snackbarHost = { ShopIQSnackBarHost(hostState = snackBarHostState) },
+        snackbarHost = {
+            ShopIQSnackBarHost(hostState = snackBarHostState)
+        },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
@@ -120,7 +152,11 @@ fun SignUpScreen(
 
                 FullNameField(
                     value = state.fullName,
-                    onValueChange = { viewModel.onIntent(SignUpIntent.FullNameChanged(it)) },
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.FullNameChanged(it)
+                        )
+                    },
                     errorMessage = fullNameRequiredError
                 )
 
@@ -128,7 +164,11 @@ fun SignUpScreen(
 
                 EmailField(
                     value = state.email,
-                    onValueChange = { viewModel.onIntent(SignUpIntent.EmailChanged(it)) },
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.EmailChanged(it)
+                        )
+                    },
                     errorMessage = emailRequiredError
                 )
 
@@ -136,7 +176,11 @@ fun SignUpScreen(
 
                 PhoneField(
                     value = state.phone,
-                    onValueChange = { viewModel.onIntent(SignUpIntent.PhoneChanged(it)) },
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.PhoneChanged(it)
+                        )
+                    },
                     errorMessage = phoneRequiredError
                 )
 
@@ -144,7 +188,11 @@ fun SignUpScreen(
 
                 PasswordField(
                     value = state.password,
-                    onValueChange = { viewModel.onIntent(SignUpIntent.PasswordChanged(it)) },
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.PasswordChanged(it)
+                        )
+                    },
                     errorMessage = passwordRequiredError
                 )
 
@@ -152,27 +200,46 @@ fun SignUpScreen(
 
                 PasswordField(
                     value = state.confirmPassword,
-                    onValueChange = { viewModel.onIntent(SignUpIntent.ConfirmPasswordChanged(it)) },
+                    onValueChange = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.ConfirmPasswordChanged(it)
+                        )
+                    },
                     placeholder = stringResource(R.string.confirm_password),
-                    errorMessage = passwordMismatchError ?: confirmPasswordRequiredError,
+                    errorMessage = passwordMismatchError ?: confirmPasswordRequiredError
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TermsCheckbox(
                     checked = state.agreeToTerms,
-                    onCheckedChange = { viewModel.onIntent(SignUpIntent.AgreeToTermsChanged(it)) },
-                    onTermsClick = { viewModel.onIntent(SignUpIntent.NavigateToTerms) },
-                    onPrivacyClick = { viewModel.onIntent(SignUpIntent.NavigateToPrivacyPolicy) },
+                    onCheckedChange = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.AgreeToTermsChanged(it)
+                        )
+                    },
+                    onTermsClick = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.NavigateToTerms
+                        )
+                    },
+                    onPrivacyClick = {
+                        viewModel.onEvent(
+                            SignUpContract.Event.NavigateToPrivacyPolicy
+                        )
+                    },
                     hasError = termsError != null
                 )
-
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 ShopIQButton(
                     text = stringResource(R.string.create_account),
-                    onClick = { viewModel.onIntent(SignUpIntent.Register) },
+                    onClick = rememberSubmitAction {
+                        viewModel.onEvent(
+                            SignUpContract.Event.Register
+                        )
+                    },
                     isLoading = state.isLoading
                 )
 
@@ -191,11 +258,23 @@ fun SignUpScreen(
 @Preview(name = "Light Mode", showSystemUi = true)
 @Composable
 private fun SignUpScreenPreview() {
-    ShopIQTheme { SignUpScreen(onNavigateToHome = {}, onNavigateToSignIn = {}) }
+    ShopIQTheme {
+        SignUpScreen(
+            onNavigateToHome = {},
+            onNavigateToSignIn = {},
+            onNavigateToEmailVerification = {}
+        )
+    }
 }
 
 @Preview(name = "Dark Mode", showSystemUi = true)
 @Composable
 private fun SignUpScreenDarkPreview() {
-    ShopIQTheme(darkTheme = true) { SignUpScreen(onNavigateToHome = {}, onNavigateToSignIn = {}) }
+    ShopIQTheme(darkTheme = true) {
+        SignUpScreen(
+            onNavigateToHome = {},
+            onNavigateToSignIn = {},
+            onNavigateToEmailVerification = {}
+        )
+    }
 }

@@ -279,10 +279,11 @@
     <string name="easy_returns_desc">14-day return policy</string>
     <string name="secure_payment_title">Secure</string>
     <string name="secure_payment_desc">100% secure checkout</string>
-    
+
     <string name="orders_title">My Orders</string>
     <string name="orders_empty_title">No orders yet</string>
-    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>    <string name="order_card_title">Order %1$s</string>
+    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>
+    <string name="order_card_title">Order %1$s</string>
     <string name="order_products_label">Products</string>
     <string name="order_total_label">Total</string>
     <string name="order_status_label">Status</string>
@@ -402,5 +403,22 @@
     <string name="address_accurate_badge">Accurate</string>
     <string name="address_error_location_missing">Please select a location on the map first.</string>
     <string name="address_select_location_title">Select Location</string>
+
+    <string name="forgot_password_title">Forgot Password?</string>
+    <string name="forgot_password_subtitle">Enter your email and we\'ll send you a link to reset your password.</string>
+
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="back_to_login">Back to Login</string>
+
+    <string name="reset_link_sent">Password reset link sent successfully.</string>
+
+    <string name="verify_your_email">Verify Your Email</string>
+
+    <string name="verify_your_email_subtitle">
+    Your email address hasn\'t been verified yet. Verify it to continue using your account.</string>
+
+    <string name="send_verification_link">Send Verification Link</string>
+
+    <string name="verification_link_sent">Verification link sent successfully. Please check your inbox.</string>
 
 </resources>

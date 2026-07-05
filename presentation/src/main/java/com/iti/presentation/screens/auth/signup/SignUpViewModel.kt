@@ -3,6 +3,7 @@ package com.iti.presentation.screens.auth.signup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
 import com.iti.domain.models.auth.RegistrationInfo
 import com.iti.domain.usecases.auth.RegisterUseCase
 import com.iti.presentation.R
@@ -19,23 +20,47 @@ class SignUpViewModel(
     private val registerUseCase: RegisterUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SignUpState())
+    private val _state = MutableStateFlow(SignUpContract.State())
     val state = _state.asStateFlow()
 
-    private val _effect = MutableSharedFlow<SignUpEffect>()
+    private val _effect = MutableSharedFlow<SignUpContract.Effect>()
     val effect = _effect.asSharedFlow()
 
-    fun onIntent(intent: SignUpIntent) {
-        when (intent) {
-            is SignUpIntent.FullNameChanged -> _state.update { it.copy(fullName = intent.fullName) }
-            is SignUpIntent.EmailChanged -> _state.update { it.copy(email = intent.email) }
-            is SignUpIntent.PhoneChanged -> _state.update { it.copy(phone = intent.phone) }
-            is SignUpIntent.PasswordChanged -> _state.update { it.copy(password = intent.password) }
-            is SignUpIntent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = intent.confirmPassword) }
-            is SignUpIntent.AgreeToTermsChanged -> _state.update { it.copy(agreeToTerms = intent.checked) }
-            is SignUpIntent.Register -> register()
-            is SignUpIntent.NavigateToTerms -> sendEffect(SignUpEffect.NavigateToTerms)
-            is SignUpIntent.NavigateToPrivacyPolicy -> sendEffect(SignUpEffect.NavigateToPrivacyPolicy)
+    fun onEvent(event: SignUpContract.Event) {
+        when (event) {
+            is SignUpContract.Event.FullNameChanged -> {
+                _state.update { it.copy(fullName = event.fullName, error = null) }
+            }
+
+            is SignUpContract.Event.EmailChanged -> {
+                _state.update { it.copy(email = event.email, error = null) }
+            }
+
+            is SignUpContract.Event.PhoneChanged -> {
+                _state.update { it.copy(phone = event.phone, error = null) }
+            }
+
+            is SignUpContract.Event.PasswordChanged -> {
+                _state.update { it.copy(password = event.password, error = null) }
+            }
+
+            is SignUpContract.Event.ConfirmPasswordChanged -> {
+                _state.update { it.copy(confirmPassword = event.confirmPassword, error = null) }
+            }
+
+            is SignUpContract.Event.AgreeToTermsChanged -> {
+                _state.update { it.copy(agreeToTerms = event.checked, error = null) }
+            }
+
+            SignUpContract.Event.Register -> register()
+
+            SignUpContract.Event.NavigateToTerms -> {
+                sendEffect(SignUpContract.Effect.NavigateToTerms)
+            }
+
+            SignUpContract.Event.NavigateToPrivacyPolicy -> {
+                sendEffect(SignUpContract.Effect.NavigateToPrivacyPolicy)
+            }
         }
     }
 
@@ -46,18 +71,22 @@ class SignUpViewModel(
             handleValidationError(UiText.StringResource(R.string.error_full_name_required))
             return
         }
+
         if (state.email.isBlank()) {
             handleValidationError(UiText.StringResource(R.string.error_email_required))
             return
         }
+
         if (state.phone.isBlank()) {
             handleValidationError(UiText.StringResource(R.string.error_phone_required))
             return
         }
+
         if (state.password.isBlank()) {
             handleValidationError(UiText.StringResource(R.string.error_password_required))
             return
         }
+
         if (state.confirmPassword.isBlank()) {
             handleValidationError(UiText.StringResource(R.string.error_confirm_password_required))
             return
@@ -75,15 +104,25 @@ class SignUpViewModel(
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
+
             try {
                 val info = RegistrationInfo(
                     fullName = state.fullName,
-                    email    = state.email,
-                    phone    = state.phone,
-                    password = state.password,
+                    email = state.email,
+                    phone = state.phone,
+                    password = state.password
                 )
+
                 when (val result = registerUseCase(info)) {
-                    is Result.Success -> sendEffect(SignUpEffect.NavigateToHome)
+                    is Result.Success -> {
+                        val user = result.data
+                        if (user is User.AuthenticatedUser && !user.isEmailVerified) {
+                            sendEffect(SignUpContract.Effect.NavigateToEmailVerification(user.email))
+                        } else {
+                            sendEffect(SignUpContract.Effect.NavigateToHome)
+                        }
+                    }
+
                     is Result.Failure -> handleFailure(result.exception)
                     is Result.Loading -> Unit
                 }
@@ -97,16 +136,18 @@ class SignUpViewModel(
 
     private fun handleValidationError(message: UiText) {
         _state.update { it.copy(error = message) }
-        sendEffect(SignUpEffect.ShowError(message))
+        sendEffect(SignUpContract.Effect.ShowError(message))
     }
 
     private fun handleFailure(exception: Throwable) {
         val message = exception.toUiMessage()
         _state.update { it.copy(error = message) }
-        sendEffect(SignUpEffect.ShowError(message))
+        sendEffect(SignUpContract.Effect.ShowError(message))
     }
 
-    private fun sendEffect(effect: SignUpEffect) {
-        viewModelScope.launch { _effect.emit(effect) }
+    private fun sendEffect(effect: SignUpContract.Effect) {
+        viewModelScope.launch {
+            _effect.emit(effect)
+        }
     }
 }
