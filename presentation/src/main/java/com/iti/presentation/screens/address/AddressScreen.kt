@@ -1,3 +1,11 @@
+//
+//  AddressScreen.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 package com.iti.presentation.screens.address
 
 import androidx.compose.animation.AnimatedContent

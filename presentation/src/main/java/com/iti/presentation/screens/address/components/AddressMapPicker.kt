@@ -1,3 +1,11 @@
+//
+//  AddressMapPicker.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 @file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
 
 package com.iti.presentation.screens.address.components
