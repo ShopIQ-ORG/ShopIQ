@@ -18,11 +18,11 @@ object OrdersContract {
     sealed class Event {
         object Refresh : Event()
         object Retry : Event()
-        data class OrderClicked(val orderId: String) : Event()
+        data class OrderClicked(val order: Order) : Event()
     }
 
     sealed class Effect {
-        data class NavigateToOrderDetails(val orderId: String) : Effect()
+        data class NavigateToOrderDetails(val order: Order) : Effect()
         data class ShowError(val message: UiText) : Effect()
     }
 }

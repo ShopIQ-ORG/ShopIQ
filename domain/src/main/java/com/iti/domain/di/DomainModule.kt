@@ -26,7 +26,6 @@ import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.address.DeleteAddressUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
-import com.iti.domain.usecases.orders.GetOrderDetailsUseCase
 import com.iti.domain.usecases.orders.GetOrdersUseCase
 import org.koin.core.module.dsl.factoryOf
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
@@ -74,7 +73,6 @@ val domainModule = module {
     factory { DeleteAddressUseCase(get()) }
     factoryOf(::ObserveCartItemCountUseCase)
     factoryOf(::GetOrdersUseCase)
-    factoryOf(::GetOrderDetailsUseCase)
 
 
 }

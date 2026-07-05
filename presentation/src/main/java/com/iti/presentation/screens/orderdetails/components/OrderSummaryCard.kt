@@ -21,9 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.iti.domain.models.order.OrderDetails
-import com.iti.domain.models.order.OrderStatus
+import com.iti.domain.models.order.Money
+import com.iti.domain.models.order.Order
 import com.iti.presentation.R
+import com.iti.presentation.screens.orders.components.previewOrder
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.ui.theme.SuccessDark
@@ -31,7 +32,7 @@ import com.iti.presentation.ui.theme.SuccessLight
 import com.iti.presentation.util.toCurrency
 
 @Composable
-fun OrderSummaryCard(orderDetails: OrderDetails) {
+fun OrderSummaryCard(order: Order) {
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
@@ -50,21 +51,30 @@ fun OrderSummaryCard(orderDetails: OrderDetails) {
 
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_subtotal),
-                value = orderDetails.subtotalPrice.toCurrency(orderDetails.currencyCode)
+                value = order.subtotalPrice.toCurrency()
             )
             Spacer(Modifier.height(8.dp))
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_shipping_fee),
-                value = orderDetails.totalShippingPrice.toCurrency(orderDetails.currencyCode)
+                value = order.totalShippingPrice.toCurrency()
             )
 
-            if (orderDetails.totalDiscounts > 0) {
+            val discount = order.totalDiscount
+            if (discount.amount > 0) {
                 Spacer(Modifier.height(8.dp))
                 val isDark = LocalDarkTheme.current
                 OrderSummaryRow(
                     label = stringResource(R.string.order_summary_discount),
-                    value = "-${orderDetails.totalDiscounts.toCurrency(orderDetails.currencyCode)}",
+                    value = "-${discount.toCurrency()}",
                     valueColor = if (isDark) SuccessDark else SuccessLight
+                )
+            }
+
+            if (order.totalTax.amount > 0) {
+                Spacer(Modifier.height(8.dp))
+                OrderSummaryRow(
+                    label = stringResource(R.string.order_summary_tax),
+                    value = order.totalTax.toCurrency()
                 )
             }
 
@@ -74,10 +84,20 @@ fun OrderSummaryCard(orderDetails: OrderDetails) {
 
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_total),
-                value = orderDetails.totalPrice.toCurrency(orderDetails.currencyCode),
+                value = order.totalPrice.toCurrency(),
                 labelWeight = FontWeight.SemiBold,
                 valueWeight = FontWeight.SemiBold
             )
+
+            if (order.totalRefunded.amount > 0) {
+                Spacer(Modifier.height(8.dp))
+                val isDark = LocalDarkTheme.current
+                OrderSummaryRow(
+                    label = stringResource(R.string.order_summary_refunded),
+                    value = "-${order.totalRefunded.toCurrency()}",
+                    valueColor = if (isDark) SuccessDark else SuccessLight
+                )
+            }
         }
     }
 }
@@ -111,37 +131,31 @@ private fun OrderSummaryRow(
 private fun OrderSummaryCardWithDiscountPreview() {
     ShopIQTheme {
         OrderSummaryCard(
-            orderDetails = previewOrderDetails(subtotal = 95.50, shipping = 10.0, discount = 5.0, total = 100.50)
+            order = previewOrder(subtotal = 95.50, shipping = 10.0, total = 100.50).withDiscountedLineItem()
         )
     }
 }
 
-@Preview(showBackground = true, name = "Summary - No Discount")
+@Preview(showBackground = true, name = "Summary - No Discount, With Tax")
 @Composable
 private fun OrderSummaryCardNoDiscountPreview() {
     ShopIQTheme {
         OrderSummaryCard(
-            orderDetails = previewOrderDetails(subtotal = 95.50, shipping = 10.0, discount = 0.0, total = 105.50)
+            order = previewOrder(subtotal = 95.50, shipping = 10.0, tax = 8.0, total = 113.50)
         )
     }
 }
 
-private fun previewOrderDetails(
-    subtotal: Double,
-    shipping: Double,
-    discount: Double,
-    total: Double
-) = OrderDetails(
-    id = "1",
-    name = "#ORD-2024-1001",
-    createdAt = "2024-05-20T10:30:00Z",
-    financialStatus = "paid",
-    fulfillmentStatus = OrderStatus.PENDING,
-    subtotalPrice = subtotal,
-    totalShippingPrice = shipping,
-    totalPrice = total,
-    totalDiscounts = discount,
-    currencyCode = "USD",
-    shippingAddress = null,
-    lineItems = emptyList()
+
+private fun Order.withDiscountedLineItem(): Order = copy(
+    lineItems = listOf(
+        com.iti.domain.models.order.OrderLineItem(
+            title = "Sample Item",
+            quantity = 1,
+            currentQuantity = 1,
+            originalTotalPrice = Money(100.50, subtotalPrice.currencyCode),
+            discountedTotalPrice = Money(95.50, subtotalPrice.currencyCode),
+            variant = null
+        )
+    )
 )

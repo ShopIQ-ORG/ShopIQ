@@ -5,6 +5,10 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Currency
 import java.util.Locale
+import com.iti.domain.models.order.Money
+
+fun Money.toCurrency(): String = amount.toCurrency(currencyCode)
+
 
 fun Double.toCurrency(currencyCode: String): String = try {
     NumberFormat.getCurrencyInstance(Locale.US).apply {

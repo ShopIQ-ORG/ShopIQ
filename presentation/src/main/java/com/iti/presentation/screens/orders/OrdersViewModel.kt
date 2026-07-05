@@ -33,7 +33,7 @@ class OrdersViewModel(
             is OrdersContract.Event.Refresh -> refreshOrders()
             is OrdersContract.Event.Retry -> loadOrders()
             is OrdersContract.Event.OrderClicked -> emitEffect(
-                OrdersContract.Effect.NavigateToOrderDetails(event.orderId)
+                OrdersContract.Effect.NavigateToOrderDetails(event.order)
             )
         }
     }

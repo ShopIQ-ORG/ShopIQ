@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.iti.domain.models.order.Order
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQSnackBarHost
@@ -25,7 +26,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun OrdersScreen(
     onNavigateBack: () -> Unit,
-    onOrderClick: (String) -> Unit,
+    onOrderClick: (Order) -> Unit,
     viewModel: OrdersViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -36,7 +37,7 @@ fun OrdersScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is OrdersContract.Effect.NavigateToOrderDetails -> onOrderClick(effect.orderId)
+                is OrdersContract.Effect.NavigateToOrderDetails -> onOrderClick(effect.order)
                 is OrdersContract.Effect.ShowError -> snackbarHostState.showSnackbar(
                     effect.message.resolve(context)
                 )

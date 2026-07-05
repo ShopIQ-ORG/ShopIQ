@@ -8,13 +8,14 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.iti.domain.models.order.Order
 import com.iti.presentation.components.ErrorScreen
 import com.iti.presentation.screens.orders.OrdersContract
 
 @Composable
 fun OrdersContent(
     state: OrdersContract.State,
-    onOrderClicked: (String) -> Unit,
+    onOrderClicked: (Order) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier

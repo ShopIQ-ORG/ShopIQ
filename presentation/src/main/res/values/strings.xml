@@ -261,8 +261,7 @@
     
     <string name="orders_title">My Orders</string>
     <string name="orders_empty_title">No orders yet</string>
-    <string name="orders_empty_message">You haven\'t placed any orders yet. Once you make your first purchase, your orders will appear here.</string>
-    <string name="order_card_title">Order %1$s</string>
+    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>    <string name="order_card_title">Order %1$s</string>
     <string name="order_products_label">Products</string>
     <string name="order_total_label">Total</string>
     <string name="order_status_label">Status</string>
@@ -304,6 +303,10 @@
 
     <string name="order_shipping_address_title">Shipping Address</string>
     <string name="order_contact_support">Need Help? Contact Support</string>
+    <string name="order_summary_tax">Tax</string>
+    <string name="order_summary_refunded">Refunded</string>
+    <string name="order_not_found_error">Order not found.</string>
+    <string name="no_orders_found">No orders found.</string>
     <!-- Address Management Screen -->
     <string name="address_title">Manage Addresses</string>
     <string name="address_add_new_title">Add New Address</string>

@@ -38,6 +38,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.iti.domain.models.order.Money
 import com.iti.presentation.R
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.ui.theme.ShopIQTheme
@@ -46,6 +47,7 @@ import com.iti.presentation.ui.theme.SuccessLight
 import com.iti.presentation.ui.theme.WarningDark
 import com.iti.presentation.ui.theme.WarningLight
 import com.iti.domain.models.order.Order
+import com.iti.domain.models.order.OrderFinancialStatus
 import com.iti.domain.models.order.OrderStatus
 import com.iti.presentation.util.toCurrency
 import com.iti.presentation.util.toDisplayDate
@@ -132,7 +134,7 @@ private fun OrderMetricsRow(order: Order) {
 
         OrderMetricItem(
             icon = Icons.Default.CreditCard,
-            label = order.totalPrice.toCurrency(order.currencyCode),
+            label = order.totalPrice.toCurrency(),
             value = stringResource(R.string.order_total_label)
         )
     }
@@ -245,7 +247,7 @@ fun OrderStatus.toStyle(): OrderStatusStyle {
 @Composable
 private fun PendingOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(OrderStatus.PENDING), onClick = {})
+        OrderCard(order = previewOrder(status =OrderStatus.PENDING), onClick = {})
     }
 }
 
@@ -253,7 +255,7 @@ private fun PendingOrderCardPreview() {
 @Composable
 private fun ProcessingOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(OrderStatus.PROCESSING), onClick = {})
+        OrderCard(order = previewOrder(status =OrderStatus.PROCESSING), onClick = {})
     }
 }
 
@@ -261,7 +263,7 @@ private fun ProcessingOrderCardPreview() {
 @Composable
 private fun CompletedOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(OrderStatus.COMPLETED), onClick = {})
+        OrderCard(order = previewOrder(status =OrderStatus.COMPLETED), onClick = {})
     }
 }
 
@@ -269,7 +271,7 @@ private fun CompletedOrderCardPreview() {
 @Composable
 private fun CancelledOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(OrderStatus.CANCELLED), onClick = {})
+        OrderCard(order = previewOrder(status =OrderStatus.CANCELLED), onClick = {})
     }
 }
 
@@ -277,16 +279,29 @@ private fun CancelledOrderCardPreview() {
 @Composable
 private fun DarkCompletedOrderCardPreview() {
     ShopIQTheme(darkTheme = true) {
-        OrderCard(order = previewOrder(OrderStatus.COMPLETED), onClick = {})
+        OrderCard(order = previewOrder(status = OrderStatus.COMPLETED), onClick = {})
     }
 }
 
-private fun previewOrder(status: OrderStatus) = Order(
+internal fun previewOrder(
+    subtotal: Double = 95.50,
+    shipping: Double = 10.0,
+    tax: Double = 0.0,
+    refunded: Double = 0.0,
+    total: Double = 105.50,
+    currencyCode: String = "USD",
+    status: OrderStatus = OrderStatus.COMPLETED
+) = Order(
     id = "1",
-    name = "#1001",
+    name = "#ORD-2024-1001",
     createdAt = "2024-05-20T10:30:00Z",
-    totalPrice = 120.5,
-    currencyCode = "USD",
-    fulfillmentStatus = status,
-    itemsCount = 3
+    financialStatus = OrderFinancialStatus.PAID,
+    fulfillmentStatus = OrderStatus.COMPLETED,
+    subtotalPrice = Money(subtotal, currencyCode),
+    totalShippingPrice = Money(shipping, currencyCode),
+    totalPrice = Money(total, currencyCode),
+    totalRefunded = Money(refunded, currencyCode),
+    totalTax = Money(tax, currencyCode),
+    shippingAddress = null,
+    lineItems = emptyList()
 )
