@@ -38,8 +38,8 @@ val presentationModule = module {
     viewModel { AiChatViewModel(get(), get(), get()) }
     viewModel { AiHistoryViewModel(get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { OnboardingViewModel(get()) }
-    viewModel { SignInViewModel(get(), get(), get(), get()) }
+    viewModel { OnboardingViewModel(get(), get()) }
+    viewModel { SignInViewModel(get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { CategoryViewModel(get()) }
     viewModel { CategoryDetailsViewModel(get(), get(), get(), get(), get()) }

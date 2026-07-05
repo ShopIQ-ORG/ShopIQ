@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
 import com.iti.domain.usecases.auth.SendPasswordResetEmailUseCase
 import com.iti.presentation.R
+import com.iti.presentation.util.AuthValidator
 import com.iti.presentation.util.UiText
 import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,12 +28,7 @@ class ForgotPasswordViewModel(
     fun onEvent(event: ForgotPasswordContract.Event) {
         when (event) {
             is ForgotPasswordContract.Event.EmailChanged -> {
-                _state.update {
-                    it.copy(
-                        email = event.email,
-                        error = null
-                    )
-                }
+                _state.update { it.copy(email = event.email, fieldErrors = it.fieldErrors - "email") }
             }
 
             ForgotPasswordContract.Event.SendResetLink -> sendResetLink()
@@ -46,27 +42,18 @@ class ForgotPasswordViewModel(
     private fun sendResetLink() {
         val email = _state.value.email.trim()
 
-        if (email.isBlank()) {
-            handleValidationError(
-                UiText.StringResource(R.string.error_email_required)
-            )
+        val errors = AuthValidator.validateForgotPassword(email)
+        if (errors.isNotEmpty()) {
+            _state.update { it.copy(fieldErrors = errors) }
             return
         }
 
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true,
-                    error = null
-                )
-            }
+            _state.update { it.copy(isLoading = true, fieldErrors = emptyMap()) }
 
             when (val result = sendPasswordResetEmailUseCase(email)) {
                 is Result.Success -> {
-                    _state.update {
-                        it.copy(linkSent = true)
-                    }
-
+                    _state.update { it.copy(linkSent = true) }
                     sendEffect(
                         ForgotPasswordContract.Effect.ShowSuccess(
                             UiText.StringResource(R.string.reset_link_sent)
@@ -74,37 +61,16 @@ class ForgotPasswordViewModel(
                     )
                 }
 
-                is Result.Failure -> handleFailure(result.exception)
+                is Result.Failure -> {
+                    val message = result.exception.toUiMessage()
+                    sendEffect(ForgotPasswordContract.Effect.ShowError(message))
+                }
 
                 is Result.Loading -> Unit
             }
 
-            _state.update {
-                it.copy(isLoading = false)
-            }
+            _state.update { it.copy(isLoading = false) }
         }
-    }
-
-    private fun handleFailure(exception: Throwable) {
-        val message = exception.toUiMessage()
-
-        _state.update {
-            it.copy(error = message)
-        }
-
-        sendEffect(
-            ForgotPasswordContract.Effect.ShowError(message)
-        )
-    }
-
-    private fun handleValidationError(message: UiText) {
-        _state.update {
-            it.copy(error = message)
-        }
-
-        sendEffect(
-            ForgotPasswordContract.Effect.ShowError(message)
-        )
     }
 
     private fun sendEffect(effect: ForgotPasswordContract.Effect) {

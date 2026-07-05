@@ -4,13 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.exceptions.AuthException
 import com.iti.domain.models.Result
-import com.iti.domain.models.User
 import com.iti.domain.models.auth.LoginCredentials
 import com.iti.domain.usecases.auth.LoginAsGuestUseCase
 import com.iti.domain.usecases.auth.LoginUseCase
-import com.iti.domain.usecases.auth.LoginWithFacebookUseCase
 import com.iti.domain.usecases.auth.LoginWithGoogleUseCase
-import com.iti.presentation.R
+import com.iti.presentation.screens.auth.signin.SignInContract
+import com.iti.presentation.util.AuthValidator
 import com.iti.presentation.util.UiText
 import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
 class SignInViewModel(
     private val loginUseCase: LoginUseCase,
     private val loginWithGoogleUseCase: LoginWithGoogleUseCase,
-    private val loginWithFacebookUseCase: LoginWithFacebookUseCase,
     private val loginAsGuestUseCase: LoginAsGuestUseCase,
 ) : ViewModel() {
 
@@ -36,32 +34,16 @@ class SignInViewModel(
     fun onEvent(event: SignInContract.Event) {
         when (event) {
             is SignInContract.Event.EmailChanged -> {
-                _state.update {
-                    it.copy(
-                        email = event.email,
-                        error = null
-                    )
-                }
+                _state.update { it.copy(email = event.email, fieldErrors = it.fieldErrors - "email") }
             }
 
             is SignInContract.Event.PasswordChanged -> {
-                _state.update {
-                    it.copy(
-                        password = event.password,
-                        error = null
-                    )
-                }
+                _state.update { it.copy(password = event.password, fieldErrors = it.fieldErrors - "password") }
             }
 
             SignInContract.Event.Login -> login()
 
-            is SignInContract.Event.LoginWithGoogle -> {
-                loginWithGoogle(event.idToken)
-            }
-
-            is SignInContract.Event.LoginWithFacebook -> {
-                loginWithFacebook(event.accessToken)
-            }
+            is SignInContract.Event.LoginWithGoogle -> loginWithGoogle(event.idToken)
 
             SignInContract.Event.LoginAsGuest -> loginAsGuest()
 
@@ -72,23 +54,16 @@ class SignInViewModel(
     }
 
     private fun login() {
-        val email = _state.value.email
-        val password = _state.value.password
-
-        if (email.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_email_required))
-            return
-        }
-
-        if (password.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_password_required))
+        val errors = AuthValidator.validateSignIn(_state.value.email, _state.value.password)
+        if (errors.isNotEmpty()) {
+            _state.update { it.copy(fieldErrors = errors) }
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, fieldErrors = emptyMap()) }
 
-            when (val result = loginUseCase(LoginCredentials(email, password))) {
+            when (val result = loginUseCase(LoginCredentials(_state.value.email, _state.value.password))) {
                 is Result.Success -> sendEffect(SignInContract.Effect.NavigateToHome)
                 is Result.Failure -> handleFailure(result.exception)
                 is Result.Loading -> Unit
@@ -100,76 +75,29 @@ class SignInViewModel(
 
     private fun loginWithGoogle(idToken: String) {
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true,
-                    error = null
-                )
-            }
+            _state.update { it.copy(isLoading = true, fieldErrors = emptyMap()) }
 
             when (val result = loginWithGoogleUseCase(idToken)) {
-                is Result.Success -> {
-                    sendEffect(SignInContract.Effect.NavigateToHome)
-                }
-
+                is Result.Success -> sendEffect(SignInContract.Effect.NavigateToHome)
                 is Result.Failure -> handleFailure(result.exception)
-
                 is Result.Loading -> Unit
             }
 
-            _state.update {
-                it.copy(isLoading = false)
-            }
-        }
-    }
-
-    private fun loginWithFacebook(accessToken: String) {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true,
-                    error = null
-                )
-            }
-
-            when (val result = loginWithFacebookUseCase(accessToken)) {
-                is Result.Success -> {
-                    sendEffect(SignInContract.Effect.NavigateToHome)
-                }
-
-                is Result.Failure -> handleFailure(result.exception)
-
-                is Result.Loading -> Unit
-            }
-
-            _state.update {
-                it.copy(isLoading = false)
-            }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 
     private fun loginAsGuest() {
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true,
-                    error = null
-                )
-            }
+            _state.update { it.copy(isLoading = true, fieldErrors = emptyMap()) }
 
             when (val result = loginAsGuestUseCase()) {
-                is Result.Success -> {
-                    sendEffect(SignInContract.Effect.NavigateToHome)
-                }
-
+                is Result.Success -> sendEffect(SignInContract.Effect.NavigateToHome)
                 is Result.Failure -> handleFailure(result.exception)
-
                 is Result.Loading -> Unit
             }
 
-            _state.update {
-                it.copy(isLoading = false)
-            }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 
@@ -180,18 +108,7 @@ class SignInViewModel(
         }
 
         val message = exception.toUiMessage()
-        _state.update { it.copy(error = message) }
         sendEffect(SignInContract.Effect.ShowError(message))
-    }
-
-    private fun handleValidationError(message: UiText) {
-        _state.update {
-            it.copy(error = message)
-        }
-
-        sendEffect(
-            SignInContract.Effect.ShowError(message)
-        )
     }
 
     private fun sendEffect(effect: SignInContract.Effect) {

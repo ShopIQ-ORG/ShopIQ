@@ -111,7 +111,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 OnboardingScreen(
                     viewModel = onboardingViewModel,
                     onNavigateToHome = {
-                        navigate(Screen.SignIn)
+                        replaceRoot(Screen.Home)
+                    },
+                    onNavigateToSignIn = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
@@ -233,6 +236,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = screen.productId,
                     onBackClick = ::navigateBack,
+                    onLogin = {
+                        replaceRoot(Screen.SignIn)
+                    }
                 )
             }
 

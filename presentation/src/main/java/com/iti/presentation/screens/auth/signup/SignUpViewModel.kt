@@ -6,8 +6,8 @@ import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.models.auth.RegistrationInfo
 import com.iti.domain.usecases.auth.RegisterUseCase
-import com.iti.presentation.R
-import com.iti.presentation.util.UiText
+import com.iti.presentation.screens.auth.signup.SignUpContract
+import com.iti.presentation.util.AuthValidator
 import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,27 +29,27 @@ class SignUpViewModel(
     fun onEvent(event: SignUpContract.Event) {
         when (event) {
             is SignUpContract.Event.FullNameChanged -> {
-                _state.update { it.copy(fullName = event.fullName, error = null) }
+                _state.update { it.copy(fullName = event.fullName, fieldErrors = it.fieldErrors - "fullName") }
             }
 
             is SignUpContract.Event.EmailChanged -> {
-                _state.update { it.copy(email = event.email, error = null) }
+                _state.update { it.copy(email = event.email, fieldErrors = it.fieldErrors - "email") }
             }
 
             is SignUpContract.Event.PhoneChanged -> {
-                _state.update { it.copy(phone = event.phone, error = null) }
+                _state.update { it.copy(phone = event.phone, fieldErrors = it.fieldErrors - "phone") }
             }
 
             is SignUpContract.Event.PasswordChanged -> {
-                _state.update { it.copy(password = event.password, error = null) }
+                _state.update { it.copy(password = event.password, fieldErrors = it.fieldErrors - "password") }
             }
 
             is SignUpContract.Event.ConfirmPasswordChanged -> {
-                _state.update { it.copy(confirmPassword = event.confirmPassword, error = null) }
+                _state.update { it.copy(confirmPassword = event.confirmPassword, fieldErrors = it.fieldErrors - "confirmPassword") }
             }
 
             is SignUpContract.Event.AgreeToTermsChanged -> {
-                _state.update { it.copy(agreeToTerms = event.checked, error = null) }
+                _state.update { it.copy(agreeToTerms = event.checked, fieldErrors = it.fieldErrors - "terms") }
             }
 
             SignUpContract.Event.Register -> register()
@@ -67,43 +67,21 @@ class SignUpViewModel(
     private fun register() {
         val state = _state.value
 
-        if (state.fullName.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_full_name_required))
-            return
-        }
-
-        if (state.email.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_email_required))
-            return
-        }
-
-        if (state.phone.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_phone_required))
-            return
-        }
-
-        if (state.password.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_password_required))
-            return
-        }
-
-        if (state.confirmPassword.isBlank()) {
-            handleValidationError(UiText.StringResource(R.string.error_confirm_password_required))
-            return
-        }
-
-        if (state.password != state.confirmPassword) {
-            handleValidationError(UiText.StringResource(R.string.error_passwords_do_not_match))
-            return
-        }
-
-        if (!state.agreeToTerms) {
-            handleValidationError(UiText.StringResource(R.string.error_agree_to_terms))
+        val errors = AuthValidator.validateSignUp(
+            fullName = state.fullName,
+            email = state.email,
+            phone = state.phone,
+            password = state.password,
+            confirmPassword = state.confirmPassword,
+            agreeToTerms = state.agreeToTerms
+        )
+        if (errors.isNotEmpty()) {
+            _state.update { it.copy(fieldErrors = errors) }
             return
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, fieldErrors = emptyMap()) }
 
             try {
                 val info = RegistrationInfo(
@@ -123,26 +101,19 @@ class SignUpViewModel(
                         }
                     }
 
-                    is Result.Failure -> handleFailure(result.exception)
+                    is Result.Failure -> {
+                        val message = result.exception.toUiMessage()
+                        sendEffect(SignUpContract.Effect.ShowError(message))
+                    }
                     is Result.Loading -> Unit
                 }
             } catch (e: Exception) {
-                handleFailure(e)
+                val message = e.toUiMessage()
+                sendEffect(SignUpContract.Effect.ShowError(message))
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
         }
-    }
-
-    private fun handleValidationError(message: UiText) {
-        _state.update { it.copy(error = message) }
-        sendEffect(SignUpContract.Effect.ShowError(message))
-    }
-
-    private fun handleFailure(exception: Throwable) {
-        val message = exception.toUiMessage()
-        _state.update { it.copy(error = message) }
-        sendEffect(SignUpContract.Effect.ShowError(message))
     }
 
     private fun sendEffect(effect: SignUpContract.Effect) {

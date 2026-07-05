@@ -12,17 +12,8 @@ object SignUpContract {
         val confirmPassword: String = "",
         val agreeToTerms: Boolean = false,
         val isLoading: Boolean = false,
-        val error: UiText? = null
-    ) {
-        val canRegister: Boolean
-            get() = fullName.isNotBlank() &&
-                    email.isNotBlank() &&
-                    phone.isNotBlank() &&
-                    password.isNotBlank() &&
-                    confirmPassword.isNotBlank() &&
-                    agreeToTerms &&
-                    !isLoading
-    }
+        val fieldErrors: Map<String, UiText> = emptyMap()
+    )
 
     sealed class Event {
         data class FullNameChanged(val fullName: String) : Event()

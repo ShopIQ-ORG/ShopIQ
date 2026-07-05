@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.auth.components
+package com.iti.presentation.screens.auth.signup.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,15 +20,16 @@ import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
 
 @Composable
-fun TermsCheckbox(
+fun TermsSection(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     onTermsClick: () -> Unit,
     onPrivacyClick: () -> Unit,
     hasError: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(

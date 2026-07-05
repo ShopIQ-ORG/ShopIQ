@@ -7,14 +7,8 @@ object ForgotPasswordContract {
         val email: String = "",
         val isLoading: Boolean = false,
         val linkSent: Boolean = false,
-        val error: UiText? = null
-    ) {
-        val canSendLink: Boolean
-            get() = email.isNotBlank() && !isLoading
-
-        val showSuccessState: Boolean
-            get() = linkSent && error == null
-    }
+        val fieldErrors: Map<String, UiText> = emptyMap()
+    )
 
     sealed class Event {
         data class EmailChanged(val email: String) : Event()
