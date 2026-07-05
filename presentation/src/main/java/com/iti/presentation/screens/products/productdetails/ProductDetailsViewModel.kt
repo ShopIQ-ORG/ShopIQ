@@ -64,8 +64,7 @@ class ProductDetailsViewModel(
                         val product = result.data
                         
                         // Start observing favorites immediately if user is signed in
-                        val userId = authRepository.getUserId()
-                        if (userId != null && userId != "guest") {
+                        if (!authRepository.isGuest()) {
                             observeFavoriteStatus(product.id)
                         }
 
@@ -94,13 +93,19 @@ class ProductDetailsViewModel(
     }
 
     private fun observeFavoriteStatus(productId: String) {
+        // Extract the numeric part only (e.g. "gid://shopify/Product/123" -> "123")
+        val cleanProductId = productId.substringAfterLast("/")
+
         viewModelScope.launch {
             combine(
                 getFavoriteProductsUseCase(),
                 favoriteOverride
             ) { result: Result<List<com.iti.domain.models.Product>>, override: Boolean? ->
                 if (result is Result.Success) {
-                    val isFavoriteInDb = result.data.any { it.id == productId }
+                    // Compare by clean numeric ID so Room & GID IDs both match
+                    val isFavoriteInDb = result.data.any {
+                        it.id.substringAfterLast("/") == cleanProductId
+                    }
                     _state.update { it.copy(isWishlisted = override ?: isFavoriteInDb) }
                 }
             }.collect()
@@ -121,11 +126,8 @@ class ProductDetailsViewModel(
 
     private fun toggleWishlist() {
         // FAST check for guest status
-        val userId = authRepository.getUserId()
-        if (userId == null || userId == "guest") {
-            viewModelScope.launch {
-                _sideEffects.emit(ProductDetailsSideEffect.NavigateToAuth)
-            }
+        if (authRepository.isGuest()) {
+            _state.update { it.copy(showUnauthorizedDialog = true) }
             return
         }
 

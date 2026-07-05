@@ -15,4 +15,5 @@ interface AuthRepository {
     suspend fun validateAuthenticatedUser(): Result<Unit>
     fun logout(): Result<Unit>
     fun getUserId(): String?
+    fun isGuest(): Boolean
 }

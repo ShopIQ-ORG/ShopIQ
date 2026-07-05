@@ -96,4 +96,6 @@
     <string name="filter_apply">تطبيق الفلاتر</string>
     <string name="filter_show_less">عرض أقل</string>
     <string name="filter_show_more">+ %1$d المزيد</string>
+    <string name="failed_to_update_favorite_status">فشل فى تحديث حاله المنتجات المفضله</string>
+    <string name="login_required_favorites">يجب تسجيل الدخول لإضافة منتجات لقائمة الأمنيات.</string>
 </resources>

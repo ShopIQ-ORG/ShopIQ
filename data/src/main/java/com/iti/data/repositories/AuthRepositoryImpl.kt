@@ -122,6 +122,10 @@ class AuthRepositoryImpl(
 
     override fun getUserId(): String? = authRemote.getCurrentFirebaseUser()?.uid
 
+    override fun isGuest(): Boolean {
+        return authRemote.getCurrentFirebaseUser()?.isAnonymous ?: true
+    }
+
     override suspend fun getValidToken(): Result<ShopifyCustomerToken> = safeCall {
         shopifyLocal?.getCachedFields()?.let { cached ->
             if (!isExpiringSoon(cached.expiresAt)) return@safeCall cached.toDomain()

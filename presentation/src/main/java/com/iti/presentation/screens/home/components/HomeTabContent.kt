@@ -122,10 +122,12 @@ fun HomeTabContent(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 items(discountProducts, key = { it.id }) { product ->
+                                    val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
+                                    val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
                                     ProductCard(
                                         product = product,
-                                        onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
-                                        onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                        onClick = onClick,
+                                        onFavoriteClick = onFavoriteClick,
                                         modifier = Modifier.width(160.dp)
                                     )
                                 }
@@ -192,10 +194,12 @@ fun HomeTabContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             items(data.products.take(6), key = { it.id }) { product ->
+                                val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
+                                val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
                                 ProductCard(
                                     product = product,
-                                    onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
-                                    onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                    onClick = onClick,
+                                    onFavoriteClick = onFavoriteClick,
                                     modifier = Modifier.width(160.dp)
                                 )
                             }

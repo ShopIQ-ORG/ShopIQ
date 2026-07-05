@@ -403,4 +403,6 @@
     <string name="address_error_location_missing">Please select a location on the map first.</string>
     <string name="address_select_location_title">Select Location</string>
 
+    <string name="failed_to_update_favorite_status">Failed to update favorite status</string>
+    <string name="login_required_favorites">You need to sign in to add items to your wishlist.</string>
 </resources>

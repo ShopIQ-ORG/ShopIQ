@@ -161,8 +161,7 @@ class AllProductsViewModel(
 
     private fun toggleFavorite(product: Product) {
         // FAST check for guest status
-        val userId = authRepository.getUserId()
-        if (userId == null || userId == "guest") {
+        if (authRepository.isGuest()) {
             emitEffect(AllProductsContract.Effect.ShowAuthRequired)
             return
         }
