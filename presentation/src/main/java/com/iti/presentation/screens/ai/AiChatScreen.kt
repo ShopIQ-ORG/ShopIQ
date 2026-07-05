@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.iti.domain.models.User
 import com.iti.presentation.R
 import com.iti.presentation.screens.ai.components.*
+import com.iti.presentation.components.NoInternetScreen
+import com.iti.presentation.util.NetworkMonitor
+import org.koin.compose.koinInject
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,9 +31,11 @@ fun AiChatScreen(
     onAuthClick: () -> Unit,
     bottomPadding: Dp = 0.dp,
     onNavigateToProduct: (Long) -> Unit,
-    viewModel: AiChatViewModel = koinViewModel()
+    viewModel: AiChatViewModel = koinViewModel(),
+    networkMonitor: NetworkMonitor = koinInject()
 ) {
     val isDark = LocalDarkTheme.current
+    val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
     
     // Auth Check
     if (currentUser !is User.AuthenticatedUser) {
@@ -38,11 +43,21 @@ fun AiChatScreen(
         return
     }
 
+    val state by viewModel.state.collectAsState()
+
+    // No Internet Check before showing chat
+    if (!isConnected && state.messages.isEmpty()) {
+        NoInternetScreen(
+            onRetry = {
+                viewModel.sendIntent(AiChatContract.Intent.SetUser(currentUser))
+            }
+        )
+        return
+    }
+
     LaunchedEffect(currentUser) {
         viewModel.sendIntent(AiChatContract.Intent.SetUser(currentUser))
     }
-
-    val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
 
     // Auto-scroll to bottom when new messages arrive

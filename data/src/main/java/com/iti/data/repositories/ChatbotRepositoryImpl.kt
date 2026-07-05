@@ -82,6 +82,28 @@ class ChatbotRepositoryImpl(
         emit(Result.Loading)
         
         try {
+            if (!isNetworkAvailable()) {
+                // If offline, write both user message and network error locally to Firestore's cache.
+                // Since Firebase snapshot listener collects locally, the UI will update instantly and remove typing indicator.
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("chats")
+                    .add(userMessage)
+
+                val errorMsg = ChatMessage(
+                    sender = "ai",
+                    text = "ERROR_NETWORK",
+                    timestamp = System.currentTimeMillis() + 10
+                )
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("chats")
+                    .add(errorMsg)
+
+                emit(Result.Success(errorMsg))
+                return@flow
+            }
+
             firestore.collection("users")
                 .document(userId)
                 .collection("chats")
@@ -215,13 +237,29 @@ class ChatbotRepositoryImpl(
                 text = friendlyMsg,
                 timestamp = System.currentTimeMillis()
             )
-            val addedDoc = firestore.collection("users")
-                .document(userId)
-                .collection("chats")
-                .add(errorMsg)
-                .await()
-
-            emit(Result.Success(errorMsg.copy(id = addedDoc.id)))
+            
+            if (isNetworkAvailable()) {
+                try {
+                    val addedDoc = firestore.collection("users")
+                        .document(userId)
+                        .collection("chats")
+                        .add(errorMsg)
+                        .await()
+                    emit(Result.Success(errorMsg.copy(id = addedDoc.id)))
+                } catch (ex: Exception) {
+                    firestore.collection("users")
+                        .document(userId)
+                        .collection("chats")
+                        .add(errorMsg)
+                    emit(Result.Success(errorMsg))
+                }
+            } else {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("chats")
+                    .add(errorMsg)
+                emit(Result.Success(errorMsg))
+            }
         }
     }.flowOn(Dispatchers.IO)
 
@@ -245,5 +283,15 @@ class ChatbotRepositoryImpl(
             emit(Result.Failure(e))
         }
     }.flowOn(Dispatchers.IO)
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = context.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+        if (connectivityManager != null) {
+            val activeNetwork = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+            return capabilities?.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        }
+        return false
+    }
 
 }
