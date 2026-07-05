@@ -5,6 +5,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.iti.data.dto.auth.CredentialAuthResult
 import com.iti.data.dto.auth.FirebaseUserInfo
+import com.iti.data.mappers.toFirebaseUserInfo
 import com.iti.domain.exceptions.AuthException
 import kotlinx.coroutines.tasks.await
 
@@ -36,14 +37,23 @@ class AuthRemoteDataSourceImpl(
         return auth.signInWithCredential(credential).await().toCredentialAuthResult()
     }
 
+    override suspend fun sendPasswordResetEmail(email: String) {
+        auth.sendPasswordResetEmail(email).await()
+    }
+
+    override suspend fun sendEmailVerification() {
+        auth.currentUser?.sendEmailVerification()?.await()
+    }
+
+    override suspend fun reloadCurrentUser(): FirebaseUserInfo? {
+        val user = auth.currentUser ?: return null
+        user.reload().await()
+        return user.toFirebaseUserInfo()
+    }
+
     override fun getCurrentFirebaseUser(): FirebaseUserInfo? {
         val user = auth.currentUser ?: return null
-        return FirebaseUserInfo(
-            uid = user.uid,
-            isAnonymous = user.isAnonymous,
-            displayName = user.displayName,
-            email = user.email
-        )
+        return user.toFirebaseUserInfo()
     }
 
     override fun signOut() = auth.signOut()

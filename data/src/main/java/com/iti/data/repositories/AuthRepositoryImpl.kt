@@ -19,6 +19,7 @@ import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.domain.exceptions.AuthException
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
+import com.iti.domain.models.auth.AuthProvider
 import com.iti.domain.models.auth.LoginCredentials
 import com.iti.domain.models.auth.RegistrationInfo
 import com.iti.domain.models.auth.ShopifyCustomerToken
@@ -87,7 +88,10 @@ class AuthRepositoryImpl(
 
     override suspend fun getCurrentUser(): Result<User> = safeCall {
         val firebaseUser = authRemote.getCurrentFirebaseUser() ?: throw AuthException.UserNotFound()
-        if (firebaseUser.isAnonymous) return@safeCall UserDto(id = firebaseUser.uid, isGuest = true).toDomain()
+        if (firebaseUser.isAnonymous) return@safeCall UserDto(
+            id = firebaseUser.uid,
+            isGuest = true
+        ).toDomain()
 
         val userDto = userRemote.getUserOrNull(firebaseUser.uid) ?: UserDto(
             id = firebaseUser.uid,
@@ -95,7 +99,10 @@ class AuthRepositoryImpl(
             email = firebaseUser.email.orEmpty(),
             isGuest = false
         )
-        userDto.toDomain()
+        userDto.toDomain(
+            provider = AuthProvider.fromProviderIds(firebaseUser.providerIds),
+            isEmailVerified = firebaseUser.isEmailVerified
+        )
     }
 
     override suspend fun validateAuthenticatedUser(): Result<Unit> {
@@ -109,6 +116,32 @@ class AuthRepositoryImpl(
         }
     }
 
+    override suspend fun sendEmailVerification(): Result<Unit> = safeCall {
+        authRemote.sendEmailVerification()
+    }
+
+    override suspend fun reloadAndGetCurrentUser(): Result<User> = safeCall {
+        val firebaseUser = authRemote.reloadCurrentUser() ?: throw AuthException.UserNotFound()
+        if (firebaseUser.isAnonymous) return@safeCall UserDto(
+            id = firebaseUser.uid,
+            isGuest = true
+        ).toDomain()
+
+        val userDto = userRemote.getUserOrNull(firebaseUser.uid) ?: UserDto(
+            id = firebaseUser.uid,
+            fullName = firebaseUser.displayName.orEmpty(),
+            email = firebaseUser.email.orEmpty(),
+            isGuest = false
+        )
+        userDto.toDomain(
+            provider = AuthProvider.fromProviderIds(firebaseUser.providerIds),
+            isEmailVerified = firebaseUser.isEmailVerified
+        )
+    }
+
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit> = safeCall {
+        authRemote.sendPasswordResetEmail(email)
+    }
     override fun logout(): Result<Unit> {
         return try {
             authRemote.signOut()
@@ -159,7 +192,10 @@ class AuthRepositoryImpl(
         }
     }
 
-    private suspend fun provisionOrRefreshOAuthUser(result: CredentialAuthResult, merge: Boolean): User {
+    private suspend fun provisionOrRefreshOAuthUser(
+        result: CredentialAuthResult,
+        merge: Boolean
+    ): User {
         val baseDto = UserDto(
             id = result.uid,
             fullName = result.fullName,
@@ -213,18 +249,34 @@ class AuthRepositoryImpl(
 
         val fields = try {
             if (needsProvisioning) {
-                val password = realPassword ?: userDto.shopifyPassword ?: UUID.randomUUID().toString()
-                provisionShopifyCustomer(userDto.email, userDto.fullName, password, persistPassword = realPassword == null)
+                val password =
+                    realPassword ?: userDto.shopifyPassword ?: UUID.randomUUID().toString()
+                provisionShopifyCustomer(
+                    userDto.email,
+                    userDto.fullName,
+                    password,
+                    persistPassword = realPassword == null
+                )
             } else {
                 val renewed = shopifyRemote.renewAccessToken(accessToken)
-                ShopifyFieldsDto(userDto.shopifyCustomerId, renewed.accessToken, renewed.expiresAt, userDto.shopifyPassword)
+                ShopifyFieldsDto(
+                    userDto.shopifyCustomerId,
+                    renewed.accessToken,
+                    renewed.expiresAt,
+                    userDto.shopifyPassword
+                )
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             val fallbackPassword = realPassword ?: userDto.shopifyPassword ?: return userDto
             val token = shopifyRemote.createAccessToken(userDto.email, fallbackPassword)
-            ShopifyFieldsDto(userDto.shopifyCustomerId, token.accessToken, token.expiresAt, userDto.shopifyPassword)
+            ShopifyFieldsDto(
+                userDto.shopifyCustomerId,
+                token.accessToken,
+                token.expiresAt,
+                userDto.shopifyPassword
+            )
         }
 
         shopifyLocal?.saveFields(fields)
