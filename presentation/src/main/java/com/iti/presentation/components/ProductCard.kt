@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.Product
+import com.iti.presentation.util.compareAtPrice
+import com.iti.presentation.util.discountPercent
 
 @Composable
 fun ProductCard(
@@ -65,6 +67,23 @@ fun ProductCard(
                 contentDescription = product.title,
                 modifier = Modifier.matchParentSize()
             )
+
+            val discountPercent = product.discountPercent
+            if (discountPercent > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                        .background(Color(0xFFC62828), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "-$discountPercent%",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White
+                    )
+                }
+            }
 
             Box(
                 modifier = Modifier
@@ -102,12 +121,28 @@ fun ProductCard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Text(
-            text = "${product.minPrice.currencyCode} ${product.minPrice.amount}",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "${product.minPrice.amount} ${product.minPrice.currencyCode}",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold
+            )
+
+            val comparePrice = product.compareAtPrice
+            if (comparePrice != null) {
+                Text(
+                    text = "${comparePrice.amount} ${comparePrice.currencyCode}",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
+                    ),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(6.dp))
 

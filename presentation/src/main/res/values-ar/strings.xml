@@ -62,6 +62,7 @@
     <string name="try_eslam_btn">ابدأ المحادثة</string>
     <string name="suggestions_title">اقتراحات لك</string>
     <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>
+    <string name="deals_of_the_day">عروض اليوم</string>
 
     <!-- Filter Screen -->
     <string name="filter_title">الفلاتر</string>

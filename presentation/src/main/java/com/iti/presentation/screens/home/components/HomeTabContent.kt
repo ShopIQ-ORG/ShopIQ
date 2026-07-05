@@ -32,6 +32,7 @@ import com.iti.presentation.components.ProductCard
 import com.iti.presentation.components.SearchBar
 import com.iti.presentation.components.ShopIQScaffold
 import com.iti.presentation.screens.home.HomeContract
+import com.iti.presentation.util.hasDiscount
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,6 +103,33 @@ fun HomeTabContent(
                     if (isGuest) {
                         item {
                             TryEslamCard(onTryEslamClick = { onIntent(HomeContract.Intent.NavigateToAiChat) })
+                        }
+                    }
+
+                    // Deals of the Day Section (shown for both guest and authenticated users)
+                    val discountProducts = data.products.filter { it.hasDiscount }
+                    if (discountProducts.isNotEmpty()) {
+                        item {
+                            SectionHeader(
+                                title = stringResource(R.string.deals_of_the_day),
+                                onViewAllClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) }
+                            )
+                        }
+                        item {
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                items(discountProducts) { product ->
+                                    ProductCard(
+                                        product = product,
+                                        onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
+                                        onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                        modifier = Modifier.width(160.dp)
+                                    )
+                                }
+                            }
                         }
                     }
 
