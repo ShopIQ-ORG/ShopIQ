@@ -115,7 +115,7 @@ val dataModule = module {
         )
     }
     single<CartRepository> {
-        CartRepositoryImpl(get(), get())
+        CartRepositoryImpl(get(), get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
 
     single<OrdersRemoteDataSource> {

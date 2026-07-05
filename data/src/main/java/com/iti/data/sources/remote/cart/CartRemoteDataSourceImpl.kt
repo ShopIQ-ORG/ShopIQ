@@ -1,15 +1,18 @@
 package com.iti.data.sources.remote.cart
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
 import com.iti.data.utils.executeOrThrow
 import com.iti.data.dto.cart.CartDto
 import com.iti.data.mappers.toDto
+import com.iti.data.storefront.CartBuyerIdentityUpdateMutation
 import com.iti.data.storefront.CartCreateMutation
 import com.iti.data.storefront.CartDiscountCodesUpdateMutation
 import com.iti.data.storefront.CartLinesAddMutation
 import com.iti.data.storefront.CartLinesRemoveMutation
 import com.iti.data.storefront.CartLinesUpdateMutation
 import com.iti.data.storefront.GetCartQuery
+import com.iti.data.storefront.type.CartBuyerIdentityInput
 import com.iti.data.storefront.type.CartLineInput
 import com.iti.data.storefront.type.CartLineUpdateInput
 import com.iti.domain.exceptions.CartException
@@ -164,5 +167,29 @@ class CartRemoteDataSourceImpl(
         val dto = cart.cartFields.toDto()
 
         return validator.validateDiscountCodes(cart = dto, requestedCodes = codes)
+    }
+
+    override suspend fun linkCartToCustomer(cartId: String, customerAccessToken: String): CartDto {
+        val response = apolloClient.mutation(
+            CartBuyerIdentityUpdateMutation(
+                cartId = cartId,
+                buyerIdentity = CartBuyerIdentityInput(
+                    customerAccessToken = Optional.present(customerAccessToken)
+                )
+            )
+        ).executeOrThrow()
+
+        validator.validateGraphQLErrors(response.errors)
+
+        validator.validateUserErrors(
+            response.data?.cartBuyerIdentityUpdate?.userErrors
+                ?.map { it.message }
+                .orEmpty()
+        )
+
+        val cart = response.data?.cartBuyerIdentityUpdate?.cart
+            ?: throw CartException.CartNotFound()
+
+        return cart.cartFields.toDto()
     }
 }
