@@ -279,4 +279,128 @@
     <string name="easy_returns_desc">14-day return policy</string>
     <string name="secure_payment_title">Secure</string>
     <string name="secure_payment_desc">100% secure checkout</string>
+    
+    <string name="orders_title">My Orders</string>
+    <string name="orders_empty_title">No orders yet</string>
+    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>    <string name="order_card_title">Order %1$s</string>
+    <string name="order_products_label">Products</string>
+    <string name="order_total_label">Total</string>
+    <string name="order_status_label">Status</string>
+    <string name="order_view_details">View Details</string>
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_completed">Completed</string>
+    <string name="order_status_cancelled">Cancelled</string>
+    <string name="order_status_unknown">Unknown</string>
+
+    <plurals name="order_items_count">
+        <item quantity="one">%d Item</item>
+        <item quantity="other">%d Items</item>
+    </plurals>
+
+    <string name="order_details_title">Order Details</string>
+    <string name="order_details_support_cd">Contact support</string>
+    <string name="back_cd">Back</string>
+
+    <string name="order_status_banner_pending_title">Your order is being processed</string>
+    <string name="order_status_banner_pending_message">We are preparing your items for shipping.</string>
+    <string name="order_status_banner_processing_title">Your order is on its way</string>
+    <string name="order_status_banner_processing_message">Your package has been shipped and is heading to you.</string>
+    <string name="order_status_banner_completed_title">Your order has been delivered</string>
+    <string name="order_status_banner_completed_message">We hope you enjoy your purchase!</string>
+    <string name="order_status_banner_cancelled_title">Your order was cancelled</string>
+    <string name="order_status_banner_cancelled_message">This order has been cancelled and will not be processed.</string>
+    <string name="order_status_banner_unknown_title">Order status unavailable</string>
+    <string name="order_status_banner_unknown_message">We couldn\'t determine the current status of this order.</string>
+
+    <string name="order_items_section_title">Order Items</string>
+    <string name="order_item_qty">Qty: %1$d</string>
+
+    <string name="order_summary_title">Order Summary</string>
+    <string name="order_summary_subtotal">Subtotal</string>
+    <string name="order_summary_shipping_fee">Shipping Fee</string>
+    <string name="order_summary_discount">Discount</string>
+    <string name="order_summary_total">Total</string>
+
+    <string name="order_shipping_address_title">Shipping Address</string>
+    <string name="order_contact_support">Need Help? Contact Support</string>
+    <string name="order_summary_tax">Tax</string>
+    <string name="order_summary_refunded">Refunded</string>
+    <string name="order_not_found_error">Order not found.</string>
+    <string name="no_orders_found">No orders found.</string>
+    <!-- Address Management Screen -->
+    <string name="address_title">Manage Addresses</string>
+    <string name="address_add_new_title">Add New Address</string>
+    <string name="address_location_detected_title">Location Detected</string>
+    <string name="address_action_add">Add Address</string>
+    <string name="address_empty_title">No addresses yet</string>
+    <string name="address_empty_subtitle">Add your first address to make checkout faster and easier.</string>
+    <string name="address_btn_add_new">Add New Address</string>
+
+    <!-- GPS Onboarding -->
+    <string name="address_gps_detecting">Detecting your location…</string>
+    <string name="address_gps_search">Search GPS Location</string>
+    <string name="address_gps_subtitle">Please allow location access to add your address.</string>
+    <string name="address_gps_feature_accuracy">Accurate location detection</string>
+    <string name="address_gps_feature_secure">Secure &amp; private</string>
+    <string name="address_gps_searching_btn">Searching Location…</string>
+    <string name="address_gps_use_btn">Use GPS Location</string>
+
+    <!-- Location Detected Form -->
+    <string name="address_detected_label">Detected Address</string>
+    <string name="address_save_as_label">Save Address As</string>
+    <string name="address_tag_home">Home</string>
+    <string name="address_tag_work">Work</string>
+    <string name="address_tag_other">Other</string>
+    <string name="address_tag_custom_placeholder">Custom Tag Name (e.g. Gym, Friend\'s House)</string>
+    <string name="address_set_default_label">Set as default address</string>
+    <string name="address_set_default_subtitle">Use this address for default delivery</string>
+    <string name="address_btn_confirm">Confirm Address</string>
+
+    <!-- Address List & Items -->
+    <string name="address_saved_list_title">Saved Addresses</string>
+    <string name="address_delete_dialog_title">Delete Address</string>
+    <string name="address_delete_dialog_msg">Are you sure you want to delete this address?</string>
+    <string name="address_delete_btn">Delete</string>
+    <string name="address_cancel_btn">Cancel</string>
+    <string name="address_added_success_title">Address Added!</string>
+    <string name="address_added_success_msg">Your address has been saved successfully.</string>
+    <string name="address_badge_default">Default</string>
+    <string name="address_more_options_desc">More Options</string>
+    <string name="address_menu_set_default">Set as Default</string>
+    <string name="address_menu_delete">Delete</string>
+    <string name="address_dismiss_desc">Dismiss</string>
+
+    <!-- Errors & Fallbacks -->
+    <string name="address_error_gps_failed">GPS Location could not be detected. Please try again.</string>
+    <string name="address_error_geocoding_failed">Unable to determine street address for this location.</string>
+
+    <!-- Location Permissions Dialogs -->
+    <string name="address_permission_required_title">Location Permission Required</string>
+    <string name="address_permission_required_msg">This app requires location permission to detect your current address for shipping and delivery. Please grant the permission.</string>
+    <string name="address_permission_retry_btn">Retry</string>
+    <string name="address_permission_denied_title">Permission Permanently Denied</string>
+    <string name="address_permission_denied_msg">Location permissions are permanently denied. Please enable them in app settings to use GPS detection.</string>
+    <string name="address_permission_settings_btn">Go to Settings</string>
+
+    <!-- Map Picker strings -->
+    <string name="address_btn_select_on_map">Select location manually on map</string>
+    <string name="address_search_hint">Search area, street, or city…</string>
+    <string name="address_btn_confirm_location">Confirm Selected Location</string>
+    <string name="address_error_location_not_found">Location not found. Please try a different search query.</string>
+
+    <!-- Redesigned Location Detected screen -->
+    <string name="address_heading_detected">We found your location!</string>
+    <string name="address_heading_selected">Location Selected</string>
+    <string name="address_subheading">Please confirm or adjust your address.</string>
+    <string name="address_btn_detect_automatically">Detect location automatically via GPS</string>
+    <string name="address_label_detected">Detected Address</string>
+    <string name="address_label_selected">Selected Address</string>
+    <string name="address_tap_to_select_location">Tap map to select location</string>
+    <string name="address_edit_on_map">Edit on map</string>
+    <string name="address_success_added">Address added successfully.</string>
+    <string name="address_accurate_badge">Accurate</string>
+    <string name="address_error_location_missing">Please select a location on the map first.</string>
+    <string name="address_select_location_title">Select Location</string>
+
 </resources>

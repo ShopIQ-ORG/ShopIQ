@@ -10,6 +10,8 @@ import com.iti.presentation.screens.cart.CartViewModel
 import com.iti.presentation.screens.category.CategoryViewModel
 import com.iti.presentation.screens.categorydetails.CategoryDetailsViewModel
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
+import com.iti.presentation.screens.orderdetails.OrderDetailsViewModel
+import com.iti.presentation.screens.orders.OrdersViewModel
 import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
@@ -20,6 +22,7 @@ import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatViewModel
 import com.iti.presentation.screens.ai.history.AiHistoryViewModel
+import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -48,4 +51,9 @@ val presentationModule = module {
     viewModelOf(::CartBadgeViewModel)
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
     viewModel { PaymentMethodViewModel() }
+    viewModelOf(::OrdersViewModel)
+    viewModelOf(::OrderDetailsViewModel)
+
+
+    viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
 }
