@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AssignmentReturn
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.AssignmentReturn
@@ -64,7 +65,7 @@ fun HomeFeaturesBar(
 
             // Easy Returns Feature
             FeatureItem(
-                icon = Icons.Default.AssignmentReturn,
+                icon = Icons.AutoMirrored.Filled.AssignmentReturn,
                 title = stringResource(R.string.easy_returns_title),
                 subtitle = stringResource(R.string.easy_returns_desc),
                 modifier = Modifier.weight(1f)
