@@ -280,5 +280,6 @@
     <string name="address_success_added">Address added successfully.</string>
     <string name="address_accurate_badge">Accurate</string>
     <string name="address_error_location_missing">Please select a location on the map first.</string>
+    <string name="address_select_location_title">Select Location</string>
 
 </resources>

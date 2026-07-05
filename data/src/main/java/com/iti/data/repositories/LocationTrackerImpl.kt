@@ -15,6 +15,23 @@ class LocationTrackerImpl(
 
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): LocationCoordinates? {
+        val lastLoc = suspendCancellableCoroutine { continuation ->
+            locationClient.lastLocation
+                .addOnSuccessListener { loc ->
+                    continuation.resume(loc)
+                }
+                .addOnFailureListener {
+                    continuation.resume(null)
+                }
+                .addOnCanceledListener {
+                    continuation.resume(null)
+                }
+        }
+
+        if (lastLoc != null) {
+            return LocationCoordinates(lastLoc.latitude, lastLoc.longitude)
+        }
+
         return suspendCancellableCoroutine { continuation ->
             val cts = CancellationTokenSource()
             locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token)

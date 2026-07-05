@@ -11,19 +11,20 @@ import com.iti.domain.usecases.address.DeleteAddressUseCase
 import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.location.GetCurrentLocationUseCase
+import com.iti.presentation.BuildConfig
 import com.iti.presentation.R
 import com.iti.presentation.util.LocationHelper
 import com.iti.presentation.util.UiText
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class AddressViewModel (
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
@@ -36,8 +37,12 @@ class AddressViewModel (
     private val _state = MutableStateFlow(AddressContract.State())
     val state: StateFlow<AddressContract.State> = _state.asStateFlow()
 
-    private val _effect = Channel<AddressContract.Effect>(Channel.BUFFERED)
-    val effect = _effect.receiveAsFlow()
+    private val _effect = MutableSharedFlow<AddressContract.Effect>(
+        replay = 0,
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.SUSPEND
+    )
+    val effect = _effect.asSharedFlow()
 
     private var temporaryDetectedAddress: Address? = null
     private var searchJob: Job? = null
@@ -282,7 +287,7 @@ class AddressViewModel (
         }
         searchJob = viewModelScope.launch {
             delay(500) // Debounce 500ms
-            val suggestions = LocationHelper.getSuggestions(context, query, com.iti.presentation.BuildConfig.MAPS_API_KEY)
+            val suggestions = LocationHelper.getSuggestions(context, query, BuildConfig.MAPS_API_KEY)
             _state.update { it.copy(searchSuggestions = suggestions) }
         }
     }
@@ -293,12 +298,12 @@ class AddressViewModel (
     }
 
     suspend fun searchLocationByName(query: String): LocationCoordinates? {
-        return LocationHelper.searchLocationByName(context, query, com.iti.presentation.BuildConfig.MAPS_API_KEY)
+        return LocationHelper.searchLocationByName(context, query, BuildConfig.MAPS_API_KEY)
     }
 
     private fun emitEffect(effect: AddressContract.Effect) {
         viewModelScope.launch {
-            _effect.send(effect)
+            _effect.emit(effect)
         }
     }
 }

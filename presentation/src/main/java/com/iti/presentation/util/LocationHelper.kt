@@ -9,7 +9,6 @@ import com.iti.presentation.screens.address.AddressContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -79,7 +78,7 @@ object LocationHelper {
         val systemResult = searchLocationByNameWithGeocoder(context, query)
         if (systemResult != null) return systemResult
 
-        val suggestions = getSuggestionsFromGoogleGeocoding(query, apiKey)
+        val suggestions = getSuggestionsFromGooglePlaces(query, apiKey)
         if (suggestions.isNotEmpty()) {
             return LocationCoordinates(suggestions[0].latitude, suggestions[0].longitude)
         }
@@ -124,13 +123,13 @@ object LocationHelper {
     }
 
     suspend fun getSuggestions(context: Context, query: String, apiKey: String): List<AddressContract.PlaceSuggestion> {
-        // Try system Geocoder suggestions first (free, robust, doesn't require Google Console key authorization)
-        val systemSuggestions = getSuggestionsFromGeocoder(context, query)
-        if (systemSuggestions.isNotEmpty()) {
-            return systemSuggestions
+        // Try Google Places Text Search first (highly optimized for POIs like ITI, Smart Village, and addresses)
+        val googleSuggestions = getSuggestionsFromGooglePlaces(query, apiKey)
+        if (googleSuggestions.isNotEmpty()) {
+            return googleSuggestions
         }
-        // Fallback to Google Geocoding API web service
-        return getSuggestionsFromGoogleGeocoding(query, apiKey)
+        // Fallback to system Geocoder
+        return getSuggestionsFromGeocoder(context, query)
     }
 
     private suspend fun getSuggestionsFromGeocoder(context: Context, query: String): List<AddressContract.PlaceSuggestion> {
@@ -172,13 +171,13 @@ object LocationHelper {
         }
     }
 
-    suspend fun getSuggestionsFromGoogleGeocoding(query: String, apiKey: String): List<AddressContract.PlaceSuggestion> {
+    suspend fun getSuggestionsFromGooglePlaces(query: String, apiKey: String): List<AddressContract.PlaceSuggestion> {
         return withContext(Dispatchers.IO) {
             val suggestions = mutableListOf<AddressContract.PlaceSuggestion>()
             var connection: HttpURLConnection? = null
             try {
                 val encodedQuery = URLEncoder.encode(query, "UTF-8")
-                val url = URL("https://maps.googleapis.com/maps/api/geocode/json?address=$encodedQuery&key=$apiKey")
+                val url = URL("https://maps.googleapis.com/maps/api/place/textsearch/json?query=$encodedQuery&key=$apiKey")
                 connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 5000
@@ -194,15 +193,20 @@ object LocationHelper {
                     reader.close()
 
                     val jsonObject = org.json.JSONObject(response.toString())
-                    val jsonArray = jsonObject.getJSONArray("results")
-                    for (i in 0 until jsonArray.length()) {
-                        val result = jsonArray.getJSONObject(i)
-                        val displayName = result.getString("formatted_address")
-                        val geometry = result.getJSONObject("geometry")
-                        val location = geometry.getJSONObject("location")
-                        val lat = location.getDouble("lat")
-                        val lon = location.getDouble("lng")
-                        suggestions.add(AddressContract.PlaceSuggestion(displayName, lat, lon))
+                    val status = jsonObject.optString("status", "")
+                    if (status == "OK" || status == "ZERO_RESULTS") {
+                        val jsonArray = jsonObject.getJSONArray("results")
+                        for (i in 0 until minOf(jsonArray.length(), 5)) {
+                            val result = jsonArray.getJSONObject(i)
+                            val name = result.getString("name")
+                            val formattedAddress = result.getString("formatted_address")
+                            val displayName = "$name, $formattedAddress"
+                            val geometry = result.getJSONObject("geometry")
+                            val location = geometry.getJSONObject("location")
+                            val lat = location.getDouble("lat")
+                            val lon = location.getDouble("lng")
+                            suggestions.add(AddressContract.PlaceSuggestion(displayName, lat, lon))
+                        }
                     }
                 }
             } catch (e: Exception) {

@@ -21,7 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
@@ -67,11 +67,14 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.iti.presentation.R
+import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.screens.address.AddressContract
 import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.ui.theme.BackgroundDark
 import com.iti.presentation.ui.theme.ShopIQTheme
+import com.iti.presentation.util.LocationHelper
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("LocalContextGetResourceValueCall")
@@ -98,6 +101,32 @@ fun AddressMapPicker(
     // Setup camera position state
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(initialLatitude, initialLongitude), 17f)
+    }
+
+    var lastGeocodedLatLng by remember { mutableStateOf<LatLng?>(null) }
+
+    // Sync camera panning with search bar query (debounced)
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (!cameraPositionState.isMoving) {
+            val center = cameraPositionState.position.target
+            val last = lastGeocodedLatLng
+            if (last == null || Math.abs(center.latitude - last.latitude) > 0.0001 || Math.abs(center.longitude - last.longitude) > 0.0001) {
+                delay(800) // Debounce
+                try {
+                    val address = LocationHelper.getAddressFromCoordinates(context, center.latitude, center.longitude)
+                    val addressStr = listOfNotNull(
+                        address.street.takeIf { it.isNotBlank() },
+                        address.city.takeIf { it.isNotBlank() },
+                        address.country.takeIf { it.isNotBlank() }
+                    ).joinToString(", ")
+                    
+                    searchQuery = addressStr
+                    lastGeocodedLatLng = center
+                } catch (e: Exception) {
+                    // Ignore geocoding errors during map panning
+                }
+            }
+        }
     }
 
     // Collect effects from ViewModel (e.g. MoveCameraToLocation when GPS finishes fetching)
@@ -142,7 +171,13 @@ fun AddressMapPicker(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            BackTopBar(
+                title = stringResource(R.string.address_select_location_title),
+                onBack = onBackClick
+            )
+        }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -204,12 +239,12 @@ fun AddressMapPicker(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = {
+                        searchQuery = ""
                         viewModel?.sendIntent(AddressContract.Intent.ClearSuggestions)
-                        onBackClick()
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.address_cancel_btn),
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear search query",
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -328,19 +363,11 @@ fun AddressMapPicker(
                     .padding(bottom = 96.dp, end = 24.dp)
                     .size(56.dp)
             ) {
-                if (state.isDetectingLocation) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.MyLocation,
-                        contentDescription = "Current Location",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.MyLocation,
+                    contentDescription = "Current Location",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
 
             // Bottom Confirmation Button
