@@ -62,6 +62,27 @@
     <string name="try_eslam_btn">ابدأ المحادثة</string>
     <string name="suggestions_title">اقتراحات لك</string>
     <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>
+    <string name="deals_of_the_day">عروض اليوم</string>
+
+    <!-- AI Picks -->
+    <string name="ai_picks_title">مختارات الذكاء الاصطناعي لك</string>
+    <string name="ai_picks_subtitle">مخصصة لك فقط</string>
+
+    <!-- Banners -->
+    <string name="new_arrivals_title">وصلنا حديثاً</string>
+    <string name="new_arrivals_desc">أحدث الموديلات\nالتي وصلت للتو</string>
+    <string name="summer_sale_title">عروض الصيف</string>
+    <string name="summer_sale_desc">خصم حتى 40% على\nقطع مختارة</string>
+    <string name="explore_btn">اكتشف الآن</string>
+    <string name="shop_now_btn">تسوق الآن</string>
+
+    <!-- Features -->
+    <string name="free_delivery_title">شحن مجاني</string>
+    <string name="free_delivery_desc">للطلبات فوق 1500 جنيه</string>
+    <string name="easy_returns_title">إرجاع سهل</string>
+    <string name="easy_returns_desc">سياسة إرجاع خلال 14 يوم</string>
+    <string name="secure_payment_title">آمن</string>
+    <string name="secure_payment_desc">عملية دفع آمنة 100%</string>
 
     <!-- Filter Screen -->
     <string name="filter_title">الفلاتر</string>
