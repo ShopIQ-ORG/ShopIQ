@@ -24,6 +24,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
+import com.iti.presentation.util.NetworkMonitor
 
 private val ILLUSTRATION_SIZE = 260.dp
 private val BUTTON_HEIGHT = 52.dp
@@ -50,6 +55,14 @@ fun NoInternetScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val networkMonitor = remember { NetworkMonitor(context) }
+    val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
+
+    LaunchedEffect(isConnected) {
+        if (isConnected) {
+            onRetry()
+        }
+    }
 
     Column(
         modifier = modifier
