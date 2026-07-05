@@ -22,6 +22,7 @@ import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatViewModel
 import com.iti.presentation.screens.ai.history.AiHistoryViewModel
+import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -54,4 +55,5 @@ val presentationModule = module {
     viewModelOf(::OrderDetailsViewModel)
 
 
+    viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
 }

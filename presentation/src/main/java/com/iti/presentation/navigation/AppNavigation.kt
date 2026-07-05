@@ -25,6 +25,8 @@ import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
 import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
+import com.iti.presentation.screens.address.AddressScreen
+import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
@@ -292,6 +294,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     order = it.order,
                     onNavigateBack = ::navigateBack,
                     onNavigateToSupport = {}
+                )
+            }
+
+            entry<Screen.ManageAddresses> {
+                val addressViewModel: AddressViewModel = koinViewModel()
+
+                AddressScreen(
+                    viewModel = addressViewModel,
+                    onNavigateBack = ::navigateBack
                 )
             }
         }

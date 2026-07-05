@@ -16,6 +16,7 @@ val localProperties = Properties().apply {
 val googleWebClientId = localProperties.getProperty("google.web.client.id") ?: "YOUR_GOOGLE_WEB_CLIENT_ID"
 val facebookAppId = localProperties.getProperty("facebook.app.id") ?: "YOUR_FACEBOOK_APP_ID"
 val facebookClientToken = localProperties.getProperty("facebook.client.token") ?: "YOUR_FACEBOOK_CLIENT_TOKEN"
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
 
 android {
     namespace = "com.iti.presentation"
@@ -40,6 +41,10 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         buildConfigField("String", "FACEBOOK_APP_ID", "\"$facebookAppId\"")
         buildConfigField("String", "FACEBOOK_CLIENT_TOKEN", "\"$facebookClientToken\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
 
         resValue("string", "google_web_client_id", googleWebClientId)
         resValue("string", "facebook_app_id", facebookAppId)
@@ -74,6 +79,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -97,6 +103,8 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.facebook.login)
+    implementation(libs.google.play.services.maps)
+    implementation(libs.google.maps.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
