@@ -32,6 +32,8 @@ class ProductsRepositoryImpl(
             val shopifyResponse = remoteDataSource.getProductsByNumber(count)
             val domainProducts = shopifyResponse.toDomainProducts()
             emit(Result.Success(domainProducts))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }
@@ -53,6 +55,8 @@ class ProductsRepositoryImpl(
                     )
                 )
             )
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }
@@ -76,6 +80,8 @@ class ProductsRepositoryImpl(
                     brand.name.uppercase().trim() !in EXCLUDED_CATEGORIES
                 }
             emit(Result.Success(brands))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
@@ -86,6 +92,8 @@ class ProductsRepositoryImpl(
         try {
             val ads = remoteDataSource.getAds().map { it.toDomainAd() }
             emit(Result.Success(ads))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
@@ -97,6 +105,8 @@ class ProductsRepositoryImpl(
             val response = remoteDataSource.getProductDetails(productId)
             val domainProduct = response.toDomainProduct()
             emit(Result.Success(domainProduct))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
@@ -108,6 +118,8 @@ class ProductsRepositoryImpl(
             val data = remoteDataSource.getMainCategories()
             val categories = data.toDomainCategories()
             emit(Result.Success(categories))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
@@ -149,6 +161,8 @@ class ProductsRepositoryImpl(
         try {
             val response = remoteDataSource.getProducts(first = 20, query = query)
             emit(Result.Success(response.toDomainProducts()))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }
@@ -162,6 +176,8 @@ class ProductsRepositoryImpl(
                 sortKey = com.iti.data.type.ProductSortKeys.BEST_SELLING
             )
             emit(Result.Success(response.toDomainProducts()))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }
@@ -172,6 +188,8 @@ class ProductsRepositoryImpl(
         try {
             val response = remoteDataSource.getProductsByCategory(categoryId)
             emit(Result.Success(response.toDomainProducts()))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }

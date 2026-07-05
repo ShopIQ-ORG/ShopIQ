@@ -35,7 +35,7 @@ val presentationModule = module {
     single { com.iti.domain.usecases.ai.ClearChatHistoryUseCase(get()) }
     viewModel { AiChatViewModel(get(), get(), get()) }
     viewModel { AiHistoryViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { SignInViewModel(get(), get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }

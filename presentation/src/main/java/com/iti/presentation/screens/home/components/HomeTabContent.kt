@@ -67,6 +67,7 @@ fun HomeTabContent(
 
             is HomeContract.ScreenState.Success -> {
                 val data = screenState.data
+                val stableShuffled = remember(data.products) { data.products.shuffled() }
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -96,6 +97,14 @@ fun HomeTabContent(
                         )
                     }
 
+                    // Show Eslam card below Ads only if the user is a guest (not logged in)
+                    val isGuest = state.currentUser == null || state.currentUser is com.iti.domain.models.User.GuestUser
+                    if (isGuest) {
+                        item {
+                            TryEslamCard(onTryEslamClick = { onIntent(HomeContract.Intent.NavigateToAiChat) })
+                        }
+                    }
+
                     item {
                         SectionHeader(
                             title = stringResource(R.string.top_brands),
@@ -107,6 +116,22 @@ fun HomeTabContent(
                                 onIntent(HomeContract.Intent.BrandClicked(brand.name))
                             }
                         )
+                    }
+
+                    // Show Suggestions Section only if the user is authenticated (not a guest) and has history in Firestore
+                    if (!isGuest && state.hasChatHistory) {
+                        item {
+                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
+                                state.aiRecommendedProducts
+                            } else {
+                                stableShuffled
+                            }
+                            SuggestionsSection(
+                                products = suggestionsProducts,
+                                isLoading = state.isLoadingRecommendations,
+                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) }
+                            )
+                        }
                     }
 
                     item {

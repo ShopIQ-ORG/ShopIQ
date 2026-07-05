@@ -61,12 +61,12 @@ fun HomeScreen(
     onNavigateToAiHistory: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
+    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-
                 is HomeContract.Effect.NavigateToAllBrands -> {
                     onNavigateToAllBrands()
                 }
@@ -93,20 +93,26 @@ fun HomeScreen(
                 HomeContract.Effect.ShowAuthRequired -> {
                     onLogout()
                 }
+
+                HomeContract.Effect.NavigateToAiChat -> {
+                    selectedIndex = 2 // AI tab index
+                }
             }
         }
     }
 
-    HomeScreenContent(
-        state = state,
-        onNavigateToProduct = onNavigateToProduct,
-        onIntent = viewModel::sendIntent,
-        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
-        onCartClick = onCartClick,
-        onCategoryClick = onCategoryClick,
-        onNavigateToAiHistory = onNavigateToAiHistory,
-        onNavigateToOrders = onNavigateToOrders
-    )
+HomeScreenContent(
+    state = state,
+    onNavigateToProduct = onNavigateToProduct,
+    onIntent = viewModel::sendIntent,
+    onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
+    onCartClick = onCartClick,
+    onCategoryClick = onCategoryClick,
+    onNavigateToAiHistory = onNavigateToAiHistory,
+    selectedIndex = selectedIndex,
+    onSelectedIndexChanged = { selectedIndex = it },
+    onNavigateToOrders = onNavigateToOrders
+)
 }
 
 @Composable
@@ -118,7 +124,9 @@ fun HomeScreenContent(
     onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onLogout: () -> Unit,
     onCartClick: () -> Unit,
-    onNavigateToAiHistory: () -> Unit
+    onNavigateToAiHistory: () -> Unit,
+    selectedIndex: Int,
+    onSelectedIndexChanged: (Int) -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -140,12 +148,10 @@ fun HomeScreenContent(
         wasConnected = isConnected
     }
 
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
-
     val navItems = BottomNavItem.entries
 
     BackHandler(enabled = selectedIndex != 0) {
-        selectedIndex = 0
+        onSelectedIndexChanged(0)
     }
 
     Scaffold(
@@ -205,26 +211,34 @@ fun HomeScreenContent(
                                             spotColor = Color(0xFF6F32E5)
                                         )
                                         .background(
-                                            brush = if (isSelected) {
-                                                Brush.linearGradient(listOf(Color(0xFF8B5CF6), Color(0xFF4F46E5)))
-                                            } else {
-                                                if (isDark) {
-                                                    Brush.linearGradient(listOf(Color(0xFF2A3038), Color(0xFF1E242B)))
+                                            brush = if (isDark) {
+                                                if (isSelected) {
+                                                    Brush.linearGradient(listOf(Color(0xFF3B1E78), Color(0xFF2C145C)))
                                                 } else {
-                                                    Brush.linearGradient(listOf(Color(0xFFF3F4F6), Color(0xFFE5E7EB)))
+                                                    Brush.linearGradient(listOf(Color(0xFF2A1B4E), Color(0xFF20103E)))
+                                                }
+                                            } else {
+                                                if (isSelected) {
+                                                    Brush.linearGradient(listOf(Color(0xFFF0E8FF), Color(0xFFE8DDFF)))
+                                                } else {
+                                                    Brush.linearGradient(listOf(Color(0xFFF6F1FF), Color(0xFFECE0FF)))
                                                 }
                                             },
                                             shape = CircleShape
                                         )
                                         .clickable {
-                                            selectedIndex = index
+                                            onSelectedIndexChanged(index)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         painter = painterResource(id = item.iconResId!!),
                                         contentDescription = item.label,
-                                        tint = if (isSelected) Color.White else iconColor,
+                                        tint = if (isDark) {
+                                            if (isSelected) Color(0xFFD4BFFF) else Color(0xFF9E80E5)
+                                        } else {
+                                            if (isSelected) Color(0xFF6F32E5) else Color(0xFF8C52FF)
+                                        },
                                         modifier = Modifier.size(28.dp) // Large sparkle icon
                                     )
                                 }
@@ -255,7 +269,7 @@ fun HomeScreenContent(
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                selectedIndex = index
+                                onSelectedIndexChanged(index)
                             },
                             icon = {
                                 Icon(
@@ -314,7 +328,7 @@ fun HomeScreenContent(
 
             BottomNavItem.AI -> {
                 AiChatScreen(
-                    onBackClick = { selectedIndex = 0 },
+                    onBackClick = { onSelectedIndexChanged(0) },
                     onHistoryClick = onNavigateToAiHistory,
                     currentUser = state.currentUser,
                     onAuthClick = onLogout,
@@ -329,7 +343,7 @@ fun HomeScreenContent(
                         val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
                         onNavigateToProduct(idLong)
                     },
-                    onExploreClick = { selectedIndex = 0 },
+                    onExploreClick = { onSelectedIndexChanged(0) },
                     onAuthClick = onLogout
                 )
             }
