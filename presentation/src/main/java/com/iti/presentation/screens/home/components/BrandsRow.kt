@@ -21,7 +21,7 @@ fun BrandsRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(brands) { brand ->
+        items(brands, key = { it.id }) { brand ->
             BrandCard(brand = brand, onClick = { onBrandClick(brand) })
         }
     }

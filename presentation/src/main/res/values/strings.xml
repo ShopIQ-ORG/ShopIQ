@@ -259,4 +259,24 @@
     <string name="suggestions_title">Suggestions</string>
     <string name="suggestions_general_subtitle">Products you might like</string>
     <string name="deals_of_the_day">Deals of the Day</string>
+
+    <!-- AI Picks -->
+    <string name="ai_picks_title">AI Picks for You</string>
+    <string name="ai_picks_subtitle">Personalized just for you</string>
+
+    <!-- Banners -->
+    <string name="new_arrivals_title">New Arrivals</string>
+    <string name="new_arrivals_desc">Fresh styles\njust landed</string>
+    <string name="summer_sale_title">Summer Sale</string>
+    <string name="summer_sale_desc">Up to 40% off on\nselected items</string>
+    <string name="explore_btn">Explore</string>
+    <string name="shop_now_btn">Shop Now</string>
+
+    <!-- Features -->
+    <string name="free_delivery_title">Free Delivery</string>
+    <string name="free_delivery_desc">On orders over 1500 EGP</string>
+    <string name="easy_returns_title">Easy Returns</string>
+    <string name="easy_returns_desc">14-day return policy</string>
+    <string name="secure_payment_title">Secure</string>
+    <string name="secure_payment_desc">100% secure checkout</string>
 </resources>

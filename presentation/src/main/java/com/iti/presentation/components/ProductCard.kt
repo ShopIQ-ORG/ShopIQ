@@ -121,9 +121,9 @@ fun ProductCard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            modifier = Modifier.height(42.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
                 text = "${product.minPrice.amount} ${product.minPrice.currencyCode}",

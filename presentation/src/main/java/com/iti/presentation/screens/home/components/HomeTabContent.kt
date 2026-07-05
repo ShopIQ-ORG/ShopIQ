@@ -69,6 +69,7 @@ fun HomeTabContent(
             is HomeContract.ScreenState.Success -> {
                 val data = screenState.data
                 val stableShuffled = remember(data.products) { data.products.shuffled() }
+                val discountProducts = remember(data.products) { data.products.filter { it.hasDiscount } }
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -106,8 +107,7 @@ fun HomeTabContent(
                         }
                     }
 
-                    // Deals of the Day Section (shown for both guest and authenticated users)
-                    val discountProducts = data.products.filter { it.hasDiscount }
+                    // 1. Deals of the Day Section (shown for both guest and authenticated users)
                     if (discountProducts.isNotEmpty()) {
                         item {
                             SectionHeader(
@@ -121,7 +121,7 @@ fun HomeTabContent(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                items(discountProducts) { product ->
+                                items(discountProducts, key = { it.id }) { product ->
                                     ProductCard(
                                         product = product,
                                         onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
@@ -133,6 +133,37 @@ fun HomeTabContent(
                         }
                     }
 
+                    // 2. AI Picks for You (SuggestionsSection) - shown only if authenticated and has history in Firestore
+                    if (!isGuest && state.hasChatHistory) {
+                        item {
+                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
+                                state.aiRecommendedProducts
+                            } else {
+                                stableShuffled
+                            }
+                            SuggestionsSection(
+                                products = suggestionsProducts,
+                                isLoading = state.isLoadingRecommendations,
+                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) },
+                                onNavigateToChat = { onIntent(HomeContract.Intent.NavigateToAiChat) }
+                            )
+                        }
+                    }
+
+                    // 3. New Arrivals & Summer Sale Banners
+                    item {
+                        HomeBanners(
+                            onExploreClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) },
+                            onShopNowClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) }
+                        )
+                    }
+
+                    // 4. Free Delivery / Features Bar
+                    item {
+                        HomeFeaturesBar()
+                    }
+
+                    // 5. Top Brands
                     item {
                         SectionHeader(
                             title = stringResource(R.string.top_brands),
@@ -146,22 +177,7 @@ fun HomeTabContent(
                         )
                     }
 
-                    // Show Suggestions Section only if the user is authenticated (not a guest) and has history in Firestore
-                    if (!isGuest && state.hasChatHistory) {
-                        item {
-                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
-                                state.aiRecommendedProducts
-                            } else {
-                                stableShuffled
-                            }
-                            SuggestionsSection(
-                                products = suggestionsProducts,
-                                isLoading = state.isLoadingRecommendations,
-                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) }
-                            )
-                        }
-                    }
-
+                    // 6. Featured Products
                     item {
                         SectionHeader(
                             title = stringResource(R.string.featured_products),
@@ -175,7 +191,7 @@ fun HomeTabContent(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(data.products.take(6)) { product ->
+                            items(data.products.take(6), key = { it.id }) { product ->
                                 ProductCard(
                                     product = product,
                                     onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },

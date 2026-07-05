@@ -1,6 +1,5 @@
 package com.iti.presentation.screens.home.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +17,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,46 +49,73 @@ fun SuggestionsSection(
     products: List<Product>,
     isLoading: Boolean,
     onProductClick: (Product) -> Unit,
+    onNavigateToChat: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        SuggestionsHeader()
- 
-        when {
-            isLoading -> SuggestionsShimmer()
-            products.isNotEmpty() -> {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(products) { product ->
-                        ProductCard(
-                            product = product,
-                            onClick = { onProductClick(product) },
-                            onFavoriteClick = {},
-                            modifier = Modifier.width(160.dp)
-                        )
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF7F5FF) // Light lavender background
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        ) {
+            // Header Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = "AI Sparkle",
+                    tint = Color(0xFF6F32E5),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.ai_picks_title),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    ),
+                    color = Color(0xFF1E143F)
+                )
+            }
+
+            when {
+                isLoading -> SuggestionsShimmer()
+                products.isNotEmpty() -> {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(products, key = { it.id }) { product ->
+                            ProductCard(
+                                product = product,
+                                onClick = { onProductClick(product) },
+                                onFavoriteClick = {},
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color.White)
+                                    .padding(8.dp)
+                            )
+                        }
                     }
                 }
             }
         }
-    }
-}
- 
-@Composable
-fun SuggestionsHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.suggestions_title),
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
-            color = MaterialTheme.colorScheme.onBackground
-        )
     }
 }
 
@@ -142,7 +172,7 @@ fun TryEslamCard(onTryEslamClick: () -> Unit) {
                         Text(
                             text = stringResource(R.string.try_eslam_btn),
                             style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.SemiBold
+                                  fontWeight = FontWeight.SemiBold
                             ),
                             color = Color.White
                         )
@@ -165,21 +195,25 @@ private fun SuggestionsShimmer() {
     val shimmerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxWidth()
             .shimmer()
     ) {
         items(4) {
             Column(
-                modifier = Modifier.width(160.dp),
+                modifier = Modifier
+                    .width(150.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White)
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .height(150.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(shimmerColor)
                 )
                 Box(
