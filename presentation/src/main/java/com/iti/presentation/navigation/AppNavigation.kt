@@ -91,6 +91,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
                             is SplashDestination.Home ->
                                 replaceRoot(Screen.Home)
+
+                            is SplashDestination.EmailVerification ->
+                                replaceRoot(Screen.EmailVerification(dest.email))
                         }
                     }
                 }
@@ -321,9 +324,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ForgotPasswordScreen(onNavigateBack = ::navigateBack)
             }
 
-            entry<Screen.EmailVerification> {
+            entry<Screen.EmailVerification> { screen ->
                 EmailVerificationScreen(
-                    onNavigateToSignIn = { replaceRoot(Screen.SignIn) }
+                    email = screen.email,
+                    onNavigateToSignIn = { replaceRoot(Screen.SignIn) },
+                    onNavigateToHome = { replaceRoot(Screen.Home) }
                 )
             }
         }

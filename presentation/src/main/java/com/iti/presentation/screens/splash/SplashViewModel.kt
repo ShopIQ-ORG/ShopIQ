@@ -17,6 +17,7 @@ sealed interface SplashDestination {
     object OnBoarding : SplashDestination
     object SignIn : SplashDestination
     object Home : SplashDestination
+    data class EmailVerification(val email: String) : SplashDestination
 }
 
 class SplashViewModel(
@@ -54,7 +55,7 @@ class SplashViewModel(
 
             is User.AuthenticatedUser -> {
                 if (!user.isEmailVerified) {
-                    SplashDestination.SignIn
+                    SplashDestination.EmailVerification(user.email)
                 } else when (getValidShopifyTokenUseCase()) {
                     is Result.Success -> SplashDestination.Home
                     else -> SplashDestination.SignIn

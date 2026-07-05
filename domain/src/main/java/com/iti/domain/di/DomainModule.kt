@@ -25,6 +25,7 @@ import com.iti.domain.usecases.location.GetCurrentLocationUseCase
 import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.address.DeleteAddressUseCase
+import com.iti.domain.usecases.auth.ReloadAndGetCurrentUserUseCase
 import com.iti.domain.usecases.auth.SendEmailVerificationUseCase
 import com.iti.domain.usecases.auth.SendPasswordResetEmailUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
@@ -79,5 +80,7 @@ val domainModule = module {
     factoryOf(::SendPasswordResetEmailUseCase)
     factoryOf(::SendEmailVerificationUseCase)
     factoryOf(::GetValidShopifyTokenUseCase)
+    factoryOf(::ReloadAndGetCurrentUserUseCase)
+
 
 }

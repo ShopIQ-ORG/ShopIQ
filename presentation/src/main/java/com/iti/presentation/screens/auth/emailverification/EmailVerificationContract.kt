@@ -6,21 +6,22 @@ object EmailVerificationContract {
 
     data class State(
         val email: String = "",
-        val isLoading: Boolean = false,
+        val isSendingLink: Boolean = false,
+        val isCheckingVerification: Boolean = false,
+        val resendCooldownSeconds: Int = 0,
         val error: UiText? = null
-    ) {
-        val canSendVerificationLink: Boolean
-            get() = !isLoading
+    )
+
+    sealed interface Event {
+        object SendVerificationLink : Event
+        object CheckVerification : Event
+        object BackToLogin : Event
     }
 
-    sealed class Event {
-        object SendVerificationLink : Event()
-        object BackToLogin : Event()
-    }
-
-    sealed class Effect {
-        object NavigateToSignIn : Effect()
-        data class ShowError(val message: UiText) : Effect()
-        data class ShowInfo(val message: UiText) : Effect()
+    sealed interface Effect {
+        object NavigateToSignIn : Effect
+        object NavigateToHome : Effect
+        data class ShowInfo(val message: UiText) : Effect
+        data class ShowError(val message: UiText) : Effect
     }
 }
