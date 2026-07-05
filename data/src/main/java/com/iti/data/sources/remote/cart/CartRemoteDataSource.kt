@@ -9,4 +9,5 @@ interface CartRemoteDataSource {
     suspend fun updateLines(cartId: String, lineId: String, quantity: Int): CartDto
     suspend fun removeLines(cartId: String, lineIds: List<String>): CartDto
     suspend fun updateDiscountCodes(cartId: String, codes: List<String>): CartDto
+    suspend fun linkCartToCustomer(cartId: String, customerAccessToken: String): CartDto
 }

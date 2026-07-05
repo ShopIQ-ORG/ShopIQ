@@ -1,12 +1,12 @@
 fragment CartFields on Cart {
   id
+  checkoutUrl
 
   lines(first: 100) {
     edges {
       node {
         id
         quantity
-
         cost {
           amountPerQuantity { amount currencyCode }
           subtotalAmount { amount currencyCode }

@@ -2,6 +2,7 @@ package com.iti.data.dto.cart
 
 data class CartDto(
     val id: String,
+    val checkoutUrl: String,
     val lines: List<CartLineDto>,
     val discountCodes: List<DiscountCodeDto>,
     val subtotalAmount: MoneyDto,

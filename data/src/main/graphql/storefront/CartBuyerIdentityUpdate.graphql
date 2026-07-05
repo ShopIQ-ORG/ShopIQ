@@ -1,0 +1,19 @@
+mutation CartBuyerIdentityUpdate($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+
+    cartBuyerIdentityUpdate(
+        cartId:$cartId,
+        buyerIdentity:$buyerIdentity
+    ){
+
+        cart{
+            ...CartFields
+        }
+
+        userErrors{
+            field
+            message
+        }
+
+    }
+
+}
