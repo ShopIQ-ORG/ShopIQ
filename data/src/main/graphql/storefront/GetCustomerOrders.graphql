@@ -1,0 +1,83 @@
+fragment MoneyFields on MoneyV2 {
+  amount
+  currencyCode
+}
+
+query GetCustomerOrders($customerAccessToken: String!) {
+  customer(customerAccessToken: $customerAccessToken) {
+    orders(first: 250) {
+      nodes {
+        id
+        name
+        processedAt
+        financialStatus
+        fulfillmentStatus
+
+        subtotalPrice {
+          ...MoneyFields
+        }
+
+        totalShippingPrice {
+          ...MoneyFields
+        }
+
+        totalPrice {
+          ...MoneyFields
+        }
+
+        totalRefunded {
+          ...MoneyFields
+        }
+
+        totalTax {
+          ...MoneyFields
+        }
+
+        shippingAddress {
+          firstName
+          lastName
+          address1
+          city
+          country
+          zip
+        }
+
+        lineItems(first: 100) {
+          nodes {
+            title
+            quantity
+            currentQuantity
+
+            originalTotalPrice {
+              ...MoneyFields
+            }
+
+            discountedTotalPrice {
+              ...MoneyFields
+            }
+
+            variant {
+              id
+              title
+              sku
+
+              price {
+                ...MoneyFields
+              }
+
+              image {
+                url
+              }
+
+              product {
+                id
+                title
+                handle
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

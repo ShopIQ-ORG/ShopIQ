@@ -18,11 +18,14 @@ import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
 import com.iti.data.sources.remote.auth.AuthRemoteDataSourceImpl
 import com.iti.data.sources.remote.cart.*
+import com.iti.data.sources.remote.orders.OrdersRemoteDataSource
+import com.iti.data.sources.remote.orders.OrdersRemoteDataSourceImpl
 import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSource
 import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSourceImpl
 import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.data.sources.remote.user.UserRemoteDataSourceImpl
 import com.iti.data.utils.ShopifyNetworkConfig
+import com.iti.domain.models.auth.ShopifyCustomerToken
 import com.iti.domain.repositories.ai.ChatbotRepository
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
@@ -31,9 +34,11 @@ import com.iti.domain.repositories.orders.OrdersRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
+import com.iti.domain.util.ShopifyTokenProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
+import org.koin.dsl.binds
 import org.koin.dsl.module
 
 val dataModule = module {
@@ -63,9 +68,13 @@ val dataModule = module {
 
     // Auth
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get()) }
-    single<AuthRepository> {
+
+    single {
         AuthRepositoryImpl(get(), get(), get(), get())
-    }
+    } binds arrayOf(
+        AuthRepository::class,
+        ShopifyTokenProvider::class
+    )
 
     // Chatbot
     single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get(), androidContext()) }
@@ -93,7 +102,13 @@ val dataModule = module {
         CartRepositoryImpl(get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
 
-    single<OrdersRepository> { OrdersRepositoryImpl() }
+    single<OrdersRemoteDataSource> {
+        OrdersRemoteDataSourceImpl(
+            get(named("storefrontApolloClient")),
+        )
+    }
+
+    single<OrdersRepository> { OrdersRepositoryImpl(get(), get()) }
 
 
     // Other repos

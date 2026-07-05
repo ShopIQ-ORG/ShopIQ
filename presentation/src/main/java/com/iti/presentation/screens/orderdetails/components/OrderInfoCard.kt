@@ -23,17 +23,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.iti.domain.models.order.OrderDetails
+import com.iti.domain.models.order.Money
+import com.iti.domain.models.order.Order
+import com.iti.domain.models.order.OrderFinancialStatus
 import com.iti.domain.models.order.OrderStatus
 import com.iti.presentation.R
 import com.iti.presentation.screens.orders.components.OrderStatusStyle
+import com.iti.presentation.screens.orders.components.previewOrder
 import com.iti.presentation.screens.orders.components.toStyle
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.util.toDisplayDate
 
 @Composable
-fun OrderInfoCard(orderDetails: OrderDetails) {
-    val style = orderDetails.fulfillmentStatus.toStyle()
+fun OrderInfoCard(order: Order) {
+    val style = order.fulfillmentStatus.toStyle()
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -62,13 +65,13 @@ fun OrderInfoCard(orderDetails: OrderDetails) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.order_card_title, orderDetails.name),
+                    text = stringResource(R.string.order_card_title, order.name),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(Modifier.width(2.dp))
                 Text(
-                    text = orderDetails.createdAt.toDisplayDate(),
+                    text = order.createdAt.toDisplayDate(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -165,7 +168,7 @@ private fun OrderStatus.toBannerContent(): OrderStatusBannerContent = when (this
 @Composable
 private fun OrderInfoCardPreview() {
     ShopIQTheme {
-        OrderInfoCard(orderDetails = previewOrderDetails())
+        OrderInfoCard(order = previewOrder())
     }
 }
 
@@ -200,18 +203,3 @@ private fun CancelledBannerPreview() {
         OrderStatusBanner(status = OrderStatus.CANCELLED)
     }
 }
-
-private fun previewOrderDetails() = OrderDetails(
-    id = "1",
-    name = "#ORD-2024-1001",
-    createdAt = "2024-05-20T10:30:00Z",
-    financialStatus = "paid",
-    fulfillmentStatus = OrderStatus.COMPLETED,
-    subtotalPrice = 95.50,
-    totalShippingPrice = 10.0,
-    totalPrice = 100.50,
-    totalDiscounts = 5.0,
-    currencyCode = "USD",
-    shippingAddress = null,
-    lineItems = emptyList()
-)

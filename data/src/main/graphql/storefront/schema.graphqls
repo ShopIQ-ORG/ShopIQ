@@ -5,10 +5,13 @@ schema {
 
 scalar DateTime
 scalar URL
-scalar Money
 
 type QueryRoot {
   cart(id: ID!): Cart
+
+  # Orders only exist behind the customer connection — there is no root-level
+  # order(id:) lookup on the Storefront API, so don't add one back.
+  customer(customerAccessToken: String!): Customer
 }
 
 type Mutation {
@@ -62,6 +65,7 @@ interface CartLineMerchandise {
 type ProductVariant implements CartLineMerchandise {
   id: ID!
   title: String!
+  sku: String
   image: Image
   price: MoneyV2!
   compareAtPrice: MoneyV2
@@ -180,6 +184,7 @@ type Customer {
   firstName: String
   lastName: String
   phone: String
+  orders(first: Int!): OrderConnection!
 }
 
 type CustomerAccessToken {
@@ -234,6 +239,77 @@ enum CustomerErrorCode {
   CONTAINS_HTML_TAGS
   CONTAINS_URL
   TOKEN_INVALID
+}
+
+# ---------- Orders ----------
+# One connection, `nodes` shorthand only — the app always wants the full
+# order payload in one shot, there's no separate "details" fetch anymore.
+
+type OrderConnection {
+  nodes: [Order!]!
+}
+
+type Order {
+  id: ID!
+  name: String!
+  processedAt: DateTime!
+
+  financialStatus: OrderFinancialStatus!
+  fulfillmentStatus: OrderFulfillmentStatus!
+
+  subtotalPrice: MoneyV2!
+  totalShippingPrice: MoneyV2!
+  totalPrice: MoneyV2!
+  totalRefunded: MoneyV2!
+  totalTax: MoneyV2!
+
+  shippingAddress: MailingAddress
+  lineItems(first: Int!): OrderLineItemConnection!
+}
+
+enum OrderFinancialStatus {
+  PENDING
+  AUTHORIZED
+  PARTIALLY_PAID
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  VOIDED
+  EXPIRED
+}
+
+enum OrderFulfillmentStatus {
+  UNFULFILLED
+  PARTIALLY_FULFILLED
+  FULFILLED
+  RESTOCKED
+  PENDING_FULFILLMENT
+  OPEN
+  IN_PROGRESS
+  ON_HOLD
+  SCHEDULED
+}
+
+type MailingAddress {
+  firstName: String
+  lastName: String
+  address1: String
+  city: String
+  country: String
+  zip: String
+}
+
+type OrderLineItemConnection {
+  nodes: [OrderLineItem!]!
+}
+
+type OrderLineItem {
+  title: String!
+  quantity: Int!
+  currentQuantity: Int!
+  originalTotalPrice: MoneyV2!
+  discountedTotalPrice: MoneyV2!
+  variant: ProductVariant
 }
 
 # ---------- Shared ----------

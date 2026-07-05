@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import com.iti.domain.models.order.Money
 import com.iti.domain.models.order.OrderLineItem
 import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
@@ -40,14 +40,14 @@ fun OrderItemsSectionTitle() {
 }
 
 @Composable
-fun OrderLineItemRow(lineItem: OrderLineItem, currencyCode: String) {
+fun OrderLineItemRow(lineItem: OrderLineItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OrderLineItemImage(imageUrl = lineItem.imageUrl)
+        OrderLineItemImage(imageUrl = lineItem.variant?.imageUrl)
 
         Spacer(Modifier.width(12.dp))
 
@@ -58,7 +58,7 @@ fun OrderLineItemRow(lineItem: OrderLineItem, currencyCode: String) {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.width(2.dp))
-            lineItem.variantTitle?.let { variantTitle ->
+            lineItem.variant?.title?.let { variantTitle ->
                 Text(
                     text = variantTitle,
                     style = MaterialTheme.typography.bodySmall,
@@ -75,7 +75,7 @@ fun OrderLineItemRow(lineItem: OrderLineItem, currencyCode: String) {
         Spacer(Modifier.width(12.dp))
 
         Text(
-            text = lineItem.price.toCurrency(currencyCode),
+            text = lineItem.discountedTotalPrice.toCurrency(),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -117,11 +117,11 @@ private fun OrderLineItemRowNoImagePreview() {
             lineItem = OrderLineItem(
                 title = "Gift Card",
                 quantity = 1,
-                variantTitle = null,
-                price = 25.0,
-                imageUrl = null
-            ),
-            currencyCode = "USD"
+                currentQuantity = 1,
+                originalTotalPrice = Money(25.0, "USD"),
+                discountedTotalPrice = Money(25.0, "USD"),
+                variant = null
+            )
         )
     }
 }

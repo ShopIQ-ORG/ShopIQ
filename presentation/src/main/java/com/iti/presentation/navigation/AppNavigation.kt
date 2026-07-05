@@ -289,7 +289,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.OrderDetails> {
                 OrderDetailsScreen(
-                    orderId = it.orderId,
+                    order = it.order,
                     onNavigateBack = ::navigateBack,
                     onNavigateToSupport = {}
                 )

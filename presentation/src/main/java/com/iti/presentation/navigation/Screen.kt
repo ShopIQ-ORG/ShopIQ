@@ -1,6 +1,7 @@
 package com.iti.presentation.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.iti.domain.models.order.Order
 
 sealed class Screen : NavKey {
     data object Splash : Screen()
@@ -20,7 +21,7 @@ sealed class Screen : NavKey {
     data object OnlinePayment : Screen()
 
     data object Orders : Screen()
-    data class OrderDetails(val orderId: String) : Screen()
+    data class OrderDetails(val order: Order) : Screen()
 
 
     data object AiHistory : Screen()

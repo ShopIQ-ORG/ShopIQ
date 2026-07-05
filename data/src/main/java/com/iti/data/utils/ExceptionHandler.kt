@@ -14,6 +14,7 @@ import com.iti.domain.exceptions.NetworkException
 import java.io.IOException
 import android.util.Log
 import com.iti.domain.exceptions.CartException
+import com.iti.domain.exceptions.OrderException
 
 fun Throwable.handleException(): Throwable {
     val result = when (this) {
@@ -26,16 +27,17 @@ fun Throwable.handleException(): Throwable {
         is ApolloHttpException -> NetworkException.ServerError(statusCode, message)
         is IOException -> NetworkException.NoConnection()
         is CartException -> this
+        is OrderException -> this
         is AuthException -> this
         is NetworkException -> this
         is AppException -> this
         else -> AppException.Unknown(cause = this)
     }
-    
+
     if (BuildConfig.DEBUG) {
         Log.e("ExceptionHandler", "Exception handled: ${result.message}", this)
     }
-    
+
     return result
 }
 fun Throwable.toFriendlyError(): String {
