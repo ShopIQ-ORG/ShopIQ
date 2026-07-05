@@ -21,6 +21,10 @@ import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.domain.usecases.onboarding.IsOnboardingCompletedUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
 import com.iti.domain.usecases.categories.GetCategoriesUseCase
+import com.iti.domain.usecases.location.GetCurrentLocationUseCase
+import com.iti.domain.usecases.address.GetSavedAddressesUseCase
+import com.iti.domain.usecases.address.SaveAddressUseCase
+import com.iti.domain.usecases.address.DeleteAddressUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
 import com.iti.domain.usecases.orders.GetOrderDetailsUseCase
 import com.iti.domain.usecases.orders.GetOrdersUseCase
@@ -64,6 +68,10 @@ val domainModule = module {
     factory { RemoveCartItemUseCase(get(), get()) }
     factory { ApplyDiscountCodesUseCase(get(), get()) }
     factory { AddCartItemUseCase(get(), get()) }
+    factory { GetCurrentLocationUseCase(get()) }
+    factory { GetSavedAddressesUseCase(get()) }
+    factory { SaveAddressUseCase(get()) }
+    factory { DeleteAddressUseCase(get()) }
     factoryOf(::ObserveCartItemCountUseCase)
     factoryOf(::GetOrdersUseCase)
     factoryOf(::GetOrderDetailsUseCase)
