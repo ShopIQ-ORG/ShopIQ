@@ -3,7 +3,8 @@ package com.iti.data.sources.remote
 import com.iti.data.dto.AdDto
 import com.iti.data.dto.BrandDto
 import com.iti.data.dto.ShopifyResponse
-import com.iti.data.GetMainCategoriesQuery
+import com.iti.data.GetAllCategoriesQuery
+import com.iti.data.GetProductsInCollectionQuery
 
 interface ProductsRemoteDataSource {
     suspend fun getProductsByNumber(first: Int = 10, after: String? = null): ShopifyResponse
@@ -14,7 +15,8 @@ interface ProductsRemoteDataSource {
         reverse: Boolean? = null
     ): ShopifyResponse
     suspend fun getProductDetails(productId: Long): ShopifyResponse
-    suspend fun getMainCategories(): GetMainCategoriesQuery.Data
+    suspend fun getMainCategories(): GetAllCategoriesQuery.Data
+    suspend fun getProductsByCategory(categoryId: String): GetProductsInCollectionQuery.Data
     suspend fun getBrands(): List<BrandDto>
     suspend fun getAds(): List<AdDto>
 }

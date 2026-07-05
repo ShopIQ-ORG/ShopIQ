@@ -25,11 +25,12 @@ fun CustomNetworkImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUrl)
                 .crossfade(true)
+                .placeholder(R.drawable.logo_light)
+                .error(R.drawable.logo_light)
+                .fallback(R.drawable.logo_light)
                 .build(),
             contentDescription = contentDescription,
             contentScale = contentScale,
-            error = painterResource(id = R.drawable.logo_light),
-            fallback = painterResource(id = R.drawable.logo_light),
             modifier = Modifier.matchParentSize()
         )
     }

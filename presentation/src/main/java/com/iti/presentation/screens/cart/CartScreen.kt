@@ -72,7 +72,7 @@ fun CartScreen(
         },
         bottomBar = {
             CartCheckoutButton(
-                visible = state.canCheckout,
+                visible = state.isCheckoutVisible,
                 onCheckoutClick = { viewModel.onEvent(CartContract.Event.ProceedToCheckout) }
             )
         },
@@ -93,9 +93,9 @@ fun CartScreen(
             onTogglePromoExpanded = { viewModel.onEvent(CartContract.Event.TogglePromoExpanded) },
             onPromoInputChanged = { viewModel.onEvent(CartContract.Event.PromoInputChanged(it)) },
             onApplyPromoClick = { viewModel.onEvent(CartContract.Event.ApplyPromoCode) },
-            onRemoveCoupon = { viewModel.onEvent(CartContract.Event.RemoveCoupon(it)) },
             promoErrorMessage = state.promoError?.resolve(context),
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            onRemoveCoupon = {  viewModel.onEvent(CartContract.Event.RemovePromoCode)}
         )
     }
 

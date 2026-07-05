@@ -19,6 +19,7 @@ val adminToken = localProperties.getProperty("shopify.admin.access.token") ?: ""
 val apiKey = localProperties.getProperty("shopify.api.key") ?: ""
 val apiSecretKey = localProperties.getProperty("shopify.api.secret.key") ?: ""
 val storeDomain = localProperties.getProperty("shopify.store.domain") ?: "mad46-and6.myshopify.com"
+val geminiApiKey = localProperties.getProperty("gemini.api.key") ?: ""
 
 android {
     namespace = "com.iti.data"
@@ -40,6 +41,7 @@ android {
         buildConfigField("String", "SHOPIFY_API_KEY", "\"$apiKey\"")
         buildConfigField("String", "SHOPIFY_API_SECRET_KEY", "\"$apiSecretKey\"")
         buildConfigField("String", "SHOPIFY_STORE_DOMAIN", "\"$storeDomain\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -94,6 +96,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.generativeai)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

@@ -22,4 +22,6 @@ interface ProductsRepository {
 
     fun searchProducts(query: String): Flow<Result<List<Product>>>
     fun getPopularProducts(count: Int = 10): Flow<Result<List<Product>>>
+    fun getProductsByCategory(categoryId: String): Flow<Result<List<Product>>>
 }
+

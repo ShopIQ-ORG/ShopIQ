@@ -123,8 +123,8 @@ fun AllProductsScreen(
 
     // Active filter count for badge
     val filterCount = with(state.filterState) {
-        (if (selectedCategory != null) 1 else 0) +
-        (if (selectedSubCategory != null) 1 else 0) +
+        selectedCategories.size +
+        selectedSubCategories.size +
         selectedBrands.size
     }
 
@@ -266,10 +266,14 @@ fun AllProductsScreen(
                 availableCategories = state.availableCategories,
                 availableSubCategories = state.availableSubCategories,
                 availableBrands = state.availableBrands,
-                onCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.PendingCategoryChanged(it)) },
-                onSubCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.PendingSubCategoryChanged(it)) },
+                onCategoryToggled = { viewModel.sendIntent(AllProductsContract.Intent.PendingCategoryToggled(it)) },
+                onClearCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingClearCategories) },
+                onSelectAllCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingSelectAllCategories) },
+                onSubCategoryToggled = { viewModel.sendIntent(AllProductsContract.Intent.PendingSubCategoryToggled(it)) },
+                onClearSubCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingClearSubCategories) },
+                onSelectAllSubCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingSelectAllSubCategories) },
                 onBrandToggled = { viewModel.sendIntent(AllProductsContract.Intent.PendingBrandToggled(it)) },
-                onBrandSearchChanged = { viewModel.sendIntent(AllProductsContract.Intent.PendingBrandSearchChanged(it)) },
+                onSelectAllBrands = { viewModel.sendIntent(AllProductsContract.Intent.PendingSelectAllBrands) },
                 onApply = { viewModel.sendIntent(AllProductsContract.Intent.ApplyFilters) },
                 onReset = { viewModel.sendIntent(AllProductsContract.Intent.ResetFilters) },
                 onDismiss = { viewModel.sendIntent(AllProductsContract.Intent.CloseFilterSheet) }

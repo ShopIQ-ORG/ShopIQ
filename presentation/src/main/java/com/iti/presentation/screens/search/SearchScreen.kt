@@ -40,6 +40,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 import com.iti.presentation.components.ErrorScreen
 import com.iti.presentation.components.NoResultsFeedback
 import com.iti.presentation.components.ProductsGrid
@@ -108,7 +110,7 @@ fun SearchScreenContent(
                 IconButton(onClick = onNavigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(id = R.string.content_desc_back),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
@@ -133,7 +135,7 @@ fun SearchScreenContent(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
-                                    contentDescription = "Clear",
+                                    contentDescription = stringResource(id = R.string.search_cd_clear),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(16.dp)
                                 )

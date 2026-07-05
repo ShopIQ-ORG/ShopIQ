@@ -1,6 +1,6 @@
 package com.iti.data.repositories
 
-import com.iti.data.core.handleException
+import com.iti.data.utils.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
@@ -8,7 +8,7 @@ import com.iti.data.mappers.toDomainProducts
 import com.iti.data.mappers.toDomainProduct
 import com.iti.data.mappers.toDomainCategories
 import com.iti.data.mappers.toFavoriteEntity
-import com.iti.data.sources.local.FavoriteDao
+import com.iti.data.sources.local.room.FavoriteDao
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
@@ -161,6 +161,16 @@ class ProductsRepositoryImpl(
                 first = count,
                 sortKey = com.iti.data.type.ProductSortKeys.BEST_SELLING
             )
+            emit(Result.Success(response.toDomainProducts()))
+        } catch (e: Exception) {
+            emit(Result.Failure(e.handleException()))
+        }
+    }
+
+    override fun getProductsByCategory(categoryId: String): Flow<Result<List<Product>>> = flow {
+        emit(Result.Loading)
+        try {
+            val response = remoteDataSource.getProductsByCategory(categoryId)
             emit(Result.Success(response.toDomainProducts()))
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))

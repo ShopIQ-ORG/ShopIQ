@@ -5,6 +5,9 @@ data class UserDto(
     val fullName: String = "",
     val email: String = "",
     val phone: String = "",
-    val isGuest: Boolean = false
+    val isGuest: Boolean = false,
+    val shopifyCustomerId: String? = null,
+    val shopifyAccessToken: String? = null,
+    val shopifyTokenExpiresAt: String? = null,
+    val shopifyPassword: String? = null
 )
-

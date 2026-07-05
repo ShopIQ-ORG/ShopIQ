@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class CategoryViewModel(
@@ -50,7 +49,6 @@ class CategoryViewModel(
                             CategoryItem(
                                 id = category.id,
                                 title = category.title,
-                                itemCount = category.itemCount,
                                 imageAssetPath = category.imageAssetPath
                             )
                         }
@@ -77,7 +75,8 @@ class CategoryViewModel(
 
     private fun handleCategoryClicked(categoryId: String) {
         viewModelScope.launch {
-            _effect.send(CategoryContract.Effect.NavigateToCategoryProducts(categoryId))
+            val title = _state.value.categories.find { it.id == categoryId }?.title ?: categoryId
+            _effect.send(CategoryContract.Effect.NavigateToCategoryProducts(categoryId, title))
         }
     }
 }

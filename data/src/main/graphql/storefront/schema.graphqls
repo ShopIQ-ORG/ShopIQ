@@ -17,7 +17,13 @@ type Mutation {
   cartLinesUpdate(cartId: ID!, lines: [CartLineUpdateInput!]!): CartLinesUpdatePayload
   cartLinesRemove(cartId: ID!, lineIds: [ID!]!): CartLinesRemovePayload
   cartDiscountCodesUpdate(cartId: ID!, discountCodes: [String!]!): CartDiscountCodesUpdatePayload
+
+  customerCreate(input: CustomerCreateInput!): CustomerCreatePayload
+  customerAccessTokenCreate(input: CustomerAccessTokenCreateInput!): CustomerAccessTokenCreatePayload
+  customerAccessTokenRenew(customerAccessToken: String!): CustomerAccessTokenRenewPayload
 }
+
+# ---------- Cart ----------
 
 type Cart {
   id: ID!
@@ -61,6 +67,8 @@ type ProductVariant implements CartLineMerchandise {
   compareAtPrice: MoneyV2
   selectedOptions: [SelectedOption!]!
   product: Product!
+  availableForSale: Boolean!
+  quantityAvailable: Int
 }
 
 type Product {
@@ -98,25 +106,6 @@ type CartBuyerIdentity {
   email: String
   phone: String
   countryCode: String
-}
-
-type MoneyV2 {
-  amount: String!
-  currencyCode: CurrencyCode!
-}
-
-enum CurrencyCode {
-  USD
-  EUR
-  GBP
-  EGP
-  SAR
-  AED
-  CAD
-  AUD
-  JPY
-  CNY
-  INR
 }
 
 input CartInput {
@@ -163,7 +152,6 @@ type CartDiscountCodesUpdatePayload {
   userErrors: [UserError!]!
 }
 
-
 type CartDeliveryGroupConnection {
   edges: [CartDeliveryGroupEdge!]!
 }
@@ -184,8 +172,92 @@ type CartDeliveryOption {
   estimatedCost: MoneyV2!
 }
 
+# ---------- Customer ----------
+
+type Customer {
+  id: ID!
+  email: String
+  firstName: String
+  lastName: String
+  phone: String
+}
+
+type CustomerAccessToken {
+  accessToken: String!
+  expiresAt: String!
+}
+
+input CustomerCreateInput {
+  email: String!
+  password: String!
+  firstName: String
+  lastName: String
+  phone: String
+  acceptsMarketing: Boolean
+}
+
+input CustomerAccessTokenCreateInput {
+  email: String!
+  password: String!
+}
+
+type CustomerCreatePayload {
+  customer: Customer
+  customerUserErrors: [CustomerUserError!]!
+}
+
+type CustomerAccessTokenCreatePayload {
+  customerAccessToken: CustomerAccessToken
+  customerUserErrors: [CustomerUserError!]!
+}
+
+type CustomerAccessTokenRenewPayload {
+  customerAccessToken: CustomerAccessToken
+  userErrors: [UserError!]!
+}
+
+type CustomerUserError {
+  field: [String!]
+  message: String!
+  code: CustomerErrorCode
+}
+
+enum CustomerErrorCode {
+  BLANK
+  INVALID
+  TAKEN
+  TOO_LONG
+  TOO_SHORT
+  UNIDENTIFIED_CUSTOMER
+  CUSTOMER_DISABLED
+  PASSWORD_STARTS_OR_ENDS_WITH_WHITESPACE
+  CONTAINS_HTML_TAGS
+  CONTAINS_URL
+  TOKEN_INVALID
+}
+
+# ---------- Shared ----------
+
+type MoneyV2 {
+  amount: String!
+  currencyCode: CurrencyCode!
+}
+
+enum CurrencyCode {
+  USD
+  EUR
+  GBP
+  EGP
+  SAR
+  AED
+  CAD
+  AUD
+  JPY
+  CNY
+  INR
+}
+
 type UserError {
   field: [String!]
   message: String!
 }
-
