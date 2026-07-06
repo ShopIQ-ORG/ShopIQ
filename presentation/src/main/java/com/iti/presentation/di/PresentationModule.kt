@@ -55,6 +55,6 @@ val presentationModule = module {
     viewModelOf(::OrdersViewModel)
     viewModelOf(::OrderDetailsViewModel)
 
-    viewModel { AddressViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModelOf(::AddressViewModel)
     viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }

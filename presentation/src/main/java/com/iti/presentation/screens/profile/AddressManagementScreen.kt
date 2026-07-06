@@ -31,6 +31,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ConfirmationDialog
 import com.iti.presentation.screens.address.components.AddressEmptyState
 import com.iti.presentation.screens.address.components.AddressItem
+import com.iti.presentation.screens.address.components.TopSnackbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,22 +65,36 @@ fun AddressManagementScreen(
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    launch {
+                        snackbarHostState.showSnackbar(effect.message)
+                    }
                 }
                 else -> Unit
             }
         }
     }
 
-    AddressManagementContent(
-        state = state,
-        snackbarHostState = snackbarHostState,
-        onIntent = viewModel::sendIntent,
-        onNavigateBack = onNavigateBack,
-        onNavigateToAddAddress = onNavigateToAddAddress,
-        onNavigateToEditAddress = onNavigateToEditAddress,
-        modifier = modifier
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        AddressManagementContent(
+            state = state,
+            snackbarHostState = snackbarHostState,
+            onIntent = viewModel::sendIntent,
+            onNavigateBack = onNavigateBack,
+            onNavigateToAddAddress = onNavigateToAddAddress,
+            onNavigateToEditAddress = onNavigateToEditAddress,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        TopSnackbar(
+            message = state.successText ?: "",
+            visible = state.successText != null,
+            onDismiss = { viewModel.sendIntent(ProfileContract.Intent.DismissSuccessMessage) },
+            isError = false,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 56.dp)
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

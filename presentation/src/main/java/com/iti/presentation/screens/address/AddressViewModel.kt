@@ -215,35 +215,10 @@ class AddressViewModel (
     private fun detectLocation() {
         viewModelScope.launch {
             val coords = getCurrentLocationUseCase()
+            _state.update { it.copy(isDetectingLocation = false) }
             if (coords != null) {
-                if (_state.value.screenState is AddressContract.ScreenState.MapPicker) {
-                    _state.update { it.copy(isDetectingLocation = false) }
-                    emitEffect(AddressContract.Effect.MoveCameraToLocation(coords.latitude, coords.longitude))
-                } else {
-                    try {
-                        val detected = LocationHelper.getAddressFromCoordinates(context, coords.latitude, coords.longitude)
-                        temporaryDetectedAddress = detected
-                        _state.update {
-                            it.copy(
-                                isDetectingLocation = false,
-                                screenState = AddressContract.ScreenState.LocationDetected(detected, isFromGps = true)
-                            )
-                        }
-                    } catch (_: Exception) {
-                        _state.update {
-                            it.copy(
-                                isDetectingLocation = false,
-                                screenState = AddressContract.ScreenState.Failure(
-                                    UiText.StringResource(R.string.address_error_geocoding_failed)
-                                )
-                            )
-                        }
-                    }
-                }
+                emitEffect(AddressContract.Effect.MoveCameraToLocation(coords.latitude, coords.longitude))
             } else {
-                _state.update {
-                    it.copy(isDetectingLocation = false)
-                }
                 emitEffect(AddressContract.Effect.ShowMessage(UiText.StringResource(R.string.address_error_gps_failed)))
             }
         }

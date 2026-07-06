@@ -45,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,7 +82,9 @@ fun AddEditAddressScreen(
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    launch {
+                        snackbarHostState.showSnackbar(effect.message)
+                    }
                 }
                 is ProfileContract.Effect.NavigateToAddressValidation -> {
                     onNavigateToValidation(

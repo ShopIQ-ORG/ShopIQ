@@ -485,36 +485,48 @@ class ProfileViewModel(
         viewModelScope.launch {
             val result = saveAddressUseCase(address)
             if (result is Result.Success) {
-                emitEffect(ProfileContract.Effect.ShowMessage(if (addressId == null) "Address added successfully" else "Address updated successfully"))
+                _state.update {
+                    it.copy(
+                        successText = if (addressId == null) "Address added successfully" else "Address updated successfully"
+                    )
+                }
                 loadAddresses()
                 emitEffect(ProfileContract.Effect.NavigateBack)
             } else if (result is Result.Failure) {
-                _state.update { it.copy(errorText = result.exception.message ?: "Failed to save address") }
+                val errorMsg = result.exception.message ?: "Failed to save address"
+                _state.update { it.copy(errorText = errorMsg) }
+                emitEffect(ProfileContract.Effect.ShowMessage(errorMsg))
             }
         }
     }
 
     fun updateTempAddressLocation(lat: Double, lng: Double) {
-        _state.update {
-            it.copy(
-                tempLatitude = lat,
-                tempLongitude = lng,
-                shouldPopulateTempAddress = true
-            )
-        }
         viewModelScope.launch {
             try {
                 val detected = LocationHelper.getAddressFromCoordinates(context, lat, lng)
                 _state.update {
                     it.copy(
+                        tempLatitude = lat,
+                        tempLongitude = lng,
                         tempStreet = detected.street,
                         tempCity = detected.city,
                         tempCountry = detected.country,
-                        tempPostalCode = detected.postalCode
+                        tempPostalCode = detected.postalCode,
+                        shouldPopulateTempAddress = true
                     )
                 }
             } catch (e: Exception) {
-                // ignore geocoding exceptions
+                _state.update {
+                    it.copy(
+                        tempLatitude = lat,
+                        tempLongitude = lng,
+                        tempStreet = "",
+                        tempCity = "",
+                        tempCountry = "",
+                        tempPostalCode = "",
+                        shouldPopulateTempAddress = true
+                    )
+                }
             }
         }
     }
