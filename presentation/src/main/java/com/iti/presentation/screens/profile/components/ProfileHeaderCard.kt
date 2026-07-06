@@ -52,8 +52,7 @@ fun ProfileHeaderCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val defaultMaleAvatar = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
-    val displayAvatar = avatarUrl?.takeIf { it.isNotBlank() } ?: defaultMaleAvatar
+    val isAvatarAvailable = avatarUrl?.isNotBlank() == true
 
     Card(
         shape = RoundedCornerShape(24.dp),
@@ -81,19 +80,38 @@ fun ProfileHeaderCard(
                 horizontalArrangement = Arrangement.Start
             ) {
                 // Circular Avatar
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(displayAvatar)
-                        .crossfade(true)
-                        .error(R.drawable.logo_light)
-                        .fallback(R.drawable.logo_light)
-                        .build(),
-                    contentDescription = "Profile Picture",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                )
+                if (isAvatarAvailable) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(avatarUrl)
+                            .crossfade(true)
+                            .error(R.drawable.logo_light)
+                            .fallback(R.drawable.logo_light)
+                            .build(),
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                    )
+                } else {
+                    val firstLetter = if (fullName.isNotBlank()) fullName.trim().first().uppercaseChar().toString() else "?"
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = firstLetter,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(20.dp))
 
