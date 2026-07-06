@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.iti.domain.models.Product
 import com.iti.presentation.util.compareAtPrice
 import com.iti.presentation.util.discountPercent
+import com.iti.presentation.util.getLocalizedCode
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -134,7 +135,7 @@ fun ProductCard(
             val convertedMinPrice = CurrencyManager.convertFromUsd(product.minPrice.amount.toDoubleOrNull() ?: 0.0)
             val minPriceStr = if (convertedMinPrice % 1.0 == 0.0) "%.0f".format(convertedMinPrice) else "%.2f".format(convertedMinPrice)
             Text(
-                text = "$minPriceStr ${currentCurrency.code}",
+                text = "$minPriceStr ${currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current)}",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,

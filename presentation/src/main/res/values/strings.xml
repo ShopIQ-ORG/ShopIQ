@@ -230,6 +230,11 @@
     <string name="error_failed_load_addresses">Failed to load addresses</string>
     <string name="success_address_deleted">Address deleted successfully</string>
     <string name="error_failed_delete_address">Failed to delete address</string>
+    <string name="success_default_address_updated">Default address updated</string>
+    <string name="error_failed_gps">Failed to retrieve GPS location coordinates</string>
+    <string name="error_failed_save_address">Failed to save address</string>
+    <string name="success_address_added">Address added successfully</string>
+    <string name="success_address_updated">Address updated successfully</string>
     <string name="clear_history">Clear Chat</string>
 
     <!-- AI Chatbot Strings -->
@@ -399,13 +404,44 @@
     <string name="address_permission_required_msg">This app requires location permission to detect your current address for shipping and delivery. Please grant the permission.</string>
     <string name="address_permission_retry_btn">Retry</string>
     <string name="address_permission_denied_title">Permission Permanently Denied</string>
-    <string name="address_permission_denied_msg">Location permissions are permanently denied. Please enable them in app settings to use GPS detection.</string>
-    <string name="address_permission_settings_btn">Go to Settings</string>
+    <string name="address_gps_not_enabled_msg">GPS is not enabled on your device. Please turn it on in settings to automatically detect your location.</string>
+    <string name="address_gps_settings_btn">Location Settings</string>
+
+    <string name="currency_usd">USD</string>
+    <string name="currency_egp">EGP</string>
+    <string name="currency_eur">EUR</string>
+    <string name="currency_gbp">GBP</string>
+    <string name="currency_aed">AED</string>
+    <string name="currency_sar">SAR</string>
+
+    <string name="address_select_location_map">Select Location on Map</string>
+    <string name="address_select_location_map_subtitle">Picks coordinates and fills address fields automatically</string>
+    <string name="address_details">Address Details</string>
+    <string name="address_recipient_name">Recipient Name</string>
+    <string name="address_mobile_number">Mobile Number</string>
+    <string name="address_label_placeholder">Address Label (e.g. Home, Work, Gym)</string>
+    <string name="address_street">Street Address</string>
+    <string name="address_city">City</string>
+    <string name="address_country">Country</string>
+    <string name="address_postal_code">Postal Code / ZIP</string>
+    <string name="address_set_default_delivery">Set as default delivery address</string>
+    <string name="address_set_default_delivery_subtitle">Use this address for default delivery</string>
+    <string name="address_required_fields_missing">Required fields missing: %1$s</string>
 
     <!-- Map Picker strings -->
     <string name="address_btn_select_on_map">Select location manually on map</string>
     <string name="address_search_hint">Search area, street, or city…</string>
     <string name="address_btn_confirm_location">Confirm Selected Location</string>
+    <string name="address_permission_denied_msg">Location permissions are permanently denied. Please enable them in app settings to use GPS detection.</string>
+    <string name="address_permission_settings_btn">Go to Settings</string>
+
+    <string name="address_trust_accurate">Accurate</string>
+    <string name="address_trust_accurate_subtitle">Detected with high accuracy</string>
+    <string name="address_trust_time">Save time</string>
+    <string name="address_trust_time_subtitle">Faster checkout</string>
+    <string name="address_trust_secure">Secure</string>
+    <string name="address_trust_secure_subtitle">Your data is safe with us</string>
+    <string name="address_change_anytime">You can change this anytime in your profile.</string>    <!-- Map Picker strings -->
     <string name="address_error_location_not_found">Location not found. Please try a different search query.</string>
 
     <!-- Redesigned Location Detected screen -->

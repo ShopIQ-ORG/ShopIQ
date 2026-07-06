@@ -28,7 +28,9 @@ import com.iti.domain.usecases.currency.GetExchangeRateHistoryUseCase
 import com.iti.domain.usecases.currency.FetchExchangeRatesUseCase
 import com.iti.domain.usecases.currency.SelectCurrencyUseCase
 import com.iti.presentation.BuildConfig
+import com.iti.presentation.R
 import com.iti.presentation.util.LocationHelper
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -166,7 +168,7 @@ class ProfileViewModel(
             }
             ProfileContract.Intent.PermissionDenied -> {
                 _state.update { it.copy(triggerPermissionRequest = false, isDetectingLocation = false) }
-                emitEffect(ProfileContract.Effect.ShowMessage("Location permission is required for GPS detection"))
+                emitEffect(ProfileContract.Effect.ShowMessage(UiText.StringResource(R.string.error_location_permission)))
             }
             is ProfileContract.Intent.ConfirmAddress -> {
                 saveConfirmedAddress(
@@ -230,7 +232,7 @@ class ProfileViewModel(
         avatarUrl: String?
     ) {
         if (name.isBlank() || email.isBlank()) {
-            _state.update { it.copy(errorText = "Name and Email are required") }
+            _state.update { it.copy(errorText = UiText.StringResource(R.string.error_name_email_required)) }
             return
         }
         _state.update { it.copy(isUpdatingProfile = true, errorText = null) }
@@ -257,7 +259,7 @@ class ProfileViewModel(
                     _state.update {
                         it.copy(
                             isUpdatingProfile = false,
-                            errorText = result.exception.message ?: "Failed to update profile"
+                            errorText = if (result.exception.message != null) UiText.Plain(result.exception.message!!) else UiText.StringResource(R.string.error_failed_update_profile)
                         )
                     }
                 }
@@ -272,9 +274,10 @@ class ProfileViewModel(
             getSavedAddressesUseCase().collect { result ->
                 when (result) {
                     is Result.Success -> {
+                        val validAddresses = result.data.filter { it.street.isNotBlank() || it.city.isNotBlank() }
                         _state.update {
                             it.copy(
-                                addresses = result.data,
+                                addresses = validAddresses,
                                 addressLoading = false
                             )
                         }
@@ -283,7 +286,7 @@ class ProfileViewModel(
                         _state.update {
                             it.copy(
                                 addressLoading = false,
-                                errorText = result.exception.message ?: "Failed to load addresses"
+                                errorText = if (result.exception.message != null) UiText.Plain(result.exception.message!!) else UiText.StringResource(R.string.error_failed_load_addresses)
                             )
                         }
                     }
@@ -297,10 +300,11 @@ class ProfileViewModel(
         viewModelScope.launch {
             val result = deleteAddressUseCase(addressId)
             if (result is Result.Success) {
-                emitEffect(ProfileContract.Effect.ShowMessage("Address deleted successfully"))
+                emitEffect(ProfileContract.Effect.ShowMessage(UiText.StringResource(R.string.success_address_deleted)))
                 loadAddresses()
             } else if (result is Result.Failure) {
-                _state.update { it.copy(errorText = result.exception.message ?: "Failed to delete address") }
+                _state.update { it.copy(errorText = if (result.exception.message != null) UiText.Plain(result.exception.message!!) else UiText.StringResource(
+                    R.string.error_failed_delete_address)) }
             }
         }
     }
@@ -310,7 +314,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             val result = saveAddressUseCase(addressToUpdate.copy(isDefault = true))
             if (result is Result.Success) {
-                emitEffect(ProfileContract.Effect.ShowMessage("Default address updated"))
+                emitEffect(ProfileContract.Effect.ShowMessage(UiText.StringResource(R.string.success_default_address_updated)))
                 loadAddresses()
             }
         }
@@ -432,7 +436,7 @@ class ProfileViewModel(
                 }
             } else {
                 _state.update { it.copy(isDetectingLocation = false) }
-                emitEffect(ProfileContract.Effect.ShowMessage("Failed to retrieve GPS location coordinates"))
+                emitEffect(ProfileContract.Effect.ShowMessage(UiText.StringResource(R.string.error_failed_gps)))
             }
         }
     }
@@ -467,17 +471,14 @@ class ProfileViewModel(
         viewModelScope.launch {
             val result = saveAddressUseCase(address)
             if (result is Result.Success) {
-                _state.update {
-                    it.copy(
-                        successText = if (addressId == null) "Address added successfully" else "Address updated successfully"
-                    )
-                }
+                val successRes = if (addressId == null) R.string.success_address_added else R.string.success_address_updated
+                _state.update { it.copy(successText = UiText.StringResource(successRes)) }
                 loadAddresses()
                 emitEffect(ProfileContract.Effect.NavigateBack)
             } else if (result is Result.Failure) {
-                val errorMsg = result.exception.message ?: "Failed to save address"
-                _state.update { it.copy(errorText = errorMsg) }
-                emitEffect(ProfileContract.Effect.ShowMessage(errorMsg))
+                val errorText = if (result.exception.message != null) UiText.Plain(result.exception.message!!) else UiText.StringResource(R.string.error_failed_save_address)
+                _state.update { it.copy(errorText = errorText) }
+                emitEffect(ProfileContract.Effect.ShowMessage(errorText))
             }
         }
     }

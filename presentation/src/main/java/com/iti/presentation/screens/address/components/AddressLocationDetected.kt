@@ -412,8 +412,8 @@ fun AddressLocationDetected(
         ) {
             TrustItem(
                 icon = Icons.Default.GpsFixed,
-                title = "Accurate",
-                subtitle = "Detected with high accuracy",
+                title = stringResource(R.string.address_trust_accurate),
+                subtitle = stringResource(R.string.address_trust_accurate_subtitle),
                 modifier = Modifier.weight(1f)
             )
             VerticalDivider(
@@ -422,8 +422,8 @@ fun AddressLocationDetected(
             )
             TrustItem(
                 icon = Icons.Default.AccessTime,
-                title = "Save time",
-                subtitle = "Faster checkout",
+                title = stringResource(R.string.address_trust_time),
+                subtitle = stringResource(R.string.address_trust_time_subtitle),
                 modifier = Modifier.weight(1f)
             )
             VerticalDivider(
@@ -432,8 +432,8 @@ fun AddressLocationDetected(
             )
             TrustItem(
                 icon = Icons.Default.Security,
-                title = "Secure",
-                subtitle = "Your data is safe with us",
+                title = stringResource(R.string.address_trust_secure),
+                subtitle = stringResource(R.string.address_trust_secure_subtitle),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -460,7 +460,7 @@ fun AddressLocationDetected(
         )
 
         Text(
-            text = "You can change this anytime in your profile.",
+            text = stringResource(R.string.address_change_anytime),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             textAlign = TextAlign.Center,

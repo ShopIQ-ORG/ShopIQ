@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.Address
@@ -60,6 +61,7 @@ fun AddressManagementScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.sendIntent(ProfileContract.Intent.LoadAddresses)
@@ -68,7 +70,7 @@ fun AddressManagementScreen(
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
                     launch {
-                        snackbarHostState.showSnackbar(effect.message)
+                        snackbarHostState.showSnackbar(effect.message.resolve(context))
                     }
                 }
                 else -> Unit
@@ -88,7 +90,7 @@ fun AddressManagementScreen(
         )
 
         TopSnackbar(
-            message = state.successText ?: "",
+            message = state.successText?.resolve(context) ?: "",
             visible = state.successText != null,
             onDismiss = { viewModel.sendIntent(ProfileContract.Intent.DismissSuccessMessage) },
             isError = false,

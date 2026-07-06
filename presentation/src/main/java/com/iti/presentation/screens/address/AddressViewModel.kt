@@ -198,8 +198,7 @@ class AddressViewModel (
                                     AddressContract.ScreenState.Empty
                                 } else {
                                     AddressContract.ScreenState.Success(addresses)
-                                },
-                                addressLoading = false
+                                }
                             )
                         }
                     }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -39,6 +40,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -177,16 +180,12 @@ fun EditProfileContent(
     // Gender selection toggle
     var genderExpanded by remember { mutableStateOf(false) }
 
-    val avatarUrls = listOf(
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
-    )
-
-    fun rotateAvatar() {
-        val currentIndex = avatarUrls.indexOf(avatarUrl)
-        val nextIndex = (currentIndex + 1) % avatarUrls.size
-        avatarUrl = avatarUrls[nextIndex]
+    val photoPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            avatarUrl = uri.toString()
+        }
     }
 
     Scaffold(
@@ -213,6 +212,7 @@ fun EditProfileContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -265,7 +265,11 @@ fun EditProfileContent(
                         .align(Alignment.BottomEnd)
                         .clip(CircleShape)
                         .background(Color(0xFF1E1E24))
-                        .clickable { rotateAvatar() }
+                        .clickable { 
+                            photoPickerLauncher.launch(
+                                androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
                 ) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_camera),

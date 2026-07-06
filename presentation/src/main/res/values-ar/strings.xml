@@ -98,6 +98,7 @@
     <string name="sort_label">ترتيب حسب</string>
     <string name="sort_best_seller">الأكثر مبيعاً</string>
     <string name="sort_price_low_high">السعر: من الأقل للأعلى</string>
+    <string name="sort_price_high_low">السعر: من الأعلى للأقل</string>
     <string name="sort_high_to_low">من الأعلى للأقل</string>
     <string name="profile_updated_successfully">تم تحديث الملف الشخصي بنجاح</string>
     <string name="error_location_permission">صلاحية الموقع مطلوبة لتحديد الـ GPS</string>
@@ -105,8 +106,13 @@
     <string name="error_failed_update_profile">فشل تحديث الملف الشخصي</string>
     <string name="error_failed_load_addresses">فشل تحميل العناوين</string>
     <string name="success_address_deleted">تم حذف العنوان بنجاح</string>
-    <string name="error_failed_delete_address">فشل حذف العنوان</string>
-    <string name="sort_apply">تطبيق</string>
+    <string name="error_failed_delete_address">فشل في حذف العنوان</string>
+    <string name="success_default_address_updated">تم تحديث العنوان الافتراضي</string>
+    <string name="error_failed_gps">فشل في جلب إحداثيات الموقع</string>
+    <string name="error_failed_save_address">فشل في حفظ العنوان</string>
+    <string name="success_address_added">تم إضافة العنوان بنجاح</string>
+    <string name="success_address_updated">تم تحديث العنوان بنجاح</string>
+    <string name="clear_history">مسح المحادثة</string>
     <string name="sort_price_asc_label">↑ السعر</string>
     <string name="sort_price_desc_label">↓ السعر</string>
     
@@ -141,7 +147,6 @@
     <string name="ai_error_network">يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</string>
     <string name="ai_error_image_processing">حدثت مشكلة أثناء معالجة الصورة المرفوعة. يرجى التأكد من أنها بصيغة صالحة (JPEG/PNG) والمحاولة مرة أخرى.</string>
     <string name="ai_error_unknown">عذراً، أواجه صعوبة في الاتصال بخادمي حالياً. يرجى محاولة إرسال رسالتك مرة أخرى.</string>
-    <string name="clear_history">مسح المحادثات</string>
 
     <!-- AI History -->
     <string name="history_title">السجل</string>
@@ -286,6 +291,38 @@
     <!-- Address List & Items -->
     <string name="address_saved_list_title">العناوين المحفوظة</string>
     <string name="address_delete_dialog_title">حذف العنوان</string>
+    <string name="address_gps_not_enabled_msg">لم يتم تفعيل الـ GPS في جهازك. يرجى تفعيله من الإعدادات لاكتشاف موقعك تلقائياً.</string>
+    <string name="address_gps_settings_btn">إعدادات الموقع</string>
+
+    <string name="currency_usd">دولار</string>
+    <string name="currency_egp">جنيه مصري</string>
+    <string name="currency_eur">يورو</string>
+    <string name="currency_gbp">جنيه إسترليني</string>
+    <string name="currency_aed">درهم إماراتي</string>
+    <string name="currency_sar">ريال سعودي</string>
+
+    <string name="address_select_location_map">اختر الموقع على الخريطة</string>
+    <string name="address_select_location_map_subtitle">يلتقط الإحداثيات ويملأ حقول العنوان تلقائياً</string>
+    <string name="address_details">تفاصيل العنوان</string>
+    <string name="address_recipient_name">اسم المستلم</string>
+    <string name="address_mobile_number">رقم الموبايل</string>
+    <string name="address_label_placeholder">تسمية العنوان (مثل المنزل، العمل، الجيم)</string>
+    <string name="address_street">عنوان الشارع</string>
+    <string name="address_city">المدينة</string>
+    <string name="address_country">الدولة</string>
+    <string name="address_postal_code">الرمز البريدي</string>
+    <string name="address_set_default_delivery">تعيين كعنوان التوصيل الافتراضي</string>
+    <string name="address_set_default_delivery_subtitle">استخدم هذا العنوان للتوصيل الافتراضي</string>
+    <string name="address_required_fields_missing">الحقول المطلوبة مفقودة: %1$s</string>
+
+    <string name="address_trust_accurate">دقيق</string>
+    <string name="address_trust_accurate_subtitle">تم التحديد بدقة عالية</string>
+    <string name="address_trust_time">وفر وقتك</string>
+    <string name="address_trust_time_subtitle">دفع أسرع</string>
+    <string name="address_trust_secure">آمن</string>
+    <string name="address_trust_secure_subtitle">بياناتك بأمان معنا</string>
+    <string name="address_change_anytime">يمكنك تغيير هذا في أي وقت من ملفك الشخصي.</string>
+
     <string name="address_delete_dialog_msg">هل أنت متأكد من رغبتك في حذف هذا العنوان من حسابك؟</string>
     <string name="address_delete_btn">حذف</string>
     <string name="address_cancel_btn">إلغاء</string>

@@ -21,6 +21,7 @@ import com.iti.presentation.R
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.getLocalizedCode
 
 @Composable
 fun CartItemInfo(
@@ -65,7 +66,7 @@ fun CartItemInfo(
         val convertedPrice = CurrencyManager.convertFromUsd(item.price.amount.toDoubleOrNull() ?: 0.0)
         val priceStr = if (convertedPrice % 1.0 == 0.0) "%.0f".format(convertedPrice) else "%.2f".format(convertedPrice)
         Text(
-            text = "$priceStr ${currentCurrency.code}",
+            text = "$priceStr ${currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current)}",
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),

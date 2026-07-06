@@ -77,7 +77,7 @@ fun LocalizationCurrencyScreen(
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(effect.message.resolve(context))
                 }
                 is ProfileContract.Effect.ShowCurrencyUpdatedMessage -> {
                     val message = context.getString(R.string.currency_updated_to, effect.currencyCode)

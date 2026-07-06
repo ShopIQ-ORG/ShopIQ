@@ -44,7 +44,7 @@ fun WishlistScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is WishlistUiEffect.ShowSnackbar -> {
-                    val msg = effect.message.asString(context)
+                    val msg = effect.message.resolve(context)
                     snackbarHostState.showSnackbar(msg)
                 }
                 is WishlistUiEffect.NavigateToAuth -> onAuthClick()
@@ -186,7 +186,8 @@ fun WishlistContentSuccessPreview() {
             cartItemCount = 2,
             onCartClick = {},
             onRemoveFromFavorites = {},
-            onRetryClick = {}
+            onRetryClick = {},
+            snackbarHostState = androidx.compose.material3.SnackbarHostState()
         )
     }
 }
@@ -203,7 +204,8 @@ fun WishlistContentEmptyPreview() {
             cartItemCount = 0,
             onCartClick = {},
             onRemoveFromFavorites = {},
-            onRetryClick = {}
+            onRetryClick = {},
+            snackbarHostState = androidx.compose.material3.SnackbarHostState()
         )
     }
 }
@@ -220,7 +222,8 @@ fun WishlistContentGuestPreview() {
             cartItemCount = 0,
             onCartClick = {},
             onRemoveFromFavorites = {},
-            onRetryClick = {}
+            onRetryClick = {},
+            snackbarHostState = androidx.compose.material3.SnackbarHostState()
         )
     }
 }

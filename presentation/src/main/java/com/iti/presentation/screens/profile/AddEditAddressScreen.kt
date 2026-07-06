@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -66,6 +67,7 @@ import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.ShopIQTextField
 import com.iti.presentation.screens.address.components.TopSnackbar
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +80,7 @@ fun AddEditAddressScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.effect.collect { effect ->
@@ -85,7 +88,7 @@ fun AddEditAddressScreen(
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
                     launch {
-                        snackbarHostState.showSnackbar(effect.message)
+                        snackbarHostState.showSnackbar(effect.message.resolve(context))
                     }
                 }
                 is ProfileContract.Effect.NavigateToAddressValidation -> {
@@ -191,6 +194,7 @@ fun AddEditAddressContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .imePadding()
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp)
             ) {
@@ -230,12 +234,12 @@ fun AddEditAddressContent(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Select Location on Map",
+                                text = stringResource(R.string.address_select_location_map),
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "Picks coordinates and fills address fields automatically",
+                                text = stringResource(R.string.address_select_location_map_subtitle),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -247,7 +251,7 @@ fun AddEditAddressContent(
 
                 // Address Details Form
                 Text(
-                    text = "Address Details",
+                    text = stringResource(R.string.address_details),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -256,7 +260,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = recipientName,
                     onValueChange = { recipientName = it },
-                    placeholder = "Recipient Name",
+                    placeholder = stringResource(R.string.address_recipient_name),
                     leadingIcon = Icons.Default.Person
                 )
 
@@ -265,7 +269,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = phone,
                     onValueChange = { phone = it },
-                    placeholder = "Mobile Number",
+                    placeholder = stringResource(R.string.address_mobile_number),
                     leadingIcon = Icons.Default.Phone,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
@@ -275,7 +279,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = nameTag,
                     onValueChange = { nameTag = it },
-                    placeholder = "Address Label (e.g. Home, Work, Gym)",
+                    placeholder = stringResource(R.string.address_label_placeholder),
                     leadingIcon = Icons.Default.Info
                 )
 
@@ -284,7 +288,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = street,
                     onValueChange = { street = it },
-                    placeholder = "Street Address",
+                    placeholder = stringResource(R.string.address_street),
                     leadingIcon = Icons.Default.Home
                 )
 
@@ -293,7 +297,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = city,
                     onValueChange = { city = it },
-                    placeholder = "City",
+                    placeholder = stringResource(R.string.address_city),
                     leadingIcon = Icons.Default.LocationOn
                 )
 
@@ -302,7 +306,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = country,
                     onValueChange = { country = it },
-                    placeholder = "Country",
+                    placeholder = stringResource(R.string.address_country),
                     leadingIcon = Icons.Default.LocationOn
                 )
 
@@ -311,7 +315,7 @@ fun AddEditAddressContent(
                 ShopIQTextField(
                     value = postalCode,
                     onValueChange = { postalCode = it },
-                    placeholder = "Postal Code / ZIP",
+                    placeholder = stringResource(R.string.address_postal_code),
                     leadingIcon = Icons.Default.Info
                 )
 
@@ -329,11 +333,11 @@ fun AddEditAddressContent(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Set as default delivery address",
+                                text = stringResource(R.string.address_set_default_delivery),
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                             )
                             Text(
-                                text = "Use this address for default delivery",
+                                text = stringResource(R.string.address_set_default_delivery_subtitle),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -355,17 +359,18 @@ fun AddEditAddressContent(
 
                 // Single Validation/Save Button
                 ShopIQButton(
-                    text = if (addressId == null) "Add Address" else "Save Address",
+                    text = if (addressId == null) stringResource(R.string.address_action_add) else stringResource(R.string.save_changes),
                     onClick = {
                         val missingFields = mutableListOf<String>()
-                        if (recipientName.isBlank()) missingFields.add("Recipient Name")
-                        if (phone.isBlank()) missingFields.add("Mobile Number")
-                        if (street.isBlank()) missingFields.add("Street Address")
-                        if (city.isBlank()) missingFields.add("City")
-                        if (country.isBlank()) missingFields.add("Country")
+                        if (recipientName.isBlank()) missingFields.add(context.getString(R.string.address_recipient_name))
+                        if (phone.isBlank()) missingFields.add(context.getString(R.string.address_mobile_number))
+                        if (street.isBlank()) missingFields.add(context.getString(R.string.address_street))
+                        if (city.isBlank()) missingFields.add(context.getString(R.string.address_city))
+                        if (country.isBlank()) missingFields.add(context.getString(R.string.address_country))
 
                         if (missingFields.isNotEmpty()) {
-                            validationSnackbarMessage = "Required fields missing: ${missingFields.joinToString(", ")}"
+                            val messageFormat = context.getString(R.string.address_required_fields_missing)
+                            validationSnackbarMessage = String.format(messageFormat, missingFields.joinToString(", "))
                             showValidationSnackbar = true
                         } else {
                             onIntent(
