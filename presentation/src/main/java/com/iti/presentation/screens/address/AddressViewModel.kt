@@ -34,11 +34,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+import com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase
+import com.iti.domain.usecases.address.SearchLocationByNameUseCase
+
 class AddressViewModel (
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
     private val getSavedAddressesUseCase: GetSavedAddressesUseCase,
     private val saveAddressUseCase: SaveAddressUseCase,
     private val deleteAddressUseCase: DeleteAddressUseCase,
+    private val getPlaceSuggestionsUseCase: GetPlaceSuggestionsUseCase,
+    private val searchLocationByNameUseCase: SearchLocationByNameUseCase,
     @param:SuppressLint("StaticFieldLeak") private val context: Context
 ) : ViewModel() {
 
@@ -295,8 +300,13 @@ class AddressViewModel (
         }
         searchJob = viewModelScope.launch {
             delay(500) // Debounce 500ms
-            val suggestions = LocationHelper.getSuggestions(context, query, BuildConfig.MAPS_API_KEY)
-            _state.update { it.copy(searchSuggestions = suggestions) }
+            val result = getPlaceSuggestionsUseCase(query, BuildConfig.MAPS_API_KEY)
+            if (result is com.iti.domain.models.Result.Success) {
+                val suggestions = result.data.map {
+                    AddressContract.PlaceSuggestion(it.displayName, it.latitude, it.longitude)
+                }
+                _state.update { it.copy(searchSuggestions = suggestions) }
+            }
         }
     }
 
@@ -306,7 +316,8 @@ class AddressViewModel (
     }
 
     suspend fun searchLocationByName(query: String): LocationCoordinates? {
-        return LocationHelper.searchLocationByName(context, query, BuildConfig.MAPS_API_KEY)
+        val result = searchLocationByNameUseCase(query, BuildConfig.MAPS_API_KEY)
+        return if (result is com.iti.domain.models.Result.Success) result.data else null
     }
 
     private fun emitEffect(effect: AddressContract.Effect) {

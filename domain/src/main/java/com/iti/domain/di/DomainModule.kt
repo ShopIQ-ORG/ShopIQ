@@ -71,8 +71,15 @@ val domainModule = module {
     factory { GetSavedAddressesUseCase(get()) }
     factory { SaveAddressUseCase(get()) }
     factory { DeleteAddressUseCase(get()) }
+    factory { com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase(get()) }
+    factory { com.iti.domain.usecases.address.SearchLocationByNameUseCase(get()) }
     factoryOf(::ObserveCartItemCountUseCase)
     factoryOf(::GetOrdersUseCase)
 
-
+    // Currency Use Cases
+    factory { com.iti.domain.usecases.currency.GetSelectedCurrencyUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.GetPopularCurrenciesUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.GetExchangeRateHistoryUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.FetchExchangeRatesUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.SelectCurrencyUseCase(get()) }
 }

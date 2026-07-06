@@ -1,3 +1,11 @@
+//
+//  AddressEntity.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 package com.iti.data.sources.local
 
 import androidx.room.Entity
@@ -14,5 +22,7 @@ data class AddressEntity(
     val country: String,
     val latitude: Double,
     val longitude: Double,
-    val isDefault: Boolean
+    val isDefault: Boolean,
+    val recipientName: String = "",
+    val phone: String = ""
 )

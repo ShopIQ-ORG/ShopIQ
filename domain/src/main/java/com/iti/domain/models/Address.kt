@@ -17,5 +17,7 @@ data class Address(
     val country: String,
     val latitude: Double,
     val longitude: Double,
-    val isDefault: Boolean = false
+    val isDefault: Boolean = false,
+    val recipientName: String = "",
+    val phone: String = ""
 )

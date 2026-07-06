@@ -75,6 +75,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.iti.presentation.R
+import com.iti.presentation.util.LocationPermissionHandler
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.screens.address.AddressContract
@@ -176,6 +177,16 @@ fun AddressMapPicker(
             }
         }
     }
+
+    LocationPermissionHandler(
+        onPermissionGranted = {
+            viewModel?.sendIntent(AddressContract.Intent.PermissionGranted)
+        },
+        onPermissionDenied = {
+            viewModel?.sendIntent(AddressContract.Intent.PermissionDenied)
+        },
+        triggerRequest = state.triggerPermissionRequest,
+    )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),

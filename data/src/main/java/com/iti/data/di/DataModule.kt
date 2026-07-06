@@ -50,6 +50,8 @@ import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
 import com.iti.domain.util.ShopifyTokenProvider
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
@@ -57,6 +59,7 @@ import org.koin.dsl.binds
 import org.koin.dsl.module
 
 val dataModule = module {
+    single { HttpClient(OkHttp) }
     single { Gson() }
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
@@ -133,5 +136,6 @@ val dataModule = module {
     single { LocationServices.getFusedLocationProviderClient(androidContext()) }
 
     single<LocationTracker> { LocationTrackerImpl(get()) }
-    single<AddressRepository> { AddressRepositoryImpl(get()) }
+    single<AddressRepository> { AddressRepositoryImpl(get(), get(), androidContext()) }
+    single<com.iti.domain.repositories.currency.CurrencyRepository> { com.iti.data.repositories.CurrencyRepositoryImpl(get(), get()) }
 }

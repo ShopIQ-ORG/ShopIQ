@@ -1,3 +1,11 @@
+//
+//  AddressMapper.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 package com.iti.data.mappers
 
 import com.iti.data.sources.local.AddressEntity
@@ -13,7 +21,9 @@ fun Address.toEntity(): AddressEntity {
         country = country,
         latitude = latitude,
         longitude = longitude,
-        isDefault = isDefault
+        isDefault = isDefault,
+        recipientName = recipientName,
+        phone = phone
     )
 }
 
@@ -27,6 +37,8 @@ fun AddressEntity.toDomain(): Address {
         country = country,
         latitude = latitude,
         longitude = longitude,
-        isDefault = isDefault
+        isDefault = isDefault,
+        recipientName = recipientName,
+        phone = phone
     )
 }

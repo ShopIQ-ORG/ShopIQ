@@ -1,3 +1,11 @@
+//
+//  AppNavigation.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 package com.iti.presentation.navigation
 
 import androidx.compose.runtime.Composable
@@ -37,11 +45,19 @@ import com.iti.presentation.screens.products.checkout.CODPaymentScreen
 import com.iti.presentation.screens.products.checkout.OnlinePaymentScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.profile.AccountSettingsScreen
+import com.iti.presentation.screens.profile.EditProfileScreen
+import com.iti.presentation.screens.profile.LocalizationCurrencyScreen
+import com.iti.presentation.screens.profile.AddressManagementScreen
+import com.iti.presentation.screens.profile.AddEditAddressScreen
+import com.iti.presentation.screens.address.components.AddressMapPicker
+import com.iti.presentation.screens.profile.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val backStack = remember { mutableStateListOf<Screen>(Screen.Splash) }
+    val profileViewModel: ProfileViewModel = koinViewModel()
 
     fun navigate(screen: Screen) {
         backStack.add(screen)
@@ -170,6 +186,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToOrders = {
                         navigate(Screen.Orders)
+                    },
+                    onNavigateToEditProfile = {
+                        navigate(Screen.EditProfile)
+                    },
+                    onNavigateToLocalizationCurrency = {
+                        navigate(Screen.LocalizationCurrency)
+                    },
+                    onNavigateToAddressManagement = {
+                        navigate(Screen.AddressManagement)
                     }
                 )
             }
@@ -303,6 +328,92 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AddressScreen(
                     viewModel = addressViewModel,
                     onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.AccountSettings> {
+                val viewModel = profileViewModel
+                AccountSettingsScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToEditProfile = { navigate(Screen.EditProfile) },
+                    onNavigateToLocalizationCurrency = { navigate(Screen.LocalizationCurrency) },
+                    onNavigateToAddressManagement = { navigate(Screen.AddressManagement) },
+                    onNavigateToOrders = { navigate(Screen.Orders) }
+                )
+            }
+
+            entry<Screen.EditProfile> {
+                val viewModel = profileViewModel
+                EditProfileScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.LocalizationCurrency> {
+                val viewModel = profileViewModel
+                LocalizationCurrencyScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.AddressManagement> {
+                val viewModel = profileViewModel
+                AddressManagementScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToAddAddress = { navigate(Screen.AddressValidation(30.0444, 31.2357)) },
+                    onNavigateToEditAddress = { id -> navigate(Screen.AddEditAddress(id)) }
+                )
+            }
+
+            entry<Screen.AddEditAddress> { screen ->
+                val viewModel = profileViewModel
+                AddEditAddressScreen(
+                    viewModel = viewModel,
+                    addressId = screen.addressId,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToValidation = { lat, lng, street, city, country, postalCode, label, isDefault, recipientName, phone, id ->
+                        navigate(
+                            Screen.AddressValidation(
+                                latitude = lat,
+                                longitude = lng,
+                                street = street,
+                                city = city,
+                                country = country,
+                                postalCode = postalCode,
+                                label = label,
+                                isDefault = isDefault,
+                                recipientName = recipientName,
+                                phone = phone,
+                                addressId = id
+                            )
+                        )
+                    }
+                )
+            }
+
+            entry<Screen.AddressValidation> { screen ->
+                val addressViewModel: AddressViewModel = koinViewModel()
+                AddressMapPicker(
+                    initialLatitude = screen.latitude,
+                    initialLongitude = screen.longitude,
+                    onLocationConfirmed = { lat, lng ->
+                        profileViewModel.updateTempAddressLocation(lat, lng)
+                        val hasAddEditAddress = backStack.any { it is Screen.AddEditAddress }
+                        if (hasAddEditAddress) {
+                            navigateBack()
+                        } else {
+                            if (backStack.isNotEmpty()) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                            navigate(Screen.AddEditAddress(null))
+                        }
+                    },
+                    onBackClick = ::navigateBack,
+                    viewModel = addressViewModel
                 )
             }
         }

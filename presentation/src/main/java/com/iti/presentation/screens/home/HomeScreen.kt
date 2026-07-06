@@ -44,6 +44,8 @@ import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.screens.home.components.HomeTabContent
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
 import com.iti.presentation.screens.home.viewmodel.HomeViewModel
+import com.iti.presentation.screens.profile.AccountSettingsScreen
+import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -59,6 +61,9 @@ fun HomeScreen(
     onNavigateToSearch: () -> Unit,
     onNavigateToOrders: () -> Unit,
     onNavigateToAiHistory: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToLocalizationCurrency: () -> Unit,
+    onNavigateToAddressManagement: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -111,7 +116,10 @@ HomeScreenContent(
     onNavigateToAiHistory = onNavigateToAiHistory,
     selectedIndex = selectedIndex,
     onSelectedIndexChanged = { selectedIndex = it },
-    onNavigateToOrders = onNavigateToOrders
+    onNavigateToOrders = onNavigateToOrders,
+    onNavigateToEditProfile = onNavigateToEditProfile,
+    onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
+    onNavigateToAddressManagement = onNavigateToAddressManagement
 )
 }
 
@@ -126,7 +134,10 @@ fun HomeScreenContent(
     onCartClick: () -> Unit,
     onNavigateToAiHistory: () -> Unit,
     selectedIndex: Int,
-    onSelectedIndexChanged: (Int) -> Unit
+    onSelectedIndexChanged: (Int) -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToLocalizationCurrency: () -> Unit,
+    onNavigateToAddressManagement: () -> Unit
 ) {
     val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
@@ -349,10 +360,15 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.Profile -> {
-                ProfileTabContent(
-                    user = state.currentUser,
-                    onLogout = onLogout,
-                    onNavigateToOrders = onNavigateToOrders
+                val profileViewModel: ProfileViewModel = koinViewModel()
+                AccountSettingsScreen(
+                    viewModel = profileViewModel,
+                    onNavigateBack = { onSelectedIndexChanged(0) },
+                    onNavigateToEditProfile = onNavigateToEditProfile,
+                    onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
+                    onNavigateToAddressManagement = onNavigateToAddressManagement,
+                    onNavigateToOrders = onNavigateToOrders,
+                    bottomPadding = padding.calculateBottomPadding()
                 )
             }
         }
