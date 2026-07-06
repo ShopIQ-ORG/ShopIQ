@@ -235,10 +235,10 @@ class HomeViewModel(
 
                 if (isFavorite) {
                     removeProductFromFavoritesUseCase(productId)
-                    emitEffect(HomeContract.Effect.ShowToast("Removed from Wishlist"))
+                    emitEffect(HomeContract.Effect.ShowToast(UiText.StringResource(R.string.removed_from_wishlist)))
                 } else {
                     addProductToFavoritesUseCase(product)
-                    emitEffect(HomeContract.Effect.ShowToast("Added to Wishlist ❤️"))
+                    emitEffect(HomeContract.Effect.ShowToast(UiText.StringResource(R.string.added_to_wishlist)))
                 }
 
                 _state.update { it.copy(isFavoriteLoading = false) }
@@ -247,7 +247,7 @@ class HomeViewModel(
                 // Revert optimistic update on failure
                 favoriteOverrides.update { it - productId }
                 _state.update { it.copy(isFavoriteLoading = false) }
-                emitEffect(HomeContract.Effect.ShowToast("Failed to update Wishlist"))
+                emitEffect(HomeContract.Effect.ShowToast(UiText.Plain("Failed to update Wishlist")))
             }
         }
     }

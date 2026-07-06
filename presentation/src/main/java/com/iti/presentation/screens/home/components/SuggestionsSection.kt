@@ -50,6 +50,7 @@ fun SuggestionsSection(
     products: List<Product>,
     isLoading: Boolean,
     onProductClick: (Product) -> Unit,
+    onFavoriteClick: (Product) -> Unit,
     onNavigateToChat: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -103,10 +104,11 @@ fun SuggestionsSection(
                     ) {
                         items(products, key = { it.id }) { product ->
                             val onClick = remember(product) { { onProductClick(product) } }
+                            val onFavClick = remember(product) { { onFavoriteClick(product) } }
                             ProductCard(
                                 product = product,
                                 onClick = onClick,
-                                onFavoriteClick = {},
+                                onFavoriteClick = onFavClick,
                                 modifier = Modifier
                                     .width(150.dp)
                                     .clip(RoundedCornerShape(16.dp))

@@ -61,6 +61,6 @@ object HomeContract {
         data object NavigateToSearch : Effect()
         data object NavigateToSignIn : Effect()
         data object NavigateToAiChat : Effect()
-        data class ShowToast(val message: String) : Effect()
+        data class ShowToast(val message: UiText) : Effect()
     }
 }

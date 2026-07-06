@@ -147,6 +147,7 @@ fun HomeTabContent(
                                 products = suggestionsProducts,
                                 isLoading = state.isLoadingRecommendations,
                                 onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) },
+                                onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(it)) },
                                 onNavigateToChat = { onIntent(HomeContract.Intent.NavigateToAiChat) }
                             )
                         }

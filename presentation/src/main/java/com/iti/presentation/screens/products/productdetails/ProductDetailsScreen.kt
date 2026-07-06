@@ -59,7 +59,7 @@ fun ProductDetailsScreen(
         viewModel.sideEffects.collect { effect ->
             when (effect) {
                 is ProductDetailsSideEffect.ShowToast ->
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, effect.message.resolve(context), Toast.LENGTH_SHORT).show()
 
                 ProductDetailsSideEffect.NavigateToAuth -> onLogin()
             }

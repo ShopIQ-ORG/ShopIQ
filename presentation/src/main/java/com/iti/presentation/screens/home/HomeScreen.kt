@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
@@ -62,6 +63,7 @@ fun HomeScreen(
     onNavigateToAiHistory: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val state by viewModel.state.collectAsState()
     var showAuthDialog by remember { mutableStateOf(false) }
@@ -102,7 +104,7 @@ fun HomeScreen(
                 }
 
                 is HomeContract.Effect.ShowToast -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(effect.message.resolve(context))
                 }
             }
         }

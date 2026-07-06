@@ -234,6 +234,10 @@
     <string name="ai_reset_chat_desc">Reset Chat</string>
     <string name="ai_greeting_message">Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.</string>
 
+    <!-- Wishlist feedback -->
+    <string name="added_to_wishlist">Added to Wishlist</string>
+    <string name="removed_from_wishlist">Removed from Wishlist</string>
+
     <!-- Chatbot error messages -->
     <string name="ai_error_invalid_key">The assistant\'s connection key is invalid. Please contact support or verify your settings.</string>
     <string name="ai_error_quota_exceeded">The assistant is currently busy with too many requests. Please try again in a moment.</string>
