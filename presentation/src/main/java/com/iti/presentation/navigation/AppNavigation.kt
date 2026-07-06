@@ -24,11 +24,12 @@ import com.iti.presentation.screens.brands.AllBrandsScreen
 import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.cart.CartScreen
+import com.iti.presentation.screens.cart.CartViewModel
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
-import com.iti.presentation.screens.products.checkout.CODPaymentScreen
-import com.iti.presentation.screens.products.checkout.OnlinePaymentScreen
+import com.iti.presentation.screens.payment.PaymentScreen
+import com.iti.presentation.screens.payment.PaymentViewModel
 import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
 import org.koin.androidx.compose.koinViewModel
@@ -235,7 +236,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToNextStep = { methodType ->
                         when (methodType) {
                             PaymentMethodType.COD -> {
-                                navigate(Screen.CODPayment)
+                                // COD handled separately or not yet implemented
                             }
                             PaymentMethodType.ONLINE -> {
                                 navigate(Screen.OnlinePayment)
@@ -245,12 +246,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 )
             }
 
-            entry<Screen.CODPayment> {
-                CODPaymentScreen(onNavigateBack = ::navigateBack)
-            }
-
             entry<Screen.OnlinePayment> {
-                OnlinePaymentScreen(onNavigateBack = ::navigateBack)
+                val paymentViewModel: PaymentViewModel = koinViewModel()
+                val cartViewModel: CartViewModel = koinViewModel()
+                val cartState by cartViewModel.state.collectAsState()
+
+                val totalAmount = cartState.cart?.total?.amount?.toDoubleOrNull() ?: 0.0
+                val amountCents = (totalAmount * 100).toLong()
+
+                PaymentScreen(
+                    viewModel = paymentViewModel,
+                    amountCents = amountCents,
+                    integrationId = com.iti.presentation.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242
+                )
             }
         }
     )
