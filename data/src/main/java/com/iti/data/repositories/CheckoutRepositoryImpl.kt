@@ -8,38 +8,101 @@
 
 package com.iti.data.repositories
 
-import com.iti.data.dto.checkout.DraftOrderDto
+import com.iti.data.dto.checkout.*
+import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSource
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
 import com.iti.data.utils.handleException
 import com.iti.domain.models.Result
 import com.iti.domain.models.checkout.DraftOrder
 import com.iti.domain.models.Address
+import com.iti.domain.models.cart.Cart
 import com.iti.domain.repositories.checkout.CheckoutRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class CheckoutRepositoryImpl(
-    private val remoteDataSource: CheckoutRemoteDataSource
+    private val remoteDataSource: CheckoutRemoteDataSource,
+    private val tokenLocalDataSource: ShopifyTokenLocalDataSource
 ) : CheckoutRepository {
 
     override suspend fun createDraftOrder(
-        lineItems: List<Pair<String, Int>>,
-        shippingAddress: Address?
+        cart: Cart,
+        shippingAddress: Address?,
+        email: String?
     ): Result<DraftOrder> = withContext(Dispatchers.IO) {
         safeCall {
-            val street = shippingAddress?.street ?: ""
-            val city = shippingAddress?.city ?: ""
-            val country = shippingAddress?.country ?: ""
-            val zip = shippingAddress?.postalCode ?: ""
+            val customerId = tokenLocalDataSource.getCachedFields()?.customerId
 
-            val dto = remoteDataSource.createDraftOrder(
-                lineItems = lineItems,
-                street = street,
-                city = city,
-                country = country,
-                zip = zip
+            // Build MailingAddressInput
+            val nameParts = shippingAddress?.name?.split(" ", limit = 2)
+            val firstName = nameParts?.firstOrNull() ?: ""
+            val lastName = nameParts?.getOrNull(1) ?: ""
+
+            val mailingAddress = shippingAddress?.let {
+                MailingAddressInput(
+                    firstName = firstName,
+                    lastName = lastName,
+                    address1 = it.street,
+                    address2 = "",
+                    city = it.city,
+                    province = it.city,
+                    country = it.country,
+                    zip = it.postalCode,
+                    phone = ""
+                )
+            }
+
+            // Build lineItems
+            val lineItems = cart.items.map { item ->
+                DraftOrderLineItemInput(
+                    variantId = item.variantId,
+                    quantity = item.quantity
+                )
+            }
+
+            // Build appliedDiscount
+            val appliedDiscount = cart.discountAmount?.let { discount ->
+                AppliedDiscountInput(
+                    title = cart.appliedPromoCode ?: "Discount",
+                    description = "Cart discount",
+                    value = discount.amount.toDoubleOrNull() ?: 0.0,
+                    valueType = "FIXED_AMOUNT"
+                )
+            }
+
+            // Build shippingLine
+            val shippingLine = cart.shippingAmount?.let { shipping ->
+                ShippingLineInput(
+                    title = "Standard Shipping",
+                    priceWithCurrency = MoneyInput(
+                        amount = shipping.amount.toDoubleOrNull() ?: 0.0,
+                        currencyCode = shipping.currencyCode
+                    )
+                )
+            }
+
+            // Build customAttributes
+            val customAttributes = listOf(
+                CustomAttributeInput(key = "cartId", value = cart.id)
             )
+
+            val input = DraftOrderInput(
+                customerId = customerId,
+                email = email,
+                lineItems = lineItems,
+                shippingAddress = mailingAddress,
+                billingAddress = mailingAddress,
+                appliedDiscount = appliedDiscount,
+                shippingLine = shippingLine,
+                note = "Created from mobile app",
+                customAttributes = customAttributes,
+                tags = listOf("Mobile App"),
+                taxExempt = false,
+                useCustomerDefaultAddress = false
+            )
+
+            val dto = remoteDataSource.createDraftOrder(input)
             dto.toDomain()
         }
     }

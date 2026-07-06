@@ -20,24 +20,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.ui.theme.*
 
 @Composable
 fun CheckoutStepper(
     currentStep: Int,
     modifier: Modifier = Modifier
 ) {
-    val isDark = LocalDarkTheme.current
-    val doneColor = if (isDark) SuccessDark else SuccessLight
-    val incomingColor = if (isDark) WarningDark else WarningLight
-    val currentColor = if (isDark) Color.White else Color.Black
-    val onCurrentColor = if (isDark) Color.Black else Color.White
-    val onIncomingColor = Color.Black
-    val onDoneColor = Color.White
+    // Dynamically calculate the horizontal offset so connecting lines align exactly with circle centers.
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val halfStepWidth = screenWidth / 8
 
     val steps = listOf(
         stringResource(R.string.checkout_step_address),
@@ -49,82 +47,112 @@ fun CheckoutStepper(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
+        Box(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            contentAlignment = Alignment.TopCenter
         ) {
-            steps.forEachIndexed { index, _ ->
-                val stepNumber = index + 1
-                val isDone = stepNumber < currentStep
-                val isActive = stepNumber == currentStep
+            // Background connecting lines between circle centers
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = halfStepWidth)
+                    .height(36.dp), // Align vertically with the center of the 36.dp circles
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    thickness = 2.dp,
+                    color = if (currentStep > 1) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outlineVariant
+                )
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    thickness = 2.dp,
+                    color = if (currentStep > 2) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outlineVariant
+                )
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f),
+                    thickness = 2.dp,
+                    color = if (currentStep > 3) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outlineVariant
+                )
+            }
 
-                val containerColor = when {
-                    isDone -> doneColor
-                    isActive -> currentColor
-                    else -> incomingColor
-                }
+            // Foreground step items (circle + description text)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                steps.forEachIndexed { index, title ->
+                    val stepNumber = index + 1
+                    val isDone = stepNumber < currentStep
+                    val isActive = stepNumber == currentStep
+                    val isActiveOrDone = stepNumber <= currentStep
 
-                val contentColor = when {
-                    isDone -> onDoneColor
-                    isActive -> onCurrentColor
-                    else -> onIncomingColor
-                }
+                    val containerColor = when {
+                        isDone -> MaterialTheme.colorScheme.tertiary
+                        isActive -> MaterialTheme.colorScheme.primary
+                        else -> MaterialTheme.colorScheme.secondaryContainer
+                    }
 
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(containerColor)
-                        .border(
-                            width = 1.dp,
-                            color = if (isActive) MaterialTheme.colorScheme.outline else Color.Transparent,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isDone) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = contentColor,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    } else {
+                    val contentColor = when {
+                        isDone -> MaterialTheme.colorScheme.onTertiary
+                        isActive -> MaterialTheme.colorScheme.onPrimary
+                        else -> MaterialTheme.colorScheme.onSecondaryContainer
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(containerColor)
+                                .border(
+                                    width = 1.dp,
+                                    color = if (isActive) MaterialTheme.colorScheme.outline else Color.Transparent,
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isDone) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = contentColor,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = stepNumber.toString(),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = contentColor
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Text(
-                            text = stepNumber.toString(),
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = contentColor
+                            text = title,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = if (isActiveOrDone) FontWeight.Bold else FontWeight.Normal
+                            ),
+                            color = if (isActiveOrDone) {
+                                MaterialTheme.colorScheme.onBackground
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            },
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
                         )
                     }
                 }
-
-                if (index < steps.lastIndex) {
-                    val lineDone = stepNumber < currentStep
-                    val lineColor = if (lineDone) doneColor else MaterialTheme.colorScheme.outlineVariant
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 8.dp),
-                        thickness = 2.dp,
-                        color = lineColor
-                    )
-                }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = when (currentStep) {
-                1 -> stringResource(R.string.checkout_step_address)
-                2 -> stringResource(R.string.checkout_step_payment)
-                3 -> stringResource(R.string.checkout_step_summary)
-                else -> stringResource(R.string.checkout_step_success)
-            },
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

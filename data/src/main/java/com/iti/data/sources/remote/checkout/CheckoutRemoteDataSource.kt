@@ -9,14 +9,11 @@
 package com.iti.data.sources.remote.checkout
 
 import com.iti.data.dto.checkout.DraftOrderDto
+import com.iti.data.dto.checkout.DraftOrderInput
 
 interface CheckoutRemoteDataSource {
     suspend fun createDraftOrder(
-        lineItems: List<Pair<String, Int>>,
-        street: String,
-        city: String,
-        country: String,
-        zip: String
+        input: DraftOrderInput
     ): DraftOrderDto
 
     suspend fun completeDraftOrder(draftOrderId: String): DraftOrderDto

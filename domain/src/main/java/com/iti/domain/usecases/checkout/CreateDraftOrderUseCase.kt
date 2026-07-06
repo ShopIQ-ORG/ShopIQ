@@ -11,15 +11,17 @@ package com.iti.domain.usecases.checkout
 import com.iti.domain.models.Result
 import com.iti.domain.models.checkout.DraftOrder
 import com.iti.domain.models.Address
+import com.iti.domain.models.cart.Cart
 import com.iti.domain.repositories.checkout.CheckoutRepository
 
 class CreateDraftOrderUseCase(
     private val repository: CheckoutRepository
 ) {
     suspend operator fun invoke(
-        lineItems: List<Pair<String, Int>>,
-        shippingAddress: Address?
+        cart: Cart,
+        shippingAddress: Address?,
+        email: String?
     ): Result<DraftOrder> {
-        return repository.createDraftOrder(lineItems, shippingAddress)
+        return repository.createDraftOrder(cart, shippingAddress, email)
     }
 }

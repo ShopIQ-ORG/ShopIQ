@@ -11,6 +11,7 @@ package com.iti.presentation.screens.checkout
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
+import com.iti.domain.models.User
 import com.iti.domain.usecases.cart.GetCartUseCase
 import com.iti.domain.usecases.cart.ClearCartUseCase
 import com.iti.domain.usecases.checkout.CreateDraftOrderUseCase
@@ -92,14 +93,14 @@ class CheckoutViewModel(
     private fun createDraftOrder() {
         val cart = _state.value.cart ?: return
         val address = _state.value.selectedAddress ?: return
-        
-        val lineItems = cart.items.map { item ->
-            Pair(item.variantId, item.quantity)
+        val email = when (val user = _state.value.currentUser) {
+            is User.AuthenticatedUser -> user.email
+            else -> null
         }
 
         _state.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
-            when (val result = createDraftOrderUseCase(lineItems, address)) {
+            when (val result = createDraftOrderUseCase(cart, address, email)) {
                 is Result.Success -> {
                     _state.update {
                         it.copy(

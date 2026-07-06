@@ -11,11 +11,7 @@ package com.iti.data.sources.remote.checkout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.iti.data.BuildConfig
-import com.iti.data.dto.checkout.DraftOrderDto
-import com.iti.data.dto.checkout.GraphQLRequest
-import com.iti.data.dto.checkout.GraphQLResponse
-import com.iti.data.dto.checkout.DraftOrderCreateData
-import com.iti.data.dto.checkout.DraftOrderCompleteData
+import com.iti.data.dto.checkout.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -31,15 +27,11 @@ class CheckoutRemoteDataSourceImpl(
     private val apiUrl = "https://${BuildConfig.SHOPIFY_STORE_DOMAIN}/admin/api/2024-07/graphql.json"
 
     override suspend fun createDraftOrder(
-        lineItems: List<Pair<String, Int>>,
-        street: String,
-        city: String,
-        country: String,
-        zip: String
+        input: DraftOrderInput
     ): DraftOrderDto {
-        val mutation = $$"""
-            mutation draftOrderCreate($input: DraftOrderInput!) {
-              draftOrderCreate(input: $input) {
+        val mutation = """
+            mutation draftOrderCreate(${'$'}input: DraftOrderInput!) {
+              draftOrderCreate(input: ${'$'}input) {
                 draftOrder {
                   id
                   totalPrice
@@ -55,24 +47,7 @@ class CheckoutRemoteDataSourceImpl(
             }
         """.trimIndent()
 
-        val formattedLineItems = lineItems.map { (variantId, quantity) ->
-            mapOf(
-                "variantId" to variantId,
-                "quantity" to quantity
-            )
-        }
-
-        val variables = mapOf(
-            "input" to mapOf(
-                "lineItems" to formattedLineItems,
-                "shippingAddress" to mapOf(
-                    "address1" to street,
-                    "city" to city,
-                    "country" to country,
-                    "zip" to zip
-                )
-            )
-        )
+        val variables = mapOf("input" to input)
 
         val requestPayload = GraphQLRequest(query = mutation, variables = variables)
         val requestBodyJson = gson.toJson(requestPayload)
