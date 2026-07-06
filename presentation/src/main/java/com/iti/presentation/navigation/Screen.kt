@@ -53,4 +53,6 @@ sealed class Screen : NavKey {
         val phone: String = "",
         val addressId: String? = null
     ) : Screen()
+    data object ForgotPassword : Screen()
+    data class EmailVerification(val email: String) : Screen()
 }

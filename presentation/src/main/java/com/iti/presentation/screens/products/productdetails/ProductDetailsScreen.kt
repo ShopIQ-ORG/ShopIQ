@@ -45,8 +45,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ProductDetailsScreen(
     productId: Long = 9746399428843L,
     viewModel: ProductDetailsViewModel = koinViewModel(),
-    onBackClick: () -> Unit = {},
-    onLogin: () -> Unit = {}
+    onBackClick: () -> Unit,
+    onLogin: () -> Unit
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -59,7 +59,7 @@ fun ProductDetailsScreen(
         viewModel.sideEffects.collect { effect ->
             when (effect) {
                 is ProductDetailsSideEffect.ShowToast ->
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, effect.message.resolve(context), Toast.LENGTH_SHORT).show()
 
                 ProductDetailsSideEffect.NavigateToAuth -> onLogin()
             }

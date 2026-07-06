@@ -220,8 +220,7 @@ class HomeViewModel(
     }
 
     private fun toggleFavorite(product: Product) {
-        val userId = authRepository.getUserId()
-        if (userId == null || userId == "guest") {
+        if (authRepository.isGuest()) {
             emitEffect(HomeContract.Effect.ShowAuthRequired)
             return
         }
@@ -230,16 +229,25 @@ class HomeViewModel(
             val productId = product.id
             val isFavorite = product.isFavorite
             try {
+                // Optimistic update: instantly reflect the new state in the UI
                 favoriteOverrides.update { it + (productId to !isFavorite) }
+                _state.update { it.copy(isFavoriteLoading = true) }
+
                 if (isFavorite) {
                     removeProductFromFavoritesUseCase(productId)
+                    emitEffect(HomeContract.Effect.ShowToast(UiText.StringResource(R.string.removed_from_wishlist)))
                 } else {
                     addProductToFavoritesUseCase(product)
+                    emitEffect(HomeContract.Effect.ShowToast(UiText.StringResource(R.string.added_to_wishlist)))
                 }
-                kotlinx.coroutines.delay(1000)
+
+                _state.update { it.copy(isFavoriteLoading = false) }
                 favoriteOverrides.update { it - productId }
             } catch (_: Exception) {
+                // Revert optimistic update on failure
                 favoriteOverrides.update { it - productId }
+                _state.update { it.copy(isFavoriteLoading = false) }
+                emitEffect(HomeContract.Effect.ShowToast(UiText.Plain("Failed to update Wishlist")))
             }
         }
     }

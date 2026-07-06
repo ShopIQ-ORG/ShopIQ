@@ -8,6 +8,8 @@
 
 package com.iti.domain.models
 
+import com.iti.domain.models.auth.AuthProvider
+
 sealed class User {
     data class AuthenticatedUser(
         val uid: String,
@@ -16,7 +18,9 @@ sealed class User {
         val phone: String,
         val dateOfBirth: String? = null,
         val gender: String? = null,
-        val avatarUrl: String? = null
+        val avatarUrl: String? = null,
+        val provider: AuthProvider = AuthProvider.PASSWORD,
+        val isEmailVerified: Boolean = false
     ) : User()
 
     object GuestUser : User()

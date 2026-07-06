@@ -1,6 +1,7 @@
 package com.iti.presentation.screens.categorydetails
 
 import com.iti.domain.models.Product
+import com.iti.presentation.util.UiText
 
 interface CategoryDetailsContract {
     data class State(
@@ -16,6 +17,7 @@ interface CategoryDetailsContract {
     }
 
     sealed interface Effect {
-        data class ShowSnackbar(val message: String) : Effect
+        data class ShowSnackbar(val message: UiText.StringResource) : Effect
+        data object ShowAuthRequired : Effect
     }
 }

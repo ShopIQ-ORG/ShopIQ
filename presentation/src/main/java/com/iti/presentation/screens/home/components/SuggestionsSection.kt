@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +50,7 @@ fun SuggestionsSection(
     products: List<Product>,
     isLoading: Boolean,
     onProductClick: (Product) -> Unit,
+    onFavoriteClick: (Product) -> Unit,
     onNavigateToChat: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -101,10 +103,12 @@ fun SuggestionsSection(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         items(products, key = { it.id }) { product ->
+                            val onClick = remember(product) { { onProductClick(product) } }
+                            val onFavClick = remember(product) { { onFavoriteClick(product) } }
                             ProductCard(
                                 product = product,
-                                onClick = { onProductClick(product) },
-                                onFavoriteClick = {},
+                                onClick = onClick,
+                                onFavoriteClick = onFavClick,
                                 modifier = Modifier
                                     .width(150.dp)
                                     .clip(RoundedCornerShape(16.dp))

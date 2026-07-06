@@ -16,14 +16,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.Product
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.NoResultsScreen
 import com.iti.presentation.components.ProductsGrid
+import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.screens.products.displayallproducts.components.AllProductsShimmer
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 
 @Composable
 fun CategoryDetailsScreen(
@@ -32,20 +36,27 @@ fun CategoryDetailsScreen(
     viewModel: CategoryDetailsViewModel = koinViewModel(),
     onBackClick: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
-    onNavigateToSearch: () -> Unit
+    onNavigateToSearch: () -> Unit,
+    onNavigateToAuth: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showAuthDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(categoryId) {
         viewModel.sendIntent(CategoryDetailsContract.Intent.LoadProducts(categoryId))
     }
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is CategoryDetailsContract.Effect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(effect.message.resolve(context))
+                }
+                CategoryDetailsContract.Effect.ShowAuthRequired -> {
+                    showAuthDialog = true
                 }
             }
         }
@@ -65,6 +76,16 @@ fun CategoryDetailsScreen(
             viewModel.sendIntent(CategoryDetailsContract.Intent.ProductFavoriteClicked(product))
         }
     )
+
+    if (showAuthDialog) {
+        UnauthorizedDialog(
+            onDismiss = { showAuthDialog = false },
+            onLogin = {
+                showAuthDialog = false
+                onNavigateToAuth()
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

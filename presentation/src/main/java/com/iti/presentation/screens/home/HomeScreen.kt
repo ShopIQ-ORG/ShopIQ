@@ -33,12 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
+import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.screens.ai.AiChatScreen
 import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.screens.home.components.HomeTabContent
@@ -66,8 +68,11 @@ fun HomeScreen(
     onNavigateToAddressManagement: () -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val state by viewModel.state.collectAsState()
+    var showAuthDialog by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -96,11 +101,15 @@ fun HomeScreen(
                     onLogout()
                 }
                 HomeContract.Effect.ShowAuthRequired -> {
-                    onLogout()
+                    showAuthDialog = true
                 }
 
                 HomeContract.Effect.NavigateToAiChat -> {
                     selectedIndex = 2 // AI tab index
+                }
+
+                is HomeContract.Effect.ShowToast -> {
+                    snackbarHostState.showSnackbar(effect.message.resolve(context))
                 }
             }
         }
@@ -119,8 +128,19 @@ HomeScreenContent(
     onNavigateToOrders = onNavigateToOrders,
     onNavigateToEditProfile = onNavigateToEditProfile,
     onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
-    onNavigateToAddressManagement = onNavigateToAddressManagement
+    onNavigateToAddressManagement = onNavigateToAddressManagement,
+    snackbarHostState = snackbarHostState
 )
+
+    if (showAuthDialog) {
+        UnauthorizedDialog(
+            onDismiss = { showAuthDialog = false },
+            onLogin = {
+                showAuthDialog = false
+                onLogout()
+            }
+        )
+    }
 }
 
 @Composable
@@ -137,15 +157,15 @@ fun HomeScreenContent(
     onSelectedIndexChanged: (Int) -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToLocalizationCurrency: () -> Unit,
-    onNavigateToAddressManagement: () -> Unit
+    onNavigateToAddressManagement: () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    networkMonitor: NetworkMonitor = koinInject(),
+    cartBadgeViewModel: CartBadgeViewModel = koinViewModel()
 ) {
-    val networkMonitor: NetworkMonitor = koinInject()
     val isConnected by networkMonitor.isConnected.collectAsState(initial = networkMonitor.isCurrentlyConnected())
-    val snackbarHostState = remember { SnackbarHostState() }
     var wasConnected by remember { mutableStateOf(isConnected) }
     val connectionLostMessage = stringResource(id = R.string.network_connection_lost)
 
-    val cartBadgeViewModel: CartBadgeViewModel = koinViewModel()
     val cartItemCount by cartBadgeViewModel.cartItemCount.collectAsState()
 
     LaunchedEffect(isConnected) {
@@ -165,6 +185,7 @@ fun HomeScreenContent(
         onSelectedIndexChanged(0)
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -355,7 +376,9 @@ fun HomeScreenContent(
                         onNavigateToProduct(idLong)
                     },
                     onExploreClick = { onSelectedIndexChanged(0) },
-                    onAuthClick = onLogout
+                    onAuthClick = onLogout,
+                    cartItemCount = cartItemCount,
+                    onCartClick = onCartClick
                 )
             }
 
@@ -373,4 +396,31 @@ fun HomeScreenContent(
             }
         }
     }
+
+    // Wishlist loading overlay — shown while add/remove is in progress
+    if (state.isFavoriteLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.25f)),
+            contentAlignment = Alignment.Center
+        ) {
+            androidx.compose.material3.Card(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Box(
+                    modifier = Modifier.padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        modifier = Modifier.size(36.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 3.dp
+                    )
+                }
+            }
+        }
+    }
+    } // end outer Box
 }
