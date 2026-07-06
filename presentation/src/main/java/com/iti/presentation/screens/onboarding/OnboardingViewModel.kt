@@ -2,7 +2,10 @@ package com.iti.presentation.screens.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.iti.domain.models.Result
+import com.iti.domain.usecases.auth.LoginAsGuestUseCase
 import com.iti.domain.usecases.onboarding.SetOnboardingCompletedUseCase
+import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +14,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class OnboardingViewModel(
-    private val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase
+    private val setOnboardingCompletedUseCase: SetOnboardingCompletedUseCase,
+    private val loginAsGuestUseCase: LoginAsGuestUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingContract.State())
@@ -52,9 +56,23 @@ class OnboardingViewModel(
     }
 
     private fun handleComplete() {
+        if (_state.value.isLoading) return
         viewModelScope.launch {
-            setOnboardingCompletedUseCase()
-            _effect.send(OnboardingContract.Effect.NavigateToHome)
+            _state.value = _state.value.copy(isLoading = true)
+            when (val result = loginAsGuestUseCase()) {
+                is Result.Success -> {
+                    setOnboardingCompletedUseCase()
+                    _state.value = _state.value.copy(isLoading = false)
+                    _effect.send(OnboardingContract.Effect.NavigateToHome)
+                }
+                is Result.Failure -> {
+                    setOnboardingCompletedUseCase()
+                    _state.value = _state.value.copy(isLoading = false)
+                    _effect.send(OnboardingContract.Effect.ShowError(result.exception.toUiMessage()))
+                    _effect.send(OnboardingContract.Effect.NavigateToSignIn)
+                }
+                else -> {}
+            }
         }
     }
 }

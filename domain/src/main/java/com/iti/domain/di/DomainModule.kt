@@ -25,6 +25,9 @@ import com.iti.domain.usecases.location.GetCurrentLocationUseCase
 import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.address.DeleteAddressUseCase
+import com.iti.domain.usecases.auth.ReloadAndGetCurrentUserUseCase
+import com.iti.domain.usecases.auth.SendEmailVerificationUseCase
+import com.iti.domain.usecases.auth.SendPasswordResetEmailUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
 import com.iti.domain.usecases.orders.GetOrdersUseCase
 import org.koin.core.module.dsl.factoryOf
@@ -32,6 +35,7 @@ import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.IsProductFavoriteUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import com.iti.domain.usecases.shopify.GetValidShopifyTokenUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -73,6 +77,10 @@ val domainModule = module {
     factory { DeleteAddressUseCase(get()) }
     factoryOf(::ObserveCartItemCountUseCase)
     factoryOf(::GetOrdersUseCase)
+    factoryOf(::SendPasswordResetEmailUseCase)
+    factoryOf(::SendEmailVerificationUseCase)
+    factoryOf(::GetValidShopifyTokenUseCase)
+    factoryOf(::ReloadAndGetCurrentUserUseCase)
 
 
 }

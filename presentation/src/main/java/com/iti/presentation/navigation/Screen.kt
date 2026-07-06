@@ -26,4 +26,7 @@ sealed class Screen : NavKey {
 
 
     data object AiHistory : Screen()
+
+    data object ForgotPassword : Screen()
+    data class EmailVerification(val email: String) : Screen()
 }

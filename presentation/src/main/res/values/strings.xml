@@ -36,6 +36,10 @@
     <string name="error_phone_required">Phone number is required</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_confirm_password_required">Please confirm your password</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="error_invalid_phone_egypt">Please enter a valid Egyptian phone number</string>
+    <string name="error_invalid_password">Password must be at least 6 characters</string>
+    <string name="error_invalid_full_name">Please enter a valid name</string>
     <string name="phone_number">Phone Number</string>
     <string name="content_desc_back">Back</string>
     <string name="content_desc_wishlist">Wishlist</string>
@@ -283,10 +287,11 @@
     <string name="easy_returns_desc">14-day return policy</string>
     <string name="secure_payment_title">Secure</string>
     <string name="secure_payment_desc">100% secure checkout</string>
-    
+
     <string name="orders_title">My Orders</string>
     <string name="orders_empty_title">No orders yet</string>
-    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>    <string name="order_card_title">Order %1$s</string>
+    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>
+    <string name="order_card_title">Order %1$s</string>
     <string name="order_products_label">Products</string>
     <string name="order_total_label">Total</string>
     <string name="order_status_label">Status</string>
@@ -409,4 +414,30 @@
 
     <string name="failed_to_update_favorite_status">Failed to update favorite status</string>
     <string name="login_required_favorites">You need to sign in to add items to your wishlist.</string>
+    <string name="forgot_password_title">Forgot Password?</string>
+    <string name="forgot_password_subtitle">Enter your email and we\'ll send you a link to reset your password.</string>
+
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="back_to_login">Back to Login</string>
+
+    <string name="reset_link_sent">Password reset link sent successfully.</string>
+
+    <string name="verify_your_email">Verify Your Email</string>
+
+    <string name="verify_your_email_subtitle">
+    Your email address hasn\'t been verified yet. Verify it to continue using your account.</string>
+    <string name="send_verification_link">Send Verification Link</string>
+    <string name="verify_email_description">We sent a verification link to %1$s. Open it, then come back here — we\'ll take you home automatically.</string>
+    <string name="verify_email_eyebrow">ALMOST THERE</string>
+    <string name="verify_email_title">Check your inbox</string>
+    <string name="verify_email_lead_in">We sent a verification link to</string>
+    <string name="verify_email_followup">Open it on this device or any other. We\'ll bring you home the moment it\'s confirmed.</string>
+    <string name="resend_verification_link">Resend link</string>
+    <string name="resend_link_cooldown">Resend in %1$ds</string>
+    <string name="ive_verified_my_email">I\'ve verified — continue</string>
+    <string name="back_to_sign_in">Back to sign in</string>
+    <string name="verification_link_sent">Verification link sent. Check your inbox.</string>
+    <string name="email_not_verified_yet">Not verified yet. Open the link we sent, then try again.</string>
+    <string name="error_shopify_token_unavailable">We couldn\'t restore your store session. Please try signing in again.</string>
+    <string name="too_many_request">Too many attempts. Please wait a few minutes before trying again.</string>
 </resources>

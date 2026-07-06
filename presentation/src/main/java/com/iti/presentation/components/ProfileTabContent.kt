@@ -32,13 +32,13 @@ fun ProfileTabContent(
             text = "👤",
             style = MaterialTheme.typography.displayLarge
         )
-        
+
         val displayName = when (user) {
             is User.AuthenticatedUser -> user.fullName
             User.GuestUser -> "Guest User"
             null -> "Loading..."
         }
-        
+
         val displayEmail = when (user) {
             is User.AuthenticatedUser -> user.email
             else -> ""
@@ -50,7 +50,7 @@ fun ProfileTabContent(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 16.dp)
         )
-        
+
         if (displayEmail.isNotEmpty()) {
             Text(
                 text = displayEmail,
@@ -70,9 +70,11 @@ fun ProfileTabContent(
         OutlinedButton(onClick = onLogout) {
             Text(text = "Back to Login")
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedButton(onClick = onNavigateToOrders) {
-            Text(text = "Go To Orders")
+        if (user is User.AuthenticatedUser) {
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(onClick = onNavigateToOrders) {
+                Text(text = "Go To Orders")
+            }
         }
     }
 }

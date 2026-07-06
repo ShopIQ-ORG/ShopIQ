@@ -27,6 +27,8 @@ import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.address.AddressScreen
 import com.iti.presentation.screens.address.AddressViewModel
+import com.iti.presentation.screens.auth.emailverification.EmailVerificationScreen
+import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordScreen
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
@@ -89,6 +91,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
                             is SplashDestination.Home ->
                                 replaceRoot(Screen.Home)
+
+                            is SplashDestination.EmailVerification ->
+                                replaceRoot(Screen.EmailVerification(dest.email))
                         }
                     }
                 }
@@ -106,7 +111,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 OnboardingScreen(
                     viewModel = onboardingViewModel,
                     onNavigateToHome = {
-                        navigate(Screen.SignIn)
+                        replaceRoot(Screen.Home)
+                    },
+                    onNavigateToSignIn = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
@@ -119,7 +127,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToHome = {
                         replaceRoot(Screen.Home)
                     },
-                    onNavigateToForgotPassword = { }
+                    onNavigateToForgotPassword = {
+                        navigate(Screen.ForgotPassword)
+                    },
+                    onNavigateToEmailVerification = {
+                        navigate(Screen.EmailVerification(it))
+                    }
                 )
             }
 
@@ -128,12 +141,16 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToHome = {
                         replaceRoot(Screen.Home)
                     },
+                    onNavigateToEmailVerification = {
+                        navigate(Screen.EmailVerification(it))
+                    },
                     onNavigateToSignIn = ::navigateBack
                 )
             }
 
             entry<Screen.AiHistory> {
-                val viewModel: com.iti.presentation.screens.ai.history.AiHistoryViewModel = org.koin.androidx.compose.koinViewModel()
+                val viewModel: com.iti.presentation.screens.ai.history.AiHistoryViewModel =
+                    org.koin.androidx.compose.koinViewModel()
                 com.iti.presentation.screens.ai.history.AiHistoryScreen(
                     viewModel = viewModel,
                     onNavigateBack = ::navigateBack
@@ -309,6 +326,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AddressScreen(
                     viewModel = addressViewModel,
                     onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.ForgotPassword> {
+                ForgotPasswordScreen(onNavigateBack = ::navigateBack)
+            }
+
+            entry<Screen.EmailVerification> { screen ->
+                EmailVerificationScreen(
+                    email = screen.email,
+                    onNavigateToSignIn = { replaceRoot(Screen.SignIn) },
+                    onNavigateToHome = { replaceRoot(Screen.Home) }
                 )
             }
         }
