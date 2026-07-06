@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.apollo)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val localProperties = Properties().apply {
@@ -19,6 +20,10 @@ val adminToken = localProperties.getProperty("shopify.admin.access.token") ?: ""
 val apiKey = localProperties.getProperty("shopify.api.key") ?: ""
 val apiSecretKey = localProperties.getProperty("shopify.api.secret.key") ?: ""
 val storeDomain = localProperties.getProperty("shopify.store.domain") ?: "mad46-and6.myshopify.com"
+val paymobApiKey = localProperties.getProperty("paymob.api.key") ?: ""
+val paymobPublicKey = localProperties.getProperty("paymob.public.key") ?: ""
+val paymobSecretKey = localProperties.getProperty("paymob.secret.key") ?: ""
+val paymobIntegrationId = localProperties.getProperty("paymob.integration.id") ?: ""
 
 android {
     namespace = "com.iti.data"
@@ -40,6 +45,10 @@ android {
         buildConfigField("String", "SHOPIFY_API_KEY", "\"$apiKey\"")
         buildConfigField("String", "SHOPIFY_API_SECRET_KEY", "\"$apiSecretKey\"")
         buildConfigField("String", "SHOPIFY_STORE_DOMAIN", "\"$storeDomain\"")
+        buildConfigField("String", "PAYMOB_API_KEY", "\"$paymobApiKey\"")
+        buildConfigField("String", "PAYMOB_PUBLIC_KEY", "\"$paymobPublicKey\"")
+        buildConfigField("String", "PAYMOB_SECRET_KEY", "\"$paymobSecretKey\"")
+        buildConfigField("String", "PAYMOB_INTEGRATION_ID", "\"$paymobIntegrationId\"")
     }
 
     buildTypes {
@@ -97,4 +106,11 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.logging.interceptor)
+
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
 }
