@@ -32,7 +32,9 @@ private val LightColorScheme = lightColorScheme(
     outline = BorderLight,
     outlineVariant = DividerLight,
     error = ErrorLight,
-    onError = Color.White
+    onError = Color.White,
+    tertiary = SuccessLight,
+    onTertiary = Color.White
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -53,7 +55,9 @@ private val DarkColorScheme = darkColorScheme(
     outline = BorderDark,
     outlineVariant = DividerDark,
     error = ErrorDark,
-    onError = Color.White
+    onError = Color.White,
+    tertiary = SuccessDark,
+    onTertiary = Color.White
 )
 
 @Composable

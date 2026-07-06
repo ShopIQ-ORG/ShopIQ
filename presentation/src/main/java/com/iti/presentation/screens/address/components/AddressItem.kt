@@ -9,6 +9,7 @@
 package com.iti.presentation.screens.address.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,20 +58,45 @@ fun AddressItem(
     onDelete: () -> Unit,
     onSetDefault: () -> Unit,
     modifier: Modifier = Modifier,
-    onEdit: (() -> Unit)? = null
+    onEdit: (() -> Unit)? = null,
+    onAddressSelected: ((Address) -> Unit)? = null,
+    isSelected: Boolean = false
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val isDark = LocalDarkTheme.current
     val containerColor = if (isDark) SuccessContainerDark else SuccessContainerLight
     val successColor = if (isDark) SuccessDark else SuccessLight
 
+    val isClickable = onAddressSelected != null
+    val clickModifier = if (isClickable) {
+        Modifier.clickable { onAddressSelected(address) }
+    } else {
+        Modifier
+    }
+
+    val borderStrokeColor = when {
+        isSelected -> MaterialTheme.colorScheme.primary
+        isClickable -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        else -> MaterialTheme.colorScheme.outlineVariant
+    }
+
+    val cardContainerColor = when {
+        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+        else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+    }
+
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(clickModifier),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            containerColor = cardContainerColor
         ),
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = androidx.compose.foundation.BorderStroke(
+            if (isSelected) 2.dp else 1.dp,
+            borderStrokeColor
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

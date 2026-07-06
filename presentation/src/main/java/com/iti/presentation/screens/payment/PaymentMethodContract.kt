@@ -1,4 +1,12 @@
-package com.iti.presentation.screens.products.checkout
+//
+//  PaymentMethodContract.kt
+//  ShopIQ
+//
+//  Created by Antigravity on 7/6/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
+package com.iti.presentation.screens.payment
 
 import com.iti.presentation.util.UiText
 

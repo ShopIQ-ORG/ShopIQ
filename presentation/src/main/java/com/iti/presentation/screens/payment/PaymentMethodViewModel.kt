@@ -1,4 +1,12 @@
-package com.iti.presentation.screens.products.checkout
+//
+//  PaymentMethodViewModel.kt
+//  ShopIQ
+//
+//  Created by Antigravity on 7/6/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
+package com.iti.presentation.screens.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -57,14 +57,14 @@ fun AuthSocialSection(
         ) {
             SocialLoginButton(
                 iconRes = R.drawable.ic_google,
-                text = "Google",
+                text = stringResource(R.string.login_google),
                 onClick = onGoogleClick,
                 enabled = enabled,
                 modifier = Modifier.weight(1f).padding(end = 8.dp)
             )
             SocialLoginButton(
                 iconRes = R.drawable.ic_guest,
-                text = "Guest",
+                text = stringResource(R.string.login_guest),
                 onClick = onGuestClick,
                 enabled = enabled,
                 modifier = Modifier.weight(1f).padding(start = 8.dp)

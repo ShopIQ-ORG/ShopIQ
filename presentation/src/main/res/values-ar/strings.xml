@@ -4,6 +4,8 @@
     <string name="shopiq_logo">شعار شوب آي كيو</string>
     <string name="welcome_back">مرحبًا بعودتك!</string>
     <string name="login_subtitle">قم بتسجيل الدخول لمواصلة التسوق واكتشاف العروض الرائعة.</string>
+    <string name="login_google">جوجل</string>
+    <string name="login_guest">زائر</string>
     <string name="email_or_phone_number">البريد الإلكتروني أو رقم الهاتف</string>
     <string name="email_address">البريد الإلكتروني</string>
     <string name="password">كلمة المرور</string>
