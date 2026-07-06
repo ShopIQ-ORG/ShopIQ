@@ -1,4 +1,5 @@
 package com.iti.data.repositories
+
 import com.iti.data.utils.handleException
 import com.iti.data.mappers.toDomain
 import com.iti.data.sources.remote.cart.CartIdDataSource
@@ -7,13 +8,16 @@ import com.iti.domain.exceptions.CartException
 import com.iti.domain.models.Result
 import com.iti.domain.models.cart.Cart
 import com.iti.domain.repositories.cart.CartRepository
+import com.iti.domain.util.ShopifyTokenProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onSubscription
+
 class CartRepositoryImpl(
     private val cartRemoteDataSource: CartRemoteDataSource,
-    private val cartIdDataSource: CartIdDataSource
+    private val cartIdDataSource: CartIdDataSource,
+    private val shopifyTokenProvider: ShopifyTokenProvider
 ) : CartRepository {
 
     private val cartState = MutableStateFlow<Result<Cart>>(Result.Loading)
@@ -40,7 +44,7 @@ class CartRepositoryImpl(
         cartRemoteDataSource.getCart(getOrCreateCartId()).toDomain()
 
     private suspend fun recreateCart(): Cart {
-        val cartId = cartRemoteDataSource.createCart()
+        val cartId = createCartAndLinkIfAuthenticated()
         cartIdDataSource.saveCartId(cartId)
         return cartRemoteDataSource.getCart(cartId).toDomain()
     }
@@ -109,9 +113,18 @@ class CartRepositoryImpl(
 
     private suspend fun getOrCreateCartId(): String {
         cartIdDataSource.getCartId()?.let { return it }
-        val newCartId = cartRemoteDataSource.createCart()
+        val newCartId = createCartAndLinkIfAuthenticated()
         cartIdDataSource.saveCartId(newCartId)
         return newCartId
+    }
+
+    private suspend fun createCartAndLinkIfAuthenticated(): String {
+        val cartId = cartRemoteDataSource.createCart()
+        val token = (shopifyTokenProvider.getValidToken() as? Result.Success)?.data
+        if (token != null) {
+            runCatching { cartRemoteDataSource.linkCartToCustomer(cartId, token.accessToken) }
+        }
+        return cartId
     }
 
     override suspend fun invalidate() {

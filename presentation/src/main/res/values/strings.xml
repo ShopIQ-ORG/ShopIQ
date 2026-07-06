@@ -36,6 +36,10 @@
     <string name="error_phone_required">Phone number is required</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_confirm_password_required">Please confirm your password</string>
+    <string name="error_invalid_email">Please enter a valid email address</string>
+    <string name="error_invalid_phone_egypt">Please enter a valid Egyptian phone number</string>
+    <string name="error_invalid_password">Password must be at least 6 characters</string>
+    <string name="error_invalid_full_name">Please enter a valid name</string>
     <string name="phone_number">Phone Number</string>
     <string name="content_desc_back">Back</string>
     <string name="content_desc_wishlist">Wishlist</string>
@@ -118,10 +122,10 @@
     <string name="filter_title">Filters</string>
     <string name="filter_reset">Reset</string>
     <string name="filter_by_category">Filter By Category</string>
-    <string name="filter_by_subcategory">Filter By Sub Category</string>
+    <string name="filter_by_subcategory">Filter By Tag Name</string>
     <string name="filter_by_brand">Filter By Brand</string>
     <string name="filter_select_category">Select Category</string>
-    <string name="filter_select_subcategory">Select Sub Category</string>
+    <string name="filter_select_subcategory">Select Tag Name</string>
     <string name="filter_search_brand">Search Brand</string>
     <string name="filter_apply">Apply Filters</string>
     <string name="filter_cd_expand">Expand section</string>
@@ -209,10 +213,231 @@
     <string name="cart_shipping_calculated_at_checkout">Calculated at checkout</string>
     <string name="cart_promo_duplicate_error">This code is already applied</string>
     <string name="all_photos">All Photos</string>
+    <string name="filter_show_less">Show less</string>
+    <string name="filter_show_more">+ %1$d more</string>
+
     <string name="cart_max_quantity_reached">You have reached the maximum available quantity for this item.</string>
     <string name="cart_promo_applied_badge">Applied</string>
     <string name="cart_out_of_stock">This item is out of stock.</string>
     <string name="cart_promo_remove_cd">Remove Prompo Code</string>
     <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
     <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
+    <string name="clear_history">Clear Chat</string>
+
+    <!-- AI Chatbot Strings -->
+    <string name="ai_assistant_title">AI Assistant</string>
+    <string name="ai_auth_required_title">Authentication Required</string>
+    <string name="ai_auth_required_subtitle">Please sign in to access Eslam, your AI shopping assistant, sync your chat history, and get personalized recommendations.</string>
+    <string name="ai_auth_btn_signin">Sign In to Continue</string>
+    <string name="ai_input_placeholder">Ask anything...</string>
+    <string name="ai_input_listening">Listening...</string>
+    <string name="ai_permission_record_audio_required">Audio permission is required for voice input</string>
+    <string name="ai_image_description">Search by this image.</string>
+    <string name="ai_image_picker_error">Failed to read image file.</string>
+    <string name="ai_product_view">View Product</string>
+    <string name="ai_reset_chat_desc">Reset Chat</string>
+    <string name="ai_greeting_message">Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.</string>
+
+    <!-- Wishlist feedback -->
+    <string name="added_to_wishlist">Added to Wishlist</string>
+    <string name="removed_from_wishlist">Removed from Wishlist</string>
+
+    <!-- Chatbot error messages -->
+    <string name="ai_error_invalid_key">The assistant\'s connection key is invalid. Please contact support or verify your settings.</string>
+    <string name="ai_error_quota_exceeded">The assistant is currently busy with too many requests. Please try again in a moment.</string>
+    <string name="ai_error_network">Please check your internet connection and try again.</string>
+    <string name="ai_error_image_processing">There was an issue processing the uploaded image. Please ensure it is a valid format (JPEG/PNG) and try again.</string>
+    <string name="ai_error_unknown">I\'m sorry, I\'m having trouble connecting to my brain right now. Please try sending your message again.</string>    <!-- AI History -->
+    <string name="history_title">History</string>
+    <string name="delete_all">Delete All</string>
+    <string name="search_conversations_hint">Search your conversations...</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="older">Older</string>
+    <string name="history_empty">No conversation history found.</string>
+    <string name="delete_history_confirm_title">Delete History</string>
+    <string name="delete_history_confirm_message">Are you sure you want to delete all chat history?</string>
+
+    <!-- Home AI Recommendations -->
+    <string name="recommended_for_you">Recommended For You</string>
+    <string name="ai_recommended_subtitle">Based on your chat with Eslam</string>
+    <string name="try_eslam_title">Chat with Eslam</string>
+    <string name="try_eslam_subtitle">Ask our AI assistant about products you love — personalized picks will appear right here.</string>
+    <string name="try_eslam_btn">Start Chatting</string>
+    <string name="suggestions_title">Suggestions</string>
+    <string name="suggestions_general_subtitle">Products you might like</string>
+    <string name="deals_of_the_day">Deals of the Day</string>
+
+    <!-- AI Picks -->
+    <string name="ai_picks_title">AI Picks for You</string>
+    <string name="ai_picks_subtitle">Personalized just for you</string>
+
+    <!-- Banners -->
+    <string name="new_arrivals_title">New Arrivals</string>
+    <string name="new_arrivals_desc">Fresh styles\njust landed</string>
+    <string name="summer_sale_title">Summer Sale</string>
+    <string name="summer_sale_desc">Up to 40% off on\nselected items</string>
+    <string name="explore_btn">Explore</string>
+    <string name="shop_now_btn">Shop Now</string>
+
+    <!-- Features -->
+    <string name="free_delivery_title">Free Delivery</string>
+    <string name="free_delivery_desc">On orders over 1500 EGP</string>
+    <string name="easy_returns_title">Easy Returns</string>
+    <string name="easy_returns_desc">14-day return policy</string>
+    <string name="secure_payment_title">Secure</string>
+    <string name="secure_payment_desc">100% secure checkout</string>
+
+    <string name="orders_title">My Orders</string>
+    <string name="orders_empty_title">No orders yet</string>
+    <string name="orders_empty_message">Your orders will appear here after your first purchase.</string>
+    <string name="order_card_title">Order %1$s</string>
+    <string name="order_products_label">Products</string>
+    <string name="order_total_label">Total</string>
+    <string name="order_status_label">Status</string>
+    <string name="order_view_details">View Details</string>
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_completed">Completed</string>
+    <string name="order_status_cancelled">Cancelled</string>
+    <string name="order_status_unknown">Unknown</string>
+
+    <plurals name="order_items_count">
+        <item quantity="one">%d Item</item>
+        <item quantity="other">%d Items</item>
+    </plurals>
+
+    <string name="order_details_title">Order Details</string>
+    <string name="order_details_support_cd">Contact support</string>
+    <string name="back_cd">Back</string>
+
+    <string name="order_status_banner_pending_title">Your order is being processed</string>
+    <string name="order_status_banner_pending_message">We are preparing your items for shipping.</string>
+    <string name="order_status_banner_processing_title">Your order is on its way</string>
+    <string name="order_status_banner_processing_message">Your package has been shipped and is heading to you.</string>
+    <string name="order_status_banner_completed_title">Your order has been delivered</string>
+    <string name="order_status_banner_completed_message">We hope you enjoy your purchase!</string>
+    <string name="order_status_banner_cancelled_title">Your order was cancelled</string>
+    <string name="order_status_banner_cancelled_message">This order has been cancelled and will not be processed.</string>
+    <string name="order_status_banner_unknown_title">Order status unavailable</string>
+    <string name="order_status_banner_unknown_message">We couldn\'t determine the current status of this order.</string>
+
+    <string name="order_items_section_title">Order Items</string>
+    <string name="order_item_qty">Qty: %1$d</string>
+
+    <string name="order_summary_title">Order Summary</string>
+    <string name="order_summary_subtotal">Subtotal</string>
+    <string name="order_summary_shipping_fee">Shipping Fee</string>
+    <string name="order_summary_discount">Discount</string>
+    <string name="order_summary_total">Total</string>
+
+    <string name="order_shipping_address_title">Shipping Address</string>
+    <string name="order_contact_support">Need Help? Contact Support</string>
+    <string name="order_summary_tax">Tax</string>
+    <string name="order_summary_refunded">Refunded</string>
+    <string name="order_not_found_error">Order not found.</string>
+    <string name="no_orders_found">No orders found.</string>
+    <!-- Address Management Screen -->
+    <string name="address_title">Manage Addresses</string>
+    <string name="address_add_new_title">Add New Address</string>
+    <string name="address_location_detected_title">Location Detected</string>
+    <string name="address_action_add">Add Address</string>
+    <string name="address_empty_title">No addresses yet</string>
+    <string name="address_empty_subtitle">Add your first address to make checkout faster and easier.</string>
+    <string name="address_btn_add_new">Add New Address</string>
+
+    <!-- GPS Onboarding -->
+    <string name="address_gps_detecting">Detecting your location…</string>
+    <string name="address_gps_search">Search GPS Location</string>
+    <string name="address_gps_subtitle">Please allow location access to add your address.</string>
+    <string name="address_gps_feature_accuracy">Accurate location detection</string>
+    <string name="address_gps_feature_secure">Secure &amp; private</string>
+    <string name="address_gps_searching_btn">Searching Location…</string>
+    <string name="address_gps_use_btn">Use GPS Location</string>
+
+    <!-- Location Detected Form -->
+    <string name="address_detected_label">Detected Address</string>
+    <string name="address_save_as_label">Save Address As</string>
+    <string name="address_tag_home">Home</string>
+    <string name="address_tag_work">Work</string>
+    <string name="address_tag_other">Other</string>
+    <string name="address_tag_custom_placeholder">Custom Tag Name (e.g. Gym, Friend\'s House)</string>
+    <string name="address_set_default_label">Set as default address</string>
+    <string name="address_set_default_subtitle">Use this address for default delivery</string>
+    <string name="address_btn_confirm">Confirm Address</string>
+
+    <!-- Address List & Items -->
+    <string name="address_saved_list_title">Saved Addresses</string>
+    <string name="address_delete_dialog_title">Delete Address</string>
+    <string name="address_delete_dialog_msg">Are you sure you want to delete this address?</string>
+    <string name="address_delete_btn">Delete</string>
+    <string name="address_cancel_btn">Cancel</string>
+    <string name="address_added_success_title">Address Added!</string>
+    <string name="address_added_success_msg">Your address has been saved successfully.</string>
+    <string name="address_badge_default">Default</string>
+    <string name="address_more_options_desc">More Options</string>
+    <string name="address_menu_set_default">Set as Default</string>
+    <string name="address_menu_delete">Delete</string>
+    <string name="address_dismiss_desc">Dismiss</string>
+
+    <!-- Errors & Fallbacks -->
+    <string name="address_error_gps_failed">GPS Location could not be detected. Please try again.</string>
+    <string name="address_error_geocoding_failed">Unable to determine street address for this location.</string>
+
+    <!-- Location Permissions Dialogs -->
+    <string name="address_permission_required_title">Location Permission Required</string>
+    <string name="address_permission_required_msg">This app requires location permission to detect your current address for shipping and delivery. Please grant the permission.</string>
+    <string name="address_permission_retry_btn">Retry</string>
+    <string name="address_permission_denied_title">Permission Permanently Denied</string>
+    <string name="address_permission_denied_msg">Location permissions are permanently denied. Please enable them in app settings to use GPS detection.</string>
+    <string name="address_permission_settings_btn">Go to Settings</string>
+
+    <!-- Map Picker strings -->
+    <string name="address_btn_select_on_map">Select location manually on map</string>
+    <string name="address_search_hint">Search area, street, or city…</string>
+    <string name="address_btn_confirm_location">Confirm Selected Location</string>
+    <string name="address_error_location_not_found">Location not found. Please try a different search query.</string>
+
+    <!-- Redesigned Location Detected screen -->
+    <string name="address_heading_detected">We found your location!</string>
+    <string name="address_heading_selected">Location Selected</string>
+    <string name="address_subheading">Please confirm or adjust your address.</string>
+    <string name="address_btn_detect_automatically">Detect location automatically via GPS</string>
+    <string name="address_label_detected">Detected Address</string>
+    <string name="address_label_selected">Selected Address</string>
+    <string name="address_tap_to_select_location">Tap map to select location</string>
+    <string name="address_edit_on_map">Edit on map</string>
+    <string name="address_success_added">Address added successfully.</string>
+    <string name="address_accurate_badge">Accurate</string>
+    <string name="address_error_location_missing">Please select a location on the map first.</string>
+    <string name="address_select_location_title">Select Location</string>
+
+    <string name="failed_to_update_favorite_status">Failed to update favorite status</string>
+    <string name="login_required_favorites">You need to sign in to add items to your wishlist.</string>
+    <string name="forgot_password_title">Forgot Password?</string>
+    <string name="forgot_password_subtitle">Enter your email and we\'ll send you a link to reset your password.</string>
+
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="back_to_login">Back to Login</string>
+
+    <string name="reset_link_sent">Password reset link sent successfully.</string>
+
+    <string name="verify_your_email">Verify Your Email</string>
+
+    <string name="verify_your_email_subtitle">
+    Your email address hasn\'t been verified yet. Verify it to continue using your account.</string>
+    <string name="send_verification_link">Send Verification Link</string>
+    <string name="verify_email_description">We sent a verification link to %1$s. Open it, then come back here — we\'ll take you home automatically.</string>
+    <string name="verify_email_eyebrow">ALMOST THERE</string>
+    <string name="verify_email_title">Check your inbox</string>
+    <string name="verify_email_lead_in">We sent a verification link to</string>
+    <string name="verify_email_followup">Open it on this device or any other. We\'ll bring you home the moment it\'s confirmed.</string>
+    <string name="resend_verification_link">Resend link</string>
+    <string name="resend_link_cooldown">Resend in %1$ds</string>
+    <string name="ive_verified_my_email">I\'ve verified — continue</string>
+    <string name="back_to_sign_in">Back to sign in</string>
+    <string name="verification_link_sent">Verification link sent. Check your inbox.</string>
+    <string name="email_not_verified_yet">Not verified yet. Open the link we sent, then try again.</string>
+    <string name="error_shopify_token_unavailable">We couldn\'t restore your store session. Please try signing in again.</string>
+    <string name="too_many_request">Too many attempts. Please wait a few minutes before trying again.</string>
 </resources>

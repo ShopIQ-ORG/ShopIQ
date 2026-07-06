@@ -40,8 +40,7 @@ class WishlistViewModel(
     }
 
     private fun loadFavorites() {
-        val userId = authRepository.getUserId()
-        if (userId == null || userId == "guest") {
+        if (authRepository.isGuest()) {
             _uiState.value = WishlistUiState.RequireAuth
             return
         }

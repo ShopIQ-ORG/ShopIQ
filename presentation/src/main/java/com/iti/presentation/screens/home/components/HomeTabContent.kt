@@ -32,6 +32,7 @@ import com.iti.presentation.components.ProductCard
 import com.iti.presentation.components.SearchBar
 import com.iti.presentation.components.ShopIQScaffold
 import com.iti.presentation.screens.home.HomeContract
+import com.iti.presentation.util.hasDiscount
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +68,8 @@ fun HomeTabContent(
 
             is HomeContract.ScreenState.Success -> {
                 val data = screenState.data
+                val stableShuffled = remember(data.products) { data.products.shuffled() }
+                val discountProducts = remember(data.products) { data.products.filter { it.hasDiscount } }
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -96,6 +99,74 @@ fun HomeTabContent(
                         )
                     }
 
+                    // Show Eslam card below Ads only if the user is a guest (not logged in)
+                    val isGuest = state.currentUser == null || state.currentUser is com.iti.domain.models.User.GuestUser
+                    if (isGuest) {
+                        item {
+                            TryEslamCard(onTryEslamClick = { onIntent(HomeContract.Intent.NavigateToAiChat) })
+                        }
+                    }
+
+                    // 1. Deals of the Day Section (shown for both guest and authenticated users)
+                    if (discountProducts.isNotEmpty()) {
+                        item {
+                            SectionHeader(
+                                title = stringResource(R.string.deals_of_the_day),
+                                onViewAllClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) }
+                            )
+                        }
+                        item {
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                items(discountProducts, key = { it.id }) { product ->
+                                    val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
+                                    val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
+                                    ProductCard(
+                                        product = product,
+                                        onClick = onClick,
+                                        onFavoriteClick = onFavoriteClick,
+                                        modifier = Modifier.width(160.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. AI Picks for You (SuggestionsSection) - shown only if authenticated and has history in Firestore
+                    if (!isGuest && state.hasChatHistory) {
+                        item {
+                            val suggestionsProducts = if (state.aiRecommendedProducts.isNotEmpty()) {
+                                state.aiRecommendedProducts
+                            } else {
+                                stableShuffled
+                            }
+                            SuggestionsSection(
+                                products = suggestionsProducts,
+                                isLoading = state.isLoadingRecommendations,
+                                onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) },
+                                onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(it)) },
+                                onNavigateToChat = { onIntent(HomeContract.Intent.NavigateToAiChat) }
+                            )
+                        }
+                    }
+
+                    // 3. New Arrivals & Summer Sale Banners
+                    item {
+                        HomeBanners(
+                            onExploreClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) },
+                            onShopNowClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) }
+                        )
+                    }
+
+                    // 4. Free Delivery / Features Bar
+                    item {
+                        HomeFeaturesBar()
+                    }
+
+                    // 5. Top Brands
                     item {
                         SectionHeader(
                             title = stringResource(R.string.top_brands),
@@ -109,6 +180,7 @@ fun HomeTabContent(
                         )
                     }
 
+                    // 6. Featured Products
                     item {
                         SectionHeader(
                             title = stringResource(R.string.featured_products),
@@ -122,11 +194,13 @@ fun HomeTabContent(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(data.products.take(6)) { product ->
+                            items(data.products.take(6), key = { it.id }) { product ->
+                                val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
+                                val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
                                 ProductCard(
                                     product = product,
-                                    onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
-                                    onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                    onClick = onClick,
+                                    onFavoriteClick = onFavoriteClick,
                                     modifier = Modifier.width(160.dp)
                                 )
                             }

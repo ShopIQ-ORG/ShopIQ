@@ -4,6 +4,7 @@ import com.iti.domain.models.Money
 
 data class Cart(
     val id: String,
+    val checkoutUrl: String,
     val items: List<CartItem>,
     val discountCodes: List<String>,
     val discountAmount: Money?,

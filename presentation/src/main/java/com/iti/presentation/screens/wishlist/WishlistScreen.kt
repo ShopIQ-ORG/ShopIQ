@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.iti.presentation.R
+import com.iti.presentation.components.ShopIQScaffold
 import com.iti.presentation.components.ErrorScreen
 import com.iti.presentation.ui.theme.*
 import com.iti.presentation.screens.wishlist.components.EmptyWishlistState
@@ -22,24 +23,20 @@ import com.iti.presentation.screens.wishlist.components.FavoritesGrid
 import com.iti.presentation.util.UiText
 import org.koin.androidx.compose.koinViewModel
 
+import androidx.compose.ui.tooling.preview.Preview
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WishlistScreen(
-    onBackClick: () -> Unit,
     onExploreProductsClick: () -> Unit,
     onProductClick: (String) -> Unit,
     onAuthClick: () -> Unit,
+    cartItemCount: Int,
+    onCartClick: () -> Unit,
     viewModel: WishlistViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
-
-    // Force Light Colors even in Dark Mode as requested
-    val backgroundColor = BackgroundLight
-    val textPrimaryColor = TextPrimaryLight
-    val textSecondaryColor = TextSecondaryLight
-    val buttonBgColor = ButtonPrimaryLight
-    val buttonTextColor = ButtonPrimaryTextLight
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEffect.collect { effect ->
@@ -52,30 +49,48 @@ fun WishlistScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.wishlist_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = textPrimaryColor
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = textPrimaryColor
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundColor)
-            )
+    WishlistContent(
+        uiState = uiState,
+        onExploreProductsClick = onExploreProductsClick,
+        onProductClick = onProductClick,
+        onAuthClick = onAuthClick,
+        cartItemCount = cartItemCount,
+        onCartClick = onCartClick,
+        onRemoveFromFavorites = { productId ->
+            viewModel.handleIntent(WishlistIntent.RemoveFromFavorites(productId))
         },
-        containerColor = backgroundColor
-    ) { paddingValues ->
+        onRetryClick = {
+            viewModel.handleIntent(WishlistIntent.LoadFavorites)
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WishlistContent(
+    uiState: WishlistUiState,
+    onExploreProductsClick: () -> Unit,
+    onProductClick: (String) -> Unit,
+    onAuthClick: () -> Unit,
+    cartItemCount: Int,
+    onCartClick: () -> Unit,
+    onRemoveFromFavorites: (String) -> Unit,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Force Light Colors even in Dark Mode as requested
+    val backgroundColor = BackgroundLight
+    val textPrimaryColor = TextPrimaryLight
+    val textSecondaryColor = TextSecondaryLight
+    val buttonBgColor = ButtonPrimaryLight
+    val buttonTextColor = ButtonPrimaryTextLight
+
+    ShopIQScaffold(
+        title = stringResource(id = R.string.wishlist_title),
+        cartItemCount = cartItemCount,
+        onCartClick = onCartClick,
+        modifier = modifier
+    ) { paddingValues, _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,9 +115,7 @@ fun WishlistScreen(
                         FavoritesGrid(
                             products = state.products,
                             onProductClick = onProductClick,
-                            onRemoveFromFavorites = { productId ->
-                                viewModel.handleIntent(WishlistIntent.RemoveFromFavorites(productId))
-                            }
+                            onRemoveFromFavorites = onRemoveFromFavorites
                         )
                     }
                 }
@@ -117,10 +130,91 @@ fun WishlistScreen(
                 is WishlistUiState.Error -> {
                     ErrorScreen(
                         message = UiText.Plain(state.message),
-                        onRetry = { viewModel.handleIntent(WishlistIntent.LoadFavorites) }
+                        onRetry = onRetryClick
                     )
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WishlistContentSuccessPreview() {
+    val dummyProducts = listOf(
+        com.iti.domain.models.Product(
+            id = "1",
+            title = "Classic Leather Jacket",
+            description = "High quality leather jacket",
+            handle = "classic-leather-jacket",
+            productType = "Apparel",
+            vendor = "Brand A",
+            tags = emptyList(),
+            minPrice = com.iti.domain.models.Money("1200.0", "EGP"),
+            maxPrice = com.iti.domain.models.Money("1200.0", "EGP"),
+            images = emptyList(),
+            variants = emptyList(),
+            isFavorite = true
+        ),
+        com.iti.domain.models.Product(
+            id = "2",
+            title = "Modern Sneakers",
+            description = "Comfortable sneakers for daily use",
+            handle = "modern-sneakers",
+            productType = "Footwear",
+            vendor = "Brand B",
+            tags = emptyList(),
+            minPrice = com.iti.domain.models.Money("850.0", "EGP"),
+            maxPrice = com.iti.domain.models.Money("850.0", "EGP"),
+            images = emptyList(),
+            variants = emptyList(),
+            isFavorite = true
+        )
+    )
+    ShopIQTheme {
+        WishlistContent(
+            uiState = WishlistUiState.Success(dummyProducts),
+            onExploreProductsClick = {},
+            onProductClick = {},
+            onAuthClick = {},
+            cartItemCount = 2,
+            onCartClick = {},
+            onRemoveFromFavorites = {},
+            onRetryClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WishlistContentEmptyPreview() {
+    ShopIQTheme {
+        WishlistContent(
+            uiState = WishlistUiState.Success(emptyList()),
+            onExploreProductsClick = {},
+            onProductClick = {},
+            onAuthClick = {},
+            cartItemCount = 0,
+            onCartClick = {},
+            onRemoveFromFavorites = {},
+            onRetryClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WishlistContentGuestPreview() {
+    ShopIQTheme {
+        WishlistContent(
+            uiState = WishlistUiState.RequireAuth,
+            onExploreProductsClick = {},
+            onProductClick = {},
+            onAuthClick = {},
+            cartItemCount = 0,
+            onCartClick = {},
+            onRemoveFromFavorites = {},
+            onRetryClick = {}
+        )
     }
 }

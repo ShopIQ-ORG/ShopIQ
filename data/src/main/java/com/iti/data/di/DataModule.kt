@@ -5,12 +5,17 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import com.iti.data.repositories.AddressRepositoryImpl
 import com.iti.data.repositories.AuthRepositoryImpl
 import com.iti.data.repositories.CartRepositoryImpl
+import com.iti.data.repositories.ChatbotRepositoryImpl
+import com.iti.data.repositories.LocationTrackerImpl
 import com.iti.data.repositories.OnboardingRepositoryImpl
+import com.iti.data.repositories.OrdersRepositoryImpl
 import com.iti.data.repositories.ProductsRepositoryImpl
 import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import com.iti.data.sources.local.room.AppDatabase
@@ -20,6 +25,9 @@ import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
 import com.iti.data.sources.remote.auth.AuthRemoteDataSourceImpl
+import com.iti.data.sources.remote.cart.*
+import com.iti.data.sources.remote.orders.OrdersRemoteDataSource
+import com.iti.data.sources.remote.orders.OrdersRemoteDataSourceImpl
 import com.iti.data.sources.remote.cart.CartIdDataSource
 import com.iti.data.sources.remote.cart.CartIdRemoteDataSourceImpl
 import com.iti.data.sources.remote.cart.CartRemoteDataSource
@@ -30,15 +38,20 @@ import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSour
 import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.data.sources.remote.user.UserRemoteDataSourceImpl
 import com.iti.data.utils.ShopifyNetworkConfig
+import com.iti.domain.models.auth.ShopifyCustomerToken
+import com.iti.domain.repositories.address.AddressRepository
+import com.iti.domain.repositories.ai.ChatbotRepository
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
+import com.iti.domain.repositories.location.LocationTracker
 import com.iti.domain.repositories.onboarding.OnboardingRepository
+import com.iti.domain.repositories.orders.OrdersRepository
 import com.iti.domain.repositories.products.ProductsRepository
 import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
+import com.iti.domain.util.ShopifyTokenProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -56,39 +69,59 @@ import com.iti.domain.repositories.payment.PaymobRepository
 import com.iti.data.BuildConfig
 
 import org.koin.dsl.bind
+import org.koin.dsl.binds
+import org.koin.dsl.module
 
 val dataModule = module {
     single { Gson() }
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get()) }
+    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get()) }
 
+    // DataStore
     single<DataStore<Preferences>> {
-        PreferenceDataStoreFactory.create(
-            produceFile = {
-                androidContext().preferencesDataStoreFile("shopiq_preferences")
-            }
-        )
+        PreferenceDataStoreFactory.create {
+            androidContext().preferencesDataStoreFile("shopiq_preferences")
+        }
     }
-    single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
-    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get()) }
+
+    single<ShopifyTokenLocalDataSource> { ShopifyTokenLocalDataSourceImpl(get()) }
+
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 
-    single<ShopifyTokenLocalDataSource> { ShopifyTokenLocalDataSourceImpl(get()) }
-    single<ShopifyCustomerRemoteDataSource> { ShopifyCustomerRemoteDataSourceImpl(get(named("storefrontApolloClient"))) }
+    single<ShopifyCustomerRemoteDataSource> {
+        ShopifyCustomerRemoteDataSourceImpl(get(named("storefrontApolloClient")))
+    }
     single<UserRemoteDataSource> { UserRemoteDataSourceImpl(get()) }
 
+    // Auth
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get()) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get()) }
 
     single {
-        Room.databaseBuilder(androidContext(), AppDatabase::class.java, AppDatabase.DATABASE_NAME)
+        AuthRepositoryImpl(get(), get(), get(), get())
+    } binds arrayOf(
+        AuthRepository::class,
+        ShopifyTokenProvider::class
+    )
+
+    // Chatbot
+    single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get(), androidContext()) }
+
+    // Room
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AppDatabase::class.java,
+            AppDatabase.DATABASE_NAME
+        ).fallbackToDestructiveMigration(true)
             .build()
     }
     single { get<AppDatabase>().favoriteDao() }
+    single { get<AppDatabase>().addressDao() }
 
+    // Cart
     single<CartResponseValidator> { CartResponseValidator() }
     single<CartIdDataSource> { CartIdRemoteDataSourceImpl(get(), get()) }
     single<CartRemoteDataSource> {
@@ -98,9 +131,14 @@ val dataModule = module {
         )
     }
     single<CartRepository> {
-        CartRepositoryImpl(get(), get())
+        CartRepositoryImpl(get(), get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
 
+    single<OrdersRemoteDataSource> {
+        OrdersRemoteDataSourceImpl(
+            get(named("storefrontApolloClient")),
+        )
+    }
     single {
         HttpClient(CIO) {
             engine {
@@ -139,4 +177,15 @@ val dataModule = module {
             publicKey = BuildConfig.PAYMOB_PUBLIC_KEY
         )
     }
+
+    single<OrdersRepository> { OrdersRepositoryImpl(get(), get()) }
+
+
+    // Other repos
+    single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
+    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get()) }
+    single { LocationServices.getFusedLocationProviderClient(androidContext()) }
+
+    single<LocationTracker> { LocationTrackerImpl(get()) }
+    single<AddressRepository> { AddressRepositoryImpl(get()) }
 }

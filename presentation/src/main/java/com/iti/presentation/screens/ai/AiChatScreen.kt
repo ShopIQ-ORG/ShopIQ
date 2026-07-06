@@ -1,0 +1,146 @@
+package com.iti.presentation.screens.ai
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.iti.domain.models.User
+import com.iti.presentation.R
+import com.iti.presentation.screens.ai.components.*
+import com.iti.presentation.ui.theme.LocalDarkTheme
+import org.koin.androidx.compose.koinViewModel
+
+@Composable
+fun AiChatScreen(
+    onBackClick: () -> Unit,
+    onHistoryClick: () -> Unit,
+    currentUser: User?,
+    onAuthClick: () -> Unit,
+    bottomPadding: Dp = 0.dp,
+    onNavigateToProduct: (Long) -> Unit,
+    viewModel: AiChatViewModel = koinViewModel()
+) {
+    val isDark = LocalDarkTheme.current
+    
+    // Auth Check
+    if (currentUser !is User.AuthenticatedUser) {
+        AuthRequiredScreen(onBackClick = onBackClick, onAuthClick = onAuthClick)
+        return
+    }
+
+    LaunchedEffect(currentUser) {
+        viewModel.sendIntent(AiChatContract.Intent.SetUser(currentUser))
+    }
+
+    val state by viewModel.state.collectAsState()
+    val listState = rememberLazyListState()
+
+    // Auto-scroll to bottom when new messages arrive
+    LaunchedEffect(state.messages.size) {
+        if (state.messages.isNotEmpty()) {
+            listState.animateScrollToItem(state.messages.lastIndex)
+        }
+    }
+
+    val context = LocalContext.current
+    val imageSearchText = stringResource(id = R.string.ai_image_description)
+    val imagePickerErrorText = stringResource(id = R.string.ai_image_picker_error)
+
+    // Image Picker Launcher
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val bytes = context.contentResolver.openInputStream(uri)?.readBytes()
+                if (bytes != null) {
+                    viewModel.sendIntent(
+                        AiChatContract.Intent.SendMessage(
+                            text = imageSearchText,
+                            imageBytes = bytes,
+                            attachedImageUrl = uri.toString()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(context, imagePickerErrorText, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        AiChatHeader(
+            onBackClick = onBackClick,
+            onHistoryClick = onHistoryClick
+        )
+        
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            if (state.messages.isEmpty() && state.isLoading) {
+                // Shimmer layout during initial loading
+                AiChatShimmer(modifier = Modifier.fillMaxSize())
+            } else {
+                // Messages List (always starts with Eslam's greeting, welcome screen logo deleted)
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp)
+                ) {
+                    items(state.messages) { message ->
+                        MessageBubbleRow(
+                            message = message,
+                            isDark = isDark,
+                            onProductClick = onNavigateToProduct
+                        )
+                    }
+                    
+                    if (state.isLoading) {
+                        item {
+                            AiTypingIndicator(isDark = isDark)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Input bar with attachment support, text support, and background SpeechRecognizer voice support
+        ChatInputFooter(
+            isDark = isDark,
+            onAttachmentClick = { imagePickerLauncher.launch("image/*") },
+            onSendMessage = { text ->
+                viewModel.sendIntent(
+                    AiChatContract.Intent.SendMessage(text = text)
+                )
+            },
+            onSendVoiceMessage = { text, duration ->
+                viewModel.sendIntent(
+                    AiChatContract.Intent.SendMessage(
+                        text = text,
+                        voiceDuration = duration
+                    )
+                )
+            }
+        )
+    }
+}

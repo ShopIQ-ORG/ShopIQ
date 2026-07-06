@@ -24,6 +24,7 @@ val paymobApiKey = localProperties.getProperty("paymob.api.key") ?: ""
 val paymobPublicKey = localProperties.getProperty("paymob.public.key") ?: ""
 val paymobSecretKey = localProperties.getProperty("paymob.secret.key") ?: ""
 val paymobIntegrationId = localProperties.getProperty("paymob.integration.id") ?: ""
+val geminiApiKey = localProperties.getProperty("gemini.api.key") ?: ""
 
 android {
     namespace = "com.iti.data"
@@ -49,6 +50,7 @@ android {
         buildConfigField("String", "PAYMOB_PUBLIC_KEY", "\"$paymobPublicKey\"")
         buildConfigField("String", "PAYMOB_SECRET_KEY", "\"$paymobSecretKey\"")
         buildConfigField("String", "PAYMOB_INTEGRATION_ID", "\"$paymobIntegrationId\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -91,6 +93,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
+    implementation(libs.google.play.services.location)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.apollo.runtime)
     implementation(libs.okhttp)
@@ -102,6 +105,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.generativeai)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

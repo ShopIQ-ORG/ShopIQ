@@ -6,6 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -23,9 +25,15 @@ import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
 import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
+import com.iti.presentation.screens.address.AddressScreen
+import com.iti.presentation.screens.address.AddressViewModel
+import com.iti.presentation.screens.auth.emailverification.EmailVerificationScreen
+import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordScreen
 import com.iti.presentation.screens.cart.CartScreen
 import com.iti.presentation.screens.cart.CartViewModel
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
+import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
+import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
 import com.iti.presentation.screens.payment.PaymentScreen
@@ -66,25 +74,34 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             entry<Screen.Splash> {
                 val viewModel: SplashViewModel = koinViewModel()
                 val destination by viewModel.destination.collectAsState()
+                var isAnimationDone by remember { mutableStateOf(false) }
 
                 LaunchedEffect(Unit) {
                     viewModel.checkDestination()
                 }
 
+                LaunchedEffect(destination, isAnimationDone) {
+                    val dest = destination
+                    if (isAnimationDone && dest != null) {
+                        when (dest) {
+                            is SplashDestination.OnBoarding ->
+                                replaceRoot(Screen.OnBoarding)
+
+                            is SplashDestination.SignIn ->
+                                replaceRoot(Screen.SignIn)
+
+                            is SplashDestination.Home ->
+                                replaceRoot(Screen.Home)
+
+                            is SplashDestination.EmailVerification ->
+                                replaceRoot(Screen.EmailVerification(dest.email))
+                        }
+                    }
+                }
+
                 SplashScreen(
                     onAnimationComplete = {
-                        destination?.let {
-                            when (it) {
-                                is SplashDestination.OnBoarding ->
-                                    replaceRoot(Screen.OnBoarding)
-
-                                is SplashDestination.SignIn ->
-                                    replaceRoot(Screen.SignIn)
-
-                                is SplashDestination.Home ->
-                                    replaceRoot(Screen.Home)
-                            }
-                        }
+                        isAnimationDone = true
                     }
                 )
             }
@@ -95,7 +112,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 OnboardingScreen(
                     viewModel = onboardingViewModel,
                     onNavigateToHome = {
-                        navigate(Screen.SignIn)
+                        replaceRoot(Screen.Home)
+                    },
+                    onNavigateToSignIn = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
@@ -108,7 +128,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToHome = {
                         replaceRoot(Screen.Home)
                     },
-                    onNavigateToForgotPassword = { }
+                    onNavigateToForgotPassword = {
+                        navigate(Screen.ForgotPassword)
+                    },
+                    onNavigateToEmailVerification = {
+                        navigate(Screen.EmailVerification(it))
+                    }
                 )
             }
 
@@ -117,7 +142,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToHome = {
                         replaceRoot(Screen.Home)
                     },
+                    onNavigateToEmailVerification = {
+                        navigate(Screen.EmailVerification(it))
+                    },
                     onNavigateToSignIn = ::navigateBack
+                )
+            }
+
+            entry<Screen.AiHistory> {
+                val viewModel: com.iti.presentation.screens.ai.history.AiHistoryViewModel =
+                    org.koin.androidx.compose.koinViewModel()
+                com.iti.presentation.screens.ai.history.AiHistoryScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = ::navigateBack
                 )
             }
 
@@ -135,6 +172,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToSearch = {
                         navigate(Screen.Search)
                     },
+                    onNavigateToAiHistory = {
+                        navigate(Screen.AiHistory)
+                    },
                     onCategoryClick = { categoryId, categoryTitle ->
                         navigate(Screen.CategoryDetails(categoryId, categoryTitle))
                     },
@@ -145,6 +185,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onLogout = {
                         replaceRoot(Screen.SignIn)
+                    },
+                    onNavigateToOrders = {
+                        navigate(Screen.Orders)
                     }
                 )
             }
@@ -186,6 +229,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
+                    },
+                    onNavigateToAuth = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }
@@ -194,6 +240,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = screen.productId,
                     onBackClick = ::navigateBack,
+                    onLogin = {
+                        replaceRoot(Screen.SignIn)
+                    }
                 )
             }
 
@@ -238,6 +287,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                             PaymentMethodType.COD -> {
                                 // COD handled separately or not yet implemented
                             }
+
                             PaymentMethodType.ONLINE -> {
                                 navigate(Screen.OnlinePayment)
                             }
@@ -258,6 +308,44 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     viewModel = paymentViewModel,
                     amountCents = amountCents,
                     integrationId = com.iti.presentation.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242
+                )
+            }
+
+            entry<Screen.Orders> {
+                OrdersScreen(
+                    onNavigateBack = ::navigateBack,
+                    onOrderClick = {
+                        navigate(Screen.OrderDetails(it))
+                    },
+                )
+            }
+
+            entry<Screen.OrderDetails> {
+                OrderDetailsScreen(
+                    order = it.order,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToSupport = {}
+                )
+            }
+
+            entry<Screen.ManageAddresses> {
+                val addressViewModel: AddressViewModel = koinViewModel()
+
+                AddressScreen(
+                    viewModel = addressViewModel,
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.ForgotPassword> {
+                ForgotPasswordScreen(onNavigateBack = ::navigateBack)
+            }
+
+            entry<Screen.EmailVerification> { screen ->
+                EmailVerificationScreen(
+                    email = screen.email,
+                    onNavigateToSignIn = { replaceRoot(Screen.SignIn) },
+                    onNavigateToHome = { replaceRoot(Screen.Home) }
                 )
             }
         }

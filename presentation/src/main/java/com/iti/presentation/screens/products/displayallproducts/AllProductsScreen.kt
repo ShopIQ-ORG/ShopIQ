@@ -41,6 +41,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import com.iti.presentation.components.UnauthorizedDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,6 +83,7 @@ fun AllProductsScreen(
     val state by viewModel.state.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val gridState = rememberLazyGridState()
+    var showAuthDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(brandName) {
         viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName))
@@ -100,7 +104,7 @@ fun AllProductsScreen(
                 }
 
                 AllProductsContract.Effect.ShowAuthRequired -> {
-                    onNavigateToAuth()
+                    showAuthDialog = true
                 }
             }
         }
@@ -123,8 +127,8 @@ fun AllProductsScreen(
 
     // Active filter count for badge
     val filterCount = with(state.filterState) {
-        (if (selectedCategory != null) 1 else 0) +
-        (if (selectedSubCategory != null) 1 else 0) +
+        selectedCategories.size +
+        selectedSubCategories.size +
         selectedBrands.size
     }
 
@@ -266,10 +270,14 @@ fun AllProductsScreen(
                 availableCategories = state.availableCategories,
                 availableSubCategories = state.availableSubCategories,
                 availableBrands = state.availableBrands,
-                onCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.PendingCategoryChanged(it)) },
-                onSubCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.PendingSubCategoryChanged(it)) },
+                onCategoryToggled = { viewModel.sendIntent(AllProductsContract.Intent.PendingCategoryToggled(it)) },
+                onClearCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingClearCategories) },
+                onSelectAllCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingSelectAllCategories) },
+                onSubCategoryToggled = { viewModel.sendIntent(AllProductsContract.Intent.PendingSubCategoryToggled(it)) },
+                onClearSubCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingClearSubCategories) },
+                onSelectAllSubCategories = { viewModel.sendIntent(AllProductsContract.Intent.PendingSelectAllSubCategories) },
                 onBrandToggled = { viewModel.sendIntent(AllProductsContract.Intent.PendingBrandToggled(it)) },
-                onBrandSearchChanged = { viewModel.sendIntent(AllProductsContract.Intent.PendingBrandSearchChanged(it)) },
+                onSelectAllBrands = { viewModel.sendIntent(AllProductsContract.Intent.PendingSelectAllBrands) },
                 onApply = { viewModel.sendIntent(AllProductsContract.Intent.ApplyFilters) },
                 onReset = { viewModel.sendIntent(AllProductsContract.Intent.ResetFilters) },
                 onDismiss = { viewModel.sendIntent(AllProductsContract.Intent.CloseFilterSheet) }
@@ -285,5 +293,15 @@ fun AllProductsScreen(
                 onDismiss = { viewModel.sendIntent(AllProductsContract.Intent.CloseSortSheet) }
             )
         }
+    }
+
+    if (showAuthDialog) {
+        UnauthorizedDialog(
+            onDismiss = { showAuthDialog = false },
+            onLogin = {
+                showAuthDialog = false
+                onNavigateToAuth()
+            }
+        )
     }
 }

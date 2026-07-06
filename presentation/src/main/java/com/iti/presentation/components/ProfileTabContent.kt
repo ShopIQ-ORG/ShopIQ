@@ -18,7 +18,8 @@ import com.iti.domain.models.User
 @Composable
 fun ProfileTabContent(
     user: User?,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNavigateToOrders: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -31,13 +32,13 @@ fun ProfileTabContent(
             text = "👤",
             style = MaterialTheme.typography.displayLarge
         )
-        
+
         val displayName = when (user) {
             is User.AuthenticatedUser -> user.fullName
             User.GuestUser -> "Guest User"
             null -> "Loading..."
         }
-        
+
         val displayEmail = when (user) {
             is User.AuthenticatedUser -> user.email
             else -> ""
@@ -49,7 +50,7 @@ fun ProfileTabContent(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 16.dp)
         )
-        
+
         if (displayEmail.isNotEmpty()) {
             Text(
                 text = displayEmail,
@@ -68,6 +69,12 @@ fun ProfileTabContent(
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedButton(onClick = onLogout) {
             Text(text = "Back to Login")
+        }
+        if (user is User.AuthenticatedUser) {
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(onClick = onNavigateToOrders) {
+                Text(text = "Go To Orders")
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ import com.iti.domain.models.cart.CartItem
 fun CartFields.toDto(): CartDto {
     return CartDto(
         id = id,
+        checkoutUrl = checkoutUrl.toString(),
         lines = lines.edges.mapNotNull { edge ->
             val variant = edge.node.merchandise.onProductVariant ?: return@mapNotNull null
             CartLineDto(
@@ -132,7 +133,7 @@ fun CartFields.toDto(): CartDto {
                     )
                 }
             )
-        }
+        },
     )
 }
 
@@ -142,6 +143,7 @@ fun CartDto.toDomain(): Cart {
 
     return Cart(
         id = id,
+        checkoutUrl = checkoutUrl,
         items = lines.map { it.toDomain() },
         discountCodes = discountCodes.filter { it.applicable }.map { it.code },
         discountAmount = discountAmount,

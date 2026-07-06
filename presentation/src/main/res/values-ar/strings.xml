@@ -30,6 +30,76 @@
     <string name="wishlist_empty_subtitle">احفظ المنتجات التي تحبها بالضغط على أيقونة القلب على أي منتج.</string>
     <string name="wishlist_explore_btn">استكشف المنتجات</string>
     <string name="wishlist_locked_title">قائمة المفضلة مقفلة</string>
-    <string name="wishlist_locked_subtitle">يجب عليك تسجيل الدخول أو إنشاء حساب لحفظ منتجاتك المفضلة وعرضها هنا.</string>
     <string name="wishlist_auth_btn">تسجيل الدخول / إنشاء حساب</string>
+
+    <!-- AI Chatbot Strings -->
+    <string name="ai_assistant_title">المساعد الذكي</string>
+    <string name="ai_auth_required_title">مطلوب تسجيل الدخول</string>
+    <string name="ai_auth_required_subtitle">يرجى تسجيل الدخول للوصول إلى إسلام، مساعدك الشخصي للتسوق، ومزامنة سجل الدردشة، والحصول على اقتراحات مخصصة.</string>
+    <string name="ai_auth_btn_signin">تسجيل الدخول للمتابعة</string>
+    <string name="ai_input_placeholder">اسأل عن أي شيء...</string>
+    <string name="ai_input_listening">جاري الاستماع...</string>
+    <string name="ai_permission_record_audio_required">إذن الصوت مطلوب لإدخال الصوت</string>
+    <string name="ai_image_description">البحث باستخدام هذه الصورة.</string>
+    <string name="ai_image_picker_error">فشل قراءة ملف الصورة.</string>
+    <string name="ai_product_view">عرض المنتج</string>
+    <string name="ai_reset_chat_desc">إعادة تعيين المحادثة</string>
+    <string name="ai_greeting_message">مرحباً! أنا إسلام، مساعدك الشخصي للتسوق. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
+
+    <!-- Wishlist feedback -->
+    <string name="added_to_wishlist">تمت الإضافة للمفضلة</string>
+    <string name="removed_from_wishlist">تم الحذف من المفضلة</string>
+
+    <!-- Chatbot error messages -->
+    <string name="ai_error_invalid_key">مفتاح اتصال المساعد غير صالح. يرجى الاتصال بالدعم أو التحقق من الإعدادات.</string>
+    <string name="ai_error_quota_exceeded">المساعد مشغول حالياً بالعديد من الطلبات. يرجى المحاولة مرة أخرى بعد قليل.</string>
+    <string name="ai_error_network">يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</string>
+    <string name="ai_error_image_processing">حدثت مشكلة أثناء معالجة الصورة المرفوعة. يرجى التأكد من أنها بصيغة صالحة (JPEG/PNG) والمحاولة مرة أخرى.</string>
+    <string name="ai_error_unknown">عذراً، أواجه صعوبة في الاتصال بخادمي حالياً. يرجى محاولة إرسال رسالتك مرة أخرى.</string>
+    <string name="clear_history">مسح المحادثات</string>
+
+    <!-- Home AI Recommendations -->
+    <string name="recommended_for_you">موصى به لك</string>
+    <string name="ai_recommended_subtitle">بناءً على محادثتك مع إسلام</string>
+    <string name="try_eslam_title">تحدث مع إسلام 🤖</string>
+    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها — ستظهر اقتراحاتك الشخصية هنا.</string>
+    <string name="try_eslam_btn">ابدأ المحادثة</string>
+    <string name="suggestions_title">اقتراحات لك</string>
+    <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>
+    <string name="deals_of_the_day">عروض اليوم</string>
+
+    <!-- AI Picks -->
+    <string name="ai_picks_title">مختارات الذكاء الاصطناعي لك</string>
+    <string name="ai_picks_subtitle">مخصصة لك فقط</string>
+
+    <!-- Banners -->
+    <string name="new_arrivals_title">وصلنا حديثاً</string>
+    <string name="new_arrivals_desc">أحدث الموديلات\nالتي وصلت للتو</string>
+    <string name="summer_sale_title">عروض الصيف</string>
+    <string name="summer_sale_desc">خصم حتى 40% على\nقطع مختارة</string>
+    <string name="explore_btn">اكتشف الآن</string>
+    <string name="shop_now_btn">تسوق الآن</string>
+
+    <!-- Features -->
+    <string name="free_delivery_title">شحن مجاني</string>
+    <string name="free_delivery_desc">للطلبات فوق 1500 جنيه</string>
+    <string name="easy_returns_title">إرجاع سهل</string>
+    <string name="easy_returns_desc">سياسة إرجاع خلال 14 يوم</string>
+    <string name="secure_payment_title">آمن</string>
+    <string name="secure_payment_desc">عملية دفع آمنة 100%</string>
+
+    <!-- Filter Screen -->
+    <string name="filter_title">الفلاتر</string>
+    <string name="filter_reset">مسح</string>
+    <string name="filter_by_category">الفئات</string>
+    <string name="filter_by_subcategory">الفئات الفرعية</string>
+    <string name="filter_by_brand">العلامات التجارية</string>
+    <string name="filter_select_category">اختر فئة</string>
+    <string name="filter_select_subcategory">اختر فئة فرعية</string>
+    <string name="filter_search_brand">ابحث عن علامة تجارية</string>
+    <string name="filter_apply">تطبيق الفلاتر</string>
+    <string name="filter_show_less">عرض أقل</string>
+    <string name="filter_show_more">+ %1$d المزيد</string>
+    <string name="failed_to_update_favorite_status">فشل فى تحديث حاله المنتجات المفضله</string>
+    <string name="login_required_favorites">يجب تسجيل الدخول لإضافة منتجات لقائمة الأمنيات.</string>
 </resources>
