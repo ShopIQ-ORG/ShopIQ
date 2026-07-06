@@ -39,6 +39,21 @@ import com.iti.domain.util.CacheInvalidator
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+import com.iti.data.sources.remote.payment.PaymobRemoteDataSource
+import com.iti.data.repositories.PaymobRepositoryImpl
+import com.iti.domain.repositories.payment.PaymobRepository
+import com.iti.data.BuildConfig
 
 import org.koin.dsl.bind
 
@@ -86,4 +101,42 @@ val dataModule = module {
         CartRepositoryImpl(get(), get())
     } bind CartRepository::class bind CacheInvalidator::class
 
+    single {
+        HttpClient(CIO) {
+            engine {
+                maxConnectionsCount = 1000
+                endpoint.keepAliveTime = 5000
+                endpoint.connectTimeout = 15000
+                endpoint.connectAttempts = 3
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    encodeDefaults = true
+                    ignoreUnknownKeys = true
+                    prettyPrint = true
+                })
+            }
+            install(Logging) {
+                level = LogLevel.BODY
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30000
+                connectTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
+            }
+            defaultRequest {
+                url("https://accept.paymob.com/api/")
+                contentType(ContentType.Application.Json)
+            }
+        }
+    }
+
+    single { PaymobRemoteDataSource(get()) }
+    single<PaymobRepository> {
+        PaymobRepositoryImpl(
+            remoteDataSource = get(),
+            secretKey = BuildConfig.PAYMOB_SECRET_KEY,
+            publicKey = BuildConfig.PAYMOB_PUBLIC_KEY
+        )
+    }
 }
