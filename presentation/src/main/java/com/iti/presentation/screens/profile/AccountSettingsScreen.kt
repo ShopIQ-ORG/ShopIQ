@@ -93,12 +93,13 @@ fun AccountSettingsScreen(
     val state by viewModel.state.collectAsState()
     val isDarkTheme by ThemeManager.isDarkTheme.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(effect.message.resolve(context))
                 }
                 else -> Unit
             }

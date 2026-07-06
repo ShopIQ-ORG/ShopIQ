@@ -98,7 +98,14 @@
     <string name="sort_label">ترتيب حسب</string>
     <string name="sort_best_seller">الأكثر مبيعاً</string>
     <string name="sort_price_low_high">السعر: من الأقل للأعلى</string>
-    <string name="sort_price_high_low">السعر: من الأعلى للأقل</string>
+    <string name="sort_high_to_low">من الأعلى للأقل</string>
+    <string name="profile_updated_successfully">تم تحديث الملف الشخصي بنجاح</string>
+    <string name="error_location_permission">صلاحية الموقع مطلوبة لتحديد الـ GPS</string>
+    <string name="error_name_email_required">الاسم والبريد الإلكتروني مطلوبان</string>
+    <string name="error_failed_update_profile">فشل تحديث الملف الشخصي</string>
+    <string name="error_failed_load_addresses">فشل تحميل العناوين</string>
+    <string name="success_address_deleted">تم حذف العنوان بنجاح</string>
+    <string name="error_failed_delete_address">فشل حذف العنوان</string>
     <string name="sort_apply">تطبيق</string>
     <string name="sort_price_asc_label">↑ السعر</string>
     <string name="sort_price_desc_label">↓ السعر</string>

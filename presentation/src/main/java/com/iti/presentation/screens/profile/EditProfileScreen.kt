@@ -82,13 +82,18 @@ fun EditProfileScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(effect.message.resolve(context))
+                }
+                ProfileContract.Effect.ShowSuccessMessage -> {
+                    val msg = context.getString(R.string.profile_updated_successfully)
+                    snackbarHostState.showSnackbar(msg)
                 }
                 else -> Unit
             }
@@ -187,7 +192,16 @@ fun EditProfileContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = { 
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                val isSuccess = data.visuals.message.contains("success", ignoreCase = true) || data.visuals.message.contains("بنجاح")
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = if (isSuccess) androidx.compose.ui.graphics.Color(0xFF4CAF50) else SnackbarDefaults.color,
+                    contentColor = if (isSuccess) androidx.compose.ui.graphics.Color.White else SnackbarDefaults.contentColor
+                )
+            }
+        },
         topBar = {
             BackTopBar(
                 title = stringResource(R.string.profile_edit_profile),

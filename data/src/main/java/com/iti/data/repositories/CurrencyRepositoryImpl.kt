@@ -8,42 +8,33 @@
 
 package com.iti.data.repositories
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+import com.iti.data.sources.local.currency.CurrencyLocalDataSource
+import com.iti.data.sources.remote.currency.CurrencyRemoteDataSource
 import com.iti.domain.models.Currency
 import com.iti.domain.repositories.currency.CurrencyRepository
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-import com.iti.data.sources.remote.currency.CurrencyRemoteDataSource
-
 class CurrencyRepositoryImpl(
-    private val dataStore: DataStore<Preferences>,
-    private val remoteDataSource: CurrencyRemoteDataSource
+    private val remoteDataSource: CurrencyRemoteDataSource,
+    private val localDataSource: CurrencyLocalDataSource
 ) : CurrencyRepository {
 
-    private object PreferencesKeys {
-        val SELECTED_CURRENCY_CODE = stringPreferencesKey("selected_currency_code")
-    }
-
+    private val fallbackCurrencies = listOf(Currency("USD", "US Dollar", "$", 1.0))
     private val _currenciesState = MutableStateFlow<List<Currency>>(emptyList())
 
     override fun getSelectedCurrency(): Flow<Currency> {
-        return dataStore.data.map { preferences ->
-            val code = preferences[PreferencesKeys.SELECTED_CURRENCY_CODE] ?: "EGP"
-            getCurrencyByCode(code)
-        }
+        return localDataSource.getSelectedCurrency()
+            .map { it ?: fallbackCurrencies.first() }
+            .onStart { emit(fallbackCurrencies.first()) }
     }
 
     override fun getPopularCurrencies(): Flow<List<Currency>> {
@@ -78,9 +69,8 @@ class CurrencyRepositoryImpl(
     }
 
     override suspend fun changeSelectedCurrency(code: String) {
-        dataStore.edit { preferences ->
-            preferences[PreferencesKeys.SELECTED_CURRENCY_CODE] = code
-        }
+        val currency = getCurrencyByCode(code)
+        localDataSource.saveSelectedCurrency(currency)
     }
 
     private fun getCurrencyByCode(code: String): Currency {

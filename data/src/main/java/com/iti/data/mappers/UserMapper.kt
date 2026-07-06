@@ -17,6 +17,9 @@ fun UserDto.toDomain(
         fullName = fullName,
         email = email,
         phone = phone,
+        dateOfBirth = dateOfBirth,
+        gender = gender,
+        avatarUrl = avatarUrl,
         provider = provider,
         isEmailVerified = isEmailVerified
     )

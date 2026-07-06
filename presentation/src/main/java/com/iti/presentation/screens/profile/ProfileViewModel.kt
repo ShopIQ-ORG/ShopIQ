@@ -16,9 +16,11 @@ import com.iti.domain.models.Address
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.usecases.address.DeleteAddressUseCase
+import com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase
 import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
+import com.iti.domain.usecases.auth.UpdateProfileUseCase
 import com.iti.domain.usecases.location.GetCurrentLocationUseCase
 import com.iti.domain.usecases.currency.GetSelectedCurrencyUseCase
 import com.iti.domain.usecases.currency.GetPopularCurrenciesUseCase
@@ -53,7 +55,8 @@ class ProfileViewModel(
     private val getExchangeRateHistoryUseCase: GetExchangeRateHistoryUseCase,
     private val fetchExchangeRatesUseCase: FetchExchangeRatesUseCase,
     private val selectCurrencyUseCase: SelectCurrencyUseCase,
-    private val getPlaceSuggestionsUseCase: com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase,
+    private val getPlaceSuggestionsUseCase: GetPlaceSuggestionsUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
     @param:SuppressLint("StaticFieldLeak") private val context: Context
 ) : ViewModel() {
 
@@ -232,26 +235,34 @@ class ProfileViewModel(
         }
         _state.update { it.copy(isUpdatingProfile = true, errorText = null) }
         viewModelScope.launch {
-            delay(1000) // Simulated API delay
-            val currentUser = _state.value.user as? User.AuthenticatedUser
-            val updatedUser = User.AuthenticatedUser(
-                uid = currentUser?.uid ?: "mock-123",
+            val result = updateProfileUseCase(
                 fullName = name,
-                email = email,
                 phone = phone,
-                dateOfBirth = dob,
-                gender = gender,
-                avatarUrl = avatarUrl ?: currentUser?.avatarUrl
+                dateOfBirth = dob.takeIf { it.isNotBlank() },
+                gender = gender.takeIf { it.isNotBlank() },
+                avatarUrl = avatarUrl
             )
-            _state.update {
-                it.copy(
-                    user = updatedUser,
-                    isUpdatingProfile = false,
-                    successText = "Profile updated successfully!"
-                )
+            when (result) {
+                is Result.Success -> {
+                    _state.update {
+                        it.copy(
+                            user = result.data,
+                            isUpdatingProfile = false
+                        )
+                    }
+                    emitEffect(ProfileContract.Effect.ShowSuccessMessage)
+                    emitEffect(ProfileContract.Effect.NavigateBack)
+                }
+                is Result.Failure -> {
+                    _state.update {
+                        it.copy(
+                            isUpdatingProfile = false,
+                            errorText = result.exception.message ?: "Failed to update profile"
+                        )
+                    }
+                }
+                else -> Unit
             }
-            emitEffect(ProfileContract.Effect.ShowMessage("Profile saved successfully"))
-            emitEffect(ProfileContract.Effect.NavigateBack)
         }
     }
 

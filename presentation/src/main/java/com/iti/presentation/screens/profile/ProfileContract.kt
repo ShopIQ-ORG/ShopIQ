@@ -33,8 +33,8 @@ object ProfileContract {
         val searchSuggestions: List<PlaceSuggestion> = emptyList(),
         val isDetectingLocation: Boolean = false,
         val detectedAddress: Address? = null,
-        val errorText: String? = null,
-        val successText: String? = null,
+        val errorText: com.iti.presentation.util.UiText? = null,
+        val successText: com.iti.presentation.util.UiText? = null,
         val triggerPermissionRequest: Boolean = false,
         val tempLatitude: Double? = null,
         val tempLongitude: Double? = null,
@@ -87,7 +87,8 @@ object ProfileContract {
 
     sealed class Effect {
         data object NavigateBack : Effect()
-        data class ShowMessage(val message: String) : Effect()
+        data class ShowMessage(val message: com.iti.presentation.util.UiText) : Effect()
+        data object ShowSuccessMessage : Effect()
         data class ShowCurrencyUpdatedMessage(val currencyCode: String) : Effect()
         data class MoveCameraToLocation(val latitude: Double, val longitude: Double) : Effect()
         data class NavigateToAddressValidation(

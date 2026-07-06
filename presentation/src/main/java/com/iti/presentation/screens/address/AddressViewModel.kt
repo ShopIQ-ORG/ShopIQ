@@ -190,7 +190,7 @@ class AddressViewModel (
                         _state.update { it.copy(screenState = AddressContract.ScreenState.Loading) }
                     }
                     is Result.Success -> {
-                        val addresses = result.data
+                        val addresses = result.data.filter { it.street.isNotBlank() || it.city.isNotBlank() }
                         _state.update {
                             it.copy(
                                 addresses = addresses,
@@ -198,7 +198,8 @@ class AddressViewModel (
                                     AddressContract.ScreenState.Empty
                                 } else {
                                     AddressContract.ScreenState.Success(addresses)
-                                }
+                                },
+                                addressLoading = false
                             )
                         }
                     }

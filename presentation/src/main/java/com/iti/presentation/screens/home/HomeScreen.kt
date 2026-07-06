@@ -115,22 +115,24 @@ fun HomeScreen(
         }
     }
 
-HomeScreenContent(
-    state = state,
-    onNavigateToProduct = onNavigateToProduct,
-    onIntent = viewModel::sendIntent,
-    onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
-    onCartClick = onCartClick,
-    onCategoryClick = onCategoryClick,
-    onNavigateToAiHistory = onNavigateToAiHistory,
-    selectedIndex = selectedIndex,
-    onSelectedIndexChanged = { selectedIndex = it },
-    onNavigateToOrders = onNavigateToOrders,
-    onNavigateToEditProfile = onNavigateToEditProfile,
-    onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
-    onNavigateToAddressManagement = onNavigateToAddressManagement,
-    snackbarHostState = snackbarHostState
-)
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    HomeScreenContent(
+        state = state,
+        onNavigateToProduct = onNavigateToProduct,
+        onIntent = viewModel::sendIntent,
+        onLogout = { showLogoutDialog = true },
+        onCartClick = onCartClick,
+        onCategoryClick = onCategoryClick,
+        onNavigateToAiHistory = onNavigateToAiHistory,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChanged = { selectedIndex = it },
+        onNavigateToOrders = onNavigateToOrders,
+        onNavigateToEditProfile = onNavigateToEditProfile,
+        onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
+        onNavigateToAddressManagement = onNavigateToAddressManagement,
+        snackbarHostState = snackbarHostState
+    )
 
     if (showAuthDialog) {
         UnauthorizedDialog(
@@ -139,6 +141,20 @@ HomeScreenContent(
                 showAuthDialog = false
                 onLogout()
             }
+        )
+    }
+
+    if (showLogoutDialog) {
+        com.iti.presentation.components.ConfirmationDialog(
+            title = stringResource(R.string.profile_sign_out_title),
+            message = stringResource(R.string.profile_sign_out_msg),
+            confirmText = stringResource(R.string.profile_sign_out_title),
+            dismissText = stringResource(R.string.profile_cancel),
+            onConfirm = {
+                showLogoutDialog = false
+                viewModel.sendIntent(HomeContract.Intent.Logout)
+            },
+            onDismiss = { showLogoutDialog = false }
         )
     }
 }

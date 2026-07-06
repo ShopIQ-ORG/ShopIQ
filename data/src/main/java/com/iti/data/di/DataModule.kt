@@ -138,5 +138,6 @@ val dataModule = module {
     single<LocationTracker> { LocationTrackerImpl(get()) }
     single<AddressRepository> { AddressRepositoryImpl(get(), get(), androidContext()) }
     single<com.iti.data.sources.remote.currency.CurrencyRemoteDataSource> { com.iti.data.sources.remote.currency.CurrencyRemoteDataSourceImpl(get()) }
+    single<com.iti.data.sources.local.currency.CurrencyLocalDataSource> { com.iti.data.sources.local.currency.CurrencyLocalDataSourceImpl(get()) }
     single<com.iti.domain.repositories.currency.CurrencyRepository> { com.iti.data.repositories.CurrencyRepositoryImpl(get(), get()) }
 }

@@ -222,6 +222,14 @@
     <string name="cart_promo_remove_cd">Remove Prompo Code</string>
     <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
     <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
+    <string name="sort_high_to_low">High to Low</string>
+    <string name="profile_updated_successfully">Profile updated successfully</string>
+    <string name="error_location_permission">Location permission is required for GPS detection</string>
+    <string name="error_name_email_required">Name and Email are required</string>
+    <string name="error_failed_update_profile">Failed to update profile</string>
+    <string name="error_failed_load_addresses">Failed to load addresses</string>
+    <string name="success_address_deleted">Address deleted successfully</string>
+    <string name="error_failed_delete_address">Failed to delete address</string>
     <string name="clear_history">Clear Chat</string>
 
     <!-- AI Chatbot Strings -->
