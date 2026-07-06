@@ -192,7 +192,7 @@ fun PaymentMethodScreen(
 
                     // Apple Pay
                     LogoContainer {
-                        Text(text = "Pay", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                        Text(text = "Pay", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Black)
                     }
                     
                     Text(
