@@ -387,6 +387,7 @@ fun HomeScreenContent(
                 AccountSettingsScreen(
                     viewModel = profileViewModel,
                     onNavigateBack = { onSelectedIndexChanged(0) },
+                    onLogout = onLogout,
                     onNavigateToEditProfile = onNavigateToEditProfile,
                     onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
                     onNavigateToAddressManagement = onNavigateToAddressManagement,

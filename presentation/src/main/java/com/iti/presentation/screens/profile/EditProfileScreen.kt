@@ -114,19 +114,22 @@ fun EditProfileContent(
 ) {
     val context = LocalContext.current
 
-    var fullName by remember { mutableStateOf(state.user?.fullName ?: "") }
-    var email by remember { mutableStateOf(state.user?.email ?: "") }
-    var phone by remember { mutableStateOf(state.user?.phone ?: "") }
-    var dateOfBirth by remember { mutableStateOf(state.user?.dateOfBirth ?: "") }
-    var gender by remember { mutableStateOf(state.user?.gender ?: "") }
-    var avatarUrl by remember { mutableStateOf(state.user?.avatarUrl ?: "") }
+    val authUser = state.user as? User.AuthenticatedUser
+
+    var fullName by remember { mutableStateOf(authUser?.fullName ?: "") }
+    var email by remember { mutableStateOf(authUser?.email ?: "") }
+    var phone by remember { mutableStateOf(authUser?.phone ?: "") }
+    var dateOfBirth by remember { mutableStateOf(authUser?.dateOfBirth ?: "") }
+    var gender by remember { mutableStateOf(authUser?.gender ?: "") }
+    var avatarUrl by remember { mutableStateOf(authUser?.avatarUrl ?: "") }
 
     var fullNameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var phoneError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(state.user) {
-        state.user?.let {
+        val u = state.user as? User.AuthenticatedUser
+        u?.let {
             fullName = it.fullName
             email = it.email
             phone = it.phone

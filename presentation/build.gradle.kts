@@ -105,6 +105,7 @@ dependencies {
     implementation(libs.facebook.login)
     implementation(libs.google.play.services.maps)
     implementation(libs.google.maps.compose)
+    implementation(libs.androidx.ui.graphics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

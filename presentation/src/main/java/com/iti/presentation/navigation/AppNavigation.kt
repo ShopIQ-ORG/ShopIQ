@@ -358,6 +358,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AccountSettingsScreen(
                     viewModel = viewModel,
                     onNavigateBack = ::navigateBack,
+                    onLogout = { replaceRoot(Screen.SignIn) },
                     onNavigateToEditProfile = { navigate(Screen.EditProfile) },
                     onNavigateToLocalizationCurrency = { navigate(Screen.LocalizationCurrency) },
                     onNavigateToAddressManagement = { navigate(Screen.AddressManagement) },

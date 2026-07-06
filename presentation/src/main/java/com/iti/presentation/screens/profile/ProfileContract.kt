@@ -21,7 +21,7 @@ object ProfileContract {
     )
 
     data class State(
-        val user: User.AuthenticatedUser? = null,
+        val user: User? = null,
         val isUpdatingProfile: Boolean = false,
         val selectedCurrency: Currency = Currency("EGP", "Egyptian Pound", "EGP", 48.0),
         val popularCurrencies: List<Currency> = emptyList(),

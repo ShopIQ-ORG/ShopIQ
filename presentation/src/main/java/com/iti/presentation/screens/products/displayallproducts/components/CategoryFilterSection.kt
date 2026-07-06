@@ -52,11 +52,11 @@ fun CategoryFilterSection(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .background(
-                        if (isAllSelected) Color.Black else Color.White
+                        if (isAllSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                     )
                     .border(
                         width = 1.dp,
-                        color = if (isAllSelected) Color.Transparent else Color(0xFFE0E0E0),
+                        color = if (isAllSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable { onClearCategories() }
@@ -68,7 +68,7 @@ fun CategoryFilterSection(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Medium
                     ),
-                    color = if (isAllSelected) Color.White else Color.Black
+                    color = if (isAllSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -79,11 +79,11 @@ fun CategoryFilterSection(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
                         .background(
-                            if (isSelected) Color.Black else Color.White
+                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                         )
                         .border(
                             width = 1.dp,
-                            color = if (isSelected) Color.Transparent else Color(0xFFE0E0E0),
+                            color = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(8.dp)
                         )
                         .clickable { onCategoryToggled(category) }
@@ -95,7 +95,7 @@ fun CategoryFilterSection(
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                         ),
-                        color = if (isSelected) Color.White else Color.Black
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

@@ -209,40 +209,10 @@ class ProfileViewModel(
         viewModelScope.launch {
             when (val result = getCurrentUserUseCase()) {
                 is Result.Success -> {
-                    val user = result.data
-                    if (user is User.AuthenticatedUser) {
-                        _state.update { it.copy(user = user) }
-                    } else {
-                        // Fallback/Mock authenticated user for premium display
-                        _state.update {
-                            it.copy(
-                                user = User.AuthenticatedUser(
-                                    uid = "mock-123",
-                                    fullName = "John Doe",
-                                    email = "john.doe@email.com",
-                                    phone = "+44 7700 900123",
-                                    dateOfBirth = "May 12, 1995",
-                                    gender = "Male",
-                                    avatarUrl = null
-                                )
-                            )
-                        }
-                    }
+                    _state.update { it.copy(user = result.data) }
                 }
                 else -> {
-                    _state.update {
-                        it.copy(
-                            user = User.AuthenticatedUser(
-                                uid = "mock-123",
-                                fullName = "John Doe",
-                                email = "john.doe@email.com",
-                                phone = "+44 7700 900123",
-                                dateOfBirth = "May 12, 1995",
-                                gender = "Male",
-                                avatarUrl = null
-                            )
-                        )
-                    }
+                    _state.update { it.copy(user = User.GuestUser) }
                 }
             }
         }
@@ -263,14 +233,15 @@ class ProfileViewModel(
         _state.update { it.copy(isUpdatingProfile = true, errorText = null) }
         viewModelScope.launch {
             delay(1000) // Simulated API delay
+            val currentUser = _state.value.user as? User.AuthenticatedUser
             val updatedUser = User.AuthenticatedUser(
-                uid = _state.value.user?.uid ?: "mock-123",
+                uid = currentUser?.uid ?: "mock-123",
                 fullName = name,
                 email = email,
                 phone = phone,
                 dateOfBirth = dob,
                 gender = gender,
-                avatarUrl = avatarUrl ?: _state.value.user?.avatarUrl
+                avatarUrl = avatarUrl ?: currentUser?.avatarUrl
             )
             _state.update {
                 it.copy(

@@ -8,19 +8,30 @@
 
 package com.iti.presentation.util
 
+import android.content.Context
+import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object ThemeManager {
+    private var sharedPreferences: SharedPreferences? = null
     private val _isDarkTheme = MutableStateFlow(false)
     val isDarkTheme: StateFlow<Boolean> = _isDarkTheme.asStateFlow()
 
+    fun initialize(context: Context) {
+        sharedPreferences = context.getSharedPreferences("shopiq_prefs", Context.MODE_PRIVATE)
+        _isDarkTheme.value = sharedPreferences?.getBoolean("dark_theme", false) ?: false
+    }
+
     fun setDarkTheme(enabled: Boolean) {
         _isDarkTheme.value = enabled
+        sharedPreferences?.edit()?.putBoolean("dark_theme", enabled)?.apply()
     }
 
     fun toggleTheme() {
-        _isDarkTheme.value = !_isDarkTheme.value
+        val newValue = !_isDarkTheme.value
+        _isDarkTheme.value = newValue
+        sharedPreferences?.edit()?.putBoolean("dark_theme", newValue)?.apply()
     }
 }

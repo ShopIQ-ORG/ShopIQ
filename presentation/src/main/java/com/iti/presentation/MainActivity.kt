@@ -13,6 +13,7 @@ import com.iti.presentation.util.ThemeManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeManager.initialize(applicationContext)
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
