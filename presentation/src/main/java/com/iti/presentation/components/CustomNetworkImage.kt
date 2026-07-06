@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.iti.presentation.R
+import com.iti.presentation.ui.theme.LocalDarkTheme
 
 @Composable
 fun CustomNetworkImage(
@@ -20,14 +21,17 @@ fun CustomNetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     backgroundColor: Color = Color.Transparent
 ) {
+    val isDark = LocalDarkTheme.current
+    val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
+
     Box(modifier = modifier.background(backgroundColor)) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUrl)
                 .crossfade(true)
-                .placeholder(R.drawable.logo_light)
-                .error(R.drawable.logo_light)
-                .fallback(R.drawable.logo_light)
+                .placeholder(fallback)
+                .error(fallback)
+                .fallback(fallback)
                 .build(),
             contentDescription = contentDescription,
             contentScale = contentScale,

@@ -29,6 +29,8 @@ import com.iti.domain.models.Money
 import com.iti.domain.models.Product
 import com.iti.domain.models.ProductImage
 import com.iti.presentation.R
+import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.getLocalizedCode
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ShopIQButton
@@ -151,10 +153,13 @@ private fun ProductDetailsContent(
             }
 
             item {
+                val convertedMinPrice = CurrencyManager.convertFromUsd(product.minPrice.amount.toDoubleOrNull() ?: 0.0)
+                val currentCurrency by CurrencyManager.selectedCurrency.collectAsState()
+                val minPriceStr = if (convertedMinPrice % 1.0 == 0.0) "%.0f".format(convertedMinPrice) else "%.2f".format(convertedMinPrice)
                 ProductInfoBlock(
                     title = product.title,
-                    currencyCode = product.minPrice.currencyCode,
-                    amount = product.minPrice.amount,
+                    currencyCode = currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current),
+                    amount = minPriceStr,
                     description = product.description
                 )
             }

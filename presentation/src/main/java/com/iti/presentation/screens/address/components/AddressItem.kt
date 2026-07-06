@@ -58,6 +58,7 @@ fun AddressItem(
     onDelete: () -> Unit,
     onSetDefault: () -> Unit,
     modifier: Modifier = Modifier,
+    onEdit: (() -> Unit)? = null,
     onAddressSelected: ((Address) -> Unit)? = null,
     isSelected: Boolean = false
 ) {
@@ -111,8 +112,14 @@ fun AddressItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val displayName = when (address.name) {
+                        "Home" -> stringResource(R.string.address_tag_home)
+                        "Work" -> stringResource(R.string.address_tag_work)
+                        "Other" -> stringResource(R.string.address_tag_other)
+                        else -> address.name
+                    }
                     Text(
-                        text = address.name,
+                        text = displayName,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -153,6 +160,15 @@ fun AddressItem(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
+                        if (onEdit != null) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.address_edit)) },
+                                onClick = {
+                                    showMenu = false
+                                    onEdit()
+                                }
+                            )
+                        }
                         if (!address.isDefault) {
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.address_menu_set_default)) },
@@ -176,6 +192,24 @@ fun AddressItem(
             Spacer(modifier = Modifier.height(2.dp))
 
             // Body address details
+            if (address.recipientName.isNotBlank()) {
+                Text(
+                    text = address.recipientName,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            if (address.phone.isNotBlank()) {
+                Text(
+                    text = address.phone,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             Text(
                 text = address.street,
                 style = MaterialTheme.typography.bodyMedium,
@@ -221,29 +255,9 @@ private fun AddressItemDefaultLightPreview() {
                 country = "Egypt",
                 latitude = 30.0444,
                 longitude = 31.2357,
-                isDefault = true
-            ),
-            onDelete = {},
-            onSetDefault = {}
-        )
-    }
-}
-
-@Preview(name = "Dark Mode - Standard Address")
-@Composable
-private fun AddressItemStandardDarkPreview() {
-    ShopIQTheme(darkTheme = true) {
-        AddressItem(
-            address = Address(
-                id = "2",
-                name = "Work",
-                street = "Smart Village, Building B12",
-                city = "Giza",
-                postalCode = "12577",
-                country = "Egypt",
-                latitude = 30.0768,
-                longitude = 31.0189,
-                isDefault = false
+                isDefault = true,
+                recipientName = "John Doe",
+                phone = "+201001234567"
             ),
             onDelete = {},
             onSetDefault = {}

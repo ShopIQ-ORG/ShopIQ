@@ -31,6 +31,9 @@ import com.iti.domain.models.Ad
 import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.text.font.FontWeight
+
 @Composable
 fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
     val filteredAds = ads.filter { it.imageUrl.isNotEmpty() }
@@ -83,8 +86,9 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                 ) {
                     Text(
                         text = ad.title,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -96,10 +100,11 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                     Button(
                         onClick = { onAdClick(ad) },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
                         shape = RoundedCornerShape(6.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                         modifier = Modifier.height(32.dp)
                     ) {
                         Text(

@@ -19,4 +19,11 @@ interface AuthRepository {
     suspend fun logout(): Result<Unit>
     fun getUserId(): String?
     fun isGuest(): Boolean
+    suspend fun updateProfile(
+        fullName: String,
+        phone: String,
+        dateOfBirth: String?,
+        gender: String?,
+        avatarUrl: String?
+    ): Result<User>
 }

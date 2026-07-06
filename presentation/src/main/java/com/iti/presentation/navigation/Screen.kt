@@ -1,3 +1,11 @@
+//
+//  Screen.kt
+//  ShopIQ
+//
+//  Created by Abdullh Gaber on 7/2/26.
+//  Copyright © 2026 ITI. All rights reserved.
+//
+
 package com.iti.presentation.navigation
 
 import androidx.navigation3.runtime.NavKey
@@ -28,6 +36,24 @@ sealed class Screen : NavKey {
 
     data object AiHistory : Screen()
 
+    data object AccountSettings : Screen()
+    data object EditProfile : Screen()
+    data object LocalizationCurrency : Screen()
+    data object AddressManagement : Screen()
+    data class AddEditAddress(val addressId: String? = null) : Screen()
+    data class AddressValidation(
+        val latitude: Double,
+        val longitude: Double,
+        val street: String = "",
+        val city: String = "",
+        val country: String = "",
+        val postalCode: String = "",
+        val label: String = "",
+        val isDefault: Boolean = false,
+        val recipientName: String = "",
+        val phone: String = "",
+        val addressId: String? = null
+    ) : Screen()
     data object ForgotPassword : Screen()
     data class EmailVerification(val email: String) : Screen()
 }

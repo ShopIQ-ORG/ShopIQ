@@ -17,6 +17,9 @@ import com.iti.presentation.screens.splash.components.SplashTagline
 import com.iti.presentation.util.Constants
 import kotlinx.coroutines.delay
 
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
+
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
@@ -47,22 +50,23 @@ fun SplashScreen(
     var tagline1Text by remember { mutableStateOf("") }
     var tagline2Text by remember { mutableStateOf("") }
 
-    LaunchedEffect(key1 = Unit) {
+    val tagline1 = stringResource(id = R.string.splash_tagline_1)
+    val tagline2 = stringResource(id = R.string.splash_tagline_2)
+
+    LaunchedEffect(key1 = tagline1, key2 = tagline2) {
         startAnimation = true
 
         delay(Constants.SPLASH_INITIAL_DELAY)
 
-        val line1 = Constants.SPLASH_TAGLINE_1
-        for (i in 1..line1.length) {
-            tagline1Text = line1.substring(0, i)
+        for (i in 1..tagline1.length) {
+            tagline1Text = tagline1.substring(0, i)
             delay(Constants.TYPING_SPEED_MS)
         }
 
         delay(Constants.SPLASH_INTER_LINE_DELAY)
 
-        val line2 = Constants.SPLASH_TAGLINE_2
-        for (i in 1..line2.length) {
-            tagline2Text = line2.substring(0, i)
+        for (i in 1..tagline2.length) {
+            tagline2Text = tagline2.substring(0, i)
             delay(Constants.TYPING_SPEED_MS)
         }
 

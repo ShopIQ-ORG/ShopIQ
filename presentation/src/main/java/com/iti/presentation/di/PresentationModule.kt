@@ -24,6 +24,7 @@ import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatViewModel
 import com.iti.presentation.screens.ai.history.AiHistoryViewModel
 import com.iti.presentation.screens.address.AddressViewModel
+import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.screens.auth.emailverification.EmailVerificationViewModel
 import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordViewModel
 import com.iti.presentation.util.NetworkMonitor
@@ -59,5 +60,6 @@ val presentationModule = module {
     viewModelOf(::OrderDetailsViewModel)
     viewModelOf(::ForgotPasswordViewModel)
     viewModelOf(::EmailVerificationViewModel)
-    viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
+    viewModel { AddressViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 }

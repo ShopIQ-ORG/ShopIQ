@@ -13,9 +13,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.iti.presentation.R
+import com.iti.presentation.ui.theme.LocalDarkTheme
 
 @Composable
 fun SingleProductImage(imageUrl: String) {
+    val isDark = LocalDarkTheme.current
+    val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
+
     AsyncImage(
         model = imageUrl,
         contentDescription = null,
@@ -25,6 +29,6 @@ fun SingleProductImage(imageUrl: String) {
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentScale = ContentScale.Crop,
-        error = painterResource(id = R.drawable.logo_light)
+        error = painterResource(id = fallback)
     )
 }

@@ -44,6 +44,7 @@ import com.iti.domain.models.Product
 import com.iti.presentation.R
 import com.iti.presentation.components.ProductCard
 import com.iti.presentation.screens.ai.components.AiAvatar
+import com.iti.presentation.ui.theme.LocalDarkTheme
 
 @Composable
 fun SuggestionsSection(
@@ -54,13 +55,19 @@ fun SuggestionsSection(
     onNavigateToChat: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = LocalDarkTheme.current
+    val containerColor = if (isDark) Color(0xFF1E1632) else Color(0xFFF7F5FF)
+    val iconTint = if (isDark) Color(0xFFA87CFF) else Color(0xFF6F32E5)
+    val titleColor = if (isDark) Color(0xFFEADBFF) else Color(0xFF1E143F)
+    val productCardBg = if (isDark) MaterialTheme.colorScheme.surface else Color.White
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF7F5FF) // Light lavender background
+            containerColor = containerColor
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -80,7 +87,7 @@ fun SuggestionsSection(
                 Icon(
                     imageVector = Icons.Default.AutoAwesome,
                     contentDescription = "AI Sparkle",
-                    tint = Color(0xFF6F32E5),
+                    tint = iconTint,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -90,7 +97,7 @@ fun SuggestionsSection(
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp
                     ),
-                    color = Color(0xFF1E143F)
+                    color = titleColor
                 )
             }
 
@@ -112,7 +119,7 @@ fun SuggestionsSection(
                                 modifier = Modifier
                                     .width(150.dp)
                                     .clip(RoundedCornerShape(16.dp))
-                                    .background(Color.White)
+                                    .background(productCardBg)
                                     .padding(8.dp)
                             )
                         }

@@ -16,8 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.iti.presentation.util.getLocalizedCode
 import com.iti.domain.models.cart.Cart
 import com.iti.presentation.R
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.iti.presentation.util.CurrencyManager
 
 @Composable
 fun OrderSummary(
@@ -30,13 +34,20 @@ fun OrderSummary(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        SummaryRow(label = stringResource(R.string.cart_subtotal), value = "$${cart.subtotal.amount}")
+        val currentCurrency by CurrencyManager.selectedCurrency.collectAsState()
+
+        val convertedSubtotal = CurrencyManager.convertFromUsd(cart.subtotal.amount.toDoubleOrNull() ?: 0.0)
+        val subtotalStr = if (convertedSubtotal % 1.0 == 0.0) "%.0f".format(convertedSubtotal) else "%.2f".format(convertedSubtotal)
+        val context = androidx.compose.ui.platform.LocalContext.current
+        SummaryRow(label = stringResource(R.string.cart_subtotal), value = "$subtotalStr ${currentCurrency.getLocalizedCode(context)}")
 
         val discount = cart.discountAmount
         if (discount != null && discount.amount.toDoubleOrNull() != 0.0) {
+            val convertedDiscount = CurrencyManager.convertFromUsd(discount.amount.toDoubleOrNull() ?: 0.0)
+            val discountStr = if (convertedDiscount % 1.0 == 0.0) "%.0f".format(convertedDiscount) else "%.2f".format(convertedDiscount)
             SummaryRow(
                 label = stringResource(R.string.cart_discount),
-                value = "-$${discount.amount}",
+                value = "-$discountStr ${currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current)}",
                 valueColor = MaterialTheme.colorScheme.tertiary
             )
         }
@@ -44,12 +55,15 @@ fun OrderSummary(
         val shipping = cart.shippingAmount
         val shippingValue = shipping?.amount?.toDoubleOrNull()
 
+        val convertedShipping = if (shippingValue != null) CurrencyManager.convertFromUsd(shippingValue) else 0.0
+        val shippingStr = if (convertedShipping % 1.0 == 0.0) "%.0f".format(convertedShipping) else "%.2f".format(convertedShipping)
+
         SummaryRow(
             label = stringResource(R.string.cart_shipping),
             value = when {
                 shipping == null -> stringResource(R.string.cart_shipping_calculated_at_checkout)
                 shippingValue == 0.0 -> stringResource(R.string.cart_shipping_free)
-                else -> "$${shipping.amount}"
+                else -> "$shippingStr ${currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current)}"
             },
             valueColor = if (shippingValue == 0.0) {
                 MaterialTheme.colorScheme.tertiary
@@ -70,8 +84,10 @@ fun OrderSummary(
                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground
             )
+            val convertedTotal = CurrencyManager.convertFromUsd(cart.total.amount.toDoubleOrNull() ?: 0.0)
+            val totalStr = if (convertedTotal % 1.0 == 0.0) "%.0f".format(convertedTotal) else "%.2f".format(convertedTotal)
             Text(
-                text = "$${cart.total.amount}",
+                text = "$totalStr ${currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current)}",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground
             )

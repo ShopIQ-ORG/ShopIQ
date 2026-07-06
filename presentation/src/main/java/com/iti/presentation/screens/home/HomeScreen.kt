@@ -46,6 +46,8 @@ import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.screens.home.components.HomeTabContent
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
 import com.iti.presentation.screens.home.viewmodel.HomeViewModel
+import com.iti.presentation.screens.profile.AccountSettingsScreen
+import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -61,6 +63,10 @@ fun HomeScreen(
     onNavigateToSearch: () -> Unit,
     onNavigateToOrders: () -> Unit,
     onNavigateToAiHistory: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToLocalizationCurrency: () -> Unit,
+    onNavigateToAddressManagement: () -> Unit,
+    profileViewModel: ProfileViewModel,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -110,19 +116,23 @@ fun HomeScreen(
         }
     }
 
-HomeScreenContent(
-    state = state,
-    onNavigateToProduct = onNavigateToProduct,
-    onIntent = viewModel::sendIntent,
-    onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
-    onCartClick = onCartClick,
-    onCategoryClick = onCategoryClick,
-    onNavigateToAiHistory = onNavigateToAiHistory,
-    selectedIndex = selectedIndex,
-    onSelectedIndexChanged = { selectedIndex = it },
-    onNavigateToOrders = onNavigateToOrders,
-    snackbarHostState = snackbarHostState
-)
+    HomeScreenContent(
+        state = state,
+        onNavigateToProduct = onNavigateToProduct,
+        onIntent = viewModel::sendIntent,
+        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
+        onCartClick = onCartClick,
+        onCategoryClick = onCategoryClick,
+        onNavigateToAiHistory = onNavigateToAiHistory,
+        selectedIndex = selectedIndex,
+        onSelectedIndexChanged = { selectedIndex = it },
+        onNavigateToOrders = onNavigateToOrders,
+        onNavigateToEditProfile = onNavigateToEditProfile,
+        onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
+        onNavigateToAddressManagement = onNavigateToAddressManagement,
+        profileViewModel = profileViewModel,
+        snackbarHostState = snackbarHostState
+    )
 
     if (showAuthDialog) {
         UnauthorizedDialog(
@@ -133,6 +143,8 @@ HomeScreenContent(
             }
         )
     }
+
+
 }
 
 @Composable
@@ -147,6 +159,10 @@ fun HomeScreenContent(
     onNavigateToAiHistory: () -> Unit,
     selectedIndex: Int,
     onSelectedIndexChanged: (Int) -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToLocalizationCurrency: () -> Unit,
+    onNavigateToAddressManagement: () -> Unit,
+    profileViewModel: ProfileViewModel,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     networkMonitor: NetworkMonitor = koinInject(),
     cartBadgeViewModel: CartBadgeViewModel = koinViewModel()
@@ -254,7 +270,7 @@ fun HomeScreenContent(
                                 ) {
                                     Icon(
                                         painter = painterResource(id = item.iconResId!!),
-                                        contentDescription = item.label,
+                                        contentDescription = stringResource(id = item.labelResId),
                                         tint = if (isDark) {
                                             if (isSelected) Color(0xFFD4BFFF) else Color(0xFF9E80E5)
                                         } else {
@@ -295,12 +311,12 @@ fun HomeScreenContent(
                             icon = {
                                 Icon(
                                     imageVector = if (isSelected) item.selectedIcon!! else item.unselectedIcon!!,
-                                    contentDescription = item.label
+                                    contentDescription = stringResource(id = item.labelResId)
                                 )
                             },
                             label = {
                                 Text(
-                                    text = item.label,
+                                    text = stringResource(id = item.labelResId),
                                     maxLines = 1,
                                     softWrap = false,
                                     style = MaterialTheme.typography.labelSmall.copy(
@@ -372,10 +388,15 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.Profile -> {
-                ProfileTabContent(
-                    user = state.currentUser,
+                AccountSettingsScreen(
+                    viewModel = profileViewModel,
+                    onNavigateBack = { onSelectedIndexChanged(0) },
                     onLogout = onLogout,
-                    onNavigateToOrders = onNavigateToOrders
+                    onNavigateToEditProfile = onNavigateToEditProfile,
+                    onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
+                    onNavigateToAddressManagement = onNavigateToAddressManagement,
+                    onNavigateToOrders = onNavigateToOrders,
+                    bottomPadding = padding.calculateBottomPadding()
                 )
             }
         }

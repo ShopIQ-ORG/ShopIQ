@@ -179,15 +179,15 @@ fun FilterBottomSheet(
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.Black
+                        contentColor = MaterialTheme.colorScheme.onBackground
                     ),
-                    border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f))
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.DeleteOutline,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
-                        tint = Color.Black
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -205,9 +205,10 @@ fun FilterBottomSheet(
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White
-                    )
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = stringResource(R.string.filter_apply),

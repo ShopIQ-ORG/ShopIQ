@@ -26,6 +26,7 @@ import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.address.DeleteAddressUseCase
 import com.iti.domain.usecases.auth.ReloadAndGetCurrentUserUseCase
+import com.iti.domain.usecases.auth.UpdateProfileUseCase
 import com.iti.domain.usecases.auth.SendEmailVerificationUseCase
 import com.iti.domain.usecases.auth.SendPasswordResetEmailUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
@@ -51,6 +52,8 @@ val domainModule = module {
     factory { LoginWithFacebookUseCase(get()) }
     factory { LoginAsGuestUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
+    factory { ReloadAndGetCurrentUserUseCase(get()) }
+    factory { UpdateProfileUseCase(get()) }
     factory { RegisterUseCase(get()) }
     factory { LogoutUseCase(get(), get()) }
     factory { GetProductsByNumberUseCase(get()) }
@@ -78,12 +81,22 @@ val domainModule = module {
     factory { GetSavedAddressesUseCase(get()) }
     factory { SaveAddressUseCase(get()) }
     factory { DeleteAddressUseCase(get()) }
+    factory { com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase(get()) }
+    factory { com.iti.domain.usecases.address.SearchLocationByNameUseCase(get()) }
     factoryOf(::ObserveCartItemCountUseCase)
     factoryOf(::GetOrdersUseCase)
     factoryOf(::SendPasswordResetEmailUseCase)
     factoryOf(::SendEmailVerificationUseCase)
     factoryOf(::GetValidShopifyTokenUseCase)
     factoryOf(::ReloadAndGetCurrentUserUseCase)
+    // Currency Use Cases
+    factory { com.iti.domain.usecases.currency.GetSelectedCurrencyUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.GetPopularCurrenciesUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.GetExchangeRateHistoryUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.FetchExchangeRatesUseCase(get()) }
+    factory { com.iti.domain.usecases.currency.SelectCurrencyUseCase(get()) }
+    
+    // Checkout Use Cases
     factory { CreateDraftOrderUseCase(get()) }
     factory { CompleteDraftOrderUseCase(get()) }
     factory { ClearCartUseCase(get()) }

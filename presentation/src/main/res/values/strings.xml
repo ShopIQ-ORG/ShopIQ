@@ -4,6 +4,8 @@
     <string name="shopiq_logo">ShopIQ Logo</string>
     <string name="welcome_back">Welcome Back!</string>
     <string name="login_subtitle">Login to continue shopping and\ndiscover great deals.</string>
+    <string name="login_google">Google</string>
+    <string name="login_guest">Guest</string>
     <string name="email_or_phone_number">Email or Phone Number</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
@@ -113,7 +115,7 @@
     <string name="search_popular_label">Popular Searches</string>
     <string name="search_clear_all">Clear All</string>
     <string name="search_empty_hint">Search for products, brands\nor categories</string>
-    <string name="search_cd_close">Close search</string>
+    <string name="currency_updated_to">Currency updated to %1$s</string><string name="search_cd_close">Close search</string>
     <string name="search_cd_clear">Clear text</string>
     <string name="search_trending_label">🔥 Trending</string>
     <string name="search_popular_now_label">Popular Now</string>
@@ -222,6 +224,19 @@
     <string name="cart_promo_remove_cd">Remove Prompo Code</string>
     <string name="cart_checkout_out_of_stock">Remove out-of-stock items before proceeding to checkout.</string>
     <string name="cart_low_stock_warning">Only %1$d left — grab it before it\'s gone!</string>
+    <string name="sort_high_to_low">High to Low</string>
+    <string name="profile_updated_successfully">Profile updated successfully</string>
+    <string name="error_location_permission">Location permission is required for GPS detection</string>
+    <string name="error_name_email_required">Name and Email are required</string>
+    <string name="error_failed_update_profile">Failed to update profile</string>
+    <string name="error_failed_load_addresses">Failed to load addresses</string>
+    <string name="success_address_deleted">Address deleted successfully</string>
+    <string name="error_failed_delete_address">Failed to delete address</string>
+    <string name="success_default_address_updated">Default address updated</string>
+    <string name="error_failed_gps">Failed to retrieve GPS location coordinates</string>
+    <string name="error_failed_save_address">Failed to save address</string>
+    <string name="success_address_added">Address added successfully</string>
+    <string name="success_address_updated">Address updated successfully</string>
     <string name="clear_history">Clear Chat</string>
 
     <!-- AI Chatbot Strings -->
@@ -361,6 +376,8 @@
     <string name="address_tag_home">Home</string>
     <string name="address_tag_work">Work</string>
     <string name="address_tag_other">Other</string>
+    <string name="address_edit">Edit Address</string>
+    <string name="address_edit_title">Edit Address</string>
     <string name="address_tag_custom_placeholder">Custom Tag Name (e.g. Gym, Friend\'s House)</string>
     <string name="address_set_default_label">Set as default address</string>
     <string name="address_set_default_subtitle">Use this address for default delivery</string>
@@ -389,13 +406,44 @@
     <string name="address_permission_required_msg">This app requires location permission to detect your current address for shipping and delivery. Please grant the permission.</string>
     <string name="address_permission_retry_btn">Retry</string>
     <string name="address_permission_denied_title">Permission Permanently Denied</string>
-    <string name="address_permission_denied_msg">Location permissions are permanently denied. Please enable them in app settings to use GPS detection.</string>
-    <string name="address_permission_settings_btn">Go to Settings</string>
+    <string name="address_gps_not_enabled_msg">GPS is not enabled on your device. Please turn it on in settings to automatically detect your location.</string>
+    <string name="address_gps_settings_btn">Location Settings</string>
+
+    <string name="currency_usd">USD</string>
+    <string name="currency_egp">EGP</string>
+    <string name="currency_eur">EUR</string>
+    <string name="currency_gbp">GBP</string>
+    <string name="currency_aed">AED</string>
+    <string name="currency_sar">SAR</string>
+
+    <string name="address_select_location_map">Select Location on Map</string>
+    <string name="address_select_location_map_subtitle">Picks coordinates and fills address fields automatically</string>
+    <string name="address_details">Address Details</string>
+    <string name="address_recipient_name">Recipient Name</string>
+    <string name="address_mobile_number">Mobile Number</string>
+    <string name="address_label_placeholder">Address Label (e.g. Home, Work, Gym)</string>
+    <string name="address_street">Street Address</string>
+    <string name="address_city">City</string>
+    <string name="address_country">Country</string>
+    <string name="address_postal_code">Postal Code / ZIP</string>
+    <string name="address_set_default_delivery">Set as default delivery address</string>
+    <string name="address_set_default_delivery_subtitle">Use this address for default delivery</string>
+    <string name="address_required_fields_missing">Required fields missing: %1$s</string>
 
     <!-- Map Picker strings -->
     <string name="address_btn_select_on_map">Select location manually on map</string>
     <string name="address_search_hint">Search area, street, or city…</string>
     <string name="address_btn_confirm_location">Confirm Selected Location</string>
+    <string name="address_permission_denied_msg">Location permissions are permanently denied. Please enable them in app settings to use GPS detection.</string>
+    <string name="address_permission_settings_btn">Go to Settings</string>
+
+    <string name="address_trust_accurate">Accurate</string>
+    <string name="address_trust_accurate_subtitle">Detected with high accuracy</string>
+    <string name="address_trust_time">Save time</string>
+    <string name="address_trust_time_subtitle">Faster checkout</string>
+    <string name="address_trust_secure">Secure</string>
+    <string name="address_trust_secure_subtitle">Your data is safe with us</string>
+    <string name="address_change_anytime">You can change this anytime in your profile.</string>    <!-- Map Picker strings -->
     <string name="address_error_location_not_found">Location not found. Please try a different search query.</string>
 
     <!-- Redesigned Location Detected screen -->
@@ -440,7 +488,70 @@
     <string name="email_not_verified_yet">Not verified yet. Open the link we sent, then try again.</string>
     <string name="error_shopify_token_unavailable">We couldn\'t restore your store session. Please try signing in again.</string>
     <string name="too_many_request">Too many attempts. Please wait a few minutes before trying again.</string>
-    
+
+
+    <!-- Language Settings -->
+    <string name="language_title">Language</string>
+    <string name="language_subtitle">Choose English or Arabic</string>
+    <string name="select_language">Select Language</string>
+
+    <!-- Bottom Nav Labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_categories">Categories</string>
+    <string name="nav_ai">AI</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Account Settings Screen -->
+    <string name="profile_settings_title">Account Settings</string>
+    <string name="profile_edit_profile">Edit Profile</string>
+    <string name="profile_edit_profile_desc">Name, email, phone &amp; more</string>
+    <string name="profile_manage_addresses">Manage Addresses</string>
+    <string name="profile_manage_addresses_desc">Add, edit or remove addresses</string>
+    <string name="profile_payment_methods">Payment Methods</string>
+    <string name="profile_payment_methods_desc">Saved cards &amp; wallets</string>
+    <string name="profile_order_history">Order History</string>
+    <string name="profile_order_history_desc">View your past orders</string>
+    <string name="profile_localization_currency">Localization &amp; Currency</string>
+    <string name="profile_localization_currency_desc">Language, currency &amp; more</string>
+    <string name="profile_preferences">Preferences</string>
+    <string name="profile_dark_theme">Dark Theme</string>
+    <string name="profile_dark_theme_desc">Change app theme preferences</string>
+    <string name="profile_sign_in_desc">Sign in to access addresses, payments and orders</string>
+    <string name="profile_sign_in_title">Sign In</string>
+    <string name="profile_sign_out_title">Sign Out</string>
+    <string name="profile_sign_out_msg">Are you sure you want to sign out of your account?</string>
+    <string name="profile_cancel">Cancel</string>
+    <string name="profile_guest">Guest</string>
+    <string name="profile_sign_in_prompt">Sign in to access your profile</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_tagline_1">SMART SHOPPING.</string>
+    <string name="splash_tagline_2">BETTER CHOICES.</string>
+
+    <!-- Edit Profile Screen -->
+    <string name="error_invalid_phone_length">Invalid phone number length</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="select_date_of_birth">Select Date of Birth</string>
+    <string name="gender">Gender</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_other">Other</string>
+    <string name="select_gender">Select Gender</string>
+    <string name="save_changes">Save Changes</string>
+
+    <!-- Address Delivery Titles -->
+    <string name="address_delivery_addresses">Delivery Addresses</string>
+    <string name="address_delete_confirm_msg">Are you sure you want to permanently remove this delivery address?</string>
+    <string name="address_set_as_default_delivery">Set as default delivery address</string>
+
+    <!-- Localization & Currency Screen -->
+    <string name="currency_current">Current Currency</string>
+    <string name="currency_popular">Popular Currencies</string>
+    <string name="currency_rates_live">Rates are live and updated</string>
+    <string name="currency_powered_by">Powered by Exchange Rate API</string>
+    <string name="currency_trend_title">Exchange Trend (Last 7 Days)</string>
+    <string name="filter_select_all">Select all</string>
+
     <!-- Checkout Flow -->
     <string name="checkout_title">Checkout</string>
     <string name="checkout_step_address">Address</string>
@@ -456,4 +567,5 @@
     <string name="checkout_success_subtitle">Your order has been successfully placed.</string>
     <string name="checkout_success_details">Shopify Order ID: %1$s</string>
     <string name="checkout_btn_go_home">Back to Home</string>
+
 </resources>

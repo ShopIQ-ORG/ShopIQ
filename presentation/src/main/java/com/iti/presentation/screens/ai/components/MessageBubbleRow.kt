@@ -51,7 +51,8 @@ fun MessageBubbleRow(
                 Spacer(modifier = Modifier.height(8.dp))
             }
             if (message.text.isNotBlank()) {
-                TextBubble(text = message.text, isUser = isUser, isDark = isDark)
+                val textToShow = if (message.id == "greeting_message") stringResource(id = R.string.ai_greeting_message) else message.text
+                TextBubble(text = textToShow, isUser = isUser, isDark = isDark)
                 Spacer(modifier = Modifier.height(8.dp))
             }
             if (message.isResolvingProducts) {

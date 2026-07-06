@@ -8,6 +8,7 @@ import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.domain.repositories.auth.AuthRepository
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,9 +61,9 @@ class WishlistViewModel(
         viewModelScope.launch {
             try {
                 removeProductFromFavoritesUseCase(productId)
-                _uiEffect.send(WishlistUiEffect.ShowToast("Product removed from favorites"))
+                _uiEffect.send(WishlistUiEffect.ShowSnackbar(UiText.StringResource(com.iti.presentation.R.string.removed_from_wishlist)))
             } catch (e: Exception) {
-                _uiEffect.send(WishlistUiEffect.ShowToast(e.message ?: "Failed to remove product"))
+                _uiEffect.send(WishlistUiEffect.ShowSnackbar(UiText.Plain(e.message ?: "Failed to remove product")))
             }
         }
     }

@@ -32,11 +32,12 @@ fun GuestWishlistState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val primaryColor = MaterialTheme.colorScheme.primary
         Box(
             modifier = Modifier
                 .size(120.dp)
                 .background(
-                    color = PrimaryLight.copy(alpha = 0.1f),
+                    color = primaryColor.copy(alpha = 0.2f),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -45,7 +46,7 @@ fun GuestWishlistState(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = null,
                 modifier = Modifier.size(50.dp),
-                tint = PrimaryLight
+                tint = primaryColor
             )
         }
 

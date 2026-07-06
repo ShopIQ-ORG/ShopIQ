@@ -106,9 +106,9 @@ private fun BrandCheckboxItem(
             checked = checked,
             onCheckedChange = null, // Set null to delegate click handling completely to the parent Row
             colors = CheckboxDefaults.colors(
-                checkedColor = Color.Black,
-                uncheckedColor = Color(0xFFC0C0C0),
-                checkmarkColor = Color.White
+                checkedColor = MaterialTheme.colorScheme.primary,
+                uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                checkmarkColor = MaterialTheme.colorScheme.onPrimary
             ),
             modifier = Modifier.size(20.dp)
         )

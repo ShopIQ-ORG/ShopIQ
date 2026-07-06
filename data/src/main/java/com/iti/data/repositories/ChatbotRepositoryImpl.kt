@@ -1,5 +1,6 @@
 package com.iti.data.repositories
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
@@ -23,7 +24,7 @@ import kotlinx.coroutines.tasks.await
 class ChatbotRepositoryImpl(
     private val firestore: FirebaseFirestore,
     private val productsRepository: ProductsRepository,
-    private val context: android.content.Context
+    private val context: Context
 ) : ChatbotRepository {
 
     override fun getChatHistory(userId: String): Flow<Result<List<ChatMessage>>> = callbackFlow {
