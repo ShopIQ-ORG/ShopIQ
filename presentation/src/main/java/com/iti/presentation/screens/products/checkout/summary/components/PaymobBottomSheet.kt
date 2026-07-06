@@ -1,10 +1,14 @@
 package com.iti.presentation.screens.products.checkout.summary.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.R
+
+import androidx.compose.ui.text.style.TextAlign
+import com.iti.presentation.ui.theme.PrimaryLight
+import com.iti.presentation.ui.theme.SearchFieldLight
+import com.iti.presentation.ui.theme.TextPrimaryLight
+import com.iti.presentation.ui.theme.TextSecondaryLight
 
 @Composable
 fun PaymobBottomSheet(
@@ -29,63 +39,104 @@ fun PaymobBottomSheet(
     var nameOnCard by remember { mutableStateOf("") }
     var saveCard by remember { mutableStateOf(true) }
 
+    val isFormValid = cardNumber.isNotEmpty() && expiryDate.isNotEmpty() && cvv.isNotEmpty() && nameOnCard.isNotEmpty()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 32.dp, top = 8.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(
+                text = "Secure Checkout",
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                color = TextPrimaryLight
+            )
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
+                Icon(Icons.Default.Close, contentDescription = "Close", tint = TextPrimaryLight)
             }
         }
 
-        OutlinedTextField(
-            value = cardNumber,
-            onValueChange = { cardNumber = it },
-            label = { Text("Card Number") },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_menu_agenda), // Replace with card icon
-                    contentDescription = null
-                )
-            },
-            shape = RoundedCornerShape(12.dp)
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            OutlinedTextField(
-                value = expiryDate,
-                onValueChange = { expiryDate = it },
-                label = { Text("MM/YY") },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                text = "Card Information",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                color = TextSecondaryLight
             )
+            
             OutlinedTextField(
-                value = cvv,
-                onValueChange = { cvv = it },
-                label = { Text("CVV") },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp)
+                value = cardNumber,
+                onValueChange = { if (it.length <= 16) cardNumber = it },
+                label = { Text("Card Number") },
+                placeholder = { Text("0000 0000 0000 0000") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
+                    Icon(Icons.Default.CreditCard, contentDescription = null, tint = PrimaryLight)
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryLight,
+                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                ),
+                textStyle = MaterialTheme.typography.bodyLarge
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = expiryDate,
+                    onValueChange = { if (it.length <= 5) expiryDate = it },
+                    label = { Text("Expiry (MM/YY)") },
+                    placeholder = { Text("MM/YY") },
+                    modifier = Modifier.weight(1.5f), // Larger weight for Expiry
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryLight,
+                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge
+                )
+                OutlinedTextField(
+                    value = cvv,
+                    onValueChange = { if (it.length <= 3) cvv = it },
+                    label = { Text("CVV") },
+                    placeholder = { Text("123") },
+                    modifier = Modifier.weight(1f),
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp), tint = PrimaryLight) },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = PrimaryLight,
+                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            OutlinedTextField(
+                value = nameOnCard,
+                onValueChange = { nameOnCard = it },
+                label = { Text("Cardholder Name") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null, tint = PrimaryLight) },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryLight,
+                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f)
+                ),
+                textStyle = MaterialTheme.typography.bodyLarge
             )
         }
-
-        OutlinedTextField(
-            value = nameOnCard,
-            onValueChange = { nameOnCard = it },
-            label = { Text("Name on card") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
-        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -93,46 +144,65 @@ fun PaymobBottomSheet(
         ) {
             Checkbox(
                 checked = saveCard,
-                onCheckedChange = { saveCard = it }
+                onCheckedChange = { saveCard = it },
+                colors = CheckboxDefaults.colors(checkedColor = PrimaryLight)
             )
             Text(
                 text = "Save card for future use",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondaryLight
             )
         }
 
         Button(
             onClick = { 
-                // Simulate payment success for now
-                onPaymentSuccess(mapOf("status" to "success"))
+                if (isFormValid) {
+                    onPaymentSuccess(mapOf("status" to "success"))
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(60.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF0F2F5)) // Light grey as in image
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isFormValid) PrimaryLight else SearchFieldLight,
+                contentColor = if (isFormValid) Color.White else Color.Gray
+            ),
+            enabled = isFormValid
         ) {
+            Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
             Text(
-                text = "Pay EGP $amount",
-                color = Color.Gray, // Disabled look if fields not filled
-                fontWeight = FontWeight.Bold
+                text = "Pay Securely ($amount)",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
         }
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Secured and powered by ",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondaryLight
+                )
+                Text(
+                    text = "paymob",
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.ExtraBold),
+                    color = Color(0xFF0055FF)
+                )
+            }
             Text(
-                text = "Secured and powered by ",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-            Text(
-                text = "paymob",
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF0055FF) // Paymob blue
+                text = "Your payment information is encrypted and secure.",
+                style = MaterialTheme.typography.labelSmall,
+                color = TextSecondaryLight.copy(alpha = 0.7f),
+                textAlign = TextAlign.Center
             )
         }
     }
