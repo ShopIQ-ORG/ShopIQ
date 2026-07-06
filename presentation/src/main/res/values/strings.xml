@@ -238,6 +238,10 @@
     <string name="ai_reset_chat_desc">Reset Chat</string>
     <string name="ai_greeting_message">Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.</string>
 
+    <!-- Wishlist feedback -->
+    <string name="added_to_wishlist">Added to Wishlist</string>
+    <string name="removed_from_wishlist">Removed from Wishlist</string>
+
     <!-- Chatbot error messages -->
     <string name="ai_error_invalid_key">The assistant\'s connection key is invalid. Please contact support or verify your settings.</string>
     <string name="ai_error_quota_exceeded">The assistant is currently busy with too many requests. Please try again in a moment.</string>
@@ -408,6 +412,8 @@
     <string name="address_error_location_missing">Please select a location on the map first.</string>
     <string name="address_select_location_title">Select Location</string>
 
+    <string name="failed_to_update_favorite_status">Failed to update favorite status</string>
+    <string name="login_required_favorites">You need to sign in to add items to your wishlist.</string>
     <string name="forgot_password_title">Forgot Password?</string>
     <string name="forgot_password_subtitle">Enter your email and we\'ll send you a link to reset your password.</string>
 

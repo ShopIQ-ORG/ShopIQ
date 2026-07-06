@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.iti.presentation.R
+import com.iti.presentation.util.UiText
 
 class CategoryDetailsViewModel(
     private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase,
@@ -129,7 +131,7 @@ class CategoryDetailsViewModel(
     private suspend fun isUserLoggedIn(): Boolean = getCurrentUserUseCase() is Result.Success
 
     private suspend fun notifyLoginRequired() {
-        _effect.send(CategoryDetailsContract.Effect.ShowSnackbar("Please log in to add favorites"))
+        _effect.send(CategoryDetailsContract.Effect.ShowAuthRequired)
     }
 
     private fun applyFavoriteOverride(productId: String, isFavorite: Boolean) {
@@ -149,7 +151,7 @@ class CategoryDetailsViewModel(
             }
         } catch (e: Exception) {
             revertFavoriteOverride(product.id)
-            _effect.send(CategoryDetailsContract.Effect.ShowSnackbar("Failed to update favorite status"))
+            _effect.send(CategoryDetailsContract.Effect.ShowSnackbar(UiText.StringResource(R.string.failed_to_update_favorite_status)))
         }
     }
 }

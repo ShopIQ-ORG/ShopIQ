@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import com.iti.presentation.util.UiText
+import com.iti.presentation.R
 import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
@@ -55,6 +57,12 @@ class ProductDetailsViewModel(
 
     private fun loadProductDetails(productId: Long) {
         viewModelScope.launch {
+            val userRes = getCurrentUserUseCase()
+            if (userRes is Result.Success && userRes.data is User.AuthenticatedUser) {
+                observeFavoriteStatus(productId.toString())
+            }
+        }
+        viewModelScope.launch {
             getProductDetailsUseCase(productId).collect { result ->
                 when (result) {
                     is Result.Loading -> {
@@ -63,12 +71,6 @@ class ProductDetailsViewModel(
                     is Result.Success -> {
                         val product = result.data
                         
-                        // Start observing favorites immediately if user is signed in
-                        val userId = authRepository.getUserId()
-                        if (userId != null && userId != "guest") {
-                            observeFavoriteStatus(product.id)
-                        }
-
                         _state.update {
                             it.copy(
                                 isLoading = false,
@@ -94,13 +96,19 @@ class ProductDetailsViewModel(
     }
 
     private fun observeFavoriteStatus(productId: String) {
+        // Extract the numeric part only (e.g. "gid://shopify/Product/123" -> "123")
+        val cleanProductId = productId.substringAfterLast("/")
+
         viewModelScope.launch {
             combine(
                 getFavoriteProductsUseCase(),
                 favoriteOverride
             ) { result: Result<List<com.iti.domain.models.Product>>, override: Boolean? ->
                 if (result is Result.Success) {
-                    val isFavoriteInDb = result.data.any { it.id == productId }
+                    // Compare by clean numeric ID so Room & GID IDs both match
+                    val isFavoriteInDb = result.data.any {
+                        it.id.substringAfterLast("/") == cleanProductId
+                    }
                     _state.update { it.copy(isWishlisted = override ?: isFavoriteInDb) }
                 }
             }.collect()
@@ -120,40 +128,40 @@ class ProductDetailsViewModel(
     }
 
     private fun toggleWishlist() {
-        // FAST check for guest status
-        val userId = authRepository.getUserId()
-        if (userId == null || userId == "guest") {
-            viewModelScope.launch {
-                _sideEffects.emit(ProductDetailsSideEffect.NavigateToAuth)
-            }
-            return
-        }
-
-        val currentProduct = _state.value.product ?: return
-        val currentlyWishlisted = _state.value.isWishlisted
-        
         viewModelScope.launch {
-            try {
-                val newStatus = !currentlyWishlisted
-                // Optimistic update via override - happens IMMEDIATELY
-                favoriteOverride.value = newStatus
+            val userRes = getCurrentUserUseCase()
+            if (userRes is Result.Success && userRes.data is User.AuthenticatedUser) {
+                val currentProduct = _state.value.product ?: return@launch
+                val currentlyWishlisted = _state.value.isWishlisted
+                
+                try {
+                    val newStatus = !currentlyWishlisted
+                    // Optimistic update via override - happens IMMEDIATELY
+                    favoriteOverride.value = newStatus
 
-                if (currentlyWishlisted) {
-                    removeProductFromFavoritesUseCase(currentProduct.id)
-                } else {
-                    addProductToFavoritesUseCase(currentProduct)
+                    if (currentlyWishlisted) {
+                        removeProductFromFavoritesUseCase(currentProduct.id)
+                    } else {
+                        addProductToFavoritesUseCase(currentProduct)
+                    }
+                    
+                    val message = if (newStatus) {
+                        UiText.StringResource(R.string.added_to_wishlist)
+                    } else {
+                        UiText.StringResource(R.string.removed_from_wishlist)
+                    }
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
+                    
+                    // Keep the override for a bit
+                    kotlinx.coroutines.delay(1000)
+                    favoriteOverride.value = null
+                } catch (e: Exception) {
+                    // Revert optimistic update
+                    favoriteOverride.value = null
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Error: ${e.message}")))
                 }
-                
-                val message = if (newStatus) "Added to Wishlist" else "Removed from Wishlist"
-                _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
-                
-                // Keep the override for a bit
-                kotlinx.coroutines.delay(1000)
-                favoriteOverride.value = null
-            } catch (e: Exception) {
-                // Revert optimistic update
-                favoriteOverride.value = null
-                _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Error: ${e.message}"))
+            } else {
+                _state.update { it.copy(showUnauthorizedDialog = true) }
             }
         }
     }
@@ -164,7 +172,7 @@ class ProductDetailsViewModel(
         val variantId = selectedVariantId()
         if (variantId == null) {
             viewModelScope.launch {
-                _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Please select options first"))
+                _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Please select options first")))
             }
             return
         }
@@ -175,7 +183,7 @@ class ProductDetailsViewModel(
             when (val result = addToCartUseCase(variantId = variantId, quantity = 1)) {
                 is Result.Success -> {
                     _state.update { it.copy(isAddingToCart = false) }
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast("Added to Cart!"))
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Added to Cart!")))
                 }
                 is Result.Failure -> {
                     _state.update { it.copy(isAddingToCart = false) }
@@ -184,7 +192,7 @@ class ProductDetailsViewModel(
                     } else {
                         _sideEffects.emit(
                             ProductDetailsSideEffect.ShowToast(
-                                result.exception.message ?: "Failed to add to cart"
+                                UiText.Plain(result.exception.message ?: "Failed to add to cart")
                             )
                         )
                     }

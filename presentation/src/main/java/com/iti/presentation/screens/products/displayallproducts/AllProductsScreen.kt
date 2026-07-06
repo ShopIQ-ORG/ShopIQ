@@ -41,6 +41,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import com.iti.presentation.components.UnauthorizedDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,6 +83,7 @@ fun AllProductsScreen(
     val state by viewModel.state.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val gridState = rememberLazyGridState()
+    var showAuthDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(brandName) {
         viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName))
@@ -100,7 +104,7 @@ fun AllProductsScreen(
                 }
 
                 AllProductsContract.Effect.ShowAuthRequired -> {
-                    onNavigateToAuth()
+                    showAuthDialog = true
                 }
             }
         }
@@ -289,5 +293,15 @@ fun AllProductsScreen(
                 onDismiss = { viewModel.sendIntent(AllProductsContract.Intent.CloseSortSheet) }
             )
         }
+    }
+
+    if (showAuthDialog) {
+        UnauthorizedDialog(
+            onDismiss = { showAuthDialog = false },
+            onLogin = {
+                showAuthDialog = false
+                onNavigateToAuth()
+            }
+        )
     }
 }

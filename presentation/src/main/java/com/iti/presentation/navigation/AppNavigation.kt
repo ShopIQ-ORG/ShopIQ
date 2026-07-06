@@ -228,6 +228,9 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
+                    },
+                    onNavigateToAuth = {
+                        replaceRoot(Screen.SignIn)
                     }
                 )
             }

@@ -122,10 +122,12 @@ fun HomeTabContent(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 items(discountProducts, key = { it.id }) { product ->
+                                    val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
+                                    val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
                                     ProductCard(
                                         product = product,
-                                        onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
-                                        onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                        onClick = onClick,
+                                        onFavoriteClick = onFavoriteClick,
                                         modifier = Modifier.width(160.dp)
                                     )
                                 }
@@ -145,6 +147,7 @@ fun HomeTabContent(
                                 products = suggestionsProducts,
                                 isLoading = state.isLoadingRecommendations,
                                 onProductClick = { onIntent(HomeContract.Intent.ProductClicked(it)) },
+                                onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(it)) },
                                 onNavigateToChat = { onIntent(HomeContract.Intent.NavigateToAiChat) }
                             )
                         }
@@ -192,10 +195,12 @@ fun HomeTabContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             items(data.products.take(6), key = { it.id }) { product ->
+                                val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
+                                val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
                                 ProductCard(
                                     product = product,
-                                    onClick = { onIntent(HomeContract.Intent.ProductClicked(product)) },
-                                    onFavoriteClick = { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) },
+                                    onClick = onClick,
+                                    onFavoriteClick = onFavoriteClick,
                                     modifier = Modifier.width(160.dp)
                                 )
                             }

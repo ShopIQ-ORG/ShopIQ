@@ -9,6 +9,7 @@ import com.iti.data.mappers.toDomainProduct
 import com.iti.data.mappers.toDomainCategories
 import com.iti.data.mappers.toFavoriteEntity
 import com.iti.data.sources.local.room.FavoriteDao
+import com.iti.domain.models.User
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
@@ -17,13 +18,21 @@ import com.iti.domain.models.Category
 import com.iti.domain.models.Result
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.products.ProductsRepository
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
+import com.iti.data.sources.local.room.FavoriteEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 
 class ProductsRepositoryImpl(
     private val remoteDataSource: ProductsRemoteDataSource,
     private val favoriteDao: FavoriteDao,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val firestore: FirebaseFirestore
 ) : ProductsRepository {
 
     override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
@@ -126,34 +135,129 @@ class ProductsRepositoryImpl(
     }
 
     override suspend fun addToFavorites(product: Product) {
-        val userId = getUserId()
-        favoriteDao.insertFavorite(product.toFavoriteEntity(userId))
+        val user = getCurrentUser()
+        if (user is User.AuthenticatedUser) {
+            val userId = user.uid
+            val cleanId = product.id.substringAfterLast("/")
+            // Write to local database cache immediately (instant UI update)
+            favoriteDao.insertFavorite(product.toFavoriteEntity(userId).copy(productId = cleanId))
+
+            // Sync to Firestore: list of product ID strings in favorites field under users/{userId} document
+            try {
+                firestore.collection("users").document(userId)
+                    .set(
+                        mapOf("favorites" to com.google.firebase.firestore.FieldValue.arrayUnion(cleanId)),
+                        com.google.firebase.firestore.SetOptions.merge()
+                    ).await()
+                android.util.Log.d("ProductsRepository", "Firestore addToFavorites OK: cleanId=$cleanId")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("ProductsRepository", "Firestore addToFavorites failed", e)
+            }
+        }
     }
 
     override suspend fun removeFromFavorites(productId: String) {
-        val userId = getUserId()
-        favoriteDao.deleteFavorite(productId, userId)
+        val user = getCurrentUser()
+        if (user is User.AuthenticatedUser) {
+            val userId = user.uid
+            val cleanId = productId.substringAfterLast("/")
+            // Delete from local database cache immediately
+            favoriteDao.deleteFavorite(cleanId, userId)
+
+            // Sync to Firestore: remove cleanId from favorites field array under users/{userId} document
+            try {
+                firestore.collection("users").document(userId)
+                    .set(
+                        mapOf("favorites" to com.google.firebase.firestore.FieldValue.arrayRemove(cleanId)),
+                        com.google.firebase.firestore.SetOptions.merge()
+                    ).await()
+                android.util.Log.d("ProductsRepository", "Firestore removeFromFavorites OK: cleanId=$cleanId")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("ProductsRepository", "Firestore removeFromFavorites failed", e)
+            }
+        }
     }
 
     override fun getFavorites(): Flow<Result<List<Product>>> = flow {
         emit(Result.Loading)
-        try {
-            val userId = getUserId()
+        val user = getCurrentUser()
+
+        if (user is User.AuthenticatedUser) {
+            val userId = user.uid
+
+            // 1) Emit Room data IMMEDIATELY so the UI is instant (no waiting for network)
+            val localList = favoriteDao.getAllFavorites(userId).first()
+            emit(Result.Success(localList.map { it.toDomainProduct() }))
+
+            // 2) Background Firestore sync (only for authenticated users)
+            try {
+                val docSnapshot = firestore.collection("users").document(userId).get().await()
+                val favoriteIds = (docSnapshot.get("favorites") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                
+                // Fetch actual product details from Shopify for each ID in parallel
+                val favorites = coroutineScope {
+                    favoriteIds.map { cleanId ->
+                        async {
+                            try {
+                                val longId = cleanId.toLongOrNull()
+                                if (longId != null) {
+                                    val response = remoteDataSource.getProductDetails(longId)
+                                    val product = response.toDomainProduct()
+                                    FavoriteEntity(
+                                        productId = cleanId,
+                                        userId = userId,
+                                        title = product.title,
+                                        price = "${product.minPrice.amount} ${product.minPrice.currencyCode}",
+                                        imageUrl = product.images.firstOrNull()?.url.orEmpty()
+                                    )
+                                } else {
+                                    null
+                                }
+                            } catch (e: Exception) {
+                                android.util.Log.e("ProductsRepository", "Failed to fetch product details from Shopify for ID: $cleanId", e)
+                                null
+                            }
+                        }
+                    }.awaitAll().filterNotNull()
+                }
+
+                // Refresh local Room cache from Firestore
+                favoriteDao.deleteFavoritesForUser(userId)
+                favorites.forEach { favoriteDao.insertFavorite(it) }
+                android.util.Log.d("ProductsRepository", "Firestore getFavorites synced ${favorites.size} items from favorites list for users/$userId")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("ProductsRepository", "Firestore getFavorites failed", e)
+            }
+
+            // 3) Keep streaming Room updates reactively after Firestore sync
             favoriteDao.getAllFavorites(userId).collect { list ->
                 emit(Result.Success(list.map { it.toDomainProduct() }))
             }
-        } catch (e: Exception) {
-            emit(Result.Failure(e))
+        } else {
+            // For guests, emit empty list since favorites are disabled
+            emit(Result.Success(emptyList()))
         }
     }
 
     override suspend fun isFavorite(productId: String): Boolean {
-        val userId = getUserId()
-        return favoriteDao.isFavorite(productId, userId)
+        val user = getCurrentUser()
+        return if (user is User.AuthenticatedUser) {
+            val cleanId = productId.substringAfterLast("/")
+            favoriteDao.isFavorite(cleanId, user.uid)
+        } else {
+            false
+        }
     }
 
-    private fun getUserId(): String {
-        return authRepository.getUserId() ?: "guest"
+    private suspend fun getCurrentUser(): User {
+        val userRes = authRepository.getCurrentUser()
+        return if (userRes is Result.Success) userRes.data else User.GuestUser
     }
 
     override fun searchProducts(query: String): Flow<Result<List<Product>>> = flow {

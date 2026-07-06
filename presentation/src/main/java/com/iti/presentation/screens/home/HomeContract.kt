@@ -26,7 +26,8 @@ object HomeContract {
         val currentUser: User? = null,
         val aiRecommendedProducts: List<Product> = emptyList(),
         val hasChatHistory: Boolean = false,
-        val isLoadingRecommendations: Boolean = false
+        val isLoadingRecommendations: Boolean = false,
+        val isFavoriteLoading: Boolean = false
     )
     data class MainDataHolder(
         val productsResult: Result<List<Product>>,
@@ -60,5 +61,6 @@ object HomeContract {
         data object NavigateToSearch : Effect()
         data object NavigateToSignIn : Effect()
         data object NavigateToAiChat : Effect()
+        data class ShowToast(val message: UiText) : Effect()
     }
 }

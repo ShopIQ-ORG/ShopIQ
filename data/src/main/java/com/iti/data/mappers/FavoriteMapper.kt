@@ -16,8 +16,9 @@ fun Product.toFavoriteEntity(userId: String): FavoriteEntity {
 }
 
 fun FavoriteEntity.toDomainProduct(): Product {
+    val fullId = if (this.productId.startsWith("gid://")) this.productId else "gid://shopify/Product/${this.productId}"
     return Product(
-        id = this.productId,
+        id = fullId,
         title = this.title,
         description = "",
         handle = "",

@@ -1,6 +1,7 @@
 package com.iti.presentation.screens.products.productdetails
 
 import com.iti.domain.models.Product
+import com.iti.presentation.util.UiText
 
 data class ProductDetailsUiState(
     val isLoading: Boolean = false,
@@ -24,7 +25,8 @@ sealed interface ProductDetailsIntent {
     object DismissUnauthorizedDialog : ProductDetailsIntent
 }
 
+
 sealed interface ProductDetailsSideEffect {
-    data class ShowToast(val message: String) : ProductDetailsSideEffect
+    data class ShowToast(val message: UiText) : ProductDetailsSideEffect
     object NavigateToAuth : ProductDetailsSideEffect
 }
