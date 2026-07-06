@@ -164,19 +164,24 @@ fun PaymobBottomSheet(
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(bottom = 16.dp)
-                .height(64.dp),
+                .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (isFormValid) PrimaryLight else SearchFieldLight,
+                containerColor = if (isFormValid) Color(0xFF1C222B) else SearchFieldLight,
                 contentColor = if (isFormValid) Color.White else Color.Gray
             ),
-            enabled = isFormValid
+            enabled = isFormValid,
+            elevation = null
         ) {
-            Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(12.dp))
+            Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(10.dp))
             Text(
                 text = "Pay Securely ($amount)",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    letterSpacing = 0.5.sp
+                )
             )
         }
 

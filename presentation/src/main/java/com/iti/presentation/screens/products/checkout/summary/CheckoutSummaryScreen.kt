@@ -80,21 +80,21 @@ fun CheckoutSummaryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding(),
-                shadowElevation = 8.dp,
                 color = MaterialTheme.colorScheme.background
             ) {
                 Button(
                     onClick = { viewModel.onEvent(CheckoutSummaryContract.Event.PlaceOrderClicked) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 20.dp)
-                        .height(64.dp),
+                        .padding(horizontal = 24.dp, vertical = 20.dp)
+                        .height(50.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryLight,
+                        containerColor = Color(0xFF1C222B),
                         contentColor = Color.White
                     ),
-                    enabled = !state.isPlacingOrder && !state.paymentProcessing
+                    enabled = !state.isPlacingOrder && !state.paymentProcessing,
+                    elevation = null
                 ) {
                     if (state.isPlacingOrder || state.paymentProcessing) {
                         CircularProgressIndicator(
@@ -105,7 +105,11 @@ fun CheckoutSummaryScreen(
                     } else {
                         Text(
                             text = if (state.paymentMethod == PaymentMethodType.COD) "Place Order" else "Pay Securely",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 14.sp,
+                                letterSpacing = 0.5.sp
+                            )
                         )
                     }
                 }
