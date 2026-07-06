@@ -127,6 +127,7 @@ fun EditProfileContent(
     val context = LocalContext.current
 
     val authUser = state.user as? User.AuthenticatedUser
+    android.util.Log.d("EditProfile", "Initial authUser: $authUser")
 
     var fullName by remember { mutableStateOf(authUser?.fullName ?: "") }
     var email by remember { mutableStateOf(authUser?.email ?: "") }
@@ -140,8 +141,10 @@ fun EditProfileContent(
     var phoneError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(state.user) {
+        android.util.Log.d("EditProfile", "state.user changed to: ${state.user}")
         val u = state.user as? User.AuthenticatedUser
         u?.let {
+            android.util.Log.d("EditProfile", "Updating fields with user data: name=${it.fullName}, avatar=${it.avatarUrl}")
             fullName = it.fullName
             email = it.email
             phone = it.phone
