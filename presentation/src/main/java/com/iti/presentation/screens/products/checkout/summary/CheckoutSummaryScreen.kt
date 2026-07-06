@@ -274,7 +274,7 @@ fun CODInfoSection() {
             Column {
                 Text(
                     text = "COD Policy",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     color = TextPrimaryLight
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -286,9 +286,9 @@ fun CODInfoSection() {
                         }
                         append(" using Cash on Delivery.")
                     },
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = TextSecondaryLight,
-                    lineHeight = 22.sp
+                    lineHeight = 20.sp
                 )
             }
         }
@@ -297,7 +297,7 @@ fun CODInfoSection() {
 
 @Composable
 fun CODSummarySection(cart: Cart) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SummaryRow(label = "Order Total", value = "$${cart.total.amount}")
         SummaryRow(label = "COD Fee", value = "$0.00")
         
@@ -308,12 +308,12 @@ fun CODSummarySection(cart: Cart) {
         ) {
             Text(
                 text = "Payable on Delivery",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                 color = TextPrimaryLight
             )
             Text(
                 text = "$${cart.total.amount}",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = TextPrimaryLight
             )
         }
@@ -329,12 +329,12 @@ private fun SummaryRow(label: String, value: String) {
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = TextSecondaryLight
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
             color = TextPrimaryLight
         )
     }
@@ -372,7 +372,7 @@ fun AddressSummarySection(address: Address?) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "Delivery Address",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
         )
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -395,11 +395,11 @@ fun AddressSummarySection(address: Address?) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = address?.name ?: "No address selected",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                     )
                     Text(
                         text = address?.city ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -416,7 +416,7 @@ fun ShippingMethodSection() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "Shipping Method",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
         )
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -434,12 +434,12 @@ fun ShippingMethodSection() {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Standard Delivery (3-5 days)",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                     )
                 }
                 Text(
                     text = "Free",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
             }
