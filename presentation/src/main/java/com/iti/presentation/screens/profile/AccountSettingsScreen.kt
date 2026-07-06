@@ -307,17 +307,7 @@ fun AccountSettingsContent(
                             if (isGuest) showAuthDialog = true else onNavigateToAddressManagement()
                         }
                     )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
-                    SettingsRowItem(
-                        icon = Icons.Default.ShoppingCart,
-                        title = stringResource(R.string.profile_payment_methods),
-                        subtitle = stringResource(R.string.profile_payment_methods_desc),
-                        onClick = {
-                            if (isGuest) showAuthDialog = true else {
-                                onIntent(ProfileContract.Intent.ConfirmAddress("", "", "", "", "", false, 0.0, 0.0, "", ""))
-                            }
-                        }
-                    )
+
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.ShoppingCart,

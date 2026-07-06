@@ -71,7 +71,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.iti.domain.models.User
 import com.iti.presentation.R
+import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.components.BackTopBar
+import com.iti.presentation.components.ShopIQButton
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -184,7 +186,20 @@ fun EditProfileContent(
         contract = androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            avatarUrl = uri.toString()
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                if (inputStream != null) {
+                    val file = java.io.File(context.filesDir, "avatar_${System.currentTimeMillis()}.jpg")
+                    val outputStream = java.io.FileOutputStream(file)
+                    inputStream.copyTo(outputStream)
+                    inputStream.close()
+                    outputStream.close()
+                    avatarUrl = android.net.Uri.fromFile(file).toString()
+                }
+            } catch (e: Exception) {
+                // Ignore if saving fails, fallback to uri
+                avatarUrl = uri.toString()
+            }
         }
     }
 
@@ -224,12 +239,15 @@ fun EditProfileContent(
                     .size(120.dp)
             ) {
                 if (avatarUrl.isNotBlank()) {
+                    val isDark = LocalDarkTheme.current
+                    val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
+
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(avatarUrl)
                             .crossfade(true)
-                            .error(R.drawable.logo_light)
-                            .fallback(R.drawable.logo_light)
+                            .error(fallback)
+                            .fallback(fallback)
                             .build(),
                         contentDescription = stringResource(R.string.profile_edit_profile),
                         contentScale = ContentScale.Crop,
@@ -295,21 +313,15 @@ fun EditProfileContent(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Input: Email
+            // Input: Email
             ProfileInputField(
                 label = stringResource(R.string.email_address),
                 value = email,
-                onValueChange = {
-                    email = it
-                    emailError = if (it.isBlank()) {
-                        context.getString(R.string.error_email_required)
-                    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()) {
-                        context.getString(R.string.error_invalid_email)
-                    } else {
-                        null
-                    }
-                },
+                onValueChange = {}, // Disabled
                 placeholder = stringResource(R.string.email_address),
-                errorMessage = emailError,
+                errorMessage = null,
+                readOnly = true,
+                enabled = false,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
@@ -400,12 +412,17 @@ fun EditProfileContent(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Black solid Button matching Screenshot 2
-            Button(
+            // Save Changes Button
+            val isModified = fullName != (state.user as? User.AuthenticatedUser)?.fullName ||
+                    phone != state.user.phone ||
+                    dateOfBirth != state.user.dateOfBirth ||
+                    gender != state.user.gender ||
+                    avatarUrl != (state.user.avatarUrl ?: "")
+
+            ShopIQButton(
+                text = stringResource(R.string.save_changes),
                 onClick = {
-                    fullNameError = if (fullName.isBlank()) context.getString(R.string.error_full_name_required) else null
-                    emailError = if (email.isBlank()) context.getString(R.string.error_email_required) else null
-                    if (isFormValid) {
+                    if (isFormValid && isModified) {
                         onIntent(
                             ProfileContract.Intent.UpdateProfile(
                                 fullName = fullName,
@@ -418,32 +435,12 @@ fun EditProfileContent(
                         )
                     }
                 },
-                enabled = isFormValid && !state.isUpdatingProfile,
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1E1E24),
-                    contentColor = Color.White,
-                    disabledContainerColor = Color(0xFF1E1E24).copy(alpha = 0.5f),
-                    disabledContentColor = Color.White.copy(alpha = 0.5f)
-                ),
+                enabled = isFormValid && isModified,
+                isLoading = state.isUpdatingProfile,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-            ) {
-                if (state.isUpdatingProfile) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = stringResource(R.string.save_changes),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+            )
         }
     }
 }
@@ -485,8 +482,8 @@ fun ProfileInputField(
             isError = errorMessage != null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
-                disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f),
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                 disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),

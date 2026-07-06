@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -68,26 +69,26 @@ fun ConfirmationDialog(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.End
                 ) {
 
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
                         onClick = onDismiss,
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(dismissText)
                     }
 
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Button(
-                        modifier = Modifier.weight(1f),
                         onClick = onConfirm,
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error
                         )
                     ) {
-                        Text(confirmText)
+                        Text(confirmText, maxLines = 1)
                     }
                 }
             }

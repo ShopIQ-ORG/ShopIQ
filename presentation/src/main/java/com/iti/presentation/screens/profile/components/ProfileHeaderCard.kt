@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.iti.presentation.R
+import com.iti.presentation.ui.theme.LocalDarkTheme
 
 @Composable
 fun ProfileHeaderCard(
@@ -81,12 +82,15 @@ fun ProfileHeaderCard(
             ) {
                 // Circular Avatar
                 if (isAvatarAvailable) {
+                    val isDark = LocalDarkTheme.current
+                    val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
+
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(avatarUrl)
                             .crossfade(true)
-                            .error(R.drawable.logo_light)
-                            .fallback(R.drawable.logo_light)
+                            .error(fallback)
+                            .fallback(fallback)
                             .build(),
                         contentDescription = "Profile Picture",
                         contentScale = ContentScale.Crop,
