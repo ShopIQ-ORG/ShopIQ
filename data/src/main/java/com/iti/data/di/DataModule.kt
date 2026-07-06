@@ -55,6 +55,10 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
+import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
+import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSourceImpl
+import com.iti.data.repositories.CheckoutRepositoryImpl
+import com.iti.domain.repositories.checkout.CheckoutRepository
 
 val dataModule = module {
     single { Gson() }
@@ -134,4 +138,6 @@ val dataModule = module {
 
     single<LocationTracker> { LocationTrackerImpl(get()) }
     single<AddressRepository> { AddressRepositoryImpl(get()) }
+    single<CheckoutRemoteDataSource> { CheckoutRemoteDataSourceImpl(get()) }
+    single<CheckoutRepository> { CheckoutRepositoryImpl(get()) }
 }

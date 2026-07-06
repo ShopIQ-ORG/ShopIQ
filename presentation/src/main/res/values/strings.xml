@@ -440,4 +440,20 @@
     <string name="email_not_verified_yet">Not verified yet. Open the link we sent, then try again.</string>
     <string name="error_shopify_token_unavailable">We couldn\'t restore your store session. Please try signing in again.</string>
     <string name="too_many_request">Too many attempts. Please wait a few minutes before trying again.</string>
+    
+    <!-- Checkout Flow -->
+    <string name="checkout_title">Checkout</string>
+    <string name="checkout_step_address">Address</string>
+    <string name="checkout_step_payment">Payment</string>
+    <string name="checkout_step_summary">Summary</string>
+    <string name="checkout_step_success">Success</string>
+    <string name="checkout_payment_title">Payment Information</string>
+    <string name="checkout_payment_method_label">Online Payment</string>
+    <string name="checkout_payment_mock_desc">Your payment method is set to Online Payment (Paymob). In this demo version, payment validation is automatically completed for you.</string>
+    <string name="checkout_btn_confirm_payment">Confirm &amp; Proceed</string>
+    <string name="checkout_btn_place_order">Place Order</string>
+    <string name="checkout_success_title">Thank You!</string>
+    <string name="checkout_success_subtitle">Your order has been successfully placed.</string>
+    <string name="checkout_success_details">Shopify Order ID: %1$s</string>
+    <string name="checkout_btn_go_home">Back to Home</string>
 </resources>
