@@ -143,10 +143,10 @@ fun AccountSettingsContent(
 
     if (showLogoutDialog) {
         ConfirmationDialog(
-            title = "Logout",
-            message = "Are you sure you want to sign out of your account?",
-            confirmText = "Logout",
-            dismissText = "Cancel",
+            title = stringResource(R.string.profile_sign_out_title),
+            message = stringResource(R.string.profile_sign_out_msg),
+            confirmText = stringResource(R.string.profile_sign_out_title),
+            dismissText = stringResource(R.string.profile_cancel),
             onConfirm = {
                 showLogoutDialog = false
                 onIntent(ProfileContract.Intent.ClearError)
@@ -219,12 +219,12 @@ fun AccountSettingsContent(
     val isGuest = state.user is User.GuestUser || state.user == null
     val displayName = when (val u = state.user) {
         is User.AuthenticatedUser -> u.fullName
-        User.GuestUser -> "Guest"
+        User.GuestUser -> stringResource(R.string.profile_guest)
         null -> "Loading..."
     }
     val displayEmail = when (val u = state.user) {
         is User.AuthenticatedUser -> u.email
-        else -> "Sign in to access your profile"
+        else -> stringResource(R.string.profile_sign_in_prompt)
     }
     val avatarUrl = when (val u = state.user) {
         is User.AuthenticatedUser -> u.avatarUrl
@@ -239,7 +239,7 @@ fun AccountSettingsContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Account Settings",
+                        text = stringResource(R.string.profile_settings_title),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = (-0.5).sp
@@ -275,7 +275,7 @@ fun AccountSettingsContent(
 
             // Section: Account Settings
             Text(
-                text = "Account Settings",
+                text = stringResource(R.string.profile_settings_title),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -291,8 +291,8 @@ fun AccountSettingsContent(
                 Column {
                     SettingsRowItem(
                         icon = Icons.Default.Person,
-                        title = "Edit Profile",
-                        subtitle = "Name, email, phone & more",
+                        title = stringResource(R.string.profile_edit_profile),
+                        subtitle = stringResource(R.string.profile_edit_profile_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToEditProfile()
                         }
@@ -300,8 +300,8 @@ fun AccountSettingsContent(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.LocationOn,
-                        title = "Manage Addresses",
-                        subtitle = "Add, edit or remove addresses",
+                        title = stringResource(R.string.profile_manage_addresses),
+                        subtitle = stringResource(R.string.profile_manage_addresses_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToAddressManagement()
                         }
@@ -309,8 +309,8 @@ fun AccountSettingsContent(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.ShoppingCart,
-                        title = "Payment Methods",
-                        subtitle = "Saved cards & wallets",
+                        title = stringResource(R.string.profile_payment_methods),
+                        subtitle = stringResource(R.string.profile_payment_methods_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else {
                                 onIntent(ProfileContract.Intent.ConfirmAddress("", "", "", "", "", false, 0.0, 0.0, "", ""))
@@ -320,8 +320,8 @@ fun AccountSettingsContent(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.ShoppingCart,
-                        title = "Order History",
-                        subtitle = "View your past orders",
+                        title = stringResource(R.string.profile_order_history),
+                        subtitle = stringResource(R.string.profile_order_history_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToOrders()
                         }
@@ -329,8 +329,8 @@ fun AccountSettingsContent(
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.Settings,
-                        title = "Localization & Currency",
-                        subtitle = "Language, currency & more",
+                        title = stringResource(R.string.profile_localization_currency),
+                        subtitle = stringResource(R.string.profile_localization_currency_desc),
                         onClick = onNavigateToLocalizationCurrency
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
@@ -347,7 +347,7 @@ fun AccountSettingsContent(
 
             // Section: Preferences & Flagship additions
             Text(
-                text = "Preferences",
+                text = stringResource(R.string.profile_preferences),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -363,8 +363,8 @@ fun AccountSettingsContent(
                 Column {
                     SettingsSwitchItem(
                         icon = Icons.Default.Settings,
-                        title = "Dark Theme",
-                        subtitle = "Change app theme preferences",
+                        title = stringResource(R.string.profile_dark_theme),
+                        subtitle = stringResource(R.string.profile_dark_theme_desc),
                         checked = isDarkTheme,
                         onCheckedChange = { ThemeManager.toggleTheme() }
                     )
@@ -397,14 +397,14 @@ fun AccountSettingsContent(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Sign In",
+                                text = stringResource(R.string.profile_sign_in_title),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             )
                             Text(
-                                text = "Sign in to access addresses, payments and orders",
+                                text = stringResource(R.string.profile_sign_in_desc),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                                 )
@@ -418,26 +418,26 @@ fun AccountSettingsContent(
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Sign Out",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-            }
+                      ),
+                      shape = RoundedCornerShape(20.dp),
+                      modifier = Modifier
+                          .fillMaxWidth()
+                          .height(56.dp)
+                  ) {
+                      Icon(
+                          imageVector = Icons.Default.Lock,
+                          contentDescription = null,
+                          modifier = Modifier.size(20.dp)
+                      )
+                      Spacer(modifier = Modifier.width(12.dp))
+                      Text(
+                          text = stringResource(R.string.profile_sign_out_title),
+                          style = MaterialTheme.typography.titleMedium.copy(
+                              fontWeight = FontWeight.Bold
+                          )
+                      )
+                  }
+              }
 
             Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
         }

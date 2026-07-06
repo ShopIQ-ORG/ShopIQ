@@ -7,16 +7,36 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import com.iti.domain.repositories.currency.CurrencyRepository
 import com.iti.presentation.navigation.AppNavigation
 import com.iti.presentation.ui.theme.ShopIQTheme
+import com.iti.presentation.util.CurrencyManager
 import com.iti.presentation.util.ThemeManager
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class MainActivity : androidx.appcompat.app.AppCompatActivity() {
+    private val currencyRepository: CurrencyRepository by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.initialize(applicationContext)
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Sync local CurrencyManager with stored DB currency state
+        lifecycleScope.launch {
+            currencyRepository.getSelectedCurrency().collect { currency ->
+                CurrencyManager.updateSelectedCurrency(currency)
+            }
+        }
+        lifecycleScope.launch {
+            currencyRepository.getPopularCurrencies().collect { currencies ->
+                CurrencyManager.updateSupportedCurrencies(currencies)
+            }
+        }
+
         setContent {
             val isDarkTheme by ThemeManager.isDarkTheme.collectAsState()
             ShopIQTheme(darkTheme = isDarkTheme) {

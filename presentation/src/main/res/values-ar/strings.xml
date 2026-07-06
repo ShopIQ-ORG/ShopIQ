@@ -1,5 +1,76 @@
 <resources>
     <string name="app_name">شوب آي كيو</string>
+    <string name="need_help">هل تحتاج إلى مساعدة؟</string>
+    <string name="shopiq_logo">شعار شوب آي كيو</string>
+    <string name="welcome_back">مرحبًا بعودتك!</string>
+    <string name="login_subtitle">قم بتسجيل الدخول لمواصلة التسوق واكتشاف العروض الرائعة.</string>
+    <string name="email_or_phone_number">البريد الإلكتروني أو رقم الهاتف</string>
+    <string name="email_address">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="confirm_password">تأكيد كلمة المرور</string>
+    <string name="toggle_password_visibility">إظهار/إخفاء كلمة المرور</string>
+    <string name="forgot_password">هل نسيت كلمة المرور؟</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="signup_subtitle">انضم إلى شوب آي كيو واستمتع بتجربة تسوق أذكى.</string>
+    <string name="full_name">الاسم الكامل</string>
+    <string name="phone_number_optional">رقم الهاتف (اختياري)</string>
+    <string name="i_agree_to_the">أنا أوافق على </string>
+    <string name="terms_of_service">شروط الخدمة</string>
+    <string name="and"> و </string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="or_continue_with">أو الاستمرار بواسطة</string>
+    <string name="dont_have_account">ليس لديك حساب؟ </string>
+    <string name="already_have_account">لديك حساب بالفعل؟ </string>
+    <string name="continue_as_guest">الدخول كزائر</string>
+    <string name="error_invalid_credentials">البريد الإلكتروني أو كلمة المرور غير صحيحة</string>
+    <string name="error_user_not_found">الحساب غير موجود</string>
+    <string name="error_email_already_in_use">البريد الإلكتروني مسجل بالفعل</string>
+    <string name="error_weak_password">كلمة المرور ضعيفة جداً</string>
+    <string name="error_network">تحقق من اتصالك بالإنترنت</string>
+    <string name="error_unknown">حدث خطأ ما</string>
+    <string name="error_passwords_do_not_match">كلمات المرور غير متطابقة</string>
+    <string name="error_agree_to_terms">يرجى الموافقة على الشروط والأحكام</string>
+    <string name="error_full_name_required">الاسم الكامل مطلوب</string>
+    <string name="error_email_required">البريد الإلكتروني مطلوب</string>
+    <string name="error_phone_required">رقم الهاتف مطلوب</string>
+    <string name="error_password_required">كلمة المرور مطلوبة</string>
+    <string name="error_confirm_password_required">يرجى تأكيد كلمة المرور</string>
+    <string name="error_invalid_email">يرجى إدخال بريد إلكتروني صحيح</string>
+    <string name="error_invalid_phone_egypt">يرجى إدخال رقم هاتف مصري صحيح</string>
+    <string name="error_invalid_password">يجب أن تتكون كلمة المرور من 6 أحرف على الأقل</string>
+    <string name="error_invalid_full_name">يرجى إدخال اسم صحيح</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="error_google_client_id_missing">معرف عميل Google غير مهيأ</string>
+    <string name="error_google_sign_in_failed">فشل تسجيل الدخول بـ Google</string>
+    <string name="error_facebook_activity_missing">لم يتم العثور على واجهة صالحة لتسجيل دخول Facebook.</string>
+    <string name="error_facebook_sign_in_failed">فشل تسجيل الدخول بـ Facebook</string>
+    <string name="home_title">الرئيسية</string>
+    <string name="top_brands">أشهر الماركات</string>
+    <string name="featured_products">المنتجات المميزة</string>
+    <string name="view_all">عرض الكل ></string>
+    <string name="shop_now">تسوق الآن</string>
+    <string name="brands_title">جميع الماركات</string>
+    <string name="brands_search_placeholder">ابحث عن الماركات…</string>
+    <string name="category_search_placeholder">ابحث عن الفئات...</string>
+    <string name="search_placeholder">ابحث عن المنتجات، الماركات…</string>
+    <string name="search_products_hint">ابحث عن المنتجات…</string>
+    <string name="search_recent_label">عمليات البحث الأخيرة</string>
+    <string name="search_popular_label">عمليات البحث الشائعة</string>
+    <string name="search_clear_all">مسح الكل</string>
+    <string name="search_empty_hint">ابحث عن المنتجات، الماركات أو الفئات</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_get_started">ابدأ الآن</string>
+    <string name="onboarding_title_1">تسوق بذكاء\nكل يوم</string>
+    <string name="onboarding_desc_1">اكتشف منتجات عالية الجودة من ماركات موثوقة، كل ذلك في مكان واحد.</string>
+    <string name="onboarding_title_2">استكشف الفئات\nالتي تحبها</string>
+    <string name="onboarding_desc_2">تصفح الفئات والماركات والمجموعات التي تناسب ذوقك وأسلوبك.</string>
+    <string name="onboarding_title_3">احفظ وسوق وسجل\nخروجك بكل سهولة</string>
+    <string name="onboarding_desc_3">احفظ مفضلاتك، وإدارة عربة تسوقك، وادفع بأمان تام بلمسات بسيطة.</string>
+
     <string name="content_desc_back">رجوع</string>
     <string name="content_desc_wishlist">قائمة الرغبات</string>
     <string name="content_desc_cart">عربة التسوق</string>
@@ -269,4 +340,61 @@
     <string name="language_title">اللغة</string>
     <string name="language_subtitle">اختر اللغة العربية أو الإنجليزية</string>
     <string name="select_language">اختر اللغة</string>
+
+    <!-- تسميات الشريط السفلي -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_categories">الأقسام</string>
+    <string name="nav_ai">الذكاء الاصطناعي</string>
+    <string name="nav_profile">حسابي</string>
+
+    <!-- شاشة إعدادات الحساب -->
+    <string name="profile_settings_title">إعدادات الحساب</string>
+    <string name="profile_edit_profile">تعديل الملف الشخصي</string>
+    <string name="profile_edit_profile_desc">الاسم، البريد الإلكتروني، الهاتف وأكثر</string>
+    <string name="profile_manage_addresses">إدارة العناوين</string>
+    <string name="profile_manage_addresses_desc">إضافة، تعديل أو حذف العناوين</string>
+    <string name="profile_payment_methods">طرق الدفع</string>
+    <string name="profile_payment_methods_desc">البطاقات والمحافظ المحفوظة</string>
+    <string name="profile_order_history">سجل الطلبات</string>
+    <string name="profile_order_history_desc">عرض طلباتك السابقة</string>
+    <string name="profile_localization_currency">الإعدادات الإقليمية والعملة</string>
+    <string name="profile_localization_currency_desc">اللغة، العملة والمزيد</string>
+    <string name="profile_preferences">التفضيلات</string>
+    <string name="profile_dark_theme">المظهر الداكن</string>
+    <string name="profile_dark_theme_desc">تغيير تفضيلات مظهر التطبيق</string>
+    <string name="profile_sign_in_desc">سجل الدخول للوصول إلى العناوين، المدفوعات والطلبات</string>
+    <string name="profile_sign_in_title">تسجيل الدخول</string>
+    <string name="profile_sign_out_title">تسجيل الخروج</string>
+    <string name="profile_sign_out_msg">هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟</string>
+    <string name="profile_cancel">إلغاء</string>
+    <string name="profile_guest">زائر</string>
+    <string name="profile_sign_in_prompt">سجل الدخول للوصول إلى ملفك الشخصي</string>
+
+    <!-- شاشة الترحيب -->
+    <string name="splash_tagline_1">تسوق ذكي.</string>
+    <string name="splash_tagline_2">خيارات أفضل.</string>
+
+    <!-- شاشة تعديل الحساب -->
+    <string name="error_invalid_phone_length">طول رقم الهاتف غير صالح</string>
+    <string name="date_of_birth">تاريخ الميلاد</string>
+    <string name="select_date_of_birth">اختر تاريخ الميلاد</string>
+    <string name="gender">الجنس</string>
+    <string name="gender_male">ذكر</string>
+    <string name="gender_female">أنثى</string>
+    <string name="gender_other">آخر</string>
+    <string name="select_gender">اختر الجنس</string>
+    <string name="save_changes">حفظ التغييرات</string>
+
+    <!-- العناوين وتوصيل الطلبات -->
+    <string name="address_delivery_addresses">عناوين التوصيل</string>
+    <string name="address_delete_confirm_msg">هل أنت متأكد من رغبتك في حذف عنوان التوصيل هذا نهائياً؟</string>
+    <string name="address_set_as_default_delivery">تعيين كعنوان توصيل افتراضي</string>
+
+    <!-- شاشة الإعدادات الإقليمية والعملة -->
+    <string name="currency_current">العملة الحالية</string>
+    <string name="currency_popular">العملات الشائعة</string>
+    <string name="currency_rates_live">الأسعار حية ومحدثة</string>
+    <string name="currency_powered_by">مدعوم بواسطة Exchange Rate API</string>
+    <string name="currency_trend_title">حركة سعر الصرف (آخر 7 أيام)</string>
+    <string name="filter_select_all">تحديد الكل</string>
 </resources>

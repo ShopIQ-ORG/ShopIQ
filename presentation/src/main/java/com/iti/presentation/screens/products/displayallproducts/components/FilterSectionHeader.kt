@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
+
 @Composable
 fun FilterSectionHeader(
     title: String,
@@ -31,7 +34,7 @@ fun FilterSectionHeader(
         )
         if (onSelectAllClick != null) {
             Text(
-                text = "Select all",
+                text = stringResource(R.string.filter_select_all),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,

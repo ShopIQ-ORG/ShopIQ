@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -189,7 +190,7 @@ fun EditProfileContent(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             BackTopBar(
-                title = "Edit Profile",
+                title = stringResource(R.string.profile_edit_profile),
                 onBack = onNavigateBack
             )
         }
@@ -216,7 +217,7 @@ fun EditProfileContent(
                             .error(R.drawable.logo_light)
                             .fallback(R.drawable.logo_light)
                             .build(),
-                        contentDescription = "Profile Picture",
+                        contentDescription = stringResource(R.string.profile_edit_profile),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
@@ -254,7 +255,7 @@ fun EditProfileContent(
                 ) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_menu_camera),
-                        contentDescription = "Change Picture",
+                        contentDescription = stringResource(R.string.profile_edit_profile),
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
                     )
@@ -263,13 +264,13 @@ fun EditProfileContent(
 
             // Input: Full Name
             ProfileInputField(
-                label = "Full Name",
+                label = stringResource(R.string.full_name),
                 value = fullName,
                 onValueChange = {
                     fullName = it
-                    fullNameError = if (it.isBlank()) "Full Name is required" else null
+                    fullNameError = if (it.isBlank()) context.getString(R.string.error_full_name_required) else null
                 },
-                placeholder = "Full Name",
+                placeholder = stringResource(R.string.full_name),
                 errorMessage = fullNameError
             )
 
@@ -277,19 +278,19 @@ fun EditProfileContent(
 
             // Input: Email
             ProfileInputField(
-                label = "Email",
+                label = stringResource(R.string.email_address),
                 value = email,
                 onValueChange = {
                     email = it
                     emailError = if (it.isBlank()) {
-                        "Email is required"
+                        context.getString(R.string.error_email_required)
                     } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()) {
-                        "Invalid email format"
+                        context.getString(R.string.error_invalid_email)
                     } else {
                         null
                     }
                 },
-                placeholder = "Email Address",
+                placeholder = stringResource(R.string.email_address),
                 errorMessage = emailError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
@@ -298,17 +299,17 @@ fun EditProfileContent(
 
             // Input: Phone Number
             ProfileInputField(
-                label = "Phone Number",
+                label = stringResource(R.string.phone_number),
                 value = phone,
                 onValueChange = {
                     phone = it
                     phoneError = if (it.isNotBlank() && it.length < 7) {
-                        "Invalid phone number length"
+                        context.getString(R.string.error_invalid_phone_length)
                     } else {
                         null
                     }
                 },
-                placeholder = "Phone Number",
+                placeholder = stringResource(R.string.phone_number),
                 errorMessage = phoneError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
             )
@@ -322,16 +323,16 @@ fun EditProfileContent(
                     .clickable { datePickerDialog.show() }
             ) {
                 ProfileInputField(
-                    label = "Date of Birth",
+                    label = stringResource(R.string.date_of_birth),
                     value = dateOfBirth,
                     onValueChange = {},
-                    placeholder = "Select Date of Birth",
+                    placeholder = stringResource(R.string.select_date_of_birth),
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Select Date",
+                            contentDescription = stringResource(R.string.select_date_of_birth),
                             modifier = Modifier.clickable { datePickerDialog.show() }
                         )
                     }
@@ -342,17 +343,22 @@ fun EditProfileContent(
 
             // Input: Gender
             Box(modifier = Modifier.fillMaxWidth()) {
+                val genderLabelMap = mapOf(
+                    "Male" to stringResource(R.string.gender_male),
+                    "Female" to stringResource(R.string.gender_female),
+                    "Other" to stringResource(R.string.gender_other)
+                )
                 ProfileInputField(
-                    label = "Gender",
-                    value = gender,
+                    label = stringResource(R.string.gender),
+                    value = genderLabelMap[gender] ?: gender,
                     onValueChange = {},
-                    placeholder = "Select Gender",
+                    placeholder = stringResource(R.string.select_gender),
                     readOnly = true,
                     enabled = false,
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Toggle Dropdown",
+                            contentDescription = stringResource(R.string.select_gender),
                             modifier = Modifier.clickable { genderExpanded = true }
                         )
                     },
@@ -364,7 +370,7 @@ fun EditProfileContent(
                 ) {
                     listOf("Male", "Female", "Other").forEach { option ->
                         DropdownMenuItem(
-                            text = { Text(option) },
+                            text = { Text(genderLabelMap[option] ?: option) },
                             onClick = {
                                 gender = option
                                 genderExpanded = false
@@ -379,8 +385,8 @@ fun EditProfileContent(
             // Black solid Button matching Screenshot 2
             Button(
                 onClick = {
-                    fullNameError = if (fullName.isBlank()) "Full Name is required" else null
-                    emailError = if (email.isBlank()) "Email is required" else null
+                    fullNameError = if (fullName.isBlank()) context.getString(R.string.error_full_name_required) else null
+                    emailError = if (email.isBlank()) context.getString(R.string.error_email_required) else null
                     if (isFormValid) {
                         onIntent(
                             ProfileContract.Intent.UpdateProfile(
@@ -414,7 +420,7 @@ fun EditProfileContent(
                     )
                 } else {
                     Text(
-                        text = "Save Changes",
+                        text = stringResource(R.string.save_changes),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )

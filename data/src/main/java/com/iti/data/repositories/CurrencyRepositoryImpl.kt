@@ -96,27 +96,17 @@ class CurrencyRepositoryImpl(
 
     override suspend fun fetchExchangeRates() {
         try {
-            val currenciesResponse = client.get("https://api.frankfurter.app/currencies")
-            val currenciesJson = Gson().fromJson(currenciesResponse.bodyAsText(), JsonObject::class.java)
-
-            val ratesResponse = client.get("https://api.frankfurter.app/latest?from=USD")
+            val ratesResponse = client.get("https://api.exchangerate-api.com/v4/latest/USD")
             val ratesJson = Gson().fromJson(ratesResponse.bodyAsText(), JsonObject::class.java)
             val ratesObject = ratesJson.getAsJsonObject("rates")
 
-            val dynamicList = mutableListOf<Currency>()
-            dynamicList.add(Currency("USD", "US Dollar", "$", 1.0))
-
-            for (code in currenciesJson.keySet()) {
-                if (code == "USD") continue
-                val name = currenciesJson.get(code).asString
-                val rate = if (ratesObject.has(code)) ratesObject.get(code).asDouble else continue
-                val symbol = getSymbol(code)
-                dynamicList.add(Currency(code, name, symbol, rate))
+            val updatedList = fallbackCurrencies.map { currency ->
+                val code = currency.code
+                val rate = if (ratesObject.has(code)) ratesObject.get(code).asDouble else currency.rateToUsd
+                currency.copy(rateToUsd = rate)
             }
 
-            if (dynamicList.size > 1) {
-                _currenciesState.value = dynamicList
-            }
+            _currenciesState.value = updatedList
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -135,11 +125,4 @@ class CurrencyRepositoryImpl(
             ?: fallbackCurrencies[0]
     }
 
-    private fun getSymbol(code: String): String {
-        return try {
-            java.util.Currency.getInstance(code).getSymbol(Locale.US)
-        } catch (e: Exception) {
-            code
-        }
-    }
 }

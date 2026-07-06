@@ -1,41 +1,30 @@
-//
-//  CurrencyManager.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.util
 
+import com.iti.domain.models.Currency
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-data class Currency(
-    val code: String,
-    val name: String,
-    val symbol: String,
-    val rateToUsd: Double // 1 USD = X Currency units
-)
-
 object CurrencyManager {
-    val supportedCurrencies = listOf(
+    private val _selectedCurrency = MutableStateFlow(Currency("EGP", "Egyptian Pound", "EGP", 48.0))
+    val selectedCurrency: StateFlow<Currency> = _selectedCurrency.asStateFlow()
+
+    private val _supportedCurrencies = MutableStateFlow(listOf(
         Currency("USD", "US Dollar", "$", 1.0),
         Currency("EGP", "Egyptian Pound", "EGP", 48.0),
         Currency("EUR", "Euro", "€", 0.92),
         Currency("GBP", "British Pound", "£", 0.78),
         Currency("AED", "UAE Dirham", "AED", 3.67),
         Currency("SAR", "Saudi Riyal", "SAR", 3.75)
-    )
+    ))
+    val supportedCurrencies: StateFlow<List<Currency>> = _supportedCurrencies.asStateFlow()
 
-    private val _selectedCurrency = MutableStateFlow(supportedCurrencies[1]) // EGP by default
-    val selectedCurrency: StateFlow<Currency> = _selectedCurrency.asStateFlow()
+    fun updateSelectedCurrency(currency: Currency) {
+        _selectedCurrency.value = currency
+    }
 
-    fun selectCurrency(code: String) {
-        supportedCurrencies.firstOrNull { it.code == code }?.let {
-            _selectedCurrency.value = it
-        }
+    fun updateSupportedCurrencies(currencies: List<Currency>) {
+        _supportedCurrencies.value = currencies
     }
 
     // Convert from USD to selected currency

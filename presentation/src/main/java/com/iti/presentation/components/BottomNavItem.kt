@@ -14,32 +14,32 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.iti.presentation.R
 
 enum class BottomNavItem(
-    val label: String,
+    val labelResId: Int,
     val selectedIcon: ImageVector? = null,
     val unselectedIcon: ImageVector? = null,
     val iconResId: Int? = null
 ) {
     Home(
-        label = "Home",
+        labelResId = R.string.nav_home,
         selectedIcon = Icons.Rounded.Home,
         unselectedIcon = Icons.Outlined.Home
     ),
     Category(
-        label = "Categories",
+        labelResId = R.string.nav_categories,
         selectedIcon = Icons.Rounded.GridView,
         unselectedIcon = Icons.Outlined.GridView
     ),
     AI(
-        label = "AI",
+        labelResId = R.string.nav_ai,
         iconResId = R.drawable.ic_ai
     ),
     Wishlist(
-        label = "Wishlist",
+        labelResId = R.string.wishlist_title,
         selectedIcon = Icons.Rounded.Favorite,
         unselectedIcon = Icons.Rounded.FavoriteBorder
     ),
     Profile(
-        label = "Profile",
+        labelResId = R.string.nav_profile,
         selectedIcon = Icons.Rounded.Person,
         unselectedIcon = Icons.Rounded.PersonOutline
     )

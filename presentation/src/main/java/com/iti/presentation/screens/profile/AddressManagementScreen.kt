@@ -46,6 +46,8 @@ import com.iti.presentation.components.ConfirmationDialog
 import com.iti.presentation.screens.address.components.AddressEmptyState
 import com.iti.presentation.screens.address.components.AddressItem
 import com.iti.presentation.screens.address.components.TopSnackbar
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,10 +114,10 @@ fun AddressManagementContent(
 
     if (addressToDelete != null) {
         ConfirmationDialog(
-            title = "Delete Address",
-            message = "Are you sure you want to permanently remove this delivery address?",
-            confirmText = "Delete",
-            dismissText = "Cancel",
+            title = stringResource(R.string.address_delete_dialog_title),
+            message = stringResource(R.string.address_delete_confirm_msg),
+            confirmText = stringResource(R.string.address_delete_btn),
+            dismissText = stringResource(R.string.address_cancel_btn),
             onConfirm = {
                 addressToDelete?.id?.let { id ->
                     onIntent(ProfileContract.Intent.DeleteAddress(id))
@@ -132,13 +134,13 @@ fun AddressManagementContent(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             BackTopBar(
-                title = "Delivery Addresses",
+                title = stringResource(R.string.address_delivery_addresses),
                 onBack = onNavigateBack,
                 actions = {
                     IconButton(onClick = onNavigateToAddAddress) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Add Address",
+                            contentDescription = stringResource(R.string.address_add_new_title),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }

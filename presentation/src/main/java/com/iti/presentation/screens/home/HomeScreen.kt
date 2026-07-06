@@ -265,7 +265,7 @@ fun HomeScreenContent(
                                 ) {
                                     Icon(
                                         painter = painterResource(id = item.iconResId!!),
-                                        contentDescription = item.label,
+                                        contentDescription = stringResource(id = item.labelResId),
                                         tint = if (isDark) {
                                             if (isSelected) Color(0xFFD4BFFF) else Color(0xFF9E80E5)
                                         } else {
@@ -306,12 +306,12 @@ fun HomeScreenContent(
                             icon = {
                                 Icon(
                                     imageVector = if (isSelected) item.selectedIcon!! else item.unselectedIcon!!,
-                                    contentDescription = item.label
+                                    contentDescription = stringResource(id = item.labelResId)
                                 )
                             },
                             label = {
                                 Text(
-                                    text = item.label,
+                                    text = stringResource(id = item.labelResId),
                                     maxLines = 1,
                                     softWrap = false,
                                     style = MaterialTheme.typography.labelSmall.copy(

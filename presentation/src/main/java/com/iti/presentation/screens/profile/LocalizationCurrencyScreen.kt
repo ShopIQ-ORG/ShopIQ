@@ -56,6 +56,8 @@ import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Currency
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.screens.profile.components.ExchangeTrendChart
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,7 +108,7 @@ fun LocalizationCurrencyContent(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             BackTopBar(
-                title = "Localization & Currency",
+                title = stringResource(R.string.profile_localization_currency),
                 onBack = onNavigateBack
             )
         }
@@ -128,13 +130,13 @@ fun LocalizationCurrencyContent(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Currency",
+                        text = stringResource(R.string.profile_localization_currency),
                         style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Current Currency",
+                        text = stringResource(R.string.currency_current),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -191,7 +193,7 @@ fun LocalizationCurrencyContent(
 
             // Section: Popular Currencies
             Text(
-                text = "Popular Currencies",
+                text = stringResource(R.string.currency_popular),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -233,7 +235,7 @@ fun LocalizationCurrencyContent(
             ) {
                 Column {
                     Text(
-                        text = "Rates are live and updated",
+                        text = stringResource(R.string.currency_rates_live),
                         style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -261,7 +263,7 @@ fun LocalizationCurrencyContent(
             }
 
             Text(
-                text = "Powered by Exchange Rate API",
+                text = stringResource(R.string.currency_powered_by),
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 modifier = Modifier.padding(start = 4.dp, top = 2.dp, bottom = 28.dp)
@@ -269,7 +271,7 @@ fun LocalizationCurrencyContent(
 
             // Section: Exchange Trend Chart (Dynamic for active selected currency)
             Text(
-                text = "${state.selectedCurrency.code} Exchange Trend (Last 7 Days)",
+                text = "${state.selectedCurrency.code} " + stringResource(R.string.currency_trend_title),
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                 modifier = Modifier.padding(bottom = 12.dp)

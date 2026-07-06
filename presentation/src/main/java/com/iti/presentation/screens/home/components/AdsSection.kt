@@ -31,6 +31,8 @@ import com.iti.domain.models.Ad
 import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
 
+import androidx.compose.foundation.layout.PaddingValues
+
 @Composable
 fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
     val filteredAds = ads.filter { it.imageUrl.isNotEmpty() }
@@ -100,6 +102,7 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                             contentColor = MaterialTheme.colorScheme.onSurface
                         ),
                         shape = RoundedCornerShape(6.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                         modifier = Modifier.height(32.dp)
                     ) {
                         Text(

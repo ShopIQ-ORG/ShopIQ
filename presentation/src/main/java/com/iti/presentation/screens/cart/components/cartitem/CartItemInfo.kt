@@ -18,6 +18,9 @@ import com.iti.domain.models.cart.CartItem
 import com.iti.domain.models.cart.atMaxQuantity
 import com.iti.domain.models.cart.isLowStock
 import com.iti.presentation.R
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.iti.presentation.util.CurrencyManager
 
 @Composable
 fun CartItemInfo(
@@ -58,8 +61,11 @@ fun CartItemInfo(
             )
         }
 
+        val currentCurrency by CurrencyManager.selectedCurrency.collectAsState()
+        val convertedPrice = CurrencyManager.convertFromUsd(item.price.amount.toDoubleOrNull() ?: 0.0)
+        val priceStr = if (convertedPrice % 1.0 == 0.0) "%.0f".format(convertedPrice) else "%.2f".format(convertedPrice)
         Text(
-            text = "$${item.price.amount}",
+            text = "$priceStr ${currentCurrency.code}",
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),
