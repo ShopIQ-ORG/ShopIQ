@@ -25,7 +25,6 @@ import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSourceImpl
 import com.iti.data.sources.remote.auth.AuthRemoteDataSource
 import com.iti.data.sources.remote.auth.AuthRemoteDataSourceImpl
-import com.iti.data.sources.remote.cart.*
 import com.iti.data.sources.remote.orders.OrdersRemoteDataSource
 import com.iti.data.sources.remote.orders.OrdersRemoteDataSourceImpl
 import com.iti.data.sources.remote.cart.CartIdDataSource
@@ -38,7 +37,6 @@ import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSour
 import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.data.sources.remote.user.UserRemoteDataSourceImpl
 import com.iti.data.utils.ShopifyNetworkConfig
-import com.iti.domain.models.auth.ShopifyCustomerToken
 import com.iti.domain.repositories.address.AddressRepository
 import com.iti.domain.repositories.ai.ChatbotRepository
 import com.iti.domain.repositories.auth.AuthRepository
@@ -55,6 +53,10 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
+import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
+import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSourceImpl
+import com.iti.data.repositories.CheckoutRepositoryImpl
+import com.iti.domain.repositories.checkout.CheckoutRepository
 
 val dataModule = module {
     single { Gson() }
@@ -134,4 +136,6 @@ val dataModule = module {
 
     single<LocationTracker> { LocationTrackerImpl(get()) }
     single<AddressRepository> { AddressRepositoryImpl(get()) }
+    single<CheckoutRemoteDataSource> { CheckoutRemoteDataSourceImpl(get()) }
+    single<CheckoutRepository> { CheckoutRepositoryImpl(get(), get()) }
 }

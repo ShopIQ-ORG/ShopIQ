@@ -8,6 +8,7 @@
 
 package com.iti.presentation.screens.address
 
+import com.iti.domain.models.Address
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -15,6 +16,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -55,7 +57,8 @@ import com.iti.presentation.util.LocationPermissionHandler
 fun AddressScreen(
     viewModel: AddressViewModel,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddressSelected: ((Address) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -126,8 +129,11 @@ fun AddressScreen(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            if (screenState !is AddressContract.ScreenState.MapPicker) {
+            if (onAddressSelected == null && 
+                screenState !is AddressContract.ScreenState.MapPicker && 
+                screenState !is AddressContract.ScreenState.LocationDetected) {
                 BackTopBar(
                     title = topBarTitle,
                     onBack = topBarNavigationAction,
@@ -151,7 +157,8 @@ fun AddressScreen(
             }
         }
     ) { innerPadding ->
-        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker) {
+        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker || 
+                                 screenState is AddressContract.ScreenState.LocationDetected) {
             PaddingValues(0.dp)
         } else {
             innerPadding
@@ -229,7 +236,8 @@ fun AddressScreen(
                             },
                             onSetDefaultAddress = { id ->
                                 viewModel.sendIntent(AddressContract.Intent.SetDefaultAddress(id))
-                            }
+                            },
+                            onAddressSelected = onAddressSelected
                         )
                     }
 

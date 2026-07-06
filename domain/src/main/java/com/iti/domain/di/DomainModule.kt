@@ -30,6 +30,9 @@ import com.iti.domain.usecases.auth.SendEmailVerificationUseCase
 import com.iti.domain.usecases.auth.SendPasswordResetEmailUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
 import com.iti.domain.usecases.orders.GetOrdersUseCase
+import com.iti.domain.usecases.cart.ClearCartUseCase
+import com.iti.domain.usecases.checkout.CreateDraftOrderUseCase
+import com.iti.domain.usecases.checkout.CompleteDraftOrderUseCase
 import org.koin.core.module.dsl.factoryOf
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
@@ -81,6 +84,7 @@ val domainModule = module {
     factoryOf(::SendEmailVerificationUseCase)
     factoryOf(::GetValidShopifyTokenUseCase)
     factoryOf(::ReloadAndGetCurrentUserUseCase)
-
-
+    factory { CreateDraftOrderUseCase(get()) }
+    factory { CompleteDraftOrderUseCase(get()) }
+    factory { ClearCartUseCase(get()) }
 }

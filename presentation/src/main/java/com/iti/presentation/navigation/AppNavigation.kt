@@ -34,11 +34,13 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
-import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
-import com.iti.presentation.screens.products.checkout.CODPaymentScreen
-import com.iti.presentation.screens.products.checkout.OnlinePaymentScreen
-import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.payment.PaymentMethodScreen
+import com.iti.presentation.screens.payment.CODPaymentScreen
+import com.iti.presentation.screens.payment.OnlinePaymentScreen
+import com.iti.presentation.screens.payment.PaymentMethodViewModel
+import com.iti.presentation.screens.payment.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.checkout.CheckoutScreen
+import com.iti.presentation.screens.checkout.CheckoutViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -254,12 +256,26 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                         )
                     },
                     onCheckout = {
-                        navigate(Screen.PaymentMethod)
+                        navigate(Screen.Checkout)
                     },
                     onLogin = {
                         replaceRoot(Screen.SignIn)
                     },
                     onBrowseProducts = ::navigateBack
+                )
+            }
+
+            entry<Screen.Checkout> {
+                val checkoutViewModel: CheckoutViewModel = koinViewModel()
+                val addressViewModel: AddressViewModel = koinViewModel()
+
+                CheckoutScreen(
+                    viewModel = checkoutViewModel,
+                    addressViewModel = addressViewModel,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToHome = {
+                        replaceRoot(Screen.Home)
+                    }
                 )
             }
 

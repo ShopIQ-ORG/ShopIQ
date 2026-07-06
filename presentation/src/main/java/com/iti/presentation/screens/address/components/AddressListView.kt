@@ -10,10 +10,16 @@ package com.iti.presentation.screens.address.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,34 +44,67 @@ fun AddressListView(
     addresses: List<Address>,
     onDeleteAddress: (String) -> Unit,
     onSetDefaultAddress: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddressSelected: ((Address) -> Unit)? = null
 ) {
     var addressToDeleteId by remember { mutableStateOf<String?>(null) }
+    var selectedAddress by remember(addresses) {
+        mutableStateOf(addresses.firstOrNull { it.isDefault } ?: addresses.firstOrNull())
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Text(
-                    text = stringResource(R.string.address_saved_list_title),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+        Column(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    Text(
+                        text = stringResource(R.string.address_saved_list_title),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                             fontWeight = FontWeight.Bold,
+                             fontSize = 18.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                items(addresses, key = { it.id }) { address ->
+                    AddressItem(
+                        address = address,
+                        onDelete = { addressToDeleteId = address.id },
+                        onSetDefault = { onSetDefaultAddress(address.id) },
+                        onAddressSelected = if (onAddressSelected != null) {
+                            { selectedAddress = it }
+                        } else {
+                            null
+                        },
+                        isSelected = onAddressSelected != null && address.id == selectedAddress?.id,
+                        modifier = Modifier.animateItem()
+                    )
+                }
             }
 
-            items(addresses, key = { it.id }) { address ->
-                AddressItem(
-                    address = address,
-                    onDelete = { addressToDeleteId = address.id },
-                    onSetDefault = { onSetDefaultAddress(address.id) },
-                    modifier = Modifier.animateItem()
-                )
+            if (onAddressSelected != null && selectedAddress != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                ) {
+                    Button(
+                        onClick = { onAddressSelected.invoke(selectedAddress!!) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.checkout_btn_confirm_payment),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
             }
         }
 
