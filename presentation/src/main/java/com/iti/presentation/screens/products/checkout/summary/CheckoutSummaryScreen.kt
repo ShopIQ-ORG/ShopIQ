@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -175,13 +177,59 @@ fun CheckoutSummaryScreen(
                     item {
                         PaddingWrapper {
                             Spacer(Modifier.height(20.dp))
-                            state.cart?.let {
+                            if (state.isLoading) {
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(16.dp),
                                     colors = CardDefaults.cardColors(containerColor = SearchFieldLight.copy(alpha = 0.5f))
                                 ) {
-                                    OrderSummary(cart = it)
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(150.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(32.dp),
+                                                color = PrimaryLight,
+                                                strokeWidth = 3.dp
+                                            )
+                                            Spacer(modifier = Modifier.height(12.dp))
+                                            Text(
+                                                text = "Calculating fees...",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = TextSecondaryLight
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                state.cart?.let {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Receipt,
+                                                contentDescription = null,
+                                                tint = TextPrimaryLight,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                            Text(
+                                                text = "Order Summary",
+                                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                                            )
+                                        }
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(16.dp),
+                                            colors = CardDefaults.cardColors(containerColor = SearchFieldLight.copy(alpha = 0.5f))
+                                        ) {
+                                            OrderSummary(cart = it)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -414,10 +462,21 @@ fun AddressSummarySection(address: Address?) {
 @Composable
 fun ShippingMethodSection() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = "Shipping Method",
-            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocalShipping,
+                contentDescription = null,
+                tint = TextPrimaryLight,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = "Shipping Method",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+            )
+        }
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
