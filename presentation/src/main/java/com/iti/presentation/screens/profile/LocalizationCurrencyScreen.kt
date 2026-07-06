@@ -8,6 +8,7 @@
 
 package com.iti.presentation.screens.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -159,7 +160,7 @@ fun LocalizationCurrencyContent(
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
-                                text = "${state.selectedCurrency.code} - ${state.selectedCurrency.name}",
+                                text = state.selectedCurrency.code,
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -175,17 +176,12 @@ fun LocalizationCurrencyContent(
                 // Dropdown menu to change current currency
                 DropdownMenu(
                     expanded = currencyDropdownExpanded,
-                    onDismissRequest = { currencyDropdownExpanded = false }
+                    onDismissRequest = { currencyDropdownExpanded = false },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                 ) {
                     state.popularCurrencies.forEach { currency ->
                         DropdownMenuItem(
-                            text = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(text = getFlagEmoji(currency.code), fontSize = 20.sp)
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = "${currency.code} - ${currency.name}")
-                                }
-                            },
+                            text = { Text("${currency.code} ${getFlagEmoji(currency.code)}") },
                             onClick = {
                                 onIntent(ProfileContract.Intent.ChangeCurrency(currency.code))
                                 currencyDropdownExpanded = false
@@ -319,12 +315,12 @@ fun PopularCurrencyRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             Text(text = flagEmoji, fontSize = 28.sp)
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
+            Column(modifier = Modifier.padding(end = 8.dp)) {
                 Text(
-                    text = "$code - $name",
+                    text = code,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface
                 )

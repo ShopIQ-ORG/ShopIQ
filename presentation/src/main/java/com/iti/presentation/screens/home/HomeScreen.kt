@@ -66,6 +66,7 @@ fun HomeScreen(
     onNavigateToEditProfile: () -> Unit,
     onNavigateToLocalizationCurrency: () -> Unit,
     onNavigateToAddressManagement: () -> Unit,
+    profileViewModel: ProfileViewModel,
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -115,13 +116,11 @@ fun HomeScreen(
         }
     }
 
-    var showLogoutDialog by remember { mutableStateOf(false) }
-
     HomeScreenContent(
         state = state,
         onNavigateToProduct = onNavigateToProduct,
         onIntent = viewModel::sendIntent,
-        onLogout = { showLogoutDialog = true },
+        onLogout = { viewModel.sendIntent(HomeContract.Intent.Logout) },
         onCartClick = onCartClick,
         onCategoryClick = onCategoryClick,
         onNavigateToAiHistory = onNavigateToAiHistory,
@@ -131,6 +130,7 @@ fun HomeScreen(
         onNavigateToEditProfile = onNavigateToEditProfile,
         onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
         onNavigateToAddressManagement = onNavigateToAddressManagement,
+        profileViewModel = profileViewModel,
         snackbarHostState = snackbarHostState
     )
 
@@ -144,19 +144,7 @@ fun HomeScreen(
         )
     }
 
-    if (showLogoutDialog) {
-        com.iti.presentation.components.ConfirmationDialog(
-            title = stringResource(R.string.profile_sign_out_title),
-            message = stringResource(R.string.profile_sign_out_msg),
-            confirmText = stringResource(R.string.profile_sign_out_title),
-            dismissText = stringResource(R.string.profile_cancel),
-            onConfirm = {
-                showLogoutDialog = false
-                viewModel.sendIntent(HomeContract.Intent.Logout)
-            },
-            onDismiss = { showLogoutDialog = false }
-        )
-    }
+
 }
 
 @Composable
@@ -174,6 +162,7 @@ fun HomeScreenContent(
     onNavigateToEditProfile: () -> Unit,
     onNavigateToLocalizationCurrency: () -> Unit,
     onNavigateToAddressManagement: () -> Unit,
+    profileViewModel: ProfileViewModel,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     networkMonitor: NetworkMonitor = koinInject(),
     cartBadgeViewModel: CartBadgeViewModel = koinViewModel()
@@ -399,7 +388,6 @@ fun HomeScreenContent(
             }
 
             BottomNavItem.Profile -> {
-                val profileViewModel: ProfileViewModel = koinViewModel()
                 AccountSettingsScreen(
                     viewModel = profileViewModel,
                     onNavigateBack = { onSelectedIndexChanged(0) },

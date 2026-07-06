@@ -20,6 +20,7 @@ import com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase
 import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
+import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.auth.UpdateProfileUseCase
 import com.iti.domain.usecases.location.GetCurrentLocationUseCase
 import com.iti.domain.usecases.currency.GetSelectedCurrencyUseCase
@@ -59,6 +60,7 @@ class ProfileViewModel(
     private val selectCurrencyUseCase: SelectCurrencyUseCase,
     private val getPlaceSuggestionsUseCase: GetPlaceSuggestionsUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase,
+    private val logoutUseCase: LogoutUseCase,
     @param:SuppressLint("StaticFieldLeak") private val context: Context
 ) : ViewModel() {
 
@@ -206,6 +208,12 @@ class ProfileViewModel(
             }
             ProfileContract.Intent.NavigateBack -> {
                 emitEffect(ProfileContract.Effect.NavigateBack)
+            }
+            ProfileContract.Intent.Logout -> {
+                viewModelScope.launch {
+                    logoutUseCase()
+                    _state.update { it.copy(user = User.GuestUser) }
+                }
             }
         }
     }

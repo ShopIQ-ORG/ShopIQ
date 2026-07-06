@@ -212,7 +212,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     },
                     onNavigateToAddressManagement = {
                         navigate(Screen.AddressManagement)
-                    }
+                    },
+                    profileViewModel = profileViewModel
                 )
             }
 

@@ -10,6 +10,7 @@ package com.iti.presentation.screens.profile
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -194,7 +195,7 @@ fun EditProfileContent(
                     inputStream.copyTo(outputStream)
                     inputStream.close()
                     outputStream.close()
-                    avatarUrl = android.net.Uri.fromFile(file).toString()
+                    avatarUrl = file.absolutePath
                 }
             } catch (e: Exception) {
                 // Ignore if saving fails, fallback to uri
@@ -237,14 +238,16 @@ fun EditProfileContent(
                 modifier = Modifier
                     .padding(bottom = 32.dp)
                     .size(120.dp)
+                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
             ) {
                 if (avatarUrl.isNotBlank()) {
                     val isDark = LocalDarkTheme.current
                     val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
 
+                    val modelData = if (avatarUrl.startsWith("/")) java.io.File(avatarUrl) else if (avatarUrl.startsWith("file://")) android.net.Uri.parse(avatarUrl) else avatarUrl
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(avatarUrl)
+                            .data(modelData)
                             .crossfade(true)
                             .error(fallback)
                             .fallback(fallback)
@@ -482,8 +485,8 @@ fun ProfileInputField(
             isError = errorMessage != null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                 disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),

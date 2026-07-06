@@ -85,9 +85,10 @@ fun ProfileHeaderCard(
                     val isDark = LocalDarkTheme.current
                     val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
 
+                    val modelData = if (avatarUrl.startsWith("/")) java.io.File(avatarUrl) else if (avatarUrl.startsWith("file://")) android.net.Uri.parse(avatarUrl) else avatarUrl
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(avatarUrl)
+                            .data(modelData)
                             .crossfade(true)
                             .error(fallback)
                             .fallback(fallback)

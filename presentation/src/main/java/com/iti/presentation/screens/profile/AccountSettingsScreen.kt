@@ -96,6 +96,7 @@ fun AccountSettingsScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(key1 = true) {
+        viewModel.sendIntent(ProfileContract.Intent.LoadProfile)
         viewModel.effect.collect { effect ->
             when (effect) {
                 is ProfileContract.Effect.ShowMessage -> {
@@ -151,6 +152,7 @@ fun AccountSettingsContent(
             onConfirm = {
                 showLogoutDialog = false
                 onIntent(ProfileContract.Intent.ClearError)
+                onIntent(ProfileContract.Intent.Logout)
                 onLogout()
             },
             onDismiss = { showLogoutDialog = false }

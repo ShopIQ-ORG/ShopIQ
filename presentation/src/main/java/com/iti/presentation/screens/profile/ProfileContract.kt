@@ -83,6 +83,7 @@ object ProfileContract {
         data object DismissSuccessMessage : Intent()
         data object ClearError : Intent()
         data object NavigateBack : Intent()
+        data object Logout : Intent()
     }
 
     sealed class Effect {
