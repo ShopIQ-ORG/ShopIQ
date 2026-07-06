@@ -162,7 +162,9 @@ fun PaymobBottomSheet(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp),
+                .navigationBarsPadding()
+                .padding(bottom = 16.dp)
+                .height(64.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isFormValid) PrimaryLight else SearchFieldLight,

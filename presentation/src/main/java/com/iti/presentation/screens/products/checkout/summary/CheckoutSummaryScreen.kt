@@ -77,7 +77,9 @@ fun CheckoutSummaryScreen(
         },
         bottomBar = {
             Surface(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
                 shadowElevation = 8.dp,
                 color = MaterialTheme.colorScheme.background
             ) {
@@ -85,8 +87,8 @@ fun CheckoutSummaryScreen(
                     onClick = { viewModel.onEvent(CheckoutSummaryContract.Event.PlaceOrderClicked) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                        .height(60.dp),
+                        .padding(horizontal = 16.dp, vertical = 20.dp)
+                        .height(64.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PrimaryLight,
