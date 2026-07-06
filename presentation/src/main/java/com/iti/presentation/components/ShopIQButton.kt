@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+enum class ShopIQButtonStyle { Primary, Secondary }
+
 @Composable
 fun ShopIQButton(
     text: String,
@@ -26,8 +28,24 @@ fun ShopIQButton(
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
     isLoading: Boolean = false,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    style: ShopIQButtonStyle = ShopIQButtonStyle.Primary
 ) {
+    val colors = when (style) {
+        ShopIQButtonStyle.Primary -> ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.primary,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary
+        )
+        ShopIQButtonStyle.Secondary -> ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
+
     Button(
         onClick = onClick,
         modifier = modifier
@@ -35,17 +53,12 @@ fun ShopIQButton(
             .height(56.dp),
         shape = RoundedCornerShape(12.dp),
         enabled = enabled && !isLoading,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.primary,
-            disabledContentColor = MaterialTheme.colorScheme.onPrimary
-        )
+        colors = colors
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(24.dp),
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = colors.contentColor,
                 strokeWidth = 2.dp
             )
         } else {

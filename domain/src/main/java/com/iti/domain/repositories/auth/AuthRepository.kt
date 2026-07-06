@@ -13,6 +13,9 @@ interface AuthRepository {
     suspend fun register(info: RegistrationInfo): Result<User>
     suspend fun getCurrentUser(): Result<User>
     suspend fun validateAuthenticatedUser(): Result<Unit>
-    fun logout(): Result<Unit>
+    suspend fun sendEmailVerification(): Result<Unit>
+    suspend fun reloadAndGetCurrentUser(): Result<User>
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit>
+    suspend fun logout(): Result<Unit>
     fun getUserId(): String?
 }

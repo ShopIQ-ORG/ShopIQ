@@ -23,6 +23,8 @@ import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatViewModel
 import com.iti.presentation.screens.ai.history.AiHistoryViewModel
 import com.iti.presentation.screens.address.AddressViewModel
+import com.iti.presentation.screens.auth.emailverification.EmailVerificationViewModel
+import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -36,8 +38,8 @@ val presentationModule = module {
     viewModel { AiChatViewModel(get(), get(), get()) }
     viewModel { AiHistoryViewModel(get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { OnboardingViewModel(get()) }
-    viewModel { SignInViewModel(get(), get(), get(), get()) }
+    viewModel { OnboardingViewModel(get(), get()) }
+    viewModel { SignInViewModel(get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { CategoryViewModel(get()) }
     viewModel { CategoryDetailsViewModel(get(), get(), get(), get(), get()) }
@@ -46,14 +48,14 @@ val presentationModule = module {
     viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CartViewModel(get(), get(), get(), get()) }
-    viewModel { SplashViewModel(get(), get()) }
+    viewModel { SplashViewModel(get(), get(), get()) }
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
     viewModelOf(::CartBadgeViewModel)
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
     viewModel { PaymentMethodViewModel() }
     viewModelOf(::OrdersViewModel)
     viewModelOf(::OrderDetailsViewModel)
-
-
+    viewModelOf(::ForgotPasswordViewModel)
+    viewModelOf(::EmailVerificationViewModel)
     viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
 }

@@ -10,6 +10,9 @@ interface AuthRemoteDataSource {
     suspend fun createUserWithEmail(email: String, password: String): String
     suspend fun linkCurrentUserWithCredential(credential: AuthCredential): CredentialAuthResult
     suspend fun signInWithCredential(credential: AuthCredential): CredentialAuthResult
+    suspend fun sendPasswordResetEmail(email: String)
+    suspend fun sendEmailVerification()
+    suspend fun reloadCurrentUser(): FirebaseUserInfo?
     fun getCurrentFirebaseUser(): FirebaseUserInfo?
     fun signOut()
 }

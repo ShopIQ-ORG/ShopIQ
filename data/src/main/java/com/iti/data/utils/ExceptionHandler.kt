@@ -13,6 +13,7 @@ import com.iti.domain.exceptions.AuthException
 import com.iti.domain.exceptions.NetworkException
 import java.io.IOException
 import android.util.Log
+import com.google.firebase.FirebaseTooManyRequestsException
 import com.iti.domain.exceptions.CartException
 import com.iti.domain.exceptions.OrderException
 
@@ -23,6 +24,7 @@ fun Throwable.handleException(): Throwable {
         is FirebaseAuthInvalidUserException -> AuthException.UserNotFound()
         is FirebaseAuthUserCollisionException -> AuthException.EmailAlreadyInUse()
         is FirebaseNetworkException -> NetworkException.NoConnection()
+        is FirebaseTooManyRequestsException -> AppException.TooManyRequests()
         is ApolloNetworkException -> NetworkException.NoConnection()
         is ApolloHttpException -> NetworkException.ServerError(statusCode, message)
         is IOException -> NetworkException.NoConnection()
