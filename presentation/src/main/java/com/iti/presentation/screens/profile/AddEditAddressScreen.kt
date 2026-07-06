@@ -58,6 +58,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 import androidx.compose.ui.unit.sp
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
@@ -180,7 +182,7 @@ fun AddEditAddressContent(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
                 BackTopBar(
-                    title = if (addressId == null) "Add Address" else "Edit Address",
+                    title = if (addressId == null) stringResource(R.string.address_add_new_title) else stringResource(R.string.address_edit_title),
                     onBack = onNavigateBack
                 )
             }

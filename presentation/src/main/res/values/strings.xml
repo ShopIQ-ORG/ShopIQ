@@ -113,7 +113,7 @@
     <string name="search_popular_label">Popular Searches</string>
     <string name="search_clear_all">Clear All</string>
     <string name="search_empty_hint">Search for products, brands\nor categories</string>
-    <string name="search_cd_close">Close search</string>
+    <string name="currency_updated_to">Currency updated to %1$s</string><string name="search_cd_close">Close search</string>
     <string name="search_cd_clear">Clear text</string>
     <string name="search_trending_label">🔥 Trending</string>
     <string name="search_popular_now_label">Popular Now</string>
@@ -361,6 +361,8 @@
     <string name="address_tag_home">Home</string>
     <string name="address_tag_work">Work</string>
     <string name="address_tag_other">Other</string>
+    <string name="address_edit">Edit Address</string>
+    <string name="address_edit_title">Edit Address</string>
     <string name="address_tag_custom_placeholder">Custom Tag Name (e.g. Gym, Friend\'s House)</string>
     <string name="address_set_default_label">Set as default address</string>
     <string name="address_set_default_subtitle">Use this address for default delivery</string>

@@ -59,7 +59,9 @@
     <string name="search_popular_label">عمليات البحث الشائعة</string>
     <string name="search_clear_all">مسح الكل</string>
     <string name="search_empty_hint">ابحث عن المنتجات، الماركات أو الفئات</string>
-    
+    <string name="categories_title">الأقسام</string>
+    <string name="category_section_title">تسوق حسب القسم</string>
+    <string name="currency_updated_to">تم تحديث العملة إلى %1$s</string>
     <!-- Onboarding Screen -->
     <string name="onboarding_skip">تخطي</string>
     <string name="onboarding_next">التالي</string>
@@ -92,6 +94,12 @@
     <string name="no_products_found">لم يتم العثور على منتجات</string>
     <string name="clear_filter">إلغاء التصفية</string>
     <string name="product_details">تفاصيل المنتج</string>
+    <string name="sort_title">ترتيب حسب</string>
+    <string name="sort_label">ترتيب حسب</string>
+    <string name="sort_best_seller">الأكثر مبيعاً</string>
+    <string name="sort_price_low_high">السعر: من الأقل للأعلى</string>
+    <string name="sort_price_high_low">السعر: من الأعلى للأقل</string>
+    <string name="sort_apply">تطبيق</string>
     <string name="sort_price_asc_label">↑ السعر</string>
     <string name="sort_price_desc_label">↓ السعر</string>
     
@@ -100,6 +108,8 @@
     <string name="wishlist_empty_title">لا توجد منتجات مفضلة بعد</string>
     <string name="wishlist_empty_subtitle">احفظ المنتجات التي تحبها بالضغط على أيقونة القلب على أي منتج.</string>
     <string name="wishlist_explore_btn">استكشف المنتجات</string>
+    <string name="added_to_wishlist">تم الإضافة إلى المفضلة</string>
+    <string name="removed_from_wishlist">تمت الإزالة من المفضلة</string>
     <string name="wishlist_locked_title">قائمة المفضلة مقفلة</string>
     <string name="wishlist_auth_btn">تسجيل الدخول / إنشاء حساب</string>
 
@@ -117,9 +127,6 @@
     <string name="ai_reset_chat_desc">إعادة تعيين المحادثة</string>
     <string name="ai_greeting_message">مرحباً! أنا إسلام، مساعدك الشخصي للتسوق. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
 
-    <!-- Wishlist feedback -->
-    <string name="added_to_wishlist">تمت الإضافة للمفضلة</string>
-    <string name="removed_from_wishlist">تم الحذف من المفضلة</string>
 
     <!-- Chatbot error messages -->
     <string name="ai_error_invalid_key">مفتاح اتصال المساعد غير صالح. يرجى الاتصال بالدعم أو التحقق من الإعدادات.</string>
@@ -260,6 +267,8 @@
     <string name="address_detected_label">العنوان المكتشف</string>
     <string name="address_save_as_label">حفظ العنوان باسم</string>
     <string name="address_tag_home">المنزل</string>
+    <string name="address_edit">تعديل العنوان</string>
+    <string name="address_edit_title">تعديل العنوان</string>
     <string name="address_tag_work">العمل</string>
     <string name="address_tag_other">أخرى</string>
     <string name="address_tag_custom_placeholder">اسم مخصص (مثل: النادي، منزل صديق)</string>

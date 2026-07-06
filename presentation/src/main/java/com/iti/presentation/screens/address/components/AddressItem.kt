@@ -86,8 +86,14 @@ fun AddressItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val displayName = when (address.name) {
+                        "Home" -> stringResource(R.string.address_tag_home)
+                        "Work" -> stringResource(R.string.address_tag_work)
+                        "Other" -> stringResource(R.string.address_tag_other)
+                        else -> address.name
+                    }
                     Text(
-                        text = address.name,
+                        text = displayName,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -130,7 +136,7 @@ fun AddressItem(
                     ) {
                         if (onEdit != null) {
                             DropdownMenuItem(
-                                text = { Text("Edit Address") },
+                                text = { Text(stringResource(R.string.address_edit)) },
                                 onClick = {
                                     showMenu = false
                                     onEdit()

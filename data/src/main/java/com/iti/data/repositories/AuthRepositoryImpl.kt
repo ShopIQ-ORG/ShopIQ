@@ -164,6 +164,35 @@ class AuthRepositoryImpl(
         shopifyLocal?.clear()
     }
 
+    override suspend fun updateProfile(
+        fullName: String,
+        phone: String,
+        dateOfBirth: String?,
+        gender: String?,
+        avatarUrl: String?
+    ): Result<User> = safeCall {
+        val firebaseUser = authRemote.getCurrentFirebaseUser() ?: throw AuthException.UserNotFound()
+        val uid = firebaseUser.uid
+
+        // Update in Firestore
+        val existingUserDto = userRemote.getUser(uid)
+        val updatedDto = existingUserDto.copy(
+            fullName = fullName,
+            phone = phone,
+            dateOfBirth = dateOfBirth,
+            gender = gender,
+            avatarUrl = avatarUrl
+        )
+        userRemote.saveUser(uid, updatedDto, merge = true)
+
+        // Optionally, update Shopify customer if needed, but for now we just update Firestore
+
+        updatedDto.toDomain(
+            provider = AuthProvider.fromProviderIds(firebaseUser.providerIds),
+            isEmailVerified = firebaseUser.isEmailVerified
+        )
+    }
+
     override fun getUserId(): String? = authRemote.getCurrentFirebaseUser()?.uid
 
     override fun isGuest(): Boolean {

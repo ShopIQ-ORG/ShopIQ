@@ -59,6 +59,7 @@ import com.iti.presentation.screens.profile.components.ExchangeTrendChart
 import androidx.compose.ui.res.stringResource
 import com.iti.presentation.R
 import java.util.Locale
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +70,7 @@ fun LocalizationCurrencyScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.effect.collect { effect ->
@@ -76,6 +78,10 @@ fun LocalizationCurrencyScreen(
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
                     snackbarHostState.showSnackbar(effect.message)
+                }
+                is ProfileContract.Effect.ShowCurrencyUpdatedMessage -> {
+                    val message = context.getString(R.string.currency_updated_to, effect.currencyCode)
+                    snackbarHostState.showSnackbar(message)
                 }
                 else -> Unit
             }

@@ -15,6 +15,6 @@ sealed interface WishlistIntent {
 }
 
 sealed interface WishlistUiEffect {
-    data class ShowToast(val message: String) : WishlistUiEffect
+    data class ShowSnackbar(val message: com.iti.presentation.util.UiText) : WishlistUiEffect
     object NavigateToAuth : WishlistUiEffect
 }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,12 +38,14 @@ fun WishlistScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                is WishlistUiEffect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                is WishlistUiEffect.ShowSnackbar -> {
+                    val msg = effect.message.asString(context)
+                    snackbarHostState.showSnackbar(msg)
                 }
                 is WishlistUiEffect.NavigateToAuth -> onAuthClick()
             }
@@ -61,7 +64,8 @@ fun WishlistScreen(
         },
         onRetryClick = {
             viewModel.handleIntent(WishlistIntent.LoadFavorites)
-        }
+        },
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -76,6 +80,7 @@ fun WishlistContent(
     onCartClick: () -> Unit,
     onRemoveFromFavorites: (String) -> Unit,
     onRetryClick: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     // Force Light Colors even in Dark Mode as requested
@@ -89,6 +94,7 @@ fun WishlistContent(
         title = stringResource(id = R.string.wishlist_title),
         cartItemCount = cartItemCount,
         onCartClick = onCartClick,
+        snackbarHostState = snackbarHostState,
         modifier = modifier
     ) { paddingValues, _ ->
         Box(

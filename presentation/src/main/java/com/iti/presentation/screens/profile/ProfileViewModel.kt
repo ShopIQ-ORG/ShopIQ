@@ -130,7 +130,7 @@ class ProfileViewModel(
             is ProfileContract.Intent.ChangeCurrency -> {
                 viewModelScope.launch {
                     selectCurrencyUseCase(intent.currencyCode)
-                    emitEffect(ProfileContract.Effect.ShowMessage("Currency updated to ${intent.currencyCode}"))
+                    emitEffect(ProfileContract.Effect.ShowCurrencyUpdatedMessage(intent.currencyCode))
                 }
             }
             ProfileContract.Intent.RefreshExchangeRates -> {

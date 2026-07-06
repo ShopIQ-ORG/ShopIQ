@@ -32,7 +32,7 @@ val SuccessLight = Color(0xFF2E7D32)
 val WarningLight = Color(0xFFF9A825)
 val ErrorLight = Color(0xFFD32F2F)
 
-val BackgroundDark = Color(0xFF111418)
+val BackgroundDark = Color(0xFF181C21)
 val SurfaceDark = Color(0xFF1A1E24)
 val CardDark = Color(0xFF232830)
 val ElevatedSurfaceDark = Color(0xFF2A2F37)

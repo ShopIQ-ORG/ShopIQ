@@ -26,6 +26,7 @@ import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.address.DeleteAddressUseCase
 import com.iti.domain.usecases.auth.ReloadAndGetCurrentUserUseCase
+import com.iti.domain.usecases.auth.UpdateProfileUseCase
 import com.iti.domain.usecases.auth.SendEmailVerificationUseCase
 import com.iti.domain.usecases.auth.SendPasswordResetEmailUseCase
 import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
@@ -48,6 +49,8 @@ val domainModule = module {
     factory { LoginWithFacebookUseCase(get()) }
     factory { LoginAsGuestUseCase(get()) }
     factory { GetCurrentUserUseCase(get()) }
+    factory { ReloadAndGetCurrentUserUseCase(get()) }
+    factory { UpdateProfileUseCase(get()) }
     factory { RegisterUseCase(get()) }
     factory { LogoutUseCase(get(), get()) }
     factory { GetProductsByNumberUseCase(get()) }

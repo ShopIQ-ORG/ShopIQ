@@ -11,14 +11,11 @@ package com.iti.data.repositories
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.iti.domain.models.Currency
 import com.iti.domain.repositories.currency.CurrencyRepository
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,26 +26,18 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+import com.iti.data.sources.remote.currency.CurrencyRemoteDataSource
+
 class CurrencyRepositoryImpl(
     private val dataStore: DataStore<Preferences>,
-    private val client: HttpClient
+    private val remoteDataSource: CurrencyRemoteDataSource
 ) : CurrencyRepository {
 
     private object PreferencesKeys {
         val SELECTED_CURRENCY_CODE = stringPreferencesKey("selected_currency_code")
     }
 
-    private val fallbackCurrencies = listOf(
-        Currency("USD", "US Dollar", "$", 1.0),
-        Currency("EGP", "Egyptian Pound", "EGP", 48.0),
-        Currency("EUR", "Euro", "€", 0.92),
-        Currency("GBP", "British Pound", "£", 0.79),
-        Currency("INR", "Indian Rupee", "₹", 83.12),
-        Currency("AED", "UAE Dirham", "د.إ", 3.67),
-        Currency("SAR", "Saudi Riyal", "SAR", 3.75)
-    )
-
-    private val _currenciesState = MutableStateFlow(fallbackCurrencies)
+    private val _currenciesState = MutableStateFlow<List<Currency>>(emptyList())
 
     override fun getSelectedCurrency(): Flow<Currency> {
         return dataStore.data.map { preferences ->
@@ -72,22 +61,7 @@ class CurrencyRepositoryImpl(
         val startDate = sdf.format(calendar.time)
 
         try {
-            val url = "https://api.frankfurter.app/$startDate..$endDate?from=USD&to=$currencyCode"
-            val response = client.get(url)
-            val body = response.bodyAsText()
-            val jsonObject = Gson().fromJson(body, JsonObject::class.java)
-            val ratesObject = jsonObject.getAsJsonObject("rates")
-            val history = mutableListOf<Pair<String, Double>>()
-
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            val outputFormat = SimpleDateFormat("EEE", Locale.US)
-
-            for (dateKey in ratesObject.keySet()) {
-                val rateVal = ratesObject.getAsJsonObject(dateKey).get(currencyCode).asDouble
-                val date = inputFormat.parse(dateKey)
-                val dayLabel = if (date != null) outputFormat.format(date) else dateKey
-                history.add(dayLabel to rateVal)
-            }
+            val history = remoteDataSource.getExchangeRateHistory(currencyCode, startDate, endDate, "USD")
             emit(history)
         } catch (e: Exception) {
             emit(emptyList())
@@ -96,16 +70,7 @@ class CurrencyRepositoryImpl(
 
     override suspend fun fetchExchangeRates() {
         try {
-            val ratesResponse = client.get("https://api.exchangerate-api.com/v4/latest/USD")
-            val ratesJson = Gson().fromJson(ratesResponse.bodyAsText(), JsonObject::class.java)
-            val ratesObject = ratesJson.getAsJsonObject("rates")
-
-            val updatedList = fallbackCurrencies.map { currency ->
-                val code = currency.code
-                val rate = if (ratesObject.has(code)) ratesObject.get(code).asDouble else currency.rateToUsd
-                currency.copy(rateToUsd = rate)
-            }
-
+            val updatedList = remoteDataSource.fetchExchangeRates("USD")
             _currenciesState.value = updatedList
         } catch (e: Exception) {
             e.printStackTrace()
@@ -121,8 +86,7 @@ class CurrencyRepositoryImpl(
     private fun getCurrencyByCode(code: String): Currency {
         val list = _currenciesState.value
         return list.firstOrNull { it.code == code }
-            ?: fallbackCurrencies.firstOrNull { it.code == code }
-            ?: fallbackCurrencies[0]
+            ?: Currency("USD", "US Dollar", "$", 1.0)
     }
 
 }

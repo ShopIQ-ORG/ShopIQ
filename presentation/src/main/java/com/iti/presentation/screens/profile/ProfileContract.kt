@@ -88,6 +88,7 @@ object ProfileContract {
     sealed class Effect {
         data object NavigateBack : Effect()
         data class ShowMessage(val message: String) : Effect()
+        data class ShowCurrencyUpdatedMessage(val currencyCode: String) : Effect()
         data class MoveCameraToLocation(val latitude: Double, val longitude: Double) : Effect()
         data class NavigateToAddressValidation(
             val latitude: Double,
