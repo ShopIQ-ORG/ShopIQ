@@ -30,12 +30,12 @@ import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.auth.emailverification.EmailVerificationScreen
 import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordScreen
 import com.iti.presentation.screens.cart.CartScreen
-import com.iti.presentation.screens.cart.CartViewModel
 import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
+import com.iti.presentation.screens.products.checkout.summary.CheckoutSummaryScreen
 import com.iti.presentation.screens.payment.PaymentScreen
 import com.iti.presentation.screens.payment.PaymentViewModel
 import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
@@ -282,10 +282,10 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 PaymentMethodScreen(
                     viewModel = paymentViewModel,
                     onNavigateBack = ::navigateBack,
-                    onNavigateToNextStep = { methodType ->
+                    onNavigateToNextStep = { methodType: PaymentMethodType ->
                         when (methodType) {
                             PaymentMethodType.COD -> {
-                                // COD handled separately or not yet implemented
+                                navigate(Screen.CODPayment)
                             }
 
                             PaymentMethodType.ONLINE -> {
@@ -296,18 +296,24 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 )
             }
 
+            entry<Screen.CODPayment> {
+                CheckoutSummaryScreen(
+                    paymentMethod = PaymentMethodType.COD,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToOrderConfirmation = {
+                        // Navigate to a success screen or back to home
+                        replaceRoot(Screen.Home)
+                    }
+                )
+            }
+
             entry<Screen.OnlinePayment> {
-                val paymentViewModel: PaymentViewModel = koinViewModel()
-                val cartViewModel: CartViewModel = koinViewModel()
-                val cartState by cartViewModel.state.collectAsState()
-
-                val totalAmount = cartState.cart?.total?.amount?.toDoubleOrNull() ?: 0.0
-                val amountCents = (totalAmount * 100).toLong()
-
-                PaymentScreen(
-                    viewModel = paymentViewModel,
-                    amountCents = amountCents,
-                    integrationId = com.iti.presentation.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242
+                CheckoutSummaryScreen(
+                    paymentMethod = PaymentMethodType.ONLINE,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToOrderConfirmation = {
+                        replaceRoot(Screen.Home)
+                    }
                 )
             }
 

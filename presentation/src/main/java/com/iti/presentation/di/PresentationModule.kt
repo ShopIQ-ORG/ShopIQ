@@ -59,6 +59,9 @@ val presentationModule = module {
     viewModelOf(::ForgotPasswordViewModel)
     viewModelOf(::EmailVerificationViewModel)
     viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
+    viewModel { (paymentMethod: com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType) ->
+        com.iti.presentation.screens.products.checkout.summary.CheckoutSummaryViewModel(get(), get(), get(), paymentMethod)
+    }
 
     viewModel { PaymentViewModel(get()) }
 }
