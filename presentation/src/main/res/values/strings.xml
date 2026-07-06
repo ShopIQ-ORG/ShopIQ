@@ -440,4 +440,9 @@
     <string name="email_not_verified_yet">Not verified yet. Open the link we sent, then try again.</string>
     <string name="error_shopify_token_unavailable">We couldn\'t restore your store session. Please try signing in again.</string>
     <string name="too_many_request">Too many attempts. Please wait a few minutes before trying again.</string>
+
+    <!-- Language Settings -->
+    <string name="language_title">Language</string>
+    <string name="language_subtitle">Choose English or Arabic</string>
+    <string name="select_language">Select Language</string>
 </resources>

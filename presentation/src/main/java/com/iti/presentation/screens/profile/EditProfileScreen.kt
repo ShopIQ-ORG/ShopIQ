@@ -208,19 +208,39 @@ fun EditProfileContent(
                     .padding(bottom = 32.dp)
                     .size(120.dp)
             ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(avatarUrl.takeIf { it.isNotBlank() } ?: avatarUrls[0])
-                        .crossfade(true)
-                        .error(R.drawable.logo_light)
-                        .fallback(R.drawable.logo_light)
-                        .build(),
-                    contentDescription = "Profile Picture",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                )
+                if (avatarUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(avatarUrl)
+                            .crossfade(true)
+                            .error(R.drawable.logo_light)
+                            .fallback(R.drawable.logo_light)
+                            .build(),
+                        contentDescription = "Profile Picture",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
+                } else {
+                    val firstLetter = if (fullName.isNotBlank()) fullName.trim().first().uppercaseChar().toString() else "?"
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = firstLetter,
+                            style = MaterialTheme.typography.displayLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 48.sp
+                            )
+                        )
+                    }
+                }
 
                 // Camera icon overlay button
                 Box(

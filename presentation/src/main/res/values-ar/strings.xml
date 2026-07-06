@@ -58,6 +58,17 @@
     <string name="ai_error_unknown">عذراً، أواجه صعوبة في الاتصال بخادمي حالياً. يرجى محاولة إرسال رسالتك مرة أخرى.</string>
     <string name="clear_history">مسح المحادثات</string>
 
+    <!-- AI History -->
+    <string name="history_title">السجل</string>
+    <string name="delete_all">حذف الكل</string>
+    <string name="search_conversations_hint">ابحث في محادثاتك...</string>
+    <string name="today">اليوم</string>
+    <string name="yesterday">أمس</string>
+    <string name="older">أقدم</string>
+    <string name="history_empty">لم يتم العثور على سجل محادثات.</string>
+    <string name="delete_history_confirm_title">حذف السجل</string>
+    <string name="delete_history_confirm_message">هل أنت متأكد من رغبتك في حذف سجل المحادثات بالكامل؟</string>
+
     <!-- Home AI Recommendations -->
     <string name="recommended_for_you">موصى به لك</string>
     <string name="ai_recommended_subtitle">بناءً على محادثتك مع إسلام</string>
@@ -100,6 +111,162 @@
     <string name="filter_apply">تطبيق الفلاتر</string>
     <string name="filter_show_less">عرض أقل</string>
     <string name="filter_show_more">+ %1$d المزيد</string>
-    <string name="failed_to_update_favorite_status">فشل فى تحديث حاله المنتجات المفضله</string>
-    <string name="login_required_favorites">يجب تسجيل الدخول لإضافة منتجات لقائمة الأمنيات.</string>
+    <string name="failed_to_update_favorite_status">فشل في تحديث حالة المنتجات المفضلة</string>
+    <string name="login_required_favorites">يجب تسجيل الدخول لإضافة منتجات لقائمة المفضلة.</string>
+
+    <!-- Orders Screen -->
+    <string name="orders_title">طلباتي</string>
+    <string name="orders_empty_title">لا توجد طلبات بعد</string>
+    <string name="orders_empty_message">ستظهر طلباتك هنا بعد إتمام أول عملية شراء.</string>
+    <string name="order_card_title">الطلب %1$s</string>
+    <string name="order_products_label">المنتجات</string>
+    <string name="order_total_label">الإجمالي</string>
+    <string name="order_status_label">الحالة</string>
+    <string name="order_view_details">عرض التفاصيل</string>
+    <string name="order_status_pending">قيد الانتظار</string>
+    <string name="order_status_processing">قيد التجهيز</string>
+    <string name="order_status_completed">مكتمل</string>
+    <string name="order_status_cancelled">ملغي</string>
+    <string name="order_status_unknown">غير معروف</string>
+    <plurals name="order_items_count">
+        <item quantity="zero">لا توجد منتجات</item>
+        <item quantity="one">منتج واحد</item>
+        <item quantity="two">منتجين</item>
+        <item quantity="few">%d منتجات</item>
+        <item quantity="many">%d منتجاً</item>
+        <item quantity="other">%d منتج</item>
+    </plurals>
+    <string name="order_details_title">تفاصيل الطلب</string>
+    <string name="order_details_support_cd">الاتصال بالدعم</string>
+    <string name="back_cd">رجوع</string>
+
+    <!-- Order Status Banners -->
+    <string name="order_status_banner_pending_title">جاري تجهيز طلبك</string>
+    <string name="order_status_banner_pending_message">نقوم حالياً بتحضير منتجاتك للشحن.</string>
+    <string name="order_status_banner_processing_title">طلبك في طريقه إليك</string>
+    <string name="order_status_banner_processing_message">تم شحن طردك وهو في طريقه إليك.</string>
+    <string name="order_status_banner_completed_title">تم تسليم الطلب بنجاح</string>
+    <string name="order_status_banner_completed_message">نتمنى أن تستمتع بمشترياتك!</string>
+    <string name="order_status_banner_cancelled_title">تم إلغاء طلبك</string>
+    <string name="order_status_banner_cancelled_message">تم إلغاء هذا الطلب ولن يتم معالجته.</string>
+    <string name="order_status_banner_unknown_title">حالة الطلب غير متوفرة</string>
+    <string name="order_status_banner_unknown_message">لم نتمكن من تحديد الحالة الحالية لهذا الطلب.</string>
+
+    <!-- Order Items & Summary -->
+    <string name="order_items_section_title">منتجات الطلب</string>
+    <string name="order_item_qty">الكمية: %1$d</string>
+    <string name="order_summary_title">ملخص الطلب</string>
+    <string name="order_summary_subtotal">المجموع الفرعي</string>
+    <string name="order_summary_shipping_fee">مصاريف الشحن</string>
+    <string name="order_summary_discount">الخصم</string>
+    <string name="order_summary_total">الإجمالي</string>
+    <string name="order_shipping_address_title">عنوان الشحن</string>
+    <string name="order_contact_support">هل تحتاج لمساعدة؟ اتصل بالدعم</string>
+    <string name="order_summary_tax">الضريبة</string>
+    <string name="order_summary_refunded">تم الاسترجاع</string>
+    <string name="order_not_found_error">الطلب غير موجود.</string>
+    <string name="no_orders_found">لم يتم العثور على أي طلبات.</string>
+
+    <!-- Address Management Screen -->
+    <string name="address_title">إدارة العناوين</string>
+    <string name="address_add_new_title">إضافة عنوان جديد</string>
+    <string name="address_location_detected_title">تم تحديد الموقع</string>
+    <string name="address_action_add">إضافة العنوان</string>
+    <string name="address_empty_title">لا توجد عناوين بعد</string>
+    <string name="address_empty_subtitle">أضف عنوانك الأول لتسريع عملية الدفع وتسهيل الشحن.</string>
+    <string name="address_btn_add_new">إضافة عنوان جديد</string>
+
+    <!-- GPS Onboarding -->
+    <string name="address_gps_detecting">جاري تحديد موقعك التفصيلي…</string>
+    <string name="address_gps_search">البحث عبر نظام GPS</string>
+    <string name="address_gps_subtitle">يرجى السماح بالوصول للموقع لتسهيل تحديد عنوان التوصيل.</string>
+    <string name="address_gps_feature_accuracy">تحديد دقيق وموثوق للموقع</string>
+    <string name="address_gps_feature_secure">آمن وخاص تماماً</string>
+    <string name="address_gps_searching_btn">جاري البحث عن الموقع…</string>
+    <string name="address_gps_use_btn">استخدام موقع الـ GPS الحالي</string>
+
+    <!-- Location Detected Form -->
+    <string name="address_detected_label">العنوان المكتشف</string>
+    <string name="address_save_as_label">حفظ العنوان باسم</string>
+    <string name="address_tag_home">المنزل</string>
+    <string name="address_tag_work">العمل</string>
+    <string name="address_tag_other">أخرى</string>
+    <string name="address_tag_custom_placeholder">اسم مخصص (مثل: النادي، منزل صديق)</string>
+    <string name="address_set_default_label">تعيين كعنوان افتراضي</string>
+    <string name="address_set_default_subtitle">استخدم هذا العنوان للتوصيل الافتراضي للطلبات</string>
+    <string name="address_btn_confirm">تأكيد وحفظ العنوان</string>
+
+    <!-- Address List & Items -->
+    <string name="address_saved_list_title">العناوين المحفوظة</string>
+    <string name="address_delete_dialog_title">حذف العنوان</string>
+    <string name="address_delete_dialog_msg">هل أنت متأكد من رغبتك في حذف هذا العنوان من حسابك؟</string>
+    <string name="address_delete_btn">حذف</string>
+    <string name="address_cancel_btn">إلغاء</string>
+    <string name="address_added_success_title">تمت إضافة العنوان!</string>
+    <string name="address_added_success_msg">تم حفظ وتخزين عنوانك بنجاح.</string>
+    <string name="address_badge_default">الافتراضي</string>
+    <string name="address_more_options_desc">خيارات إضافية</string>
+    <string name="address_menu_set_default">تعيين كعنوان افتراضي</string>
+    <string name="address_menu_delete">حذف</string>
+    <string name="address_dismiss_desc">إغلاق</string>
+
+    <!-- Errors & Fallbacks -->
+    <string name="address_error_gps_failed">تعذر تحديد موقع GPS الحالي. يرجى المحاولة مجدداً.</string>
+    <string name="address_error_geocoding_failed">تعذر تحديد اسم الشارع للعنوان المقابل لهذا الموقع.</string>
+
+    <!-- Location Permissions Dialogs -->
+    <string name="address_permission_required_title">إذن الوصول للموقع مطلوب</string>
+    <string name="address_permission_required_msg">يتطلب التطبيق إذن الوصول للموقع لتسهيل تسليم شحناتك بدقة. يرجى تفعيل الإذن للمتابعة.</string>
+    <string name="address_permission_retry_btn">إعادة المحاولة</string>
+    <string name="address_permission_denied_title">تم رفض الإذن بشكل دائم</string>
+    <string name="address_permission_denied_msg">أذونات الوصول للموقع مرفوضة بشكل دائم. يرجى الذهاب لإعدادات الهاتف وتفعيل الإذن يدوياً لاستخدام الـ GPS.</string>
+    <string name="address_permission_settings_btn">الذهاب إلى الإعدادات</string>
+
+    <!-- Map Picker strings -->
+    <string name="address_btn_select_on_map">تحديد الموقع يدوياً على الخريطة</string>
+    <string name="address_search_hint">ابحث عن المنطقة، الشارع، أو المدينة…</string>
+    <string name="address_btn_confirm_location">تأكيد الموقع المحدد</string>
+    <string name="address_error_location_not_found">لم يتم العثور على هذا الموقع. تفقد نص البحث وحاول مرة أخرى.</string>
+
+    <!-- Redesigned Location Detected screen -->
+    <string name="address_heading_detected">لقد عثرنا على موقعك!</string>
+    <string name="address_heading_selected">تم تحديد الموقع</string>
+    <string name="address_subheading">يرجى تأكيد أو تعديل عنوان التوصيل الخاص بك.</string>
+    <string name="address_btn_detect_automatically">تحديد الموقع تلقائياً عبر GPS</string>
+    <string name="address_label_detected">العنوان المكتشف</string>
+    <string name="address_label_selected">العنوان المحدد</string>
+    <string name="address_tap_to_select_location">اضغط على الخريطة لتعديل وتحديد الموقع</string>
+    <string name="address_edit_on_map">تعديل على الخريطة</string>
+    <string name="address_success_added">تم إضافة العنوان بنجاح.</string>
+    <string name="address_accurate_badge">دقيق</string>
+    <string name="address_error_location_missing">يرجى تحديد موقع على الخريطة أولاً.</string>
+    <string name="address_select_location_title">تحديد الموقع</string>
+
+    <string name="forgot_password_title">نسيت كلمة المرور؟</string>
+    <string name="forgot_password_subtitle">أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة مرورك.</string>
+    <string name="send_reset_link">إرسال رابط إعادة التعيين</string>
+    <string name="back_to_login">العودة لتسجيل الدخول</string>
+    <string name="reset_link_sent">تم إرسال رابط إعادة تعيين كلمة المرور بنجاح.</string>
+
+    <string name="verify_your_email">أكد بريدك الإلكتروني</string>
+    <string name="verify_your_email_subtitle">بريدك الإلكتروني غير مؤكد بعد. يرجى تأكيده لمتابعة استخدام حسابك والتمتع بكامل المميزات.</string>
+    <string name="send_verification_link">إرسال رابط التأكيد</string>
+    <string name="verify_email_description">لقد أرسلنا رابط تأكيد إلى %1$s. افتح الرابط ثم عد إلى هنا وسندخلك تلقائياً.</string>
+    <string name="verify_email_eyebrow">أوشكت على الانتهاء</string>
+    <string name="verify_email_title">تفقد صندوق الوارد الخاص بك</string>
+    <string name="verify_email_lead_in">لقد أرسلنا رابط التأكيد إلى</string>
+    <string name="verify_email_followup">افتح الرابط على هذا الجهاز أو أي جهاز آخر. سنقوم بتأكيد حسابك ونقلك للرئيسية فوراً بمجرد الضغط عليه.</string>
+    <string name="resend_verification_link">إعادة إرسال الرابط</string>
+    <string name="resend_link_cooldown">إعادة الإرسال خلال %1$d ثانية</string>
+    <string name="ive_verified_my_email">لقد قمت بالتأكيد — متابعة</string>
+    <string name="back_to_sign_in">العودة لتسجيل الدخول</string>
+    <string name="verification_link_sent">تم إرسال رابط التأكيد بنجاح. تفقد بريدك الوارد.</string>
+    <string name="email_not_verified_yet">البريد الإلكتروني غير مؤكد بعد. افتح الرابط الذي أرسلناه وتأكد من الضغط عليه ثم حاول مجدداً.</string>
+    <string name="error_shopify_token_unavailable">لم نتمكن من استعادة جلستك بالمتجر. يرجى إعادة تسجيل الدخول.</string>
+    <string name="too_many_request">محاولات كثيرة جداً. يرجى الانتظار بضع دقائق والمحاولة مرة أخرى.</string>
+
+    <!-- إعدادات اللغة -->
+    <string name="language_title">اللغة</string>
+    <string name="language_subtitle">اختر اللغة العربية أو الإنجليزية</string>
+    <string name="select_language">اختر اللغة</string>
 </resources>

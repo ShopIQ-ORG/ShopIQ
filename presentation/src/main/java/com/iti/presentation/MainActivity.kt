@@ -11,7 +11,7 @@ import com.iti.presentation.navigation.AppNavigation
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.util.ThemeManager
 
-class MainActivity : ComponentActivity() {
+class MainActivity : androidx.appcompat.app.AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.initialize(applicationContext)
         installSplashScreen()

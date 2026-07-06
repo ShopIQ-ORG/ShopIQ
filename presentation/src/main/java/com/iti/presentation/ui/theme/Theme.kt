@@ -73,10 +73,15 @@ fun ShopIQTheme(
         }
     }
 
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val currentLocale = configuration.locales[0]
+    val isArabic = currentLocale.language == "ar"
+    val typography = if (isArabic) getTypography(Cairo) else Typography
+
     CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
+            typography = typography,
             content = content
         )
     }

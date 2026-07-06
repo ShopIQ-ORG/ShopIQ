@@ -29,10 +29,18 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.res.stringResource
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.Arrangement
+import androidx.core.os.LocaleListCompat
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -131,6 +139,7 @@ fun AccountSettingsContent(
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showAuthDialog by remember { mutableStateOf(false) }
+    var showLanguageBottomSheet by remember { mutableStateOf(false) }
 
     if (showLogoutDialog) {
         ConfirmationDialog(
@@ -155,6 +164,56 @@ fun AccountSettingsContent(
                 onLogout()
             }
         )
+    }
+
+    if (showLanguageBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showLanguageBottomSheet = false },
+            containerColor = MaterialTheme.colorScheme.background,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.select_language),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                val currentLanguage = androidx.compose.ui.platform.LocalConfiguration.current.locales[0].language
+
+                // English Option
+                LanguageItemRow(
+                    languageName = "English",
+                    isSelected = currentLanguage == "en",
+                    onClick = {
+                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
+                        showLanguageBottomSheet = false
+                    }
+                )
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
+
+                // Arabic Option
+                LanguageItemRow(
+                    languageName = "العربية",
+                    isSelected = currentLanguage == "ar",
+                    onClick = {
+                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ar"))
+                        showLanguageBottomSheet = false
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
     }
 
     val isGuest = state.user is User.GuestUser || state.user == null
@@ -273,6 +332,13 @@ fun AccountSettingsContent(
                         title = "Localization & Currency",
                         subtitle = "Language, currency & more",
                         onClick = onNavigateToLocalizationCurrency
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
+                    SettingsRowItem(
+                        icon = Icons.Default.Language,
+                        title = stringResource(R.string.language_title),
+                        subtitle = stringResource(R.string.language_subtitle),
+                        onClick = { showLanguageBottomSheet = true }
                     )
                 }
             }
@@ -405,5 +471,37 @@ fun AccountSettingsScreenPreview() {
             onNavigateToOrders = {},
             bottomPadding = 0.dp
         )
+    }
+}
+
+@Composable
+fun LanguageItemRow(
+    languageName: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = languageName,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+            ),
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+        )
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
