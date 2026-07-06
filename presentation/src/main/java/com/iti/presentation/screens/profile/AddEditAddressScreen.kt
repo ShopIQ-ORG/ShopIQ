@@ -133,6 +133,7 @@ fun AddEditAddressContent(
     onNavigateToValidation: (Double, Double, String, String, String, String, String, Boolean, String, String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var nameTag by remember { mutableStateOf("") }
     var street by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
