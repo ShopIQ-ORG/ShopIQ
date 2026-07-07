@@ -92,7 +92,7 @@ fun OrderSuccessScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // ── Primary CTA: View Orders ──
+        // ── Primary CTA: Proceed your order ──
         Button(
             onClick = onNavigateToOrders,
             modifier = Modifier
@@ -101,47 +101,13 @@ fun OrderSuccessScreen(
             shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1C222B))
         ) {
-            Icon(
-                imageVector = Icons.Default.Receipt,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = "View My Orders",
+                text = "Proceed your order",
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 0.5.sp
                 ),
                 color = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        // ── Secondary CTA: Continue Shopping ──
-        OutlinedButton(
-            onClick = onNavigateToHome,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimaryLight),
-            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-                tint = TextPrimaryLight
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(
-                text = "Continue Shopping",
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 0.5.sp
-                )
             )
         }
 
