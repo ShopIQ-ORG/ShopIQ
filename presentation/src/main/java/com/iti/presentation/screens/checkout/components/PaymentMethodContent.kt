@@ -34,7 +34,8 @@ fun PaymentMethodContent(
     selectedMethod: PaymentMethodType?,
     onSelectMethod: (PaymentMethodType) -> Unit,
     onContinue: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     val scrollState = rememberScrollState()
 
@@ -136,7 +137,7 @@ fun PaymentMethodContent(
 
         Button(
             onClick = onContinue,
-            enabled = selectedMethod != null,
+            enabled = selectedMethod != null && !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
@@ -144,11 +145,19 @@ fun PaymentMethodContent(
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(
-                text = "Continue",
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.labelLarge
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = "Continue",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
         }
     }
 }
