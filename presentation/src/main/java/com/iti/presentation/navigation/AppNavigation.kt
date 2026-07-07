@@ -8,6 +8,7 @@
 
 package com.iti.presentation.navigation
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,9 +43,7 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
-import com.iti.presentation.screens.checkout.PaymentMethodScreen
 import com.iti.presentation.screens.checkout.PaymentMethodViewModel
-import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
 import com.iti.presentation.screens.payment.PaymentScreen
 import com.iti.presentation.screens.payment.PaymentViewModel
 import com.iti.presentation.screens.profile.AccountSettingsScreen
@@ -53,6 +52,10 @@ import com.iti.presentation.screens.profile.LocalizationCurrencyScreen
 import com.iti.presentation.screens.profile.AddressManagementScreen
 import com.iti.presentation.screens.profile.AddEditAddressScreen
 import com.iti.presentation.screens.address.components.AddressMapPicker
+import com.iti.presentation.screens.checkout.PaymentMethodContract
+import com.iti.presentation.screens.checkout.PaymentMethodScreen
+import com.iti.presentation.screens.checkout.CheckoutScreen
+import com.iti.presentation.screens.checkout.CheckoutViewModel
 import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.screens.checkout.summary.CheckoutSummaryScreen
 import com.iti.presentation.screens.checkout.summary.OrderSuccessScreen
@@ -292,13 +295,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
 
             entry<Screen.Checkout> {
+                val checkoutViewModel: CheckoutViewModel = koinViewModel()
                 val addressViewModel: AddressViewModel = koinViewModel()
 
-                AddressScreen(
-                    viewModel = addressViewModel,
+                CheckoutScreen(
+                    viewModel = checkoutViewModel,
+                    addressViewModel = addressViewModel,
                     onNavigateBack = ::navigateBack,
-                    onAddressSelected = { address ->
-                        navigate(Screen.PaymentMethod)
+                    onNavigateToHome = {
+                        replaceRoot(Screen.Home)
                     }
                 )
             }
@@ -321,13 +326,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 PaymentMethodScreen(
                     viewModel = paymentViewModel,
                     onNavigateBack = ::navigateBack,
-                    onNavigateToNextStep = { methodType: PaymentMethodType, amountCents: Long ->
+                    onNavigateToNextStep = { methodType: PaymentMethodContract.PaymentMethodType, amountCents: Long ->
                         when (methodType) {
-                            PaymentMethodType.COD -> {
+                            PaymentMethodContract.PaymentMethodType.COD -> {
                                 navigate(Screen.CODPayment)
                             }
 
-                            PaymentMethodType.ONLINE -> {
+                            PaymentMethodContract.PaymentMethodType.ONLINE -> {
                                 navigate(Screen.OnlinePayment(amountCents))
                             }
                         }
@@ -337,7 +342,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.CODPayment> {
                 CheckoutSummaryScreen(
-                    paymentMethod = PaymentMethodType.COD,
+                    paymentMethod = PaymentMethodContract.PaymentMethodType.COD,
                     onNavigateBack = ::navigateBack,
                     onNavigateToOrderConfirmation = {
                         navigate(Screen.OrderSuccess)
@@ -361,7 +366,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
 
             entry<Screen.OnlinePaymentSummary> {
                 CheckoutSummaryScreen(
-                    paymentMethod = PaymentMethodType.ONLINE,
+                    paymentMethod = PaymentMethodContract.PaymentMethodType.ONLINE,
                     onNavigateBack = ::navigateBack,
                     onNavigateToOrderConfirmation = {
                         navigate(Screen.OrderSuccess)

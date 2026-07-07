@@ -557,6 +557,7 @@
     <!-- Checkout Flow -->
     <string name="checkout_title">Checkout</string>
     <string name="checkout_step_address">Address</string>
+    <string name="checkout_step_method">Method</string>
     <string name="checkout_step_payment">Payment</string>
     <string name="checkout_step_summary">Summary</string>
     <string name="checkout_step_success">Success</string>

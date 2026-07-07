@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/components/PaymentMethodCard.kt
 //
 //  PaymentMethodCard.kt
 //  ShopIQ
@@ -7,10 +6,7 @@
 //  Copyright © 2026 ITI. All rights reserved.
 //
 
-package com.iti.presentation.screens.payment.components
-========
 package com.iti.presentation.screens.checkout.components
->>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/components/PaymentMethodCard.kt
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -25,11 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/components/PaymentMethodCard.kt
-import com.iti.presentation.screens.payment.PaymentMethodContract.PaymentMethodType
-========
 import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
->>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/components/PaymentMethodCard.kt
 
 @Composable
 fun PaymentMethodCard(

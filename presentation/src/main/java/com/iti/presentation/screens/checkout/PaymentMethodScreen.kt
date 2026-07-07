@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/PaymentMethodScreen.kt
 //
 //  PaymentMethodScreen.kt
 //  ShopIQ
@@ -7,10 +6,7 @@
 //  Copyright © 2026 ITI. All rights reserved.
 //
 
-package com.iti.presentation.screens.payment
-========
 package com.iti.presentation.screens.checkout
->>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/PaymentMethodScreen.kt
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -37,14 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/PaymentMethodScreen.kt
-import com.iti.presentation.screens.payment.PaymentMethodContract.Intent
-import com.iti.presentation.screens.payment.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.screens.payment.components.PaymentMethodCard
-import com.iti.presentation.screens.payment.components.LogoContainer
-import com.iti.presentation.ui.theme.SearchFieldLight
-
-========
 import com.iti.presentation.screens.checkout.PaymentMethodContract.Intent
 import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
 import com.iti.presentation.screens.checkout.components.PaymentMethodCard
@@ -63,13 +51,13 @@ fun LogoContainer(content: @Composable () -> Unit) {
         }
     }
 }
->>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/PaymentMethodScreen.kt
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentMethodScreen(
     viewModel: PaymentMethodViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToNextStep: (PaymentMethodType) -> Unit
+    onNavigateToNextStep: (PaymentMethodContract.PaymentMethodType,Long) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
@@ -80,7 +68,7 @@ fun PaymentMethodScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is PaymentMethodContract.Effect.NavigateBack -> onNavigateBack()
-                is PaymentMethodContract.Effect.NavigateToNextStep -> onNavigateToNextStep(effect.methodType)
+                is PaymentMethodContract.Effect.NavigateToNextStep -> onNavigateToNextStep(effect.methodType,effect.amountCents)
                 is PaymentMethodContract.Effect.ShowCodLimitError -> {
                     snackbarHostState.showSnackbar(
                         message = effect.message,

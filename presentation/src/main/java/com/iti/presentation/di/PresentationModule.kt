@@ -12,10 +12,7 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsViewModel
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
 import com.iti.presentation.screens.orderdetails.OrderDetailsViewModel
 import com.iti.presentation.screens.orders.OrdersViewModel
-import com.iti.presentation.screens.payment.PaymentMethodViewModel
 import com.iti.presentation.screens.checkout.CheckoutViewModel
-import com.iti.presentation.screens.checkout.summary.CheckoutSummaryViewModel
-import com.iti.presentation.screens.checkout.PaymentMethodContract
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsFilterManager
@@ -31,6 +28,7 @@ import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.screens.auth.emailverification.EmailVerificationViewModel
 import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordViewModel
 import com.iti.presentation.screens.checkout.PaymentMethodContract
+import com.iti.presentation.screens.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.checkout.summary.CheckoutSummaryViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel

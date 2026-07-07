@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/PaymentMethodContract.kt
 //
 //  PaymentMethodContract.kt
 //  ShopIQ
@@ -7,10 +6,7 @@
 //  Copyright © 2026 ITI. All rights reserved.
 //
 
-package com.iti.presentation.screens.payment
-========
 package com.iti.presentation.screens.checkout
->>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/PaymentMethodContract.kt
 
 import com.iti.presentation.util.UiText
 
