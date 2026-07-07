@@ -525,6 +525,7 @@
     <string name="checkout_btn_go_home">العودة إلى الصفحة الرئيسية</string>
 
     <string name="search_cd_close">إغلاق البحث</string>
+    <string name="view_cart">عرض العربة</string>
 
     <plurals name="cart_items_count">
         <item quantity="zero">لا توجد منتجات</item>
@@ -534,5 +535,13 @@
         <item quantity="many">%d منتج</item>
         <item quantity="other">%d منتج</item>
     </plurals>
+    <string name="content_desc_favorite">المفضلة</string>
+    <string name="content_desc_rating">التقييم</string>
+    <string name="product_rating_placeholder">4.6</string>
+    <string name="product_discount_badge">‎-%1$d%%</string>
+    <string name="remove_favorite_title">إزالة من المفضلة</string>
+    <string name="remove_favorite_message">هل أنت متأكد أنك تريد إزالة هذا المنتج من المفضلة؟</string>
+    <string name="remove_favorite_confirm">إزالة</string>
+    <string name="remove_favorite_cancel">إلغاء</string>
 
 </resources>

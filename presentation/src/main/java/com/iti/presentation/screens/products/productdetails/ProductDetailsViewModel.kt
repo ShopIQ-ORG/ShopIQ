@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import com.iti.presentation.util.UiText
 import com.iti.presentation.R
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
@@ -70,14 +70,12 @@ class ProductDetailsViewModel(
                     }
                     is Result.Success -> {
                         val product = result.data
-                        
                         _state.update {
                             it.copy(
                                 isLoading = false,
                                 product = product,
-                                // Default selection logic
-                                selectedColor = "Beige", // default as per mockup
-                                selectedSize = "M",      // default as per mockup
+                                selectedColor = "Beige",
+                                selectedSize = "M",
                                 selectedImageIndex = 0
                             )
                         }
@@ -96,7 +94,6 @@ class ProductDetailsViewModel(
     }
 
     private fun observeFavoriteStatus(productId: String) {
-        // Extract the numeric part only (e.g. "gid://shopify/Product/123" -> "123")
         val cleanProductId = productId.substringAfterLast("/")
 
         viewModelScope.launch {
@@ -105,7 +102,6 @@ class ProductDetailsViewModel(
                 favoriteOverride
             ) { result: Result<List<com.iti.domain.models.Product>>, override: Boolean? ->
                 if (result is Result.Success) {
-                    // Compare by clean numeric ID so Room & GID IDs both match
                     val isFavoriteInDb = result.data.any {
                         it.id.substringAfterLast("/") == cleanProductId
                     }
@@ -133,10 +129,9 @@ class ProductDetailsViewModel(
             if (userRes is Result.Success && userRes.data is User.AuthenticatedUser) {
                 val currentProduct = _state.value.product ?: return@launch
                 val currentlyWishlisted = _state.value.isWishlisted
-                
+
                 try {
                     val newStatus = !currentlyWishlisted
-                    // Optimistic update via override - happens IMMEDIATELY
                     favoriteOverride.value = newStatus
 
                     if (currentlyWishlisted) {
@@ -144,21 +139,24 @@ class ProductDetailsViewModel(
                     } else {
                         addProductToFavoritesUseCase(currentProduct)
                     }
-                    
+
                     val message = if (newStatus) {
                         UiText.StringResource(R.string.added_to_wishlist)
                     } else {
                         UiText.StringResource(R.string.removed_from_wishlist)
                     }
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
-                    
-                    // Keep the override for a bit
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(message = message, kind = SnackbarKind.Success))
+
                     kotlinx.coroutines.delay(1000)
                     favoriteOverride.value = null
                 } catch (e: Exception) {
-                    // Revert optimistic update
                     favoriteOverride.value = null
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Error: ${e.message}")))
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowSnackbar(
+                            message = UiText.Plain("Error: ${e.message}"),
+                            kind = SnackbarKind.Error
+                        )
+                    )
                 }
             } else {
                 _state.update { it.copy(showUnauthorizedDialog = true) }
@@ -172,7 +170,12 @@ class ProductDetailsViewModel(
         val variantId = selectedVariantId()
         if (variantId == null) {
             viewModelScope.launch {
-                _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Please select options first")))
+                _sideEffects.emit(
+                    ProductDetailsSideEffect.ShowSnackbar(
+                        message = UiText.Plain("Please select options first"),
+                        kind = SnackbarKind.Error
+                    )
+                )
             }
             return
         }
@@ -183,7 +186,14 @@ class ProductDetailsViewModel(
             when (val result = addToCartUseCase(variantId = variantId, quantity = 1)) {
                 is Result.Success -> {
                     _state.update { it.copy(isAddingToCart = false) }
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Added to Cart!")))
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowSnackbar(
+                            message = UiText.Plain("Added to Cart!"),
+                            kind = SnackbarKind.Success,
+                            actionLabel = UiText.StringResource(R.string.view_cart),
+                            isCartAction = true
+                        )
+                    )
                 }
                 is Result.Failure -> {
                     _state.update { it.copy(isAddingToCart = false) }
@@ -191,8 +201,9 @@ class ProductDetailsViewModel(
                         _state.update { it.copy(showUnauthorizedDialog = true) }
                     } else {
                         _sideEffects.emit(
-                            ProductDetailsSideEffect.ShowToast(
-                                UiText.Plain(result.exception.message ?: "Failed to add to cart")
+                            ProductDetailsSideEffect.ShowSnackbar(
+                                message = UiText.Plain(result.exception.message ?: "Failed to add to cart"),
+                                kind = SnackbarKind.Error
                             )
                         )
                     }

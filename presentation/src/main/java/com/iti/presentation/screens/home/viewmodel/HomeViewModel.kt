@@ -18,6 +18,7 @@ import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.products.SearchProductsUseCase
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
+import com.iti.presentation.components.ShopIQSnackbarType
 import com.iti.presentation.screens.home.HomeContract
 import com.iti.presentation.util.UiText
 import com.iti.presentation.util.Stopwords
@@ -80,11 +81,9 @@ class HomeViewModel(
                 if (user is com.iti.domain.models.User.AuthenticatedUser) {
                     observeChatHistory(user.uid)
                 } else {
-                    // Guest user - recommendations ready immediately (empty)
                     aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
                 }
             } else {
-                // User loading failed - treat as guest immediately to unblock screen loading
                 aiRecommendationsFlow.value = AiRecommendationsState(isLoaded = true)
             }
         }
@@ -151,7 +150,6 @@ class HomeViewModel(
                                 }
                             } else emptyList()
 
-                            // Wait and merge results
                             val recommendedList = recommendationJobs.awaitAll().filterNotNull()
                             resolvedProducts.addAll(recommendedList)
 
@@ -159,7 +157,6 @@ class HomeViewModel(
                             resolvedProducts.addAll(searchList)
                         }
 
-                        // Remove duplicates and limit to 10
                         val finalProducts = resolvedProducts.distinctBy { it.id }.take(10)
 
                         aiRecommendationsFlow.value = AiRecommendationsState(
@@ -236,29 +233,41 @@ class HomeViewModel(
             val productId = product.id
             val isFavorite = product.isFavorite
             try {
-                // Optimistic update: instantly reflect the new state in the UI
                 favoriteOverrides.update { it + (productId to !isFavorite) }
                 _state.update { it.copy(isFavoriteLoading = true) }
 
                 if (isFavorite) {
                     removeProductFromFavoritesUseCase(productId)
-                    emitEffect(HomeContract.Effect.ShowToast(UiText.StringResource(R.string.removed_from_wishlist)))
+                    emitEffect(
+                        HomeContract.Effect.ShowToast(
+                            message = UiText.StringResource(R.string.removed_from_wishlist),
+                            type = ShopIQSnackbarType.Success
+                        )
+                    )
                 } else {
                     addProductToFavoritesUseCase(product)
-                    emitEffect(HomeContract.Effect.ShowToast(UiText.StringResource(R.string.added_to_wishlist)))
+                    emitEffect(
+                        HomeContract.Effect.ShowToast(
+                            message = UiText.StringResource(R.string.added_to_wishlist),
+                            type = ShopIQSnackbarType.Success
+                        )
+                    )
                 }
 
                 _state.update { it.copy(isFavoriteLoading = false) }
                 favoriteOverrides.update { it - productId }
             } catch (_: Exception) {
-                // Revert optimistic update on failure
                 favoriteOverrides.update { it - productId }
                 _state.update { it.copy(isFavoriteLoading = false) }
-                emitEffect(HomeContract.Effect.ShowToast(UiText.Plain("Failed to update Wishlist")))
+                emitEffect(
+                    HomeContract.Effect.ShowToast(
+                        message = UiText.Plain("Failed to update Wishlist"),
+                        type = ShopIQSnackbarType.Error
+                    )
+                )
             }
         }
     }
-
 
     private fun loadAll() {
         _state.update { it.copy(screenState = HomeContract.ScreenState.Loading) }
@@ -334,7 +343,7 @@ class HomeViewModel(
                         val bestSellers = if (mainData.bestSellersResult is Result.Success) {
                             mainData.bestSellersResult.data
                         } else emptyList()
-                        
+
                         val updatedBestSellers = bestSellers.map { product ->
                             val isFavoriteInDb = product.id in favoriteIds
                             val isFavorite = mainData.overrides[product.id] ?: isFavoriteInDb

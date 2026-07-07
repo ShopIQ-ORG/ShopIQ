@@ -5,6 +5,7 @@ import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
+import com.iti.presentation.components.ShopIQSnackbarType
 import com.iti.presentation.util.UiText
 
 object HomeContract {
@@ -64,6 +65,6 @@ object HomeContract {
         data object NavigateToSearch : Effect()
         data object NavigateToSignIn : Effect()
         data object NavigateToAiChat : Effect()
-        data class ShowToast(val message: UiText) : Effect()
+        data class ShowToast(val message: UiText, val type: ShopIQSnackbarType = ShopIQSnackbarType.Success) : Effect()
     }
 }
