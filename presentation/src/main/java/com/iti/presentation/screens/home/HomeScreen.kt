@@ -55,7 +55,7 @@ import org.koin.compose.koinInject
 @Composable
 fun HomeScreen(
     onNavigateToAllBrands: () -> Unit,
-    onNavigateToAllProducts: (String?) -> Unit,
+    onNavigateToAllProducts: (brandName: String?, subCategoryName: String?) -> Unit,
     onCartClick: () -> Unit,
     onCategoryClick: (categoryId: String, categoryTitle: String) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
@@ -83,7 +83,7 @@ fun HomeScreen(
                 }
 
                 HomeContract.Effect.NavigateToAllProducts -> {
-                    onNavigateToAllProducts(null)
+                    onNavigateToAllProducts(null, null)
                 }
 
                 is HomeContract.Effect.NavigateToProduct -> {
@@ -91,7 +91,7 @@ fun HomeScreen(
                 }
 
                 is HomeContract.Effect.NavigateToProducts -> {
-                    onNavigateToAllProducts(effect.brandName)
+                    onNavigateToAllProducts(effect.brandName, effect.subCategoryName)
                 }
 
                 HomeContract.Effect.NavigateToSearch -> {
@@ -198,7 +198,6 @@ fun HomeScreenContent(
         bottomBar = {
             if (navItems[selectedIndex] != BottomNavItem.AI) {
                 NavigationBar(
-                    modifier = Modifier.navigationBarsPadding(),
                 containerColor = MaterialTheme.colorScheme.background,
                 tonalElevation = 0.dp
             ) {

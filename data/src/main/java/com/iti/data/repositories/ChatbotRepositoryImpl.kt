@@ -78,7 +78,8 @@ class ChatbotRepositoryImpl(
     override fun sendMessage(
         userId: String,
         userMessage: ChatMessage,
-        imageBytes: ByteArray?
+        imageBytes: ByteArray?,
+        currencyContext: String?
     ): Flow<Result<ChatMessage>> = flow {
         emit(Result.Loading)
         
@@ -111,7 +112,8 @@ class ChatbotRepositoryImpl(
                 ChatbotSystemPrompt.NO_PRODUCTS_TEXT
             }
 
-            val systemInstructionText = ChatbotSystemPrompt.getSystemPrompt(catalogText)
+            val systemInstructionText = ChatbotSystemPrompt.getSystemPrompt(catalogText) + 
+                if (currencyContext != null) "\n\nCRITICAL RULE: The user has selected their currency as $currencyContext. You MUST use this currency when mentioning prices. For example, if the catalog says 'Price: 100 USD', and currency is EGP, DO NOT say USD. State the price strictly in $currencyContext by multiplying the USD price by the exchange rate if you know it, OR just state the price if you don't know the exact rate but emphasize it is in $currencyContext." else ""
 
             val historySnapshot = firestore.collection("users")
                 .document(userId)

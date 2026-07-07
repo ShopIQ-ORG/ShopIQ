@@ -37,8 +37,8 @@ fun ActiveFiltersRow(
         if (state.sortOption != AllProductsContract.SortOption.BEST_SELLING) {
             ActiveChip(
                 label = when (state.sortOption) {
-                    AllProductsContract.SortOption.PRICE_ASC  -> stringResource(R.string.sort_price_asc_label)
-                    AllProductsContract.SortOption.PRICE_DESC -> stringResource(R.string.sort_price_desc_label)
+                    AllProductsContract.SortOption.PRICE_ASC  -> stringResource(R.string.sort_price_low_high)
+                    AllProductsContract.SortOption.PRICE_DESC -> stringResource(R.string.sort_price_high_low)
                     AllProductsContract.SortOption.BEST_SELLING -> ""
                 },
                 onRemove = onRemoveSort
@@ -68,9 +68,9 @@ private fun ActiveChip(label: String, onRemove: () -> Unit) {
             )
         },
         colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+            selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary
         )
     )
 }

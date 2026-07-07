@@ -287,15 +287,19 @@ class ProductsRepositoryImpl(
         }
     }
 
-    override fun getProductsByCategory(categoryId: String): Flow<Result<List<Product>>> = flow {
+    override fun getProductsByCategory(categoryId: String, count: Int): Flow<Result<List<Product>>> = flow {
         emit(Result.Loading)
         try {
-            val response = remoteDataSource.getProductsByCategory(categoryId)
+            val response = remoteDataSource.getProductsByCategory(categoryId, count)
             emit(Result.Success(response.toDomainProducts()))
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
             emit(Result.Failure(e.handleException()))
         }
+    }
+
+    override fun getBestSellers(count: Int): Flow<Result<List<Product>>> {
+        return getProductsByCategory("gid://shopify/Collection/493787218155", count)
     }
 }

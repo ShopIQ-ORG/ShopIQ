@@ -293,18 +293,8 @@ fun AccountSettingsContent(
             ) {
                 Column {
                     SettingsRowItem(
-                        icon = Icons.Default.Person,
-                        title = stringResource(R.string.profile_edit_profile),
-                        subtitle = stringResource(R.string.profile_edit_profile_desc),
-                        onClick = {
-                            if (isGuest) showAuthDialog = true else onNavigateToEditProfile()
-                        }
-                    )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
-                    SettingsRowItem(
                         icon = Icons.Default.LocationOn,
                         title = stringResource(R.string.profile_manage_addresses),
-                        subtitle = stringResource(R.string.profile_manage_addresses_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToAddressManagement()
                         }
@@ -314,7 +304,6 @@ fun AccountSettingsContent(
                     SettingsRowItem(
                         icon = Icons.Default.ShoppingCart,
                         title = stringResource(R.string.profile_order_history),
-                        subtitle = stringResource(R.string.profile_order_history_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToOrders()
                         }
@@ -323,14 +312,12 @@ fun AccountSettingsContent(
                     SettingsRowItem(
                         icon = Icons.Default.Settings,
                         title = stringResource(R.string.profile_localization_currency),
-                        subtitle = stringResource(R.string.profile_localization_currency_desc),
                         onClick = onNavigateToLocalizationCurrency
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.Language,
                         title = stringResource(R.string.language_title),
-                        subtitle = stringResource(R.string.language_subtitle),
                         onClick = { showLanguageBottomSheet = true }
                     )
                 }
@@ -357,7 +344,6 @@ fun AccountSettingsContent(
                     SettingsSwitchItem(
                         icon = Icons.Default.Settings,
                         title = stringResource(R.string.profile_dark_theme),
-                        subtitle = stringResource(R.string.profile_dark_theme_desc),
                         checked = isDarkTheme,
                         onCheckedChange = { ThemeManager.toggleTheme() }
                     )
@@ -406,31 +392,34 @@ fun AccountSettingsContent(
                     }
                 }
             } else {
-                androidx.compose.material3.Button(
+                androidx.compose.material3.OutlinedButton(
                     onClick = { showLogoutDialog = true },
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = Color.White
-                      ),
-                      shape = RoundedCornerShape(20.dp),
-                      modifier = Modifier
-                          .fillMaxWidth()
-                          .height(56.dp)
-                  ) {
-                      Icon(
-                          imageVector = Icons.Default.Lock,
-                          contentDescription = null,
-                          modifier = Modifier.size(20.dp)
-                      )
-                      Spacer(modifier = Modifier.width(12.dp))
-                      Text(
-                          text = stringResource(R.string.profile_sign_out_title),
-                          style = MaterialTheme.typography.titleMedium.copy(
-                              fontWeight = FontWeight.Bold
-                          )
-                      )
-                  }
-              }
+                    colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
+                    ),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(R.string.profile_sign_out_title),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
         }

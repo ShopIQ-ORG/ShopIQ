@@ -55,49 +55,51 @@ fun ProductsHeaderControls(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Filter Button
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(50.dp)
-                    )
-                    .clickable { onFilterClick() }
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.FilterList,
-                    contentDescription = stringResource(R.string.cd_filter),
-                    modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = stringResource(R.string.filter_button_label),
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                if (filterCount > 0) {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(16.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "!",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = MaterialTheme.colorScheme.onPrimary
+            if (state.activeSubCategory == null && state.activeBrand == null) {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(Color.Transparent)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            RoundedCornerShape(50.dp)
                         )
+                        .clickable { onFilterClick() }
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = stringResource(R.string.cd_filter),
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.filter_button_label),
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    if (filterCount > 0) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(16.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "!",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                     }
                 }
             }
@@ -106,24 +108,17 @@ fun ProductsHeaderControls(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                    .background(Color.Transparent)
                     .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(50.dp)
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        RoundedCornerShape(50.dp)
                     )
                     .clickable { onSortClick() }
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Sort,
-                    contentDescription = stringResource(R.string.cd_sort),
-                    modifier = Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = stringResource(R.string.sort_button_label),
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
@@ -142,73 +137,79 @@ fun ProductsHeaderControls(
         }
 
         // ── Horizontal Subcategory Scrollable Chips Row ──────────────────
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // "All" chip
-            item {
-                val isAllSelected = state.filterState.selectedCategories.isEmpty()
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(
-                            if (isAllSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        if (state.activeSubCategory == null && state.activeBrand == null) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // "All" chip
+                item {
+                    val isAllSelected = state.filterState.selectedSubCategories.isEmpty()
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(
+                                if (isAllSelected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = if (isAllSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(
+                                    alpha = 0.15f
+                                ),
+                                shape = RoundedCornerShape(50.dp)
+                            )
+                            .clickable { onCategorySelected(null) }
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.all_subcategory),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Medium
+                            ),
+                            color = if (isAllSelected) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        .border(
-                            width = 1.dp,
-                            color = if (isAllSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(50.dp)
-                        )
-                        .clickable { onCategorySelected(null) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.all_subcategory),
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Medium
-                        ),
-                        color = if (isAllSelected) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    }
                 }
-            }
 
-            // Subcategory chips
-            items(state.availableCategories) { category ->
-                val isSelected = state.filterState.selectedCategories.contains(category)
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(
-                            if (isSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                // Subcategory chips
+                items(state.availableSubCategories) { subCategory ->
+                    val isSelected = state.filterState.selectedSubCategories.contains(subCategory)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(
+                                if (isSelected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                            )
+                            .border(
+                                width = 1.dp,
+                                color = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(
+                                    alpha = 0.15f
+                                ),
+                                shape = RoundedCornerShape(50.dp)
+                            )
+                            .clickable { onCategorySelected(subCategory) }
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = subCategory,
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                            ),
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        .border(
-                            width = 1.dp,
-                            color = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(50.dp)
-                        )
-                        .clickable { onCategorySelected(category) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = category,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                        ),
-                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    }
                 }
             }
         }
-    }
-}
+    }}
+

@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -60,10 +61,19 @@ import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.screens.checkout.summary.CheckoutSummaryScreen
 import com.iti.presentation.screens.checkout.summary.OrderSuccessScreen
 import org.koin.androidx.compose.koinViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.iti.presentation.screens.products.displayallproducts.AllProductsContract
+import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
+
+class NavigationViewModel : ViewModel() {
+    val backStack = mutableStateListOf<Screen>(Screen.Splash)
+}
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
-    val backStack = remember { mutableStateListOf<Screen>(Screen.Splash) }
+    val navViewModel: NavigationViewModel = viewModel()
+    val backStack = navViewModel.backStack
     val profileViewModel: ProfileViewModel = koinViewModel()
 
     fun navigate(screen: Screen) {
@@ -186,8 +196,8 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     onNavigateToAllBrands = {
                         navigate(Screen.AllBrands)
                     },
-                    onNavigateToAllProducts = { brandName ->
-                        navigate(Screen.AllProducts(brandName))
+                    onNavigateToAllProducts = { brandName, subCategoryName ->
+                        navigate(Screen.AllProducts(brandName, subCategoryName))
                     },
                     onNavigateToSearch = {
                         navigate(Screen.Search)
@@ -226,7 +236,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 AllBrandsScreen(
                     onNavigateBack = ::navigateBack,
                     onNavigateToAllProducts = { brandName ->
-                        navigate(Screen.AllProducts(brandName))
+                        navigate(Screen.AllProducts(brandName, null))
                     },
                     onCartClick = {
                         if (backStack.lastOrNull() !is Screen.Cart) {
@@ -237,8 +247,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
 
             entry<Screen.AllProducts> { screen ->
+                val allProductsViewModel: AllProductsViewModel = koinViewModel()
+                
                 AllProductsScreen(
                     brandName = screen.brandName,
+                    subCategoryName = screen.subCategoryName,
+                    viewModel = allProductsViewModel,
                     onNavigateBack = ::navigateBack,
                     onNavigateToProduct = { productId ->
                         navigate(Screen.ProductDetails(productId))

@@ -9,7 +9,7 @@ query GetProducts($first: Int!, $after: String, $query: String, $sortKey: Produc
                 productType
                 vendor
                 tags
-                priceRange {
+                priceRangeV2 {
                     minVariantPrice {
                         amount
                         currencyCode

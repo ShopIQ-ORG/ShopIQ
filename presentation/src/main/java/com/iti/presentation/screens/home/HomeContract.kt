@@ -12,7 +12,8 @@ object HomeContract {
     data class HomeData(
         val products: List<Product>,
         val brands: List<Brand>,
-        val ads: List<Ad>
+        val ads: List<Ad>,
+        val bestSellers: List<Product>
     )
 
     sealed class ScreenState {
@@ -34,6 +35,7 @@ object HomeContract {
         val brandsResult: Result<List<Brand>>,
         val adsResult: Result<List<Ad>>,
         val favoritesResult: Result<List<Product>>,
+        val bestSellersResult: Result<List<Product>>,
         val overrides: Map<String, Boolean>
     )
 
@@ -44,6 +46,7 @@ object HomeContract {
         data class ProductClicked(val product: Product) : Intent()
         data class AiRecommendedProductClicked(val product: Product) : Intent()
         data class BrandClicked(val brandName: String) : Intent()
+        data class SubCategoryClicked(val subCategoryName: String) : Intent()
         data class AdClicked(val ad: Ad) : Intent()
         data object ViewAllBrandsClicked : Intent()
         data object ViewAllProductsClicked : Intent()
@@ -54,7 +57,7 @@ object HomeContract {
 
     sealed class Effect {
         data class NavigateToAllBrands(val brandName: String? = null) : Effect()
-        data class NavigateToProducts(val brandName: String? = null) : Effect()
+        data class NavigateToProducts(val brandName: String? = null, val subCategoryName: String? = null) : Effect()
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
         data object ShowAuthRequired : Effect()

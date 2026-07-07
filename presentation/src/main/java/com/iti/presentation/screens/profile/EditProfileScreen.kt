@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +30,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -241,8 +244,13 @@ fun EditProfileContent(
                 modifier = Modifier
                     .padding(bottom = 32.dp)
                     .size(120.dp)
-                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
             ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
+                ) {
                 if (avatarUrl.isNotBlank()) {
                     val isDark = LocalDarkTheme.current
                     val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
@@ -273,13 +281,14 @@ fun EditProfileContent(
                         Text(
                             text = firstLetter,
                             style = MaterialTheme.typography.displayLarge.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontSize = 48.sp
+                                fontSize = 40.sp
                             )
                         )
                     }
-                }
+                } // Close if-else block
+                } // Close inner Box
 
                 // Camera icon overlay button
                 Box(
@@ -287,8 +296,9 @@ fun EditProfileContent(
                     modifier = Modifier
                         .size(36.dp)
                         .align(Alignment.BottomEnd)
+                        .offset(x = (-4).dp, y = (-4).dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF1E1E24))
+                        .background(MaterialTheme.colorScheme.primary)
                         .clickable { 
                             photoPickerLauncher.launch(
                                 androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -296,9 +306,9 @@ fun EditProfileContent(
                         }
                 ) {
                     Icon(
-                        painter = painterResource(id = android.R.drawable.ic_menu_camera),
+                        imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.profile_edit_profile),
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -319,7 +329,6 @@ fun EditProfileContent(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Input: Email
-            // Input: Email
             ProfileInputField(
                 label = stringResource(R.string.email_address),
                 value = email,
@@ -328,7 +337,14 @@ fun EditProfileContent(
                 errorMessage = null,
                 readOnly = true,
                 enabled = false,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Uneditable",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                }
             )
 
             Spacer(modifier = Modifier.height(20.dp))

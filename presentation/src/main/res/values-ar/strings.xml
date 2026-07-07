@@ -133,8 +133,7 @@
     <!-- AI Chatbot Strings -->
     <string name="ai_assistant_title">المساعد الذكي</string>
     <string name="ai_auth_required_title">مطلوب تسجيل الدخول</string>
-    <string name="ai_auth_required_subtitle">يرجى تسجيل الدخول للوصول إلى إسلام، مساعدك الشخصي للتسوق، ومزامنة سجل الدردشة، والحصول على اقتراحات مخصصة.</string>
-    <string name="ai_auth_btn_signin">تسجيل الدخول للمتابعة</string>
+    <string name="ai_auth_required_subtitle">يرجى تسجيل الدخول للوصول إلى مساعد التسوق الذكي الخاص بك، ومزامنة سجل المحادثات، والحصول على توصيات مخصصة.</string>    <string name="ai_auth_btn_signin">تسجيل الدخول للمتابعة</string>
     <string name="ai_input_placeholder">اسأل عن أي شيء...</string>
     <string name="ai_input_listening">جاري الاستماع...</string>
     <string name="ai_permission_record_audio_required">إذن الصوت مطلوب لإدخال الصوت</string>
@@ -142,8 +141,7 @@
     <string name="ai_image_picker_error">فشل قراءة ملف الصورة.</string>
     <string name="ai_product_view">عرض المنتج</string>
     <string name="ai_reset_chat_desc">إعادة تعيين المحادثة</string>
-    <string name="ai_greeting_message">مرحباً! أنا إسلام، مساعدك الشخصي للتسوق. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
-
+    <string name="ai_greeting_message">مرحبًا! أنا مساعد التسوق الذكي الخاص بك. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
 
     <!-- Chatbot error messages -->
     <string name="ai_error_invalid_key">مفتاح اتصال المساعد غير صالح. يرجى الاتصال بالدعم أو التحقق من الإعدادات.</string>
@@ -165,9 +163,9 @@
 
     <!-- Home AI Recommendations -->
     <string name="recommended_for_you">موصى به لك</string>
-    <string name="ai_recommended_subtitle">بناءً على محادثتك مع إسلام</string>
-    <string name="try_eslam_title">تحدث مع إسلام 🤖</string>
-    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها — ستظهر اقتراحاتك الشخصية هنا.</string>
+    <string name="ai_recommended_subtitle">بناءً على محادثتك مع مساعدنا الذكي</string>
+    <string name="try_eslam_title">تحدث مع مساعدنا الذكي</string>
+    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها وستظهر لك ترشيحات مخصصة هنا.</string>
     <string name="try_eslam_btn">ابدأ المحادثة</string>
     <string name="suggestions_title">اقتراحات لك</string>
     <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>
@@ -414,7 +412,7 @@
     <string name="profile_payment_methods_desc">البطاقات والمحافظ المحفوظة</string>
     <string name="profile_order_history">سجل الطلبات</string>
     <string name="profile_order_history_desc">عرض طلباتك السابقة</string>
-    <string name="profile_localization_currency">الإعدادات الإقليمية والعملة</string>
+    <string name="profile_localization_currency">اعدادات العمله</string>
     <string name="profile_localization_currency_desc">اللغة، العملة والمزيد</string>
     <string name="profile_preferences">التفضيلات</string>
     <string name="profile_dark_theme">المظهر الداكن</string>
@@ -454,4 +452,87 @@
     <string name="currency_powered_by">مدعوم بواسطة Exchange Rate API</string>
     <string name="currency_trend_title">حركة سعر الصرف (آخر 7 أيام)</string>
     <string name="filter_select_all">تحديد الكل</string>
+    <string name="no_brands_available">لا توجد علامات تجارية متاحة</string>
+    <string name="clicked_product">تم الضغط على %1$s</string>
+    <string name="error_loading_brands">فشل في تحميل العلامات التجارية</string>
+    <string name="error_loading_ads">فشل في تحميل الإعلانات</string>
+    <string name="retry">إعادة المحاولة</string> <string name="something_went_wrong">حدث خطأ ما</string>
+
+    <string name="brands_discover_collection">اكتشف المجموعة →</string>
+
+
+    <!-- Connection & Empty States -->
+
+    <string name="no_internet_title">لا يوجد اتصال بالإنترنت</string> <string name="no_internet_subtitle">يرجى التحقق من الاتصال والمحاولة مرة أخرى</string> <string name="no_internet_btn_retry">حاول مرة أخرى</string> <string name="no_internet_btn_settings">فحص الإعدادات</string>
+
+    <string name="no_results_title">لا توجد نتائج</string> <string name="no_results_subtitle">لم نتمكن من العثور على منتجات تطابق "%1$s".</string> <string name="no_results_subtitle_generic">لم نتمكن من العثور على منتجات تطابق بحثك.</string> <string name="no_results_btn_search">جرب بحثًا آخر</string> <string name="no_results_btn_browse">تصفح المنتجات</string> <string name="category_items_count">%1$d عنصر</string> <string name="network_connection_lost">تم فقدان الاتصال بالإنترنت</string>
+
+    <string name="search_cd_clear">مسح النص</string> <string name="search_trending_label">🔥 الأكثر رواجًا</string> <string name="search_popular_now_label">الأكثر شيوعًا الآن</string>
+
+    <string name="filter_cd_expand">توسيع القسم</string> <string name="filter_cd_collapse">طي القسم</string>
+
+    <string name="sort_apply">تطبيق الترتيب</string>
+
+    <string name="popular_snowboard">لوح تزلج</string> <string name="popular_shoes">أحذية</string> <string name="popular_backpack">حقيبة ظهر</string> <string name="popular_gift_card">بطاقة هدية</string> <string name="popular_hoodie">هودي</string> <string name="popular_sunglasses">نظارات شمسية</string>
+
+    <string name="cd_search">بحث</string> <string name="cd_filter">تصفية</string> <string name="cd_sort">ترتيب</string>
+
+    <string name="cart_title">سلة التسوق</string> <string name="cart_promo_label">هل لديك كود خصم؟</string> <string name="cart_promo_apply">تطبيق</string> <string name="cart_promo_hint">أدخل الكود</string> <string name="cart_subtotal">الإجمالي الفرعي</string> <string name="cart_discount">الخصم</string> <string name="cart_shipping">الشحن</string> <string name="cart_shipping_free">مجاني</string> <string name="cart_total">الإجمالي</string> <string name="cart_proceed_to_checkout">إتمام الشراء</string> <string name="cart_remove_item_cd">حذف المنتج</string> <string name="cart_empty_title">سلة التسوق فارغة</string> <string name="cart_empty_subtitle">أضف منتجات للبدء</string> <string name="cart_browse_products">تصفح المنتجات</string> <string name="cart_promo_empty_error">يرجى إدخال كود الخصم</string> <string name="cart_promo_invalid_error">كود الخصم غير صالح</string> <string name="cart_quantity_update_error">فشل في تحديث الكمية</string> <string name="cart_remove_item_error">فشل في حذف المنتج</string> <string name="cart_load_error">خطأ غير معروف</string>
+
+    <string name="login_required_title">تسجيل الدخول مطلوب</string> <string name="login_required_message">يجب تسجيل الدخول لإضافة منتجات إلى سلة التسوق.</string> <string name="login_required_action">تسجيل الدخول</string> <string name="action_cancel">إلغاء</string>
+
+    <string name="cart_unauthorized_title">قم بتسجيل الدخول لعرض سلة التسوق</string> <string name="cart_unauthorized_message">أنشئ حسابًا أو قم بتسجيل الدخول لرؤية منتجاتك المحفوظة وإتمام الشراء.</string>
+
+    <string name="remove_item">حذف المنتج</string> <string name="remove_item_message">
+هل أنت متأكد أنك تريد حذف هذا المنتج من سلة التسوق؟ </string>
+    <string name="delete">حذف</string>
+
+    <string name="cancel">إلغاء</string>
+
+    <!-- res/values/plurals.xml -->
+
+
+    <string name="wishlist_locked_subtitle">يجب تسجيل الدخول أو إنشاء حساب لحفظ منتجاتك المفضلة وعرضها هنا.</string>
+
+    <string name="cart_shipping_calculated_at_checkout">يتم حسابه عند إتمام الشراء</string> <string name="cart_promo_duplicate_error">تم استخدام هذا الكود بالفعل</string>
+
+    <string name="all_photos">كل الصور</string>
+
+    <string name="cart_max_quantity_reached">لقد وصلت إلى الحد الأقصى المتاح لهذا المنتج.</string>
+    <string name="cart_promo_applied_badge">تم التطبيق</string>
+    <string name="cart_out_of_stock">هذا المنتج غير متوفر حاليًا.</string>
+    <string name="cart_promo_remove_cd">إزالة كود الخصم</string>
+    <string name="cart_checkout_out_of_stock">قم بإزالة المنتجات غير المتوفرة قبل المتابعة لإتمام الشراء.</string>
+    <string name="cart_low_stock_warning">متبقي %1$d فقط — احصل عليه قبل نفاده!</string>
+
+    <string name="checkout_title">إتمام الشراء</string>
+    <string name="checkout_step_address">العنوان</string>
+    <string name="checkout_step_payment">الدفع</string>
+    <string name="checkout_step_summary">الملخص</string>
+    <string name="checkout_step_success">تم بنجاح</string>
+
+    <string name="checkout_payment_title">معلومات الدفع</string>
+    <string name="checkout_payment_method_label">الدفع الإلكتروني</string>
+    <string name="checkout_payment_mock_desc">طريقة الدفع مضبوطة على الدفع الإلكتروني (Paymob). في هذه النسخة التجريبية، يتم تأكيد الدفع تلقائيًا.</string>
+
+    <string name="checkout_btn_confirm_payment">تأكيد والمتابعة</string>
+    <string name="checkout_btn_place_order">إتمام الطلب</string>
+
+    <string name="checkout_success_title">شكرًا لك!</string>
+    <string name="checkout_success_subtitle">تم إتمام طلبك بنجاح.</string>
+    <string name="checkout_success_details">رقم الطلب (Shopify): %1$s</string>
+
+    <string name="checkout_btn_go_home">العودة إلى الصفحة الرئيسية</string>
+
+    <string name="search_cd_close">إغلاق البحث</string>
+
+    <plurals name="cart_items_count">
+        <item quantity="zero">لا توجد منتجات</item>
+        <item quantity="one">منتج واحد</item>
+        <item quantity="two">منتجان</item>
+        <item quantity="few">%d منتجات</item>
+        <item quantity="many">%d منتج</item>
+        <item quantity="other">%d منتج</item>
+    </plurals>
+
 </resources>
