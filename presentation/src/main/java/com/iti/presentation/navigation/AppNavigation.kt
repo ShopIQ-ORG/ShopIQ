@@ -36,6 +36,7 @@ import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
 import com.iti.presentation.screens.checkout.PaymentMethodScreen
 import com.iti.presentation.screens.checkout.summary.CheckoutSummaryScreen
+import com.iti.presentation.screens.checkout.summary.OrderSuccessScreen
 import com.iti.presentation.screens.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
 import org.koin.androidx.compose.koinViewModel
@@ -299,8 +300,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     paymentMethod = PaymentMethodType.COD,
                     onNavigateBack = ::navigateBack,
                     onNavigateToOrderConfirmation = {
-                        // Navigate to a success screen or back to home
-                        replaceRoot(Screen.Home)
+                        navigate(Screen.OrderSuccess)
                     }
                 )
             }
@@ -310,7 +310,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                     paymentMethod = PaymentMethodType.ONLINE,
                     onNavigateBack = ::navigateBack,
                     onNavigateToOrderConfirmation = {
+                        navigate(Screen.OrderSuccess)
+                    }
+                )
+            }
+
+            entry<Screen.OrderSuccess> {
+                OrderSuccessScreen(
+                    onNavigateToHome = {
                         replaceRoot(Screen.Home)
+                    },
+                    onNavigateToOrders = {
+                        replaceRoot(Screen.Home)
+                        navigate(Screen.Orders)
                     }
                 )
             }
