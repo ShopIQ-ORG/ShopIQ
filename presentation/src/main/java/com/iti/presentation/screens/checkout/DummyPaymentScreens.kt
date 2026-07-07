@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/DummyPaymentScreens.kt
 //
 //  DummyPaymentScreens.kt
 //  ShopIQ
@@ -7,6 +8,9 @@
 //
 
 package com.iti.presentation.screens.payment
+========
+package com.iti.presentation.screens.checkout
+>>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/DummyPaymentScreens.kt
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

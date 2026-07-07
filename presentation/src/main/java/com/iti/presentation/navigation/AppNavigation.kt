@@ -56,6 +56,8 @@ import com.iti.presentation.screens.profile.AddressManagementScreen
 import com.iti.presentation.screens.profile.AddEditAddressScreen
 import com.iti.presentation.screens.address.components.AddressMapPicker
 import com.iti.presentation.screens.profile.ProfileViewModel
+import com.iti.presentation.screens.checkout.summary.CheckoutSummaryScreen
+import com.iti.presentation.screens.checkout.summary.OrderSuccessScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -323,7 +325,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 PaymentMethodScreen(
                     viewModel = paymentViewModel,
                     onNavigateBack = ::navigateBack,
-                    onNavigateToNextStep = { methodType ->
+                    onNavigateToNextStep = { methodType: PaymentMethodType ->
                         when (methodType) {
                             PaymentMethodType.COD -> {
                                 navigate(Screen.CODPayment)
@@ -338,11 +340,35 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
 
             entry<Screen.CODPayment> {
-                CODPaymentScreen(onNavigateBack = ::navigateBack)
+                CheckoutSummaryScreen(
+                    paymentMethod = PaymentMethodType.COD,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToOrderConfirmation = {
+                        navigate(Screen.OrderSuccess)
+                    }
+                )
             }
 
             entry<Screen.OnlinePayment> {
-                OnlinePaymentScreen(onNavigateBack = ::navigateBack)
+                CheckoutSummaryScreen(
+                    paymentMethod = PaymentMethodType.ONLINE,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToOrderConfirmation = {
+                        navigate(Screen.OrderSuccess)
+                    }
+                )
+            }
+
+            entry<Screen.OrderSuccess> {
+                OrderSuccessScreen(
+                    onNavigateToHome = {
+                        replaceRoot(Screen.Home)
+                    },
+                    onNavigateToOrders = {
+                        replaceRoot(Screen.Home)
+                        navigate(Screen.Orders)
+                    }
+                )
             }
 
             entry<Screen.Orders> {

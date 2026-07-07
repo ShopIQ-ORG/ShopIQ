@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:presentation/src/main/java/com/iti/presentation/screens/payment/PaymentMethodContract.kt
 //
 //  PaymentMethodContract.kt
 //  ShopIQ
@@ -7,6 +8,9 @@
 //
 
 package com.iti.presentation.screens.payment
+========
+package com.iti.presentation.screens.checkout
+>>>>>>>> feature/paymob-payment:presentation/src/main/java/com/iti/presentation/screens/checkout/PaymentMethodContract.kt
 
 import com.iti.presentation.util.UiText
 
@@ -26,6 +30,7 @@ sealed interface PaymentMethodContract {
     sealed interface Effect {
         object NavigateBack : Effect
         data class NavigateToNextStep(val methodType: PaymentMethodType) : Effect
+        data class ShowCodLimitError(val message: String) : Effect
     }
 
     enum class PaymentMethodType {
