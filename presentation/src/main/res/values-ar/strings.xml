@@ -61,6 +61,8 @@
     <string name="search_popular_label">عمليات البحث الشائعة</string>
     <string name="search_clear_all">مسح الكل</string>
     <string name="search_empty_hint">ابحث عن المنتجات، الماركات أو الفئات</string>
+    <string name="search_start_title">ابحث عن منتجك المفضل التالي</string>
+    <string name="search_start_subtitle">ابحث عن المنتجات، العلامات التجارية والفئات للبدء.</string>
     <string name="categories_title">الأقسام</string>
     <string name="category_section_title">تسوق حسب القسم</string>
     <string name="currency_updated_to">تم تحديث العملة إلى %1$s</string>
