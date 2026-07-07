@@ -115,7 +115,8 @@
     <string name="search_popular_label">Popular Searches</string>
     <string name="search_clear_all">Clear All</string>
     <string name="search_empty_hint">Search for products, brands\nor categories</string>
-    <string name="currency_updated_to">Currency updated to %1$s</string><string name="search_cd_close">Close search</string>
+    <string name="currency_updated_to">Currency updated to %1$s</string>
+    <string name="search_cd_close">Close search</string>
     <string name="search_cd_clear">Clear text</string>
     <string name="search_trending_label">🔥 Trending</string>
     <string name="search_popular_now_label">Popular Now</string>
