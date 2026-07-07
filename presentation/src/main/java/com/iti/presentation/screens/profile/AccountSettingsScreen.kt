@@ -293,18 +293,8 @@ fun AccountSettingsContent(
             ) {
                 Column {
                     SettingsRowItem(
-                        icon = Icons.Default.Person,
-                        title = stringResource(R.string.profile_edit_profile),
-                        subtitle = stringResource(R.string.profile_edit_profile_desc),
-                        onClick = {
-                            if (isGuest) showAuthDialog = true else onNavigateToEditProfile()
-                        }
-                    )
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
-                    SettingsRowItem(
                         icon = Icons.Default.LocationOn,
                         title = stringResource(R.string.profile_manage_addresses),
-                        subtitle = stringResource(R.string.profile_manage_addresses_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToAddressManagement()
                         }
@@ -314,7 +304,6 @@ fun AccountSettingsContent(
                     SettingsRowItem(
                         icon = Icons.Default.ShoppingCart,
                         title = stringResource(R.string.profile_order_history),
-                        subtitle = stringResource(R.string.profile_order_history_desc),
                         onClick = {
                             if (isGuest) showAuthDialog = true else onNavigateToOrders()
                         }
@@ -323,14 +312,12 @@ fun AccountSettingsContent(
                     SettingsRowItem(
                         icon = Icons.Default.Settings,
                         title = stringResource(R.string.profile_localization_currency),
-                        subtitle = stringResource(R.string.profile_localization_currency_desc),
                         onClick = onNavigateToLocalizationCurrency
                     )
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
                     SettingsRowItem(
                         icon = Icons.Default.Language,
                         title = stringResource(R.string.language_title),
-                        subtitle = stringResource(R.string.language_subtitle),
                         onClick = { showLanguageBottomSheet = true }
                     )
                 }
@@ -357,7 +344,6 @@ fun AccountSettingsContent(
                     SettingsSwitchItem(
                         icon = Icons.Default.Settings,
                         title = stringResource(R.string.profile_dark_theme),
-                        subtitle = stringResource(R.string.profile_dark_theme_desc),
                         checked = isDarkTheme,
                         onCheckedChange = { ThemeManager.toggleTheme() }
                     )
@@ -409,8 +395,8 @@ fun AccountSettingsContent(
                 androidx.compose.material3.Button(
                     onClick = { showLogoutDialog = true },
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.error
                       ),
                       shape = RoundedCornerShape(20.dp),
                       modifier = Modifier

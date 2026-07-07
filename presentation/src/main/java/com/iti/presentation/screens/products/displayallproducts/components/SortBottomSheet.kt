@@ -60,13 +60,7 @@ fun SortBottomSheet(
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
 
-            // ── Label ─────────────────────────────────────────────────────────
-            Text(
-                text = stringResource(R.string.sort_label),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
-            )
+
 
             // ── Radio options ─────────────────────────────────────────────────
             SortRadioRow(

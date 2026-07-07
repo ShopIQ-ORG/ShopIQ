@@ -131,8 +131,7 @@
     <!-- AI Chatbot Strings -->
     <string name="ai_assistant_title">المساعد الذكي</string>
     <string name="ai_auth_required_title">مطلوب تسجيل الدخول</string>
-    <string name="ai_auth_required_subtitle">يرجى تسجيل الدخول للوصول إلى إسلام، مساعدك الشخصي للتسوق، ومزامنة سجل الدردشة، والحصول على اقتراحات مخصصة.</string>
-    <string name="ai_auth_btn_signin">تسجيل الدخول للمتابعة</string>
+    <string name="ai_auth_required_subtitle">يرجى تسجيل الدخول للوصول إلى مساعد التسوق الذكي الخاص بك، ومزامنة سجل المحادثات، والحصول على توصيات مخصصة.</string>    <string name="ai_auth_btn_signin">تسجيل الدخول للمتابعة</string>
     <string name="ai_input_placeholder">اسأل عن أي شيء...</string>
     <string name="ai_input_listening">جاري الاستماع...</string>
     <string name="ai_permission_record_audio_required">إذن الصوت مطلوب لإدخال الصوت</string>
@@ -140,8 +139,7 @@
     <string name="ai_image_picker_error">فشل قراءة ملف الصورة.</string>
     <string name="ai_product_view">عرض المنتج</string>
     <string name="ai_reset_chat_desc">إعادة تعيين المحادثة</string>
-    <string name="ai_greeting_message">مرحباً! أنا إسلام، مساعدك الشخصي للتسوق. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
-
+    <string name="ai_greeting_message">مرحبًا! أنا مساعد التسوق الذكي الخاص بك. أنا هنا لمساعدتك في اختيار أفضل المنتجات من متجرنا.</string>
 
     <!-- Chatbot error messages -->
     <string name="ai_error_invalid_key">مفتاح اتصال المساعد غير صالح. يرجى الاتصال بالدعم أو التحقق من الإعدادات.</string>
@@ -163,9 +161,9 @@
 
     <!-- Home AI Recommendations -->
     <string name="recommended_for_you">موصى به لك</string>
-    <string name="ai_recommended_subtitle">بناءً على محادثتك مع إسلام</string>
-    <string name="try_eslam_title">تحدث مع إسلام 🤖</string>
-    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها — ستظهر اقتراحاتك الشخصية هنا.</string>
+    <string name="ai_recommended_subtitle">بناءً على محادثتك مع مساعدنا الذكي</string>
+    <string name="try_eslam_title">تحدث مع مساعدنا الذكي</string>
+    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها — وستظهر لك ترشيحات مخصصة هنا.</string>
     <string name="try_eslam_btn">ابدأ المحادثة</string>
     <string name="suggestions_title">اقتراحات لك</string>
     <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>

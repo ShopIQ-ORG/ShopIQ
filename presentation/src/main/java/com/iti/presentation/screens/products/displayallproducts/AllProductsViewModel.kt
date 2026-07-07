@@ -87,8 +87,8 @@ class AllProductsViewModel(
             // legacy brand chip
             is AllProductsContract.Intent.ClearFilter        -> clearLegacyBrandFilter()
 
-            // direct category selection
             is AllProductsContract.Intent.SelectCategory     -> selectCategory(intent.category)
+            is AllProductsContract.Intent.SelectSubCategory  -> selectSubCategory(intent.subCategory)
 
             // search
             is AllProductsContract.Intent.OpenSearch         -> _state.update { it.copy(isSearchActive = true) }
@@ -330,6 +330,14 @@ class AllProductsViewModel(
                 filterState = it.filterState.copy(selectedCategories = cats),
                 pendingFilterState = it.pendingFilterState.copy(selectedCategories = cats)
             )
+        }
+        applyAll()
+    }
+
+    private fun selectSubCategory(subCategory: String?) {
+        _state.update {
+            val newSubCategories = if (subCategory == null) emptySet() else setOf(subCategory)
+            it.copy(filterState = it.filterState.copy(selectedSubCategories = newSubCategories))
         }
         applyAll()
     }

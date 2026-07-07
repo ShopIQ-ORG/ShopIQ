@@ -194,7 +194,10 @@ class HomeViewModel(
             is HomeContract.Intent.ProductFavoriteClicked -> toggleFavorite(intent.product)
 
             is HomeContract.Intent.BrandClicked ->
-                emitEffect(HomeContract.Effect.NavigateToProducts(intent.brandName))
+                emitEffect(HomeContract.Effect.NavigateToProducts(brandName = intent.brandName))
+
+            is HomeContract.Intent.SubCategoryClicked ->
+                emitEffect(HomeContract.Effect.NavigateToProducts(subCategoryName = intent.subCategoryName))
 
             is HomeContract.Intent.AdClicked ->
                 emitEffect(HomeContract.Effect.NavigateToProducts(intent.ad.subtitle))

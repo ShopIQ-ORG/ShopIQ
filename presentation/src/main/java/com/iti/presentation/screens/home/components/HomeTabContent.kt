@@ -156,8 +156,8 @@ fun HomeTabContent(
                     // 3. New Arrivals & Summer Sale Banners
                     item {
                         HomeBanners(
-                            onExploreClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) },
-                            onShopNowClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) }
+                            onExploreClick = { onIntent(HomeContract.Intent.SubCategoryClicked("T-SHIRTS")) },
+                            onShopNowClick = { onIntent(HomeContract.Intent.SubCategoryClicked("ACCESSORIES")) }
                         )
                     }
 
@@ -189,12 +189,16 @@ fun HomeTabContent(
                     }
 
                     item {
+                        val featuredProducts = remember(data.products) {
+                            val shoes = data.products.filter { it.productType.contains("shoes", ignoreCase = true) }
+                            if (shoes.isNotEmpty()) shoes.take(6) else data.products.shuffled().take(6)
+                        }
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(data.products.take(6), key = { it.id }) { product ->
+                            items(featuredProducts, key = { it.id }) { product ->
                                 val onClick = remember(product) { { onIntent(HomeContract.Intent.ProductClicked(product)) } }
                                 val onFavoriteClick = remember(product) { { onIntent(HomeContract.Intent.ProductFavoriteClicked(product)) } }
                                 ProductCard(

@@ -243,8 +243,7 @@
     <!-- AI Chatbot Strings -->
     <string name="ai_assistant_title">AI Assistant</string>
     <string name="ai_auth_required_title">Authentication Required</string>
-    <string name="ai_auth_required_subtitle">Please sign in to access Eslam, your AI shopping assistant, sync your chat history, and get personalized recommendations.</string>
-    <string name="ai_auth_btn_signin">Sign In to Continue</string>
+    <string name="ai_auth_required_subtitle">Please sign in to access your AI shopping assistant, sync your chat history, and get personalized recommendations.</string>    <string name="ai_auth_btn_signin">Sign In to Continue</string>
     <string name="ai_input_placeholder">Ask anything...</string>
     <string name="ai_input_listening">Listening...</string>
     <string name="ai_permission_record_audio_required">Audio permission is required for voice input</string>
@@ -252,7 +251,7 @@
     <string name="ai_image_picker_error">Failed to read image file.</string>
     <string name="ai_product_view">View Product</string>
     <string name="ai_reset_chat_desc">Reset Chat</string>
-    <string name="ai_greeting_message">Hello! I am Eslam, your personal shopping assistant. I am here to help you choose the best products from our shop.</string>
+    <string name="ai_greeting_message">Hello! I am your AI shopping assistant. I\'m here to help you choose the best products from our shop.</string>
 
     <!-- Wishlist feedback -->
     <string name="added_to_wishlist">Added to Wishlist</string>
@@ -276,8 +275,8 @@
 
     <!-- Home AI Recommendations -->
     <string name="recommended_for_you">Recommended For You</string>
-    <string name="ai_recommended_subtitle">Based on your chat with Eslam</string>
-    <string name="try_eslam_title">Chat with Eslam</string>
+    <string name="ai_recommended_subtitle">Based on your chat with our AI assistant</string>
+    <string name="try_eslam_title">Chat with our AI assistant</string>
     <string name="try_eslam_subtitle">Ask our AI assistant about products you love — personalized picks will appear right here.</string>
     <string name="try_eslam_btn">Start Chatting</string>
     <string name="suggestions_title">Suggestions</string>

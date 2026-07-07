@@ -75,6 +75,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AllProductsScreen(
     brandName: String? = null,
+    subCategoryName: String? = null,
     onNavigateBack: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     onNavigateToAuth: () -> Unit,
@@ -85,8 +86,8 @@ fun AllProductsScreen(
     val gridState = rememberLazyGridState()
     var showAuthDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(brandName) {
-        viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName))
+    LaunchedEffect(brandName, subCategoryName) {
+        viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName, subCategoryName))
     }
 
     LaunchedEffect(state.filterState, state.sortOption, state.activeBrand, state.searchQuery) {
@@ -137,7 +138,7 @@ fun AllProductsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
-                title = state.activeBrand ?: stringResource(R.string.all_products_title),
+                title = state.activeSubCategory ?: state.activeBrand ?: stringResource(R.string.all_products_title),
                 onBack = onNavigateBack,
                 scrollBehavior = scrollBehavior
             )
@@ -148,14 +149,6 @@ fun AllProductsScreen(
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding())
         ) {
-            // ── Legacy brand filter chip ─────────────────────────────────────
-            AnimatedVisibility(visible = state.activeBrand != null) {
-                FilterBanner(
-                    brandName = state.activeBrand ?: "",
-                    onClear = { viewModel.sendIntent(AllProductsContract.Intent.ClearFilter) },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-            }
 
             // Get product count from state
             val productCount = when (val screenState = state.screenState) {
@@ -170,7 +163,7 @@ fun AllProductsScreen(
                 productCount = productCount,
                 onFilterClick = { viewModel.sendIntent(AllProductsContract.Intent.OpenFilterSheet) },
                 onSortClick = { viewModel.sendIntent(AllProductsContract.Intent.OpenSortSheet) },
-                onCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.SelectCategory(it)) }
+                onCategorySelected = { viewModel.sendIntent(AllProductsContract.Intent.SelectSubCategory(it)) }
             )
 
             // ── Main Grid Content ────────────────────────────────────────────

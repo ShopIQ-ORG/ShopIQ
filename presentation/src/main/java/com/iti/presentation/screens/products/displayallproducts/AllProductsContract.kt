@@ -68,6 +68,7 @@ object AllProductsContract {
 
         // direct category chip selection (bypasses pending state)
         data class SelectCategory(val category: String?) : Intent()
+        data class SelectSubCategory(val subCategory: String?) : Intent()
 
         // search
         data object OpenSearch : Intent()

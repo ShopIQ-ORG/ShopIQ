@@ -138,17 +138,7 @@ fun FilterBottomSheet(
                     HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
                 }
 
-                // ── Filter by Sub-Category ─────────────────────────────────────
-                item {
-                    SubCategoryFilterSection(
-                        selectedSubCategories = filterState.selectedSubCategories,
-                        subCategories = availableSubCategories,
-                        onSubCategoryToggled = onSubCategoryToggled,
-                        onClearSubCategories = onClearSubCategories,
-                        onSelectAllSubCategories = onSelectAllSubCategories
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
-                }
+
 
                 // ── Filter by Brand ────────────────────────────────────────────
                 item {
