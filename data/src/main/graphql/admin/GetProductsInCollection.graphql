@@ -1,8 +1,8 @@
-query GetProductsInCollection($id: ID!) {
+query GetProductsInCollection($id: ID!, $first: Int = 50) {
   collection(id: $id) {
     id
     title
-    products(first: 50) {
+    products(first: $first) {
       edges {
         node {
           id

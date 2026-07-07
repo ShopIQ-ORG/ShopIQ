@@ -511,7 +511,7 @@
     <string name="profile_payment_methods_desc">Saved cards &amp; wallets</string>
     <string name="profile_order_history">Order History</string>
     <string name="profile_order_history_desc">View your past orders</string>
-    <string name="profile_localization_currency">Localization &amp; Currency</string>
+    <string name="profile_localization_currency">Preferred Currency</string>
     <string name="profile_localization_currency_desc">Language, currency &amp; more</string>
     <string name="profile_preferences">Preferences</string>
     <string name="profile_dark_theme">Dark Theme</string>

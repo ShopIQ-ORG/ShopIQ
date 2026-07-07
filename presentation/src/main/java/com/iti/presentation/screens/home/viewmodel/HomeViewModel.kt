@@ -13,7 +13,9 @@ import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import com.iti.domain.repositories.products.ProductsRepository
+import com.iti.domain.usecases.products.GetBestSellersUseCase
+import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.SearchProductsUseCase
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.screens.home.HomeContract
@@ -43,7 +45,9 @@ class HomeViewModel(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val authRepository: AuthRepository,
     private val getChatHistoryUseCase: GetChatHistoryUseCase,
-    private val productsRepository: ProductsRepository
+    private val getBestSellersUseCase: GetBestSellersUseCase,
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
+    private val searchProductsUseCase: SearchProductsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeContract.State())
@@ -123,7 +127,7 @@ class HomeViewModel(
                                     async {
                                         try {
                                             val numericId = rawId.substringAfterLast("/").toLongOrNull() ?: return@async null
-                                            val res = productsRepository.getProductDetails(numericId)
+                                            val res = getProductDetailsUseCase(numericId)
                                                 .first { it !is Result.Loading }
                                             if (res is Result.Success) res.data else null
                                         } catch (_: Exception) {
@@ -137,7 +141,7 @@ class HomeViewModel(
                                 keywords.takeLast(3).map { keyword ->
                                     async {
                                         try {
-                                            val res = productsRepository.searchProducts(keyword)
+                                            val res = searchProductsUseCase(keyword)
                                                 .first { it !is Result.Loading }
                                             if (res is Result.Success) res.data else emptyList()
                                         } catch (_: Exception) {
@@ -259,19 +263,31 @@ class HomeViewModel(
     private fun loadAll() {
         _state.update { it.copy(screenState = HomeContract.ScreenState.Loading) }
         viewModelScope.launch {
-            val mainDataFlow = combine(
+            val flow1 = combine(
                 getProductsByNumberUseCase(),
                 getBrandsUseCase(),
-                getAdsUseCase(),
+                getAdsUseCase()
+            ) { p, b, a -> Triple(p, b, a) }
+
+            val flow2 = combine(
                 getFavoriteProductsUseCase(),
+                getBestSellersUseCase(50),
                 favoriteOverrides
-            ) { productsResult, brandsResult, adsResult, favoritesResult, overrides ->
+            ) { f, s, o -> Triple(f, s, o) }
+
+            val mainDataFlow = combine(flow1, flow2) { (productsResult, brandsResult, adsResult), (favoritesResult, bestSellersResult, overrides) ->
+                val processedBestSellers = if (bestSellersResult is Result.Success) {
+                    Result.Success(bestSellersResult.data.takeLast(10))
+                } else {
+                    bestSellersResult
+                }
                 HomeContract.MainDataHolder(
-                    productsResult,
-                    brandsResult,
-                    adsResult,
-                    favoritesResult,
-                    overrides
+                    productsResult = productsResult,
+                    brandsResult = brandsResult,
+                    adsResult = adsResult,
+                    favoritesResult = favoritesResult,
+                    bestSellersResult = processedBestSellers,
+                    overrides = overrides
                 )
             }
 
@@ -315,11 +331,22 @@ class HomeViewModel(
                             product.copy(isFavorite = isFavorite)
                         }
 
+                        val bestSellers = if (mainData.bestSellersResult is Result.Success) {
+                            mainData.bestSellersResult.data
+                        } else emptyList()
+                        
+                        val updatedBestSellers = bestSellers.map { product ->
+                            val isFavoriteInDb = product.id in favoriteIds
+                            val isFavorite = mainData.overrides[product.id] ?: isFavoriteInDb
+                            product.copy(isFavorite = isFavorite)
+                        }
+
                         HomeContract.ScreenState.Success(
                             HomeContract.HomeData(
                                 products = updatedProducts,
                                 brands = (mainData.brandsResult as Result.Success).data,
-                                ads = (mainData.adsResult as Result.Success).data
+                                ads = (mainData.adsResult as Result.Success).data,
+                                bestSellers = updatedBestSellers
                             )
                         )
                     }

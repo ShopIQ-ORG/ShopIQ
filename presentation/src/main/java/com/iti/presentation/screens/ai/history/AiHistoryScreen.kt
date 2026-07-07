@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChevronRight
@@ -63,9 +64,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.platform.LocalLocale
-import androidx.compose.ui.res.painterResource
 import com.iti.presentation.screens.ai.components.AiAvatar
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AiHistoryScreen(
@@ -326,7 +325,7 @@ fun ConversationCard(
                     fontSize = 12.sp
                 )
                 Icon(
-                    imageVector = Icons.Default.ChevronRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = Color.Gray,
                     modifier = Modifier.padding(start = 4.dp)

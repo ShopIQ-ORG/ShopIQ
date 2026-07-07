@@ -45,9 +45,18 @@ fun AiChatScreen(
     val state by viewModel.state.collectAsState()
     val listState = rememberLazyListState()
 
-    // Auto-scroll to bottom when new messages arrive
-    LaunchedEffect(state.messages.size) {
-        if (state.messages.isNotEmpty()) {
+    val scrollToTimestamp by AiChatSharedState.scrollToMessageTimestamp.collectAsState()
+    
+    // Auto-scroll to bottom or to specific message when arriving from history
+    LaunchedEffect(state.messages.size, scrollToTimestamp) {
+        val targetTs = scrollToTimestamp
+        if (targetTs != null && state.messages.isNotEmpty()) {
+            val index = state.messages.indexOfFirst { it.timestamp == targetTs }
+            if (index != -1) {
+                listState.animateScrollToItem(index)
+            }
+            AiChatSharedState.scrollToMessageTimestamp.value = null
+        } else if (state.messages.isNotEmpty() && targetTs == null) {
             listState.animateScrollToItem(state.messages.lastIndex)
         }
     }
@@ -115,7 +124,7 @@ fun AiChatScreen(
                         )
                     }
                     
-                    if (state.isLoading) {
+                    if (state.isBotTyping) {
                         item {
                             AiTypingIndicator(isDark = isDark)
                         }

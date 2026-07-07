@@ -9,8 +9,9 @@ class SendChatMessageUseCase(private val repository: ChatbotRepository) {
     operator fun invoke(
         userId: String,
         userMessage: ChatMessage,
-        imageBytes: ByteArray? = null
+        imageBytes: ByteArray? = null,
+        currencyContext: String? = null
     ): Flow<Result<ChatMessage>> {
-        return repository.sendMessage(userId, userMessage, imageBytes)
+        return repository.sendMessage(userId, userMessage, imageBytes, currencyContext)
     }
 }

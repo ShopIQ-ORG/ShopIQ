@@ -113,8 +113,8 @@ class ProductsRemoteDataSourceImpl(
         return response.data ?: throw Exception("Response data is null")
     }
 
-    override suspend fun getProductsByCategory(categoryId: String): GetProductsInCollectionQuery.Data {
-        val response = apolloClient.query(GetProductsInCollectionQuery(categoryId)).execute()
+    override suspend fun getProductsByCategory(categoryId: String, first: Int): GetProductsInCollectionQuery.Data {
+        val response = apolloClient.query(GetProductsInCollectionQuery(id = categoryId, first = Optional.presentIfNotNull(first))).execute()
 
         if (response.hasErrors()) {
             throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")

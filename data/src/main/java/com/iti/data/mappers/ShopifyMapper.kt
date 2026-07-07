@@ -26,12 +26,12 @@ fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
                 tags = edge.node.tags,
                 priceRangeV2 = PriceRangeV2(
                     minVariantPrice = MoneyV2(
-                        amount = edge.node.priceRange.minVariantPrice.amount,
-                        currencyCode = edge.node.priceRange.minVariantPrice.currencyCode.name
+                        amount = edge.node.priceRangeV2.minVariantPrice.amount,
+                        currencyCode = edge.node.priceRangeV2.minVariantPrice.currencyCode.name
                     ),
                     maxVariantPrice = MoneyV2(
-                        amount = edge.node.priceRange.maxVariantPrice.amount,
-                        currencyCode = edge.node.priceRange.maxVariantPrice.currencyCode.name
+                        amount = edge.node.priceRangeV2.maxVariantPrice.amount,
+                        currencyCode = edge.node.priceRangeV2.maxVariantPrice.currencyCode.name
                     )
                 ),
                 images = ImageConnection(
@@ -52,7 +52,7 @@ fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
                                 title = variantEdge.node.title,
                                 price = MoneyV2(
                                     amount = variantEdge.node.price.toString(),
-                                    currencyCode = edge.node.priceRange.minVariantPrice.currencyCode.name
+                                    currencyCode = edge.node.priceRangeV2.minVariantPrice.currencyCode.name
                                 ),
                                 availableForSale = variantEdge.node.availableForSale
                             )
@@ -134,12 +134,12 @@ fun GetProductDetailsQuery.Product.toShopifyResponse(): ShopifyResponse {
         tags = this.tags,
         priceRangeV2 = PriceRangeV2(
             minVariantPrice = MoneyV2(
-                amount = this.priceRange.minVariantPrice.amount,
-                currencyCode = this.priceRange.minVariantPrice.currencyCode.name
+                amount = this.priceRangeV2.minVariantPrice.amount,
+                currencyCode = this.priceRangeV2.minVariantPrice.currencyCode.name
             ),
             maxVariantPrice = MoneyV2(
-                amount = this.priceRange.maxVariantPrice.amount,
-                currencyCode = this.priceRange.maxVariantPrice.currencyCode.name
+                amount = this.priceRangeV2.maxVariantPrice.amount,
+                currencyCode = this.priceRangeV2.maxVariantPrice.currencyCode.name
             )
         ),
         images = ImageConnection(
@@ -160,7 +160,7 @@ fun GetProductDetailsQuery.Product.toShopifyResponse(): ShopifyResponse {
                         title = variantEdge.node.title,
                         price = MoneyV2(
                             amount = variantEdge.node.price.toString(),
-                            currencyCode = this.priceRange.minVariantPrice.currencyCode.name
+                            currencyCode = this.priceRangeV2.minVariantPrice.currencyCode.name
                         ),
                         availableForSale = variantEdge.node.availableForSale
                     )

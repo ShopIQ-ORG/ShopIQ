@@ -189,9 +189,8 @@ fun HomeTabContent(
                     }
 
                     item {
-                        val featuredProducts = remember(data.products) {
-                            val shoes = data.products.filter { it.productType.contains("shoes", ignoreCase = true) }
-                            if (shoes.isNotEmpty()) shoes.take(6) else data.products.shuffled().take(6)
+                        val featuredProducts = data.bestSellers.ifEmpty { 
+                            remember(data.products) { data.products.shuffled().take(6) } 
                         }
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 16.dp),

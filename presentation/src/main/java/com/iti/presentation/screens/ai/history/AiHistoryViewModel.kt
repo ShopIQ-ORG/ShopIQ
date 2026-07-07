@@ -51,6 +51,7 @@ class AiHistoryViewModel(
             is AiHistoryContract.Intent.ConfirmDeleteAll -> clearHistory()
             is AiHistoryContract.Intent.ConversationClicked -> {
                 viewModelScope.launch {
+                    com.iti.presentation.screens.ai.AiChatSharedState.scrollToMessageTimestamp.value = intent.item.timestamp
                     _effect.send(AiHistoryContract.Effect.NavigateBack)
                 }
             }

@@ -163,7 +163,7 @@
     <string name="recommended_for_you">موصى به لك</string>
     <string name="ai_recommended_subtitle">بناءً على محادثتك مع مساعدنا الذكي</string>
     <string name="try_eslam_title">تحدث مع مساعدنا الذكي</string>
-    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها — وستظهر لك ترشيحات مخصصة هنا.</string>
+    <string name="try_eslam_subtitle">اسأل مساعدنا الذكي عن المنتجات التي تحبها وستظهر لك ترشيحات مخصصة هنا.</string>
     <string name="try_eslam_btn">ابدأ المحادثة</string>
     <string name="suggestions_title">اقتراحات لك</string>
     <string name="suggestions_general_subtitle">منتجات قد تعجبك</string>
@@ -410,7 +410,7 @@
     <string name="profile_payment_methods_desc">البطاقات والمحافظ المحفوظة</string>
     <string name="profile_order_history">سجل الطلبات</string>
     <string name="profile_order_history_desc">عرض طلباتك السابقة</string>
-    <string name="profile_localization_currency">الإعدادات الإقليمية والعملة</string>
+    <string name="profile_localization_currency">اعدادات العمله</string>
     <string name="profile_localization_currency_desc">اللغة، العملة والمزيد</string>
     <string name="profile_preferences">التفضيلات</string>
     <string name="profile_dark_theme">المظهر الداكن</string>

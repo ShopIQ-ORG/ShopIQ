@@ -392,31 +392,34 @@ fun AccountSettingsContent(
                     }
                 }
             } else {
-                androidx.compose.material3.Button(
+                androidx.compose.material3.OutlinedButton(
                     onClick = { showLogoutDialog = true },
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                    colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
-                      ),
-                      shape = RoundedCornerShape(20.dp),
-                      modifier = Modifier
-                          .fillMaxWidth()
-                          .height(56.dp)
-                  ) {
-                      Icon(
-                          imageVector = Icons.Default.Lock,
-                          contentDescription = null,
-                          modifier = Modifier.size(20.dp)
-                      )
-                      Spacer(modifier = Modifier.width(12.dp))
-                      Text(
-                          text = stringResource(R.string.profile_sign_out_title),
-                          style = MaterialTheme.typography.titleMedium.copy(
-                              fontWeight = FontWeight.Bold
-                          )
-                      )
-                  }
-              }
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
+                    ),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(R.string.profile_sign_out_title),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(bottomPadding + 16.dp))
         }

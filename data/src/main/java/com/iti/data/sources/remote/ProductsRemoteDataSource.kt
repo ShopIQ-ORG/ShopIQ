@@ -16,7 +16,7 @@ interface ProductsRemoteDataSource {
     ): ShopifyResponse
     suspend fun getProductDetails(productId: Long): ShopifyResponse
     suspend fun getMainCategories(): GetAllCategoriesQuery.Data
-    suspend fun getProductsByCategory(categoryId: String): GetProductsInCollectionQuery.Data
+    suspend fun getProductsByCategory(categoryId: String, first: Int = 10): GetProductsInCollectionQuery.Data
     suspend fun getBrands(): List<BrandDto>
     suspend fun getAds(): List<AdDto>
 }

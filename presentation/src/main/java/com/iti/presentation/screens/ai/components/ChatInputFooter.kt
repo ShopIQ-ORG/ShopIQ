@@ -148,7 +148,11 @@ fun ChatInputFooter(
             ) {
                 TextField(
                     value = inputText,
-                    onValueChange = { inputText = it },
+                    onValueChange = { newValue ->
+                        if (newValue.length <= 500 && newValue.count { it == '\n' } <= 4) {
+                            inputText = newValue
+                        }
+                    },
                     placeholder = {
                         Text(
                             text = if (recordingState == RecordingState.RECORDING) {
@@ -253,7 +257,7 @@ fun ChatInputFooter(
                         IconButton(
                             onClick = {
                                 if (inputText.isNotBlank()) {
-                                    onSendMessage(inputText)
+                                    onSendMessage(inputText.trim())
                                     inputText = ""
                                 }
                             },

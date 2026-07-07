@@ -49,7 +49,8 @@ class AiChatViewModel(
                         intent.text,
                         intent.imageBytes,
                         intent.attachedImageUrl,
-                        intent.voiceDuration
+                        intent.voiceDuration,
+                        com.iti.presentation.util.CurrencyManager.selectedCurrency.value.code
                     )
                 }
             }
@@ -68,7 +69,7 @@ class AiChatViewModel(
                         _state.update { it.copy(isLoading = true) }
                     }
                     is Result.Success -> {
-                        _state.update { it.copy(error = null) }
+                        _state.update { it.copy(isLoading = false, error = null) }
                         resolveProductsAndEmit(result.data)
                     }
                     is Result.Failure -> {
@@ -127,9 +128,7 @@ class AiChatViewModel(
                     isResolvingProducts = false
                 )
             }
-            val isLastMessageFromUser = mappedMessages.lastOrNull()?.sender == "user"
-            val shouldBeLoading = mappedMessages.isEmpty() || isLastMessageFromUser
-            _state.update { it.copy(messages = mappedMessages, isLoading = shouldBeLoading) }
+            _state.update { it.copy(messages = mappedMessages) }
         }
     }
 
@@ -138,7 +137,8 @@ class AiChatViewModel(
         text: String,
         imageBytes: ByteArray?,
         attachedImageUrl: String?,
-        voiceDuration: String?
+        voiceDuration: String?,
+        currencyCode: String? = null
     ) {
         viewModelScope.launch {
             val userMsg = ChatMessage(
@@ -149,16 +149,16 @@ class AiChatViewModel(
                 voiceDuration = voiceDuration
             )
             
-            sendChatMessageUseCase(userId, userMsg, imageBytes).collect { result ->
+            sendChatMessageUseCase(userId, userMsg, imageBytes, currencyCode).collect { result ->
                 when (result) {
                     is Result.Loading -> {
-                        _state.update { it.copy(isLoading = true) }
+                        _state.update { it.copy(isBotTyping = true) }
                     }
                     is Result.Success -> {
-                        _state.update { it.copy(isLoading = false) }
+                        _state.update { it.copy(isBotTyping = false) }
                     }
                     is Result.Failure -> {
-                        _state.update { it.copy(isLoading = false, error = result.exception.message) }
+                        _state.update { it.copy(isBotTyping = false, error = result.exception.message) }
                     }
                 }
             }

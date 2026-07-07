@@ -28,6 +28,7 @@ object AiChatContract {
     data class State(
         val messages: List<ChatMessageUi> = emptyList(),
         val isLoading: Boolean = false,
+        val isBotTyping: Boolean = false,
         val error: String? = null,
         val currentUser: User? = null
     )

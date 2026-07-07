@@ -12,7 +12,8 @@ object HomeContract {
     data class HomeData(
         val products: List<Product>,
         val brands: List<Brand>,
-        val ads: List<Ad>
+        val ads: List<Ad>,
+        val bestSellers: List<Product>
     )
 
     sealed class ScreenState {
@@ -34,6 +35,7 @@ object HomeContract {
         val brandsResult: Result<List<Brand>>,
         val adsResult: Result<List<Ad>>,
         val favoritesResult: Result<List<Product>>,
+        val bestSellersResult: Result<List<Product>>,
         val overrides: Map<String, Boolean>
     )
 

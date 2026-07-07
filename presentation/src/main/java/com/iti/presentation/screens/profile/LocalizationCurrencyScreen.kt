@@ -271,28 +271,7 @@ fun LocalizationCurrencyContent(
                 modifier = Modifier.padding(start = 4.dp, top = 2.dp, bottom = 28.dp)
             )
 
-            // Section: Exchange Trend Chart (Dynamic for active selected currency)
-            Text(
-                text = "${state.selectedCurrency.code} " + stringResource(R.string.currency_trend_title),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
 
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    ExchangeTrendChart(
-                        history = state.exchangeRateHistory,
-                        primaryColor = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
         }
     }
 }

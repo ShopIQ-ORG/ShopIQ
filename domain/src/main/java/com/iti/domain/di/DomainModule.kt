@@ -45,6 +45,9 @@ import org.koin.dsl.module
 val domainModule = module {
     factory { GetProductsByNumberUseCase(get()) }
     factory { GetProductsPaginatedUseCase(get()) }
+    factory { com.iti.domain.usecases.products.SearchProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetPopularProductsUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetBestSellersUseCase(get()) }
     factory { GetBrandsUseCase(get()) }
     factory { GetAdsUseCase(get()) }
     factory { LoginUseCase(get()) }
