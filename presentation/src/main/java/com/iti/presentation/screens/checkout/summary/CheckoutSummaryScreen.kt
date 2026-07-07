@@ -12,6 +12,14 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.foundation.background
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -161,6 +169,10 @@ fun CheckoutSummaryScreen(
                     }
                 } else {
                     item {
+                        OnlinePaymentHeaderSection(isLoading = state.isLoading)
+                    }
+
+                    item {
                         PaddingWrapper {
                             Spacer(Modifier.height(20.dp))
                             ShippingMethodSection()
@@ -170,34 +182,11 @@ fun CheckoutSummaryScreen(
                     item {
                         PaddingWrapper {
                             Spacer(Modifier.height(20.dp))
-                            if (state.isLoading) {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = CardDefaults.cardColors(containerColor = SearchFieldLight.copy(alpha = 0.5f))
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(150.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.size(32.dp),
-                                                color = PrimaryLight,
-                                                strokeWidth = 3.dp
-                                            )
-                                            Spacer(modifier = Modifier.height(12.dp))
-                                            Text(
-                                                text = "Calculating fees...",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = TextSecondaryLight
-                                            )
-                                        }
-                                    }
-                                }
-                            } else {
+                            AnimatedVisibility(
+                                visible = !state.isLoading,
+                                enter = fadeIn() + expandVertically(),
+                                exit = fadeOut() + shrinkVertically()
+                            ) {
                                 state.cart?.let {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Row(
@@ -493,6 +482,66 @@ fun ShippingMethodSection() {
                     text = "Free",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OnlinePaymentHeaderSection(isLoading: Boolean) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        // Icon header — matches CODHeaderSection style
+        Surface(
+            modifier = Modifier.size(80.dp),
+            shape = CircleShape,
+            color = SearchFieldLight
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.AccountBalanceWallet,
+                contentDescription = null,
+                modifier = Modifier.padding(20.dp),
+                tint = PrimaryLight.copy(alpha = 0.4f)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Online Payment",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = TextPrimaryLight
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Your payment is secure & encrypted",
+            style = MaterialTheme.typography.bodySmall,
+            color = TextSecondaryLight
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Progress bar — visible while loading
+        if (isLoading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp),
+                    color = PrimaryLight,
+                    trackColor = SearchFieldLight
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Calculating fees...",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondaryLight
                 )
             }
         }

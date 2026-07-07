@@ -39,6 +39,7 @@ class CheckoutSummaryViewModel(
             CheckoutSummaryContract.Event.LoadData -> loadData()
             CheckoutSummaryContract.Event.PlaceOrderClicked -> handlePlaceOrder()
             CheckoutSummaryContract.Event.DismissPaymobBottomSheet -> _state.update { it.copy(showPaymobBottomSheet = false) }
+            CheckoutSummaryContract.Event.DismissCodLimitError -> _state.update { it.copy(showCodLimitError = false) }
             is CheckoutSummaryContract.Event.OnPaymentSuccess -> handlePaymentSuccess(event.response)
             is CheckoutSummaryContract.Event.OnPaymentFailure -> handlePaymentFailure(event.message)
             CheckoutSummaryContract.Event.OnPaymentPending -> handlePaymentPending()
@@ -72,6 +73,13 @@ class CheckoutSummaryViewModel(
         if (_state.value.paymentMethod == PaymentMethodType.ONLINE) {
             _state.update { it.copy(showPaymobBottomSheet = true) }
         } else {
+            // COD: check $500 limit
+            val cartTotal = _state.value.cart?.total?.amount?.toDoubleOrNull() ?: 0.0
+            if (cartTotal > COD_MAX_AMOUNT) {
+                _state.update { it.copy(showCodLimitError = true) }
+                return
+            }
+
             // Handle COD placement
             viewModelScope.launch {
                 _state.update { it.copy(isPlacingOrder = true) }
@@ -104,5 +112,9 @@ class CheckoutSummaryViewModel(
     private fun handlePaymentPending() {
         _state.update { it.copy(showPaymobBottomSheet = false) }
         // Maybe navigate to orders with pending status
+    }
+
+    companion object {
+        const val COD_MAX_AMOUNT = 500.0
     }
 }

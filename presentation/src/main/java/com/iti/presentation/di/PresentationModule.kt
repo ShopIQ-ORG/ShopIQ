@@ -55,7 +55,7 @@ val presentationModule = module {
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
     viewModelOf(::CartBadgeViewModel)
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
-    viewModel { PaymentMethodViewModel() }
+    viewModel { PaymentMethodViewModel(get()) }
     viewModelOf(::OrdersViewModel)
     viewModelOf(::OrderDetailsViewModel)
     viewModelOf(::ForgotPasswordViewModel)

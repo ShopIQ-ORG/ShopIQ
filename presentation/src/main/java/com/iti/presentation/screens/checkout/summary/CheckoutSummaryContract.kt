@@ -14,13 +14,15 @@ sealed interface CheckoutSummaryContract {
         val isPlacingOrder: Boolean = false,
         val error: UiText? = null,
         val showPaymobBottomSheet: Boolean = false,
-        val paymentProcessing: Boolean = false
+        val paymentProcessing: Boolean = false,
+        val showCodLimitError: Boolean = false
     )
 
     sealed interface Event {
         object LoadData : Event
         object PlaceOrderClicked : Event
         object DismissPaymobBottomSheet : Event
+        object DismissCodLimitError : Event
         data class OnPaymentSuccess(val response: Map<String, String?>) : Event
         data class OnPaymentFailure(val message: String) : Event
         object OnPaymentPending : Event
