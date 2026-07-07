@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.checkout
+package com.iti.presentation.screens.checkout
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

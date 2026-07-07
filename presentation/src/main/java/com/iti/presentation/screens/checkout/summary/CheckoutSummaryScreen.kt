@@ -1,13 +1,11 @@
-package com.iti.presentation.screens.products.checkout.summary
+package com.iti.presentation.screens.checkout.summary
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -19,13 +17,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,12 +32,11 @@ import com.iti.presentation.ui.theme.TextPrimaryLight
 import com.iti.presentation.ui.theme.TextSecondaryLight
 import com.iti.presentation.ui.theme.SuccessLight
 import com.iti.presentation.components.BackTopBar
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.screens.products.checkout.summary.components.PaymobBottomSheet
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.checkout.summary.components.PaymobBottomSheet
 import com.iti.presentation.screens.cart.components.OrderSummary
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import com.iti.presentation.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -306,7 +299,7 @@ fun CODInfoSection() {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = Color(0xFFE3F2FD).copy(alpha = 0.5f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBBDEFB))
+        border = BorderStroke(1.dp, Color(0xFFBBDEFB))
     ) {
         Row(
             modifier = Modifier.padding(20.dp),

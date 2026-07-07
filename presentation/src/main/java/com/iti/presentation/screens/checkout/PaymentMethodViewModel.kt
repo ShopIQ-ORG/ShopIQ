@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.checkout
+package com.iti.presentation.screens.checkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

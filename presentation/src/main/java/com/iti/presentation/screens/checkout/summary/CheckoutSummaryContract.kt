@@ -1,8 +1,8 @@
-package com.iti.presentation.screens.products.checkout.summary
+package com.iti.presentation.screens.checkout.summary
 
 import com.iti.domain.models.Address
 import com.iti.domain.models.cart.Cart
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
 import com.iti.presentation.util.UiText
 
 sealed interface CheckoutSummaryContract {

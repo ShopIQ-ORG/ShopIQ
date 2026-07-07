@@ -34,12 +34,10 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
-import com.iti.presentation.screens.products.checkout.PaymentMethodScreen
-import com.iti.presentation.screens.products.checkout.summary.CheckoutSummaryScreen
-import com.iti.presentation.screens.payment.PaymentScreen
-import com.iti.presentation.screens.payment.PaymentViewModel
-import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.checkout.PaymentMethodScreen
+import com.iti.presentation.screens.checkout.summary.CheckoutSummaryScreen
+import com.iti.presentation.screens.checkout.PaymentMethodViewModel
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

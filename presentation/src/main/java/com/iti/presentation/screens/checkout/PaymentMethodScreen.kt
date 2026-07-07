@@ -1,5 +1,6 @@
-package com.iti.presentation.screens.products.checkout
+package com.iti.presentation.screens.checkout
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,9 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.Intent
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.screens.products.checkout.components.PaymentMethodCard
+import com.iti.presentation.screens.checkout.PaymentMethodContract.Intent
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.checkout.components.PaymentMethodCard
 import com.iti.presentation.ui.theme.SearchFieldLight
 
 @Composable
@@ -33,7 +34,7 @@ fun LogoContainer(content: @Composable () -> Unit) {
     Surface(
         shape = RoundedCornerShape(4.dp),
         color = MaterialTheme.colorScheme.background,
-        border = androidx.compose.foundation.BorderStroke(1.dp, SearchFieldLight),
+        border = BorderStroke(1.dp, SearchFieldLight),
         shadowElevation = 0.5.dp
     ) {
         Box(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {

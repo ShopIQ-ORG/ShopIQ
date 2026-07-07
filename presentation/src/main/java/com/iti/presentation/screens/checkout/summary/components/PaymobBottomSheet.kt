@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.checkout.summary.components
+package com.iti.presentation.screens.checkout.summary.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

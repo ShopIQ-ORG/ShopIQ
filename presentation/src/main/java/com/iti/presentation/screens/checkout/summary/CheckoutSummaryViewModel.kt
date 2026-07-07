@@ -1,4 +1,4 @@
-package com.iti.presentation.screens.products.checkout.summary
+package com.iti.presentation.screens.checkout.summary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,9 +6,10 @@ import com.iti.domain.models.Result
 import com.iti.domain.repositories.payment.PaymobRepository
 import com.iti.domain.usecases.address.GetSavedAddressesUseCase
 import com.iti.domain.usecases.cart.GetCartUseCase
-import com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.util.toUiMessage
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -76,7 +77,7 @@ class CheckoutSummaryViewModel(
                 _state.update { it.copy(isPlacingOrder = true) }
                 // TODO: Call createOrderUseCase
                 // For now, simulate success
-                kotlinx.coroutines.delay(1500)
+                delay(1500)
                 _state.update { it.copy(isPlacingOrder = false) }
                 _effect.send(CheckoutSummaryContract.Effect.NavigateToOrderConfirmation)
             }
@@ -87,7 +88,7 @@ class CheckoutSummaryViewModel(
         _state.update { it.copy(showPaymobBottomSheet = false, paymentProcessing = true) }
         viewModelScope.launch {
             // TODO: Finalize order on Shopify
-            kotlinx.coroutines.delay(1500)
+            delay(1500)
             _state.update { it.copy(paymentProcessing = false) }
             _effect.send(CheckoutSummaryContract.Effect.NavigateToOrderConfirmation)
         }
@@ -96,7 +97,7 @@ class CheckoutSummaryViewModel(
     private fun handlePaymentFailure(message: String) {
         _state.update { it.copy(showPaymobBottomSheet = false) }
         viewModelScope.launch {
-            _effect.send(CheckoutSummaryContract.Effect.ShowError(com.iti.presentation.util.UiText.Plain(message)))
+            _effect.send(CheckoutSummaryContract.Effect.ShowError(UiText.Plain(message)))
         }
     }
 

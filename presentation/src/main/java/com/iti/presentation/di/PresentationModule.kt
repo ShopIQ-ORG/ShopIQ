@@ -12,7 +12,7 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsViewModel
 import com.iti.presentation.screens.home.viewmodel.CartBadgeViewModel
 import com.iti.presentation.screens.orderdetails.OrderDetailsViewModel
 import com.iti.presentation.screens.orders.OrdersViewModel
-import com.iti.presentation.screens.products.checkout.PaymentMethodViewModel
+import com.iti.presentation.screens.checkout.PaymentMethodViewModel
 import com.iti.presentation.screens.search.SearchViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 import com.iti.presentation.screens.products.displayallproducts.AllProductsFilterManager
@@ -26,6 +26,8 @@ import com.iti.presentation.screens.ai.history.AiHistoryViewModel
 import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.auth.emailverification.EmailVerificationViewModel
 import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordViewModel
+import com.iti.presentation.screens.checkout.PaymentMethodContract
+import com.iti.presentation.screens.checkout.summary.CheckoutSummaryViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -59,8 +61,8 @@ val presentationModule = module {
     viewModelOf(::ForgotPasswordViewModel)
     viewModelOf(::EmailVerificationViewModel)
     viewModel { AddressViewModel(get(), get(), get(), get(), get()) }
-    viewModel { (paymentMethod: com.iti.presentation.screens.products.checkout.PaymentMethodContract.PaymentMethodType) ->
-        com.iti.presentation.screens.products.checkout.summary.CheckoutSummaryViewModel(get(), get(), get(), paymentMethod)
+    viewModel { (paymentMethod: PaymentMethodContract.PaymentMethodType) ->
+        CheckoutSummaryViewModel(get(), get(), get(), paymentMethod)
     }
 
     viewModel { PaymentViewModel(get()) }
