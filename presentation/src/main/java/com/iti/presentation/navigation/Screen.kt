@@ -28,7 +28,8 @@ sealed class Screen : NavKey {
 
     data object PaymentMethod : Screen()
     data object CODPayment : Screen()
-    data object OnlinePayment : Screen()
+    data class OnlinePayment(val amountCents: Long) : Screen()
+    data object OnlinePaymentSummary : Screen()
     data object OrderSuccess : Screen()
 
     data object Orders : Screen()

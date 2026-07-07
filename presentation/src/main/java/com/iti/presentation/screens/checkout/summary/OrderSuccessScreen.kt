@@ -92,7 +92,7 @@ fun OrderSuccessScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // ── Primary CTA: Proceed your order ──
+        // ── Primary CTA: Track Your Order ──
         Button(
             onClick = onNavigateToOrders,
             modifier = Modifier
@@ -102,12 +102,33 @@ fun OrderSuccessScreen(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1C222B))
         ) {
             Text(
-                text = "Proceed your order",
+                text = "Track Your Order",
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 0.5.sp
                 ),
                 color = Color.White
+            )
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // ── Secondary CTA: Continue Shopping ──
+        OutlinedButton(
+            onClick = onNavigateToHome,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimaryLight),
+            border = ButtonDefaults.outlinedButtonBorder(enabled = true)
+        ) {
+            Text(
+                text = "Continue Shopping",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 0.5.sp
+                )
             )
         }
 

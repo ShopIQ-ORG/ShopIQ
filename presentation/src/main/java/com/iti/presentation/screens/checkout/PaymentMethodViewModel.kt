@@ -57,7 +57,8 @@ class PaymentMethodViewModel(
                             )
                         )
                     } else {
-                        _effect.send(PaymentMethodContract.Effect.NavigateToNextStep(selectedMethod))
+                        val amountCents = (cartTotal * 100).toLong()
+                        _effect.send(PaymentMethodContract.Effect.NavigateToNextStep(selectedMethod, amountCents))
                     }
                 }
             }

@@ -42,13 +42,11 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
-import com.iti.presentation.screens.payment.PaymentMethodScreen
-import com.iti.presentation.screens.payment.CODPaymentScreen
-import com.iti.presentation.screens.payment.OnlinePaymentScreen
-import com.iti.presentation.screens.payment.PaymentMethodViewModel
-import com.iti.presentation.screens.payment.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.screens.checkout.CheckoutScreen
-import com.iti.presentation.screens.checkout.CheckoutViewModel
+import com.iti.presentation.screens.checkout.PaymentMethodScreen
+import com.iti.presentation.screens.checkout.PaymentMethodViewModel
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.payment.PaymentScreen
+import com.iti.presentation.screens.payment.PaymentViewModel
 import com.iti.presentation.screens.profile.AccountSettingsScreen
 import com.iti.presentation.screens.profile.EditProfileScreen
 import com.iti.presentation.screens.profile.LocalizationCurrencyScreen
@@ -294,15 +292,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
 
             entry<Screen.Checkout> {
-                val checkoutViewModel: CheckoutViewModel = koinViewModel()
                 val addressViewModel: AddressViewModel = koinViewModel()
 
-                CheckoutScreen(
-                    viewModel = checkoutViewModel,
-                    addressViewModel = addressViewModel,
+                AddressScreen(
+                    viewModel = addressViewModel,
                     onNavigateBack = ::navigateBack,
-                    onNavigateToHome = {
-                        replaceRoot(Screen.Home)
+                    onAddressSelected = { address ->
+                        navigate(Screen.PaymentMethod)
                     }
                 )
             }
@@ -325,14 +321,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 PaymentMethodScreen(
                     viewModel = paymentViewModel,
                     onNavigateBack = ::navigateBack,
-                    onNavigateToNextStep = { methodType: PaymentMethodType ->
+                    onNavigateToNextStep = { methodType: PaymentMethodType, amountCents: Long ->
                         when (methodType) {
                             PaymentMethodType.COD -> {
                                 navigate(Screen.CODPayment)
                             }
 
                             PaymentMethodType.ONLINE -> {
-                                navigate(Screen.OnlinePayment)
+                                navigate(Screen.OnlinePayment(amountCents))
                             }
                         }
                     }
@@ -349,7 +345,21 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 )
             }
 
-            entry<Screen.OnlinePayment> {
+            entry<Screen.OnlinePayment> { screen ->
+                val paymentViewModel: PaymentViewModel = koinViewModel()
+
+                PaymentScreen(
+                    viewModel = paymentViewModel,
+                    amountCents = screen.amountCents,
+                    integrationId = com.iti.data.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242,
+                    onPaymentSuccess = {
+                        navigate(Screen.OnlinePaymentSummary)
+                    },
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.OnlinePaymentSummary> {
                 CheckoutSummaryScreen(
                     paymentMethod = PaymentMethodType.ONLINE,
                     onNavigateBack = ::navigateBack,

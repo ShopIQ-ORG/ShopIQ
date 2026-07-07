@@ -25,10 +25,21 @@ fun PaymentScreen(
     viewModel: PaymentViewModel,
     amountCents: Long,
     currency: String = "EGP",
-    integrationId: Int
+    integrationId: Int,
+    onPaymentSuccess: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.paymentUiState.collectAsState()
+
+    // Auto-start payment flow on entry
+    LaunchedEffect(Unit) {
+        viewModel.startPaymentFlow(
+            amountCents = amountCents,
+            currency = currency,
+            integrationId = integrationId
+        )
+    }
 
     LaunchedEffect(uiState) {
         if (uiState is PaymentUiState.Success) {
@@ -43,6 +54,7 @@ fun PaymentScreen(
                         override fun onSuccess(payResponse: HashMap<String, String?>) {
                             viewModel.resetState()
                             Toast.makeText(context, "Payment Successful", Toast.LENGTH_LONG).show()
+                            onPaymentSuccess()
                         }
 
                         override fun onFailure(msg: String?) {
