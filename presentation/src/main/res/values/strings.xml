@@ -119,6 +119,8 @@
     <string name="search_cd_clear">Clear text</string>
     <string name="search_trending_label">🔥 Trending</string>
     <string name="search_popular_now_label">Popular Now</string>
+    <string name="search_start_title">Find Your Next Favorite Thing</string>
+    <string name="search_start_subtitle">Search for products, brands, and categories to get started.</string>
 
     <!-- All Products – Filter -->
     <string name="filter_title">Filters</string>

@@ -81,7 +81,6 @@ class SearchViewModel(
                 val query = intent.query
                 if (query.isNotBlank()) {
                     searchJob?.cancel()
-                    saveSearchQuery(query)
                     performImmediateSearch(query)
                 }
             }
@@ -142,6 +141,9 @@ class SearchViewModel(
                         _state.update {
                             it.copy(screenState = SearchContract.ScreenState.Suggestions(result.data))
                         }
+                        if (result.data.isNotEmpty()) {
+                            saveSearchQuery(query)
+                        }
                     }
                     is Result.Failure -> {
                         val errorMsg = result.exception.message?.let { UiText.Plain(it) }
@@ -166,6 +168,9 @@ class SearchViewModel(
                     is Result.Success -> {
                         _state.update {
                             it.copy(screenState = SearchContract.ScreenState.Success(result.data))
+                        }
+                        if (result.data.isNotEmpty()) {
+                            saveSearchQuery(query)
                         }
                     }
                     is Result.Failure -> {
