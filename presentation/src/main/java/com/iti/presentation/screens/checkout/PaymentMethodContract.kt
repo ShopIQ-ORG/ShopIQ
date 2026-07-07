@@ -18,6 +18,7 @@ sealed interface PaymentMethodContract {
     sealed interface Effect {
         object NavigateBack : Effect
         data class NavigateToNextStep(val methodType: PaymentMethodType) : Effect
+        data class ShowCodLimitError(val message: String) : Effect
     }
 
     enum class PaymentMethodType {

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,18 +52,42 @@ fun PaymentMethodScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // Handle Side Effects (Navigation)
+    // Handle Side Effects (Navigation + Snackbar)
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is PaymentMethodContract.Effect.NavigateBack -> onNavigateBack()
                 is PaymentMethodContract.Effect.NavigateToNextStep -> onNavigateToNextStep(effect.methodType)
+                is PaymentMethodContract.Effect.ShowCodLimitError -> {
+                    snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        duration = SnackbarDuration.Long
+                    )
+                }
             }
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(top = 8.dp),
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        shape = RoundedCornerShape(12.dp),
+                        containerColor = Color(0xFFD32F2F),
+                        contentColor = Color.White,
+                        actionColor = Color.White
+                    )
+                }
+            )
+        },
         topBar = {
             TopAppBar(
                 title = {
