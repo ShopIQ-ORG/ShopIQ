@@ -146,7 +146,8 @@ fun CheckoutScreen(
                             },
                             onContinue = {
                                 viewModel.onEvent(CheckoutContract.Event.PaymentMethodConfirmed)
-                            }
+                            },
+                            isLoading = state.isLoading
                         )
                     }
 
@@ -170,7 +171,8 @@ fun CheckoutScreen(
                                 cart = state.cart,
                                 onConfirm = {
                                     viewModel.onEvent(CheckoutContract.Event.PaymentConfirmed)
-                                }
+                                },
+                                isLoading = state.isLoading
                             )
                         }
                     }
@@ -192,7 +194,8 @@ fun CheckoutScreen(
                             shippingAddress = state.selectedAddress,
                             onPlaceOrder = {
                                 viewModel.onEvent(CheckoutContract.Event.PlaceOrder)
-                            }
+                            },
+                            isLoading = state.isLoading
                         )
                     }
 
@@ -202,17 +205,6 @@ fun CheckoutScreen(
                             currentUser = state.currentUser,
                             onGoHome = onNavigateToHome
                         )
-                    }
-                }
-
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }

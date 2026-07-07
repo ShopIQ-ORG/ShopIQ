@@ -30,7 +30,8 @@ import com.iti.domain.models.cart.Cart
 fun PaymentStepContent(
     cart: Cart?,
     onConfirm: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -176,6 +177,7 @@ fun PaymentStepContent(
 
         Button(
             onClick = onConfirm,
+            enabled = !isLoading,
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
@@ -183,11 +185,19 @@ fun PaymentStepContent(
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(
-                text = "Confirm COD Details",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = "Confirm COD Details",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }

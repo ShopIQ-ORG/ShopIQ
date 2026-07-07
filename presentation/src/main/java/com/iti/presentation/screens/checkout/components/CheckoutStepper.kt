@@ -41,8 +41,8 @@ fun CheckoutStepper(
         stringResource(R.string.checkout_step_address),
         stringResource(R.string.checkout_step_method),
         stringResource(R.string.checkout_step_payment),
-        stringResource(R.string.checkout_step_summary),
-        stringResource(R.string.checkout_step_success)
+        stringResource(R.string.checkout_step_paid),
+        stringResource(R.string.checkout_step_summary)
     )
 
     Column(
