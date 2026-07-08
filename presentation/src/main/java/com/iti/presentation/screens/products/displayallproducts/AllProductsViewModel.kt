@@ -245,7 +245,7 @@ class AllProductsViewModel(
                             )
                         }
                         // Batch-fetch Arabic translations if device is in Arabic
-                        if (java.util.Locale.getDefault().language == "ar") {
+                        if (com.iti.presentation.util.LocaleHelper.isArabic()) {
                             fetchTranslationsForProducts(result.data.products)
                         }
                     }

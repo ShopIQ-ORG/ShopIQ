@@ -45,5 +45,7 @@ interface ProductsRepository {
         reviewId: String
     ): Flow<Result<Unit>>
     fun getProductTranslations(productId: String): Flow<Result<Map<String, String>>>
+    fun getCollectionTranslations(collectionId: String, locale: String): Flow<Result<Map<String, String>?>>
+    fun saveCollectionTranslation(collectionId: String, locale: String, title: String, bodyHtml: String): Flow<Result<Unit>>
 }
 

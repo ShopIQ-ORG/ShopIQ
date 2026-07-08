@@ -4,5 +4,6 @@ data class Brand(
     val id: String,
     val name: String,
     val imageUrl: String,
-    val mappedImageUrl: String = ""
+    val mappedImageUrl: String = "",
+    val arTitle: String? = null
 )

@@ -65,6 +65,8 @@ val domainModule = module {
     factory { SetOnboardingCompletedUseCase(get()) }
     factory { GetCategoriesUseCase(get()) }
     factory { GetProductsByCategoryUseCase(get()) }
+    factory { com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase(get()) }
+    factory { com.iti.domain.usecases.categories.SaveCollectionTranslationUseCase(get()) }
     factory { AddProductToFavoritesUseCase(get()) }
     factory { RemoveProductFromFavoritesUseCase(get()) }
     factory { GetFavoriteProductsUseCase(get()) }

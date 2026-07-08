@@ -1,0 +1,10 @@
+query GetCollectionTranslations($id: ID!) {
+  translatableResource(resourceId: $id) {
+    resourceId
+    translations(locale: "ar") {
+      key
+      value
+      outdated
+    }
+  }
+}

@@ -66,10 +66,12 @@ fun BrandsContent(
             items = brands,
             key = { _, brand -> brand.id }
         ) { _, brand ->
+            val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
+            val displayName = if (isArabic) (brand.arTitle ?: brand.name) else brand.name
             BrandBannerCard(
-                brandName = brand.name,
+                brandName = displayName,
                 imageUrl = brand.mappedImageUrl,
-                onClick = { onBrandClick(brand.name) },
+                onClick = { onBrandClick(brand.name) }, // always pass EN name for product filtering
                 modifier = Modifier.animateItem()
             )
         }

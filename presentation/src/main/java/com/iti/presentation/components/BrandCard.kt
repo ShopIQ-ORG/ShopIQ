@@ -49,8 +49,10 @@ fun BrandCard(
                 .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
         )
 
+        val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
+        val displayName = if (isArabic) (brand.arTitle ?: brand.name) else brand.name
         Text(
-            text = brand.name,
+            text = displayName,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

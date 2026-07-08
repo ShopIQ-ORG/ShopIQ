@@ -21,8 +21,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+import com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.first
+
 class AllBrandsViewModel(
-    private val getBrandsUseCase: GetBrandsUseCase
+    private val getBrandsUseCase: GetBrandsUseCase,
+    private val getCollectionTranslationsUseCase: GetCollectionTranslationsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AllBrandsContract.State())
@@ -55,28 +61,65 @@ class AllBrandsViewModel(
         _state.update { it.copy(screenState = AllBrandsContract.ScreenState.Loading) }
         fetchJob = viewModelScope.launch {
             getBrandsUseCase().collect { result ->
-                _state.update {
-                    when (result) {
-                        is Result.Loading -> it.copy(
-                            screenState = AllBrandsContract.ScreenState.Loading
-                        )
-                        is Result.Success -> {
-                            allBrands = result.data
-                            val filtered = applyFilter(result.data, it.query)
+                when (result) {
+                    is Result.Loading -> {
+                        _state.update { it.copy(screenState = AllBrandsContract.ScreenState.Loading) }
+                    }
+                    is Result.Success -> {
+                        allBrands = result.data
+                        val filtered = applyFilter(result.data, _state.value.query)
+                        _state.update {
                             it.copy(
                                 screenState = AllBrandsContract.ScreenState.Success(result.data),
                                 filteredBrands = filtered
                             )
                         }
-                        is Result.Failure -> it.copy(
-                            screenState = AllBrandsContract.ScreenState.Failure(
-                                result.exception.message
-                                    ?.let { msg -> UiText.Plain(msg) }
-                                    ?: UiText.StringResource(R.string.error_loading_brands)
+                        if (com.iti.presentation.util.LocaleHelper.isArabic()) {
+                            fetchTranslationsForBrands(result.data)
+                        }
+                    }
+                    is Result.Failure -> {
+                        _state.update {
+                            it.copy(
+                                screenState = AllBrandsContract.ScreenState.Failure(
+                                    result.exception.message
+                                        ?.let { msg -> UiText.Plain(msg) }
+                                        ?: UiText.StringResource(R.string.error_loading_brands)
+                                )
                             )
-                        )
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    private fun fetchTranslationsForBrands(brands: List<Brand>) {
+        viewModelScope.launch {
+            val translatedMap = brands.distinctBy { it.id }.map { brand ->
+                async {
+                    try {
+                        val res = getCollectionTranslationsUseCase(brand.id, "ar")
+                            .first { it !is Result.Loading }
+                        if (res is Result.Success) {
+                            val map = res.data
+                            brand.id to brand.copy(
+                                arTitle = map?.get("title")?.takeIf { it.isNotBlank() }
+                            )
+                        } else brand.id to brand
+                    } catch (_: Exception) {
+                        brand.id to brand
+                    }
+                }
+            }.awaitAll().toMap()
+
+            allBrands = allBrands.map { translatedMap[it.id] ?: it }
+            val filtered = applyFilter(allBrands, _state.value.query)
+            _state.update {
+                it.copy(
+                    screenState = AllBrandsContract.ScreenState.Success(allBrands),
+                    filteredBrands = filtered
+                )
             }
         }
     }
@@ -90,7 +133,10 @@ class AllBrandsViewModel(
 
     private fun applyFilter(brands: List<Brand>, query: String): List<Brand> {
         if (query.isBlank()) return brands
-        return brands.filter { it.name.contains(query, ignoreCase = true) }
+        return brands.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                    (it.arTitle?.contains(query, ignoreCase = true) == true)
+        }
     }
 
     private fun emitEffect(effect: AllBrandsContract.Effect) {

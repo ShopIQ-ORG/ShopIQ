@@ -199,8 +199,9 @@ fun ProductCard(
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
             Text(
-                text = product.arTitle ?: product.title,
+                text = if (isArabic) (product.arTitle ?: product.title) else product.title,
                 style = MaterialTheme.typography.bodyMedium,
                 color = onCardPrimaryText,
                 fontWeight = FontWeight.SemiBold,

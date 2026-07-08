@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class GetProductsByNumberUseCase(
     private val repository: ProductsRepository
 ){
-    operator fun invoke() : Flow<Result<List<Product>>> {
-        return repository.getProductsByNumber()
+    operator fun invoke(count: Int = 10) : Flow<Result<List<Product>>> {
+        return repository.getProductsByNumber(count)
     }
 }

@@ -348,7 +348,8 @@ fun BrandDto.toDomainBrand(): Brand {
         id = this.id,
         name = this.name,
         imageUrl = this.imageUrl,
-        mappedImageUrl = BrandImageMapper.getBrandImageUrl(this.name, this.imageUrl)
+        mappedImageUrl = BrandImageMapper.getBrandImageUrl(this.name, this.imageUrl),
+        arTitle = this.arTitle
     )
 }
 

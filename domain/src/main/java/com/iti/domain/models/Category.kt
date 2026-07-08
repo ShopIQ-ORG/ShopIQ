@@ -4,5 +4,6 @@ data class Category(
     val id: String,
     val title: String,
     val itemCount: Int,
-    val imageAssetPath: String
+    val imageAssetPath: String,
+    val arTitle: String? = null
 )
