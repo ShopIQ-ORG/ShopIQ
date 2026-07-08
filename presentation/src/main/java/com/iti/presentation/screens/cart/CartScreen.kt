@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import com.iti.domain.models.cart.CartItem
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ConfirmationDialog
-import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.screens.cart.components.CartBody
 import com.iti.presentation.screens.cart.components.CartCheckoutButton
 import org.koin.androidx.compose.koinViewModel
@@ -37,7 +35,6 @@ fun CartScreen(
     viewModel: CartViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var deleteDialogState by remember {
         mutableStateOf<CartItem?>(null)
@@ -48,13 +45,7 @@ fun CartScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is CartContract.Effect.NavigateToCheckout -> onCheckout()
-                is CartContract.Effect.ShowError -> snackbarHostState.showSnackbar(
-                    effect.message.resolve(context)
-                )
-
-                is CartContract.Effect.ShowSuccess -> snackbarHostState.showSnackbar(
-                    effect.message.resolve(context)
-                )
+                else -> Unit
             }
         }
     }
@@ -66,9 +57,6 @@ fun CartScreen(
                 onBack = onBackClick,
                 scrollBehavior = scrollBehavior
             )
-        },
-        snackbarHost = {
-            ShopIQSnackBarHost(hostState = snackbarHostState)
         },
         bottomBar = {
             CartCheckoutButton(
@@ -95,7 +83,7 @@ fun CartScreen(
             onApplyPromoClick = { viewModel.onEvent(CartContract.Event.ApplyPromoCode) },
             promoErrorMessage = state.promoError?.resolve(context),
             modifier = Modifier.padding(innerPadding),
-            onRemoveCoupon = {  viewModel.onEvent(CartContract.Event.RemovePromoCode)}
+            onRemoveCoupon = { viewModel.onEvent(CartContract.Event.RemovePromoCode) }
         )
     }
 

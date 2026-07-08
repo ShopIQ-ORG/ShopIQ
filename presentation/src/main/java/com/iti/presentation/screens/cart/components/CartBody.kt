@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import com.iti.domain.models.cart.CartItem
 import com.iti.presentation.R
 import com.iti.presentation.components.ErrorScreen
+import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.UnauthorizedContent
 import com.iti.presentation.screens.cart.CartContract
 
@@ -49,11 +50,18 @@ fun CartBody(
     }
 
     if (state.error != null) {
-        ErrorScreen(
-            message = state.error,
-            onRetry = onRetry,
-            modifier = modifier.fillMaxSize()
-        )
+        if (state.isNoInternet) {
+            NoInternetScreen(
+                onRetry = onRetry,
+                modifier = modifier.fillMaxSize()
+            )
+        } else {
+            ErrorScreen(
+                message = state.error,
+                onRetry = onRetry,
+                modifier = modifier.fillMaxSize()
+            )
+        }
         return
     }
 

@@ -23,8 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +42,7 @@ import com.iti.presentation.util.compareAtPrice
 import com.iti.presentation.util.discountPercent
 import com.iti.presentation.util.getLocalizedCode
 import com.iti.presentation.components.BackTopBar
+import com.iti.presentation.components.ConfirmationDialog
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.ShopIQSnackBarHost
@@ -67,6 +70,7 @@ fun ProductDetailsScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var showRemoveFavoriteConfirmation by remember { mutableStateOf(false) }
 
     LaunchedEffect(productId) {
         viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId))
@@ -103,6 +107,20 @@ fun ProductDetailsScreen(
         )
     }
 
+    if (showRemoveFavoriteConfirmation) {
+        ConfirmationDialog(
+            title = stringResource(id = R.string.remove_favorite_title),
+            message = stringResource(id = R.string.remove_favorite_message),
+            confirmText = stringResource(id = R.string.remove_favorite_confirm),
+            dismissText = stringResource(id = R.string.remove_favorite_cancel),
+            onConfirm = {
+                showRemoveFavoriteConfirmation = false
+                viewModel.handleIntent(ProductDetailsIntent.ToggleWishlist)
+            },
+            onDismiss = { showRemoveFavoriteConfirmation = false }
+        )
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
@@ -110,7 +128,15 @@ fun ProductDetailsScreen(
                     title = stringResource(id = R.string.product_details),
                     onBack = onBackClick,
                     actions = {
-                        IconButton(onClick = { viewModel.handleIntent(ProductDetailsIntent.ToggleWishlist) }) {
+                        IconButton(
+                            onClick = {
+                                if (state.isWishlisted) {
+                                    showRemoveFavoriteConfirmation = true
+                                } else {
+                                    viewModel.handleIntent(ProductDetailsIntent.ToggleWishlist)
+                                }
+                            }
+                        ) {
                             Icon(
                                 imageVector = if (state.isWishlisted) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                                 contentDescription = stringResource(id = R.string.content_desc_wishlist),

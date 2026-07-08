@@ -50,9 +50,6 @@ import com.iti.presentation.util.compareAtPrice
 import com.iti.presentation.util.discountPercent
 import com.iti.presentation.util.getLocalizedCode
 
-private val CardWidth = 172.dp
-private val ImageAspectRatio = 1f
-private val InfoBlockHeight = 96.dp
 
 @Composable
 fun ProductCard(
@@ -71,7 +68,7 @@ fun ProductCard(
 
     Column(
         modifier = modifier
-            .width(CardWidth)
+            .width(172.dp)
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(20.dp),
@@ -88,7 +85,7 @@ fun ProductCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(ImageAspectRatio)
+                .aspectRatio(1f)
         ) {
             CustomNetworkImage(
                 imageUrl = product.images.firstOrNull()?.url.orEmpty(),
@@ -185,7 +182,7 @@ fun ProductCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(InfoBlockHeight)
+                .height(96.dp)
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -251,7 +248,7 @@ fun ProductCard(
     if (showRemoveConfirmation) {
         ConfirmationDialog(
             title = stringResource(id = R.string.remove_favorite_title),
-            message = stringResource(id = R.string.remove_favorite_message, product.title),
+            message = stringResource(id = R.string.remove_favorite_message),
             confirmText = stringResource(id = R.string.remove_favorite_confirm),
             dismissText = stringResource(id = R.string.remove_favorite_cancel),
             onConfirm = {

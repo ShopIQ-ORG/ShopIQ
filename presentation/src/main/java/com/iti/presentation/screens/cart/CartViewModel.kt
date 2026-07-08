@@ -3,6 +3,7 @@ package com.iti.presentation.screens.cart
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.exceptions.AuthException
+import com.iti.domain.exceptions.NetworkException
 import com.iti.domain.models.Result
 import com.iti.domain.models.cart.Cart
 import com.iti.domain.models.cart.atMaxQuantity
@@ -67,7 +68,7 @@ class CartViewModel(
     }
 
     private fun loadCart() {
-        _state.update { it.copy(isLoading = true, error = null) }
+        _state.update { it.copy(isLoading = true, error = null, isNoInternet = false) }
 
         viewModelScope.launch {
             getCartUseCase().collect { result ->
@@ -106,7 +107,10 @@ class CartViewModel(
                         )
                     }
 
-                    is Result.Failure -> handleFailure(result.exception)
+                    is Result.Failure -> handleFailure(result.exception) { message ->
+                        _state.update { it.copy(error = message) }
+                    }
+
                     else -> Unit
                 }
             }
@@ -242,7 +246,7 @@ class CartViewModel(
                 }
 
                 is Result.Failure -> {
-                     var message = result.exception.toUiMessage()
+                    val message = result.exception.toUiMessage()
                     _state.update { it.copy(isApplyingPromo = false, promoError = message) }
                 }
 
@@ -297,12 +301,18 @@ class CartViewModel(
     ) {
         _state.update { it.copy(isLoading = false, isRefreshing = false) }
 
-        if (exception is AuthException.UnauthorizedAccess) {
-            _state.update { it.copy(accessRestricted = true) }
-        } else {
-            val message = exception.toUiMessage()
-            onError(message)
-            _effect.send(CartContract.Effect.ShowError(message))
+        when (exception) {
+            is AuthException.UnauthorizedAccess -> _state.update { it.copy(accessRestricted = true) }
+            is NetworkException.NoConnection -> {
+                val message = exception.toUiMessage()
+                _state.update { it.copy(isNoInternet = true) }
+                onError(message)
+            }
+            else -> {
+                val message = exception.toUiMessage()
+                _state.update { it.copy(isNoInternet = false) }
+                onError(message)
+            }
         }
     }
 }

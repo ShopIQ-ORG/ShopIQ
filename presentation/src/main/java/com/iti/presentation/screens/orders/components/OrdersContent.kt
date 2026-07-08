@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.iti.domain.models.order.Order
 import com.iti.presentation.components.ErrorScreen
+import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.screens.orders.OrdersContract
 
 @Composable
@@ -26,11 +27,18 @@ fun OrdersContent(
     }
 
     if (state.error != null) {
-        ErrorScreen(
-            message = state.error,
-            onRetry = onRetry,
-            modifier = modifier.fillMaxSize()
-        )
+        if (state.isNoInternet) {
+            NoInternetScreen(
+                onRetry = onRetry,
+                modifier = modifier.fillMaxSize()
+            )
+        } else {
+            ErrorScreen(
+                message = state.error,
+                onRetry = onRetry,
+                modifier = modifier.fillMaxSize()
+            )
+        }
         return
     }
 

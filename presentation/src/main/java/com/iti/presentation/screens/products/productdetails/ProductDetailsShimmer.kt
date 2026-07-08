@@ -18,84 +18,66 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
-
-private val ILLUSTRATION_HEIGHT = 340.dp
-private val THUMBNAIL_SIZE = 72.dp
-private val CIRCLE_SIZE = 36.dp
-private val SQUARE_WIDTH = 54.dp
-private val SQUARE_HEIGHT = 44.dp
-private val SPACER_LARGE = 24.dp
-private val SPACER_MEDIUM = 16.dp
-private val SPACER_SMALL = 8.dp
-private val CORNER_RADIUS_LARGE = 16.dp
-private val CORNER_RADIUS_MEDIUM = 12.dp
-private val CORNER_RADIUS_SMALL = 8.dp
 
 @Composable
 fun ProductDetailsShimmer(
     modifier: Modifier = Modifier
 ) {
+    val shimmerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .shimmer()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(SPACER_MEDIUM)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Image Gallery Shimmer Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(ILLUSTRATION_HEIGHT),
-            horizontalArrangement = Arrangement.spacedBy(SPACER_MEDIUM)
+                .height(340.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Thumbnails column
             Column(
                 modifier = Modifier
-                    .width(THUMBNAIL_SIZE)
+                    .width(72.dp)
                     .fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(SPACER_SMALL)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 repeat(3) {
                     Box(
                         modifier = Modifier
-                            .size(THUMBNAIL_SIZE)
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(CORNER_RADIUS_MEDIUM)
-                            )
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(shimmerColor)
+                            .shimmer()
                     )
                 }
             }
 
-            // Main Image box
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_LARGE)
-                    )
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
         }
 
-        Spacer(modifier = Modifier.height(SPACER_SMALL))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Title Shimmer
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .height(28.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                )
+                .clip(RoundedCornerShape(8.dp))
+                .background(shimmerColor)
+                .shimmer()
         )
 
-        // Price & Rating Shimmer Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -104,108 +86,83 @@ fun ProductDetailsShimmer(
                 modifier = Modifier
                     .width(120.dp)
                     .height(24.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
 
             Box(
                 modifier = Modifier
                     .width(80.dp)
                     .height(20.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
         }
 
-        Spacer(modifier = Modifier.height(SPACER_SMALL))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Description Shimmer
-        Column(verticalArrangement = Arrangement.spacedBy(SPACER_SMALL)) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .height(16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
         }
 
-        Spacer(modifier = Modifier.height(SPACER_SMALL))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Colors Section Shimmer
-        Column(verticalArrangement = Arrangement.spacedBy(SPACER_SMALL)) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(
                 modifier = Modifier
                     .width(100.dp)
                     .height(16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(shimmerColor)
+                    .shimmer()
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(SPACER_MEDIUM)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 repeat(3) {
                     Box(
                         modifier = Modifier
-                            .size(CIRCLE_SIZE)
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = CircleShape
-                            )
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(shimmerColor)
+                            .shimmer()
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(SPACER_SMALL))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Sizes Section Shimmer
-        Column(verticalArrangement = Arrangement.spacedBy(SPACER_SMALL)) {
-            Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(16.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                    )
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(SPACER_SMALL)) {
-                repeat(5) {
-                    Box(
-                        modifier = Modifier
-                            .size(width = SQUARE_WIDTH, height = SQUARE_HEIGHT)
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = RoundedCornerShape(CORNER_RADIUS_SMALL)
-                            )
-                    )
-                }
-            }
-        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(shimmerColor)
+                .shimmer()
+        )
     }
 }
