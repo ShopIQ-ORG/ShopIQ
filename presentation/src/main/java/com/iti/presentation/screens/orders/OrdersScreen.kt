@@ -3,7 +3,6 @@ package com.iti.presentation.screens.orders
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.foundation.layout.padding
@@ -13,12 +12,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.iti.domain.models.order.Order
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
-import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.screens.orders.components.OrdersContent
 import org.koin.androidx.compose.koinViewModel
 
@@ -30,17 +27,13 @@ fun OrdersScreen(
     viewModel: OrdersViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is OrdersContract.Effect.NavigateToOrderDetails -> onOrderClick(effect.order)
-                is OrdersContract.Effect.ShowError -> snackbarHostState.showSnackbar(
-                    effect.message.resolve(context)
-                )
+                else -> Unit
             }
         }
     }
@@ -52,9 +45,6 @@ fun OrdersScreen(
                 onBack = onNavigateBack,
                 scrollBehavior = scrollBehavior
             )
-        },
-        snackbarHost = {
-            ShopIQSnackBarHost(hostState = snackbarHostState)
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->

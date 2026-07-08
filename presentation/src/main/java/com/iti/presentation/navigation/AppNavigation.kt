@@ -284,6 +284,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = screen.productId,
                     onBackClick = ::navigateBack,
+                    onNavigateToCart = {
+                        if (backStack.lastOrNull() !is Screen.Cart) {
+                            navigate(Screen.Cart)
+                        }
+                    },
                     onLogin = {
                         replaceRoot(Screen.SignIn)
                     }

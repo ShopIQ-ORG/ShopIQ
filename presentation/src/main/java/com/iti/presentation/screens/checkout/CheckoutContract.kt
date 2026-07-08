@@ -17,7 +17,7 @@ sealed interface CheckoutContract {
     data class State(
         val currentStep: Int = 1, // 1: Address, 2: PaymentMethod, 3: PaymentDetails, 4: PaymentSuccess, 5: OrderSummary, 6: Finished
         val selectedAddress: Address? = null,
-        val paymentMethod: com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType? = null,
+        val paymentMethod: PaymentMethodContract.PaymentMethodType? = null,
         val cart: Cart? = null,
         val draftOrder: DraftOrder? = null,
         val currentUser: com.iti.domain.models.User? = null,

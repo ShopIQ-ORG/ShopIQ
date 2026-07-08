@@ -82,7 +82,7 @@ fun CartItemInfo(
         )
 
         AnimatedVisibility(
-            visible = item.isLowStock && item.atMaxQuantity,
+            visible = item.isLowStock,
             enter = fadeIn(),
             exit = fadeOut()
         ) {

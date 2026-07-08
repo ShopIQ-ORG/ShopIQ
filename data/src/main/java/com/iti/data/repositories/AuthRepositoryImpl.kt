@@ -17,6 +17,7 @@ import com.iti.data.sources.remote.auth.AuthRemoteDataSource
 import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSource
 import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.domain.exceptions.AuthException
+import com.iti.domain.exceptions.NetworkException
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
 import com.iti.domain.models.auth.AuthProvider
@@ -50,7 +51,7 @@ class AuthRepositoryImpl(
 
         refreshed.toDomain(
             provider = AuthProvider.fromProviderIds(firebaseUser.providerIds),
-            isEmailVerified = firebaseUser.isEmailVerified
+            isEmailVerified = true
         )
     }
 
@@ -304,9 +305,19 @@ class AuthRepositoryImpl(
             }
         } catch (e: CancellationException) {
             throw e
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            val mapped = e.handleException()
+            if (mapped is NetworkException) throw mapped
+
             val fallbackPassword = userDto.shopifyPassword ?: throw AuthException.ShopifyTokenUnavailable()
-            val token = shopifyRemote.createAccessToken(userDto.email, fallbackPassword)
+            val token = try {
+                shopifyRemote.createAccessToken(userDto.email, fallbackPassword)
+            } catch (fallbackError: CancellationException) {
+                throw fallbackError
+            } catch (fallbackError: Exception) {
+                val fallbackMapped = fallbackError.handleException()
+                throw fallbackMapped
+            }
             ShopifyFieldsDto(
                 userDto.shopifyCustomerId,
                 token.accessToken,

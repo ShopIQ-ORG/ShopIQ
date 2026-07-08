@@ -12,5 +12,6 @@ object FirebaseConstants {
         const val SHOPIFY_ACCESS_TOKEN = "shopifyAccessToken"
         const val SHOPIFY_TOKEN_EXPIRES_AT = "shopifyTokenExpiresAt"
         const val SHOPIFY_PASSWORD = "shopifyPassword"
+        const val FAVORITES = "favorites"
     }
 }

@@ -10,6 +10,7 @@ object CartContract {
         val isLoading: Boolean = false,
         val isRefreshing: Boolean = false,
         val error: UiText? = null,
+        val isNoInternet: Boolean = false,
         val accessRestricted: Boolean = false,
         val isPromoExpanded: Boolean = false,
         val promoInput: String = "",

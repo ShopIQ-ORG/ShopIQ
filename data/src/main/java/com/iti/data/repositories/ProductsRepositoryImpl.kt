@@ -2,6 +2,7 @@ package com.iti.data.repositories
 
 import com.iti.data.utils.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
+import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSource
 import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
 import com.iti.data.mappers.toDomainProducts
@@ -18,7 +19,6 @@ import com.iti.domain.models.Category
 import com.iti.domain.models.Result
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.products.ProductsRepository
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.iti.data.sources.local.room.FavoriteEntity
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +31,8 @@ import kotlinx.coroutines.awaitAll
 class ProductsRepositoryImpl(
     private val remoteDataSource: ProductsRemoteDataSource,
     private val favoriteDao: FavoriteDao,
-    private val authRepository: AuthRepository,
-    private val firestore: FirebaseFirestore
+    private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
+    private val authRepository: AuthRepository
 ) : ProductsRepository {
 
     override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
@@ -139,16 +139,11 @@ class ProductsRepositoryImpl(
         if (user is User.AuthenticatedUser) {
             val userId = user.uid
             val cleanId = product.id.substringAfterLast("/")
-            // Write to local database cache immediately (instant UI update)
+
             favoriteDao.insertFavorite(product.toFavoriteEntity(userId).copy(productId = cleanId))
 
-            // Sync to Firestore: list of product ID strings in favorites field under users/{userId} document
             try {
-                firestore.collection("users").document(userId)
-                    .set(
-                        mapOf("favorites" to com.google.firebase.firestore.FieldValue.arrayUnion(cleanId)),
-                        com.google.firebase.firestore.SetOptions.merge()
-                    ).await()
+                favoriteRemoteDataSource.addFavorite(userId, cleanId)
                 android.util.Log.d("ProductsRepository", "Firestore addToFavorites OK: cleanId=$cleanId")
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
@@ -163,16 +158,11 @@ class ProductsRepositoryImpl(
         if (user is User.AuthenticatedUser) {
             val userId = user.uid
             val cleanId = productId.substringAfterLast("/")
-            // Delete from local database cache immediately
+
             favoriteDao.deleteFavorite(cleanId, userId)
 
-            // Sync to Firestore: remove cleanId from favorites field array under users/{userId} document
             try {
-                firestore.collection("users").document(userId)
-                    .set(
-                        mapOf("favorites" to com.google.firebase.firestore.FieldValue.arrayRemove(cleanId)),
-                        com.google.firebase.firestore.SetOptions.merge()
-                    ).await()
+                favoriteRemoteDataSource.removeFavorite(userId, cleanId)
                 android.util.Log.d("ProductsRepository", "Firestore removeFromFavorites OK: cleanId=$cleanId")
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
@@ -189,16 +179,12 @@ class ProductsRepositoryImpl(
         if (user is User.AuthenticatedUser) {
             val userId = user.uid
 
-            // 1) Emit Room data IMMEDIATELY so the UI is instant (no waiting for network)
             val localList = favoriteDao.getAllFavorites(userId).first()
             emit(Result.Success(localList.map { it.toDomainProduct() }))
 
-            // 2) Background Firestore sync (only for authenticated users)
             try {
-                val docSnapshot = firestore.collection("users").document(userId).get().await()
-                val favoriteIds = (docSnapshot.get("favorites") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
-                
-                // Fetch actual product details from Shopify for each ID in parallel
+                val favoriteIds = favoriteRemoteDataSource.getFavoriteIds(userId)
+
                 val favorites = coroutineScope {
                     favoriteIds.map { cleanId ->
                         async {
@@ -211,7 +197,7 @@ class ProductsRepositoryImpl(
                                         productId = cleanId,
                                         userId = userId,
                                         title = product.title,
-                                        price = "${product.minPrice.amount} ${product.minPrice.currencyCode}",
+                                        price = product.minPrice.amount,
                                         imageUrl = product.images.firstOrNull()?.url.orEmpty()
                                     )
                                 } else {
@@ -225,7 +211,6 @@ class ProductsRepositoryImpl(
                     }.awaitAll().filterNotNull()
                 }
 
-                // Refresh local Room cache from Firestore
                 favoriteDao.deleteFavoritesForUser(userId)
                 favorites.forEach { favoriteDao.insertFavorite(it) }
                 android.util.Log.d("ProductsRepository", "Firestore getFavorites synced ${favorites.size} items from favorites list for users/$userId")
@@ -235,12 +220,10 @@ class ProductsRepositoryImpl(
                 android.util.Log.e("ProductsRepository", "Firestore getFavorites failed", e)
             }
 
-            // 3) Keep streaming Room updates reactively after Firestore sync
             favoriteDao.getAllFavorites(userId).collect { list ->
                 emit(Result.Success(list.map { it.toDomainProduct() }))
             }
         } else {
-            // For guests, emit empty list since favorites are disabled
             emit(Result.Success(emptyList()))
         }
     }
