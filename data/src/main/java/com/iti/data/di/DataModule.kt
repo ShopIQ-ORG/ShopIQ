@@ -79,6 +79,10 @@ import org.koin.dsl.module
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSourceImpl
 import com.iti.data.repositories.CheckoutRepositoryImpl
+import com.iti.data.sources.local.onboarding.OnboardingLocalDataSource
+import com.iti.data.sources.local.onboarding.OnboardingLocalDataSourceImpl
+import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSource
+import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSourceImpl
 import com.iti.domain.repositories.checkout.CheckoutRepository
 
 val dataModule = module {
@@ -88,6 +92,7 @@ val dataModule = module {
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
     single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get()) }
+    single<FavoriteRemoteDataSource> { FavoriteRemoteDataSourceImpl(get()) }
 
     // DataStore
     single<DataStore<Preferences>> {
@@ -190,9 +195,8 @@ val dataModule = module {
 
     single<OrdersRepository> { OrdersRepositoryImpl(get(), get()) }
 
-
     // Other repos
-    single<com.iti.data.sources.local.onboarding.OnboardingLocalDataSource> { com.iti.data.sources.local.onboarding.OnboardingLocalDataSourceImpl(get()) }
+    single<OnboardingLocalDataSource> { OnboardingLocalDataSourceImpl(get()) }
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
 
     single<com.iti.data.sources.local.search.SearchHistoryLocalDataSource> { com.iti.data.sources.local.search.SearchHistoryLocalDataSourceImpl(get(), get()) }
