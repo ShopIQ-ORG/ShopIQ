@@ -61,8 +61,17 @@ class CheckoutViewModel(
             is CheckoutContract.Event.AddressSelected -> {
                 _state.update { it.copy(selectedAddress = event.address, currentStep = 2) }
             }
-            CheckoutContract.Event.PaymentConfirmed -> {
+            is CheckoutContract.Event.PaymentMethodSelected -> {
+                _state.update { it.copy(paymentMethod = event.method) }
+            }
+            CheckoutContract.Event.PaymentMethodConfirmed -> {
                 createDraftOrder()
+            }
+            CheckoutContract.Event.PaymentConfirmed -> {
+                _state.update { it.copy(currentStep = 4) }
+            }
+            CheckoutContract.Event.PaymentSuccessProceed -> {
+                _state.update { it.copy(currentStep = 5) }
             }
             CheckoutContract.Event.PlaceOrder -> {
                 completeDraftOrder()
@@ -144,10 +153,10 @@ class CheckoutViewModel(
         viewModelScope.launch {
             when (clearCartUseCase()) {
                 is Result.Success -> {
-                    _state.update { it.copy(isLoading = false, currentStep = 4) }
+                    _state.update { it.copy(isLoading = false, currentStep = 6) }
                 }
                 is Result.Failure -> {
-                    _state.update { it.copy(isLoading = false, currentStep = 4) }
+                    _state.update { it.copy(isLoading = false, currentStep = 6) }
                 }
                 else -> Unit
             }
@@ -157,9 +166,15 @@ class CheckoutViewModel(
     private fun navigateBack() {
         viewModelScope.launch {
             val current = _state.value.currentStep
-            if (current > 1 && current < 4) {
-                _state.update { it.copy(currentStep = current - 1) }
-            } else if (current == 4) {
+            if (current > 1 && current < 6) {
+                // If we are at Step 4 (Payment Success) or Step 6, going back should be controlled (Step 4 probably goes back to 2 or 3, Step 6 goes to Home).
+                if (current == 4) {
+                    // Reset to step 2 to allow choosing another payment method
+                    _state.update { it.copy(currentStep = 2) }
+                } else {
+                    _state.update { it.copy(currentStep = current - 1) }
+                }
+            } else if (current == 6) {
                 _effect.send(CheckoutContract.Effect.NavigateToHome)
             } else {
                 _effect.send(CheckoutContract.Effect.NavigateBack)

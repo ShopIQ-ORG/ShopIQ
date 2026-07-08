@@ -61,7 +61,13 @@ fun SearchEmptyState(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        if (recentSearches.isNotEmpty()) {
+        if (recentSearches.isEmpty()) {
+            item {
+                SearchStartAnimation(
+                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp)
+                )
+            }
+        } else {
             item {
                 Row(
                     modifier = Modifier

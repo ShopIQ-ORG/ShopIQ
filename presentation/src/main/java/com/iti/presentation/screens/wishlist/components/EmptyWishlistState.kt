@@ -1,21 +1,27 @@
 package com.iti.presentation.screens.wishlist.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import com.iti.presentation.R
-import com.iti.presentation.ui.theme.ErrorLight
+import com.iti.presentation.components.ShopIQButton
 
 @Composable
 fun EmptyWishlistState(
@@ -32,22 +38,12 @@ fun EmptyWishlistState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(
-                    color = ErrorLight.copy(alpha = 0.1f),
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = null,
-                modifier = Modifier.size(50.dp),
-                tint = ErrorLight
-            )
-        }
+        Image(
+            painter = painterResource(id = R.drawable.empty_wishlist),
+            contentDescription = stringResource(id = R.string.wishlist_empty_title),
+            modifier = Modifier.size(260.dp),
+            contentScale = ContentScale.Fit
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -69,19 +65,10 @@ fun EmptyWishlistState(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
+        ShopIQButton(
+            text = stringResource(id = R.string.wishlist_explore_btn),
             onClick = onExploreClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = buttonBgColor)
-        ) {
-            Text(
-                text = stringResource(id = R.string.wishlist_explore_btn),
-                style = MaterialTheme.typography.labelLarge,
-                color = buttonTextColor
-            )
-        }
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

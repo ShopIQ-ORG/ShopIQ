@@ -6,7 +6,7 @@
 //  Copyright © 2026 ITI. All rights reserved.
 //
 
-package com.iti.presentation.screens.payment
+package com.iti.presentation.screens.checkout
 
 import com.iti.presentation.util.UiText
 
@@ -25,7 +25,8 @@ sealed interface PaymentMethodContract {
 
     sealed interface Effect {
         object NavigateBack : Effect
-        data class NavigateToNextStep(val methodType: PaymentMethodType) : Effect
+        data class NavigateToNextStep(val methodType: PaymentMethodType, val amountCents: Long) : Effect
+        data class ShowCodLimitError(val message: String) : Effect
     }
 
     enum class PaymentMethodType {

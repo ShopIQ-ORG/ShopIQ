@@ -18,10 +18,14 @@ data class Order(
         get() = lineItems.sumOf { it.quantity }
 
     val totalDiscount: Money
-        get() = Money(
-            amount = lineItems.sumOf { it.originalTotalPrice.amount - it.discountedTotalPrice.amount },
-            currencyCode = totalPrice.currencyCode
-        )
+        get() {
+            val originalSubtotal = lineItems.sumOf { it.originalTotalPrice.amount }
+
+            return Money(
+                amount = (originalSubtotal - subtotalPrice.amount).coerceAtLeast(0.0),
+                currencyCode = subtotalPrice.currencyCode
+            )
+        }
 }
 
 data class Money(

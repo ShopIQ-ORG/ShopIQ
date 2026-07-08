@@ -1,9 +1,11 @@
 package com.iti.data.sources.remote.orders
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.exception.ApolloNetworkException
 import com.iti.data.dto.orders.OrderDto
 import com.iti.data.mappers.toDto
 import com.iti.data.storefront.GetCustomerOrdersQuery
+import com.iti.domain.exceptions.NetworkException
 import com.iti.domain.exceptions.OrderException
 
 class OrdersRemoteDataSourceImpl(
@@ -12,6 +14,13 @@ class OrdersRemoteDataSourceImpl(
 
     override suspend fun getOrders(customerAccessToken: String): List<OrderDto> {
         val response = apolloClient.query(GetCustomerOrdersQuery(customerAccessToken)).execute()
+
+        response.exception?.let { apolloException ->
+            if (apolloException is ApolloNetworkException) {
+                throw NetworkException.NoConnection()
+            }
+            throw OrderException.GraphQLError(listOf(apolloException.message.orEmpty()))
+        }
 
         if (response.hasErrors()) {
             throw OrderException.GraphQLError(response.errors.orEmpty().map { it.message })

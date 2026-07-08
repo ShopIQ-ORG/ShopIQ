@@ -12,7 +12,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -41,6 +40,10 @@ import com.iti.presentation.components.BottomNavItem
 import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
 import com.iti.presentation.components.UnauthorizedDialog
+import com.iti.presentation.components.ShopIQSnackBarHost
+import com.iti.presentation.components.ShopIQSnackbarType
+import com.iti.presentation.components.showError
+import com.iti.presentation.components.showSuccess
 import com.iti.presentation.screens.ai.AiChatScreen
 import com.iti.presentation.screens.category.CategoryScreen
 import com.iti.presentation.screens.home.components.HomeTabContent
@@ -110,7 +113,11 @@ fun HomeScreen(
                 }
 
                 is HomeContract.Effect.ShowToast -> {
-                    snackbarHostState.showSnackbar(effect.message.resolve(context))
+                    if (effect.type == ShopIQSnackbarType.Success) {
+                        snackbarHostState.showSuccess(effect.message.resolve(context))
+                    } else {
+                        snackbarHostState.showError(effect.message.resolve(context))
+                    }
                 }
             }
         }
@@ -143,8 +150,6 @@ fun HomeScreen(
             }
         )
     }
-
-
 }
 
 @Composable
@@ -176,9 +181,7 @@ fun HomeScreenContent(
     LaunchedEffect(isConnected) {
         if (!isConnected && wasConnected) {
             if (state.screenState is HomeContract.ScreenState.Success) {
-                snackbarHostState.showSnackbar(
-                    message = connectionLostMessage
-                )
+                snackbarHostState.showError(connectionLostMessage)
             }
         }
         wasConnected = isConnected
@@ -191,240 +194,216 @@ fun HomeScreenContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        bottomBar = {
-            if (navItems[selectedIndex] != BottomNavItem.AI) {
-                NavigationBar(
-                containerColor = MaterialTheme.colorScheme.background,
-                tonalElevation = 0.dp
-            ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+                if (navItems[selectedIndex] != BottomNavItem.AI) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        tonalElevation = 0.dp
+                    ) {
 
-                navItems.forEachIndexed { index, item ->
-                    val isSelected = selectedIndex == index
-                    if (item == BottomNavItem.AI) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(80.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            val isDark = LocalDarkTheme.current
-                            val bgColor = if (isSelected) {
-                                if (isDark) Color(0xFF3B1E78) else Color(0xFFE8DDFF)
-                            } else {
-                                if (isDark) Color(0xFF242A31) else Color(0xFFF3F4F6)
-                            }
-                            val iconColor = if (isSelected) {
-                                if (isDark) Color(0xFFD4BFFF) else Color(0xFF6F32E5)
-                            } else {
-                                if (isDark) Color(0xFF8D97A5) else Color(0xFF8E8E93)
-                            }
-
-                            Box(
-                                modifier = Modifier.offset(y = (-8).dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                // Outer glow/halo
+                        navItems.forEachIndexed { index, item ->
+                            val isSelected = selectedIndex == index
+                            if (item == BottomNavItem.AI) {
                                 Box(
                                     modifier = Modifier
-                                        .size(68.dp)
-                                        .background(
-                                            color = if (isSelected) Color(0xFF6F32E5).copy(alpha = 0.12f) else Color.Transparent,
-                                            shape = CircleShape
-                                        )
-                                )
-                                // Inner gradient circle
-                                Box(
-                                    modifier = Modifier
-                                        .size(52.dp)
-                                        .shadow(
-                                            elevation = if (isSelected) 8.dp else 0.dp,
-                                            shape = CircleShape,
-                                            ambientColor = Color(0xFF6F32E5),
-                                            spotColor = Color(0xFF6F32E5)
-                                        )
-                                        .background(
-                                            brush = if (isDark) {
-                                                if (isSelected) {
-                                                    Brush.linearGradient(listOf(Color(0xFF3B1E78), Color(0xFF2C145C)))
-                                                } else {
-                                                    Brush.linearGradient(listOf(Color(0xFF2A1B4E), Color(0xFF20103E)))
-                                                }
-                                            } else {
-                                                if (isSelected) {
-                                                    Brush.linearGradient(listOf(Color(0xFFF0E8FF), Color(0xFFE8DDFF)))
-                                                } else {
-                                                    Brush.linearGradient(listOf(Color(0xFFF6F1FF), Color(0xFFECE0FF)))
-                                                }
-                                            },
-                                            shape = CircleShape
-                                        )
-                                        .clickable {
-                                            onSelectedIndexChanged(index)
-                                        },
+                                        .weight(1f)
+                                        .height(80.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(
-                                        painter = painterResource(id = item.iconResId!!),
-                                        contentDescription = stringResource(id = item.labelResId),
-                                        tint = if (isDark) {
-                                            if (isSelected) Color(0xFFD4BFFF) else Color(0xFF9E80E5)
-                                        } else {
-                                            if (isSelected) Color(0xFF6F32E5) else Color(0xFF8C52FF)
-                                        },
-                                        modifier = Modifier.size(28.dp) // Large sparkle icon
-                                    )
-                                }
-                            }
-
-                            // Selected indicator triangle at the bottom of the bar
-                            if (isSelected) {
-                                Canvas(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .padding(bottom = 6.dp)
-                                        .size(8.dp, 6.dp)
-                                ) {
-                                    val path = Path().apply {
-                                        moveTo(size.width / 2f, 0f)
-                                        lineTo(size.width, size.height)
-                                        lineTo(0f, size.height)
-                                        close()
+                                    val isDark = LocalDarkTheme.current
+                                    val bgColor = if (isSelected) {
+                                        if (isDark) Color(0xFF3B1E78) else Color(0xFFE8DDFF)
+                                    } else {
+                                        if (isDark) Color(0xFF242A31) else Color(0xFFF3F4F6)
                                     }
-                                    drawPath(
-                                        path = path,
-                                        color = if (isDark) Color(0xFFD4BFFF) else Color(0xFF6F32E5)
-                                    )
+                                    val iconColor = if (isSelected) {
+                                        if (isDark) Color(0xFFD4BFFF) else Color(0xFF6F32E5)
+                                    } else {
+                                        if (isDark) Color(0xFF8D97A5) else Color(0xFF8E8E93)
+                                    }
+
+                                    Box(
+                                        modifier = Modifier.offset(y = (-8).dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(68.dp)
+                                                .background(
+                                                    color = if (isSelected) Color(0xFF6F32E5).copy(alpha = 0.12f) else Color.Transparent,
+                                                    shape = CircleShape
+                                                )
+                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .size(52.dp)
+                                                .shadow(
+                                                    elevation = if (isSelected) 8.dp else 0.dp,
+                                                    shape = CircleShape,
+                                                    ambientColor = Color(0xFF6F32E5),
+                                                    spotColor = Color(0xFF6F32E5)
+                                                )
+                                                .background(
+                                                    brush = if (isDark) {
+                                                        if (isSelected) {
+                                                            Brush.linearGradient(listOf(Color(0xFF3B1E78), Color(0xFF2C145C)))
+                                                        } else {
+                                                            Brush.linearGradient(listOf(Color(0xFF2A1B4E), Color(0xFF20103E)))
+                                                        }
+                                                    } else {
+                                                        if (isSelected) {
+                                                            Brush.linearGradient(listOf(Color(0xFFF0E8FF), Color(0xFFE8DDFF)))
+                                                        } else {
+                                                            Brush.linearGradient(listOf(Color(0xFFF6F1FF), Color(0xFFECE0FF)))
+                                                        }
+                                                    },
+                                                    shape = CircleShape
+                                                )
+                                                .clickable {
+                                                    onSelectedIndexChanged(index)
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = item.iconResId!!),
+                                                contentDescription = stringResource(id = item.labelResId),
+                                                tint = if (isDark) {
+                                                    if (isSelected) Color(0xFFD4BFFF) else Color(0xFF9E80E5)
+                                                } else {
+                                                    if (isSelected) Color(0xFF6F32E5) else Color(0xFF8C52FF)
+                                                },
+                                                modifier = Modifier.size(28.dp)
+                                            )
+                                        }
+                                    }
+
+                                    if (isSelected) {
+                                        Canvas(
+                                            modifier = Modifier
+                                                .align(Alignment.BottomCenter)
+                                                .padding(bottom = 6.dp)
+                                                .size(8.dp, 6.dp)
+                                        ) {
+                                            val path = Path().apply {
+                                                moveTo(size.width / 2f, 0f)
+                                                lineTo(size.width, size.height)
+                                                lineTo(0f, size.height)
+                                                close()
+                                            }
+                                            drawPath(
+                                                path = path,
+                                                color = if (isDark) Color(0xFFD4BFFF) else Color(0xFF6F32E5)
+                                            )
+                                        }
+                                    }
                                 }
+                            } else {
+                                NavigationBarItem(
+                                    selected = isSelected,
+                                    onClick = {
+                                        onSelectedIndexChanged(index)
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = if (isSelected) item.selectedIcon!! else item.unselectedIcon!!,
+                                            contentDescription = stringResource(id = item.labelResId)
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(id = item.labelResId),
+                                            maxLines = 1,
+                                            softWrap = false,
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontSize = 11.sp
+                                            )
+                                        )
+                                    },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = MaterialTheme.colorScheme.onBackground,
+                                        selectedTextColor = MaterialTheme.colorScheme.onBackground,
+                                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        indicatorColor = Color.Transparent
+                                    )
+                                )
                             }
                         }
-                    } else {
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = {
-                                onSelectedIndexChanged(index)
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (isSelected) item.selectedIcon!! else item.unselectedIcon!!,
-                                    contentDescription = stringResource(id = item.labelResId)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = item.labelResId),
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = 11.sp
-                                    )
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.onBackground,
-                                selectedTextColor = MaterialTheme.colorScheme.onBackground,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = Color.Transparent
-                            )
-                        )
                     }
                 }
             }
-        }
-    }
-) { padding ->
+        ) { padding ->
 
-        val isDark = LocalDarkTheme.current
+            when (navItems[selectedIndex]) {
 
-        when (navItems[selectedIndex]) {
+                BottomNavItem.Home -> {
+                    HomeTabContent(
+                        state = state,
+                        onIntent = onIntent,
+                        bottomPadding = padding.calculateBottomPadding(),
+                        cartItemCount = cartItemCount,
+                        onCartClick = onCartClick
+                    )
+                }
 
-            BottomNavItem.Home -> {
-                HomeTabContent(
-                    state = state,
-                    onIntent = onIntent,
-                    bottomPadding = padding.calculateBottomPadding(),
-                    cartItemCount = cartItemCount,
-                    onCartClick = onCartClick
-                )
-            }
+                BottomNavItem.Category -> {
+                    CategoryScreen(
+                        viewModel = koinViewModel(),
+                        bottomPadding = padding.calculateBottomPadding(),
+                        cartItemCount = cartItemCount,
+                        onCartClick = onCartClick,
+                        onCategoryClick = onCategoryClick,
+                    )
+                }
 
-            BottomNavItem.Category -> {
-                CategoryScreen(
-                    viewModel = koinViewModel(),
-                    bottomPadding = padding.calculateBottomPadding(),
-                    cartItemCount = cartItemCount,
-                    onCartClick = onCartClick,
-                    onCategoryClick = onCategoryClick,
-                )
-            }
+                BottomNavItem.AI -> {
+                    AiChatScreen(
+                        onBackClick = { onSelectedIndexChanged(0) },
+                        onHistoryClick = onNavigateToAiHistory,
+                        currentUser = state.currentUser,
+                        onAuthClick = onLogout,
+                        bottomPadding = 0.dp,
+                        onNavigateToProduct = onNavigateToProduct
+                    )
+                }
 
-            BottomNavItem.AI -> {
-                AiChatScreen(
-                    onBackClick = { onSelectedIndexChanged(0) },
-                    onHistoryClick = onNavigateToAiHistory,
-                    currentUser = state.currentUser,
-                    onAuthClick = onLogout,
-                    bottomPadding = 0.dp,
-                    onNavigateToProduct = onNavigateToProduct
-                )
-            }
+                BottomNavItem.Wishlist -> {
+                    WishlistTabContent(
+                        onProductClick = { productId ->
+                            val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
+                            onNavigateToProduct(idLong)
+                        },
+                        onExploreClick = { onSelectedIndexChanged(0) },
+                        onAuthClick = onLogout,
+                        cartItemCount = cartItemCount,
+                        onCartClick = onCartClick
+                    )
+                }
 
-            BottomNavItem.Wishlist -> {
-                WishlistTabContent(
-                    onProductClick = { productId ->
-                        val idLong = productId.substringAfterLast("/").toLongOrNull() ?: 0L
-                        onNavigateToProduct(idLong)
-                    },
-                    onExploreClick = { onSelectedIndexChanged(0) },
-                    onAuthClick = onLogout,
-                    cartItemCount = cartItemCount,
-                    onCartClick = onCartClick
-                )
-            }
-
-            BottomNavItem.Profile -> {
-                AccountSettingsScreen(
-                    viewModel = profileViewModel,
-                    onNavigateBack = { onSelectedIndexChanged(0) },
-                    onLogout = onLogout,
-                    onNavigateToEditProfile = onNavigateToEditProfile,
-                    onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
-                    onNavigateToAddressManagement = onNavigateToAddressManagement,
-                    onNavigateToOrders = onNavigateToOrders,
-                    bottomPadding = padding.calculateBottomPadding()
-                )
-            }
-        }
-    }
-
-    // Wishlist loading overlay — shown while add/remove is in progress
-    if (state.isFavoriteLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.25f)),
-            contentAlignment = Alignment.Center
-        ) {
-            androidx.compose.material3.Card(
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Box(
-                    modifier = Modifier.padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    androidx.compose.material3.CircularProgressIndicator(
-                        modifier = Modifier.size(36.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        strokeWidth = 3.dp
+                BottomNavItem.Profile -> {
+                    AccountSettingsScreen(
+                        viewModel = profileViewModel,
+                        onNavigateBack = { onSelectedIndexChanged(0) },
+                        onLogout = onLogout,
+                        onNavigateToEditProfile = onNavigateToEditProfile,
+                        onNavigateToLocalizationCurrency = onNavigateToLocalizationCurrency,
+                        onNavigateToAddressManagement = onNavigateToAddressManagement,
+                        onNavigateToOrders = onNavigateToOrders,
+                        bottomPadding = padding.calculateBottomPadding()
                     )
                 }
             }
         }
-    }
+
+        ShopIQSnackBarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 4.dp)
+        )
     } // end outer Box
 }

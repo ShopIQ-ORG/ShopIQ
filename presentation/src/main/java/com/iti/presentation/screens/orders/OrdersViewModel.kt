@@ -2,7 +2,7 @@ package com.iti.presentation.screens.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iti.domain.exceptions.AuthException
+import com.iti.domain.exceptions.NetworkException
 import com.iti.domain.models.Result
 import com.iti.domain.usecases.orders.GetOrdersUseCase
 import com.iti.presentation.util.toUiMessage
@@ -39,7 +39,7 @@ class OrdersViewModel(
     }
 
     private fun loadOrders() {
-        _state.update { it.copy(isLoading = true, error = null) }
+        _state.update { it.copy(isLoading = true, error = null, isNoInternet = false) }
 
         viewModelScope.launch {
             when (val result = getOrdersUseCase()) {
@@ -80,9 +80,15 @@ class OrdersViewModel(
         viewModelScope.launch { _effect.send(effect) }
     }
 
-    private suspend fun handleFailure(exception: Throwable) {
-        _state.update { it.copy(isLoading = false, isRefreshing = false) }
+    private fun handleFailure(exception: Throwable) {
         val message = exception.toUiMessage()
-        _effect.send(OrdersContract.Effect.ShowError(message))
+        _state.update {
+            it.copy(
+                isLoading = false,
+                isRefreshing = false,
+                error = message,
+                isNoInternet = exception is NetworkException.NoConnection
+            )
+        }
     }
 }

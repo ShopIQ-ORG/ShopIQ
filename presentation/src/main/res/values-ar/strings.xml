@@ -61,6 +61,8 @@
     <string name="search_popular_label">عمليات البحث الشائعة</string>
     <string name="search_clear_all">مسح الكل</string>
     <string name="search_empty_hint">ابحث عن المنتجات، الماركات أو الفئات</string>
+    <string name="search_start_title">ابحث عن منتجك المفضل التالي</string>
+    <string name="search_start_subtitle">ابحث عن المنتجات، العلامات التجارية والفئات للبدء.</string>
     <string name="categories_title">الأقسام</string>
     <string name="category_section_title">تسوق حسب القسم</string>
     <string name="currency_updated_to">تم تحديث العملة إلى %1$s</string>
@@ -523,6 +525,7 @@
     <string name="checkout_btn_go_home">العودة إلى الصفحة الرئيسية</string>
 
     <string name="search_cd_close">إغلاق البحث</string>
+    <string name="view_cart">عرض العربة</string>
 
     <plurals name="cart_items_count">
         <item quantity="zero">لا توجد منتجات</item>
@@ -532,6 +535,14 @@
         <item quantity="many">%d منتج</item>
         <item quantity="other">%d منتج</item>
     </plurals>
+    <string name="content_desc_favorite">المفضلة</string>
+    <string name="content_desc_rating">التقييم</string>
+    <string name="product_rating_placeholder">4.6</string>
+    <string name="product_discount_badge">‎-%1$d%%</string>
+    <string name="remove_favorite_title">إزالة من المفضلة</string>
+    <string name="remove_favorite_message">هل أنت متأكد أنك تريد إزالة هذا المنتج من المفضلة؟</string>
+    <string name="remove_favorite_confirm">إزالة</string>
+    <string name="remove_favorite_cancel">إلغاء</string>
 
     <!-- Product Reviews -->
     <string name="rating_out_of_5">من 5</string>

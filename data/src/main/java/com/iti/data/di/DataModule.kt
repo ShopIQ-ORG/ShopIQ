@@ -58,12 +58,31 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+import com.iti.data.sources.remote.payment.PaymobRemoteDataSource
+import com.iti.data.repositories.PaymobRepositoryImpl
+import com.iti.domain.repositories.payment.PaymobRepository
+import com.iti.data.BuildConfig
+
 import org.koin.dsl.bind
 import org.koin.dsl.binds
 import org.koin.dsl.module
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSourceImpl
 import com.iti.data.repositories.CheckoutRepositoryImpl
+import com.iti.data.sources.local.onboarding.OnboardingLocalDataSource
+import com.iti.data.sources.local.onboarding.OnboardingLocalDataSourceImpl
+import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSource
+import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSourceImpl
 import com.iti.domain.repositories.checkout.CheckoutRepository
 
 val dataModule = module {
@@ -72,7 +91,8 @@ val dataModule = module {
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get(), get()) }
+    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get()) }
+    single<FavoriteRemoteDataSource> { FavoriteRemoteDataSourceImpl(get()) }
 
     // DataStore
     single<DataStore<Preferences>> {
@@ -134,12 +154,49 @@ val dataModule = module {
             get(named("storefrontApolloClient")),
         )
     }
+    single {
+        HttpClient(CIO) {
+            engine {
+                maxConnectionsCount = 1000
+                endpoint.keepAliveTime = 5000
+                endpoint.connectTimeout = 15000
+                endpoint.connectAttempts = 3
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    encodeDefaults = true
+                    ignoreUnknownKeys = true
+                    prettyPrint = true
+                })
+            }
+            install(Logging) {
+                level = LogLevel.BODY
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30000
+                connectTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
+            }
+            defaultRequest {
+                url("https://accept.paymob.com/api/")
+                contentType(ContentType.Application.Json)
+            }
+        }
+    }
+
+    single { PaymobRemoteDataSource(get()) }
+    single<PaymobRepository> {
+        PaymobRepositoryImpl(
+            remoteDataSource = get(),
+            secretKey = BuildConfig.PAYMOB_SECRET_KEY,
+            publicKey = BuildConfig.PAYMOB_PUBLIC_KEY
+        )
+    }
 
     single<OrdersRepository> { OrdersRepositoryImpl(get(), get()) }
 
-
     // Other repos
-    single<com.iti.data.sources.local.onboarding.OnboardingLocalDataSource> { com.iti.data.sources.local.onboarding.OnboardingLocalDataSourceImpl(get()) }
+    single<OnboardingLocalDataSource> { OnboardingLocalDataSourceImpl(get()) }
     single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
 
     single<com.iti.data.sources.local.search.SearchHistoryLocalDataSource> { com.iti.data.sources.local.search.SearchHistoryLocalDataSourceImpl(get(), get()) }

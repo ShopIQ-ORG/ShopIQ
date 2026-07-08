@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import com.iti.presentation.util.UiText
@@ -26,6 +25,7 @@ import com.iti.presentation.R
 import com.iti.domain.usecases.products.AddProductReviewUseCase
 import com.iti.domain.usecases.products.UpdateProductReviewUseCase
 import com.iti.domain.usecases.products.DeleteProductReviewUseCase
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import com.iti.domain.usecases.products.GetProductTranslationsUseCase
 import com.iti.presentation.util.ReviewsCache
@@ -94,7 +94,6 @@ class ProductDetailsViewModel(
                     }
                     is Result.Success -> {
                         val product = result.data
-                        
                         // Update ReviewsCache with the loaded product's reviews
                         ReviewsCache.updateReviews(product.id, product.reviews)
 
@@ -169,7 +168,6 @@ class ProductDetailsViewModel(
     }
 
     private fun observeFavoriteStatus(productId: String) {
-        // Extract the numeric part only (e.g. "gid://shopify/Product/123" -> "123")
         val cleanProductId = productId.substringAfterLast("/")
 
         viewModelScope.launch {
@@ -178,7 +176,6 @@ class ProductDetailsViewModel(
                 favoriteOverride
             ) { result: Result<List<com.iti.domain.models.Product>>, override: Boolean? ->
                 if (result is Result.Success) {
-                    // Compare by clean numeric ID so Room & GID IDs both match
                     val isFavoriteInDb = result.data.any {
                         it.id.substringAfterLast("/") == cleanProductId
                     }
@@ -206,10 +203,9 @@ class ProductDetailsViewModel(
             if (userRes is Result.Success && userRes.data is User.AuthenticatedUser) {
                 val currentProduct = _state.value.product ?: return@launch
                 val currentlyWishlisted = _state.value.isWishlisted
-                
+
                 try {
                     val newStatus = !currentlyWishlisted
-                    // Optimistic update via override - happens IMMEDIATELY
                     favoriteOverride.value = newStatus
 
                     if (currentlyWishlisted) {
@@ -217,21 +213,24 @@ class ProductDetailsViewModel(
                     } else {
                         addProductToFavoritesUseCase(currentProduct)
                     }
-                    
+
                     val message = if (newStatus) {
                         UiText.StringResource(R.string.added_to_wishlist)
                     } else {
                         UiText.StringResource(R.string.removed_from_wishlist)
                     }
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(message))
-                    
-                    // Keep the override for a bit
+                    _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(message = message, kind = SnackbarKind.Success))
+
                     kotlinx.coroutines.delay(1000)
                     favoriteOverride.value = null
                 } catch (e: Exception) {
-                    // Revert optimistic update
                     favoriteOverride.value = null
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Error: ${e.message}")))
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowSnackbar(
+                            message = UiText.Plain("Error: ${e.message}"),
+                            kind = SnackbarKind.Error
+                        )
+                    )
                 }
             } else {
                 _state.update { it.copy(showUnauthorizedDialog = true) }
@@ -245,7 +244,12 @@ class ProductDetailsViewModel(
         val variantId = selectedVariantId()
         if (variantId == null) {
             viewModelScope.launch {
-                _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Please select options first")))
+                _sideEffects.emit(
+                    ProductDetailsSideEffect.ShowSnackbar(
+                        message = UiText.Plain("Please select options first"),
+                        kind = SnackbarKind.Error
+                    )
+                )
             }
             return
         }
@@ -256,7 +260,14 @@ class ProductDetailsViewModel(
             when (val result = addToCartUseCase(variantId = variantId, quantity = 1)) {
                 is Result.Success -> {
                     _state.update { it.copy(isAddingToCart = false) }
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Added to Cart!")))
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowSnackbar(
+                            message = UiText.Plain("Added to Cart!"),
+                            kind = SnackbarKind.Success,
+                            actionLabel = UiText.StringResource(R.string.view_cart),
+                            isCartAction = true
+                        )
+                    )
                 }
                 is Result.Failure -> {
                     _state.update { it.copy(isAddingToCart = false) }
@@ -264,8 +275,9 @@ class ProductDetailsViewModel(
                         _state.update { it.copy(showUnauthorizedDialog = true) }
                     } else {
                         _sideEffects.emit(
-                            ProductDetailsSideEffect.ShowToast(
-                                UiText.Plain(result.exception.message ?: "Failed to add to cart")
+                            ProductDetailsSideEffect.ShowSnackbar(
+                                message = UiText.Plain(result.exception.message ?: "Failed to add to cart"),
+                                kind = SnackbarKind.Error
                             )
                         )
                     }
@@ -330,7 +342,7 @@ class ProductDetailsViewModel(
                         _state.value.product?.let { p ->
                             ReviewsCache.updateReviews(p.id, p.reviews)
                         }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.StringResource(R.string.review_submitted_successfully)))
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.StringResource(R.string.review_submitted_successfully)))
                         // Re-load product details to fetch new reviews in the background
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
                         if (numericId != null) {
@@ -340,7 +352,7 @@ class ProductDetailsViewModel(
                     is Result.Failure -> {
                         _state.update { it.copy(isSubmittingReview = false, reviewError = result.exception.message) }
                         _sideEffects.emit(
-                            ProductDetailsSideEffect.ShowToast(
+                            ProductDetailsSideEffect.ShowSnackbar(
                                 UiText.Plain(result.exception.message ?: "Failed to submit review")
                             )
                         )
@@ -401,7 +413,7 @@ class ProductDetailsViewModel(
                         _state.value.product?.let { p ->
                             ReviewsCache.updateReviews(p.id, p.reviews)
                         }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Review updated successfully!")))
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.Plain("Review updated successfully!")))
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
                         if (numericId != null) {
                             loadProductDetails(numericId)
@@ -409,7 +421,7 @@ class ProductDetailsViewModel(
                     }
                     is Result.Failure -> {
                         _state.update { it.copy(isSubmittingReview = false, reviewError = result.exception.message) }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain(result.exception.message ?: "Failed to update review")))
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.Plain(result.exception.message ?: "Failed to update review")))
                     }
                 }
             }
@@ -446,7 +458,7 @@ class ProductDetailsViewModel(
                         _state.value.product?.let { p ->
                             ReviewsCache.updateReviews(p.id, p.reviews)
                         }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Review deleted!")))
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.Plain("Review deleted!")))
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
                         if (numericId != null) {
                             loadProductDetails(numericId)
@@ -454,7 +466,7 @@ class ProductDetailsViewModel(
                     }
                     is Result.Failure -> {
                         _state.update { it.copy(isSubmittingReview = false) }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain(result.exception.message ?: "Failed to delete review")))
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.Plain(result.exception.message ?: "Failed to delete review")))
                     }
                 }
             }

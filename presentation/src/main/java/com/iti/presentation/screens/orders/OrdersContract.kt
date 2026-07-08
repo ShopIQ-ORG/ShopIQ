@@ -10,6 +10,7 @@ object OrdersContract {
         val isLoading: Boolean = false,
         val isRefreshing: Boolean = false,
         val error: UiText? = null,
+        val isNoInternet: Boolean = false
     ) {
         val isEmpty: Boolean
             get() = orders.isEmpty()

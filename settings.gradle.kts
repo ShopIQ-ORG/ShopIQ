@@ -12,10 +12,14 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        maven { url = java.net.URI("https://jitpack.io") }
+        maven { url = java.net.URI("https://paymob-sdk.s3.eu-central-1.amazonaws.com/maven") }
+        maven { url = rootProject.projectDir.toURI().resolve("libs") }
+        maven { url = rootProject.projectDir.toURI().resolve("app/libs") }
+        maven { url = rootProject.projectDir.toURI().resolve("presentation/libs") }
     }
 }
 

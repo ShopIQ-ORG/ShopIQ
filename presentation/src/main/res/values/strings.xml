@@ -120,6 +120,8 @@
     <string name="search_cd_clear">Clear text</string>
     <string name="search_trending_label">🔥 Trending</string>
     <string name="search_popular_now_label">Popular Now</string>
+    <string name="search_start_title">Find Your Next Favorite Thing</string>
+    <string name="search_start_subtitle">Search for products, brands, and categories to get started.</string>
 
     <!-- All Products – Filter -->
     <string name="filter_title">Filters</string>
@@ -555,7 +557,9 @@
     <!-- Checkout Flow -->
     <string name="checkout_title">Checkout</string>
     <string name="checkout_step_address">Address</string>
+    <string name="checkout_step_method">Method</string>
     <string name="checkout_step_payment">Payment</string>
+    <string name="checkout_step_paid">Paid</string>
     <string name="checkout_step_summary">Summary</string>
     <string name="checkout_step_success">Success</string>
     <string name="checkout_payment_title">Payment Information</string>
@@ -567,7 +571,6 @@
     <string name="checkout_success_subtitle">Your order has been successfully placed.</string>
     <string name="checkout_success_details">Shopify Order ID: %1$s</string>
     <string name="checkout_btn_go_home">Back to Home</string>
-
     <!-- Product Reviews -->
     <string name="rating_out_of_5">out of 5</string>
     <string name="ratings_count">ratings</string>
@@ -592,4 +595,13 @@
     <string name="review_title_placeholder">Title of your review</string>
     <string name="review_body_placeholder">Write your review body here…</string>
 
+    <string name="view_cart">View Cart</string>
+    <string name="content_desc_favorite">Favorite</string>
+    <string name="content_desc_rating">Rating</string>
+    <string name="product_rating_placeholder">4.6</string>
+    <string name="product_discount_badge">-%1$d%%</string>
+    <string name="remove_favorite_title">Remove from favorites</string>
+    <string name="remove_favorite_message">Are you sure you want to remove this item from your favorites?</string>
+    <string name="remove_favorite_confirm">Remove</string>
+    <string name="remove_favorite_cancel">Cancel</string>
 </resources>

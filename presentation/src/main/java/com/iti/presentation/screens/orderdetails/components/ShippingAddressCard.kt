@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,9 +46,12 @@ fun ShippingAddressCard(shippingAddress: ShippingAddress) {
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(Modifier.width(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(verticalAlignment = Alignment.Top) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Box(
                     modifier = Modifier
                         .size(36.dp)
@@ -64,7 +67,7 @@ fun ShippingAddressCard(shippingAddress: ShippingAddress) {
                     )
                 }
 
-                Spacer(Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -72,19 +75,15 @@ fun ShippingAddressCard(shippingAddress: ShippingAddress) {
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(Modifier.width(2.dp))
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
                     Text(
                         text = shippingAddress.formattedAddress(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }
@@ -94,7 +93,9 @@ private fun ShippingAddress.recipientName(): String =
     listOfNotNull(firstName, lastName).joinToString(" ").ifBlank { "—" }
 
 private fun ShippingAddress.formattedAddress(): String =
-    listOfNotNull(address1, city, zip, country).filter { it.isNotBlank() }.joinToString(", ")
+    listOfNotNull(address1, city, zip, country)
+        .filter { it.isNotBlank() }
+        .joinToString(", ")
 
 @Preview(showBackground = true, name = "Full Address")
 @Composable

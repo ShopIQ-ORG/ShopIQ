@@ -50,6 +50,11 @@ import com.iti.presentation.screens.checkout.components.SummaryStepContent
 import com.iti.presentation.screens.checkout.components.SuccessStepContent
 import com.iti.presentation.ui.theme.*
 
+import org.koin.androidx.compose.koinViewModel
+import com.iti.presentation.screens.checkout.components.PaymentMethodContent
+import com.iti.presentation.screens.checkout.components.PaymentSuccessContent
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutScreen(
@@ -62,7 +67,7 @@ fun CheckoutScreen(
     val state by viewModel.state.collectAsState()
     val addressState by addressViewModel.state.collectAsState()
 
-    val showCheckoutHeaders = state.currentStep < 4 &&
+    val showCheckoutHeaders = state.currentStep < 6 &&
             addressState.screenState !is AddressContract.ScreenState.MapPicker &&
             addressState.screenState !is AddressContract.ScreenState.LocationDetected
 
@@ -84,7 +89,14 @@ fun CheckoutScreen(
         topBar = {
             if (showCheckoutHeaders) {
                 BackTopBar(
-                    title = stringResource(R.string.checkout_title),
+                    title = when (state.currentStep) {
+                        1 -> stringResource(R.string.checkout_step_address)
+                        2 -> "Payment Method"
+                        3 -> "Payment Details"
+                        4 -> "Payment Confirmed"
+                        5 -> "Review Summary"
+                        else -> stringResource(R.string.checkout_title)
+                    },
                     onBack = { viewModel.onEvent(CheckoutContract.Event.NavigateBack) },
                     actions = {
                         if (state.currentStep == 1) {
@@ -127,41 +139,72 @@ fun CheckoutScreen(
                     }
 
                     2 -> {
-                        PaymentStepContent(
-                            onConfirm = {
-                                viewModel.onEvent(CheckoutContract.Event.PaymentConfirmed)
-                            }
+                        PaymentMethodContent(
+                            selectedMethod = state.paymentMethod,
+                            onSelectMethod = { method ->
+                                viewModel.onEvent(CheckoutContract.Event.PaymentMethodSelected(method))
+                            },
+                            onContinue = {
+                                viewModel.onEvent(CheckoutContract.Event.PaymentMethodConfirmed)
+                            },
+                            isLoading = state.isLoading
                         )
                     }
 
                     3 -> {
+                        if (state.paymentMethod == PaymentMethodType.ONLINE) {
+                            val paymentViewModel: com.iti.presentation.screens.payment.PaymentViewModel = koinViewModel()
+                            val totalCents = ((state.cart?.total?.amount?.toDoubleOrNull() ?: 0.0) * 100).toLong()
+                            com.iti.presentation.screens.payment.PaymentScreen(
+                                viewModel = paymentViewModel,
+                                amountCents = totalCents,
+                                integrationId = com.iti.data.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242,
+                                onPaymentSuccess = {
+                                    viewModel.onEvent(CheckoutContract.Event.PaymentConfirmed)
+                                },
+                                onNavigateBack = {
+                                    viewModel.onEvent(CheckoutContract.Event.NavigateBack)
+                                }
+                            )
+                        } else {
+                            PaymentStepContent(
+                                cart = state.cart,
+                                onConfirm = {
+                                    viewModel.onEvent(CheckoutContract.Event.PaymentConfirmed)
+                                },
+                                isLoading = state.isLoading
+                            )
+                        }
+                    }
+
+                    4 -> {
+                        PaymentSuccessContent(
+                            paymentMethod = state.paymentMethod,
+                            cart = state.cart,
+                            onProceed = {
+                                viewModel.onEvent(CheckoutContract.Event.PaymentSuccessProceed)
+                            }
+                        )
+                    }
+
+                    5 -> {
                         SummaryStepContent(
                             cart = state.cart,
                             draftOrder = state.draftOrder,
                             shippingAddress = state.selectedAddress,
                             onPlaceOrder = {
                                 viewModel.onEvent(CheckoutContract.Event.PlaceOrder)
-                            }
+                            },
+                            isLoading = state.isLoading
                         )
                     }
 
-                    4 -> {
+                    6 -> {
                         SuccessStepContent(
                             draftOrder = state.draftOrder,
                             currentUser = state.currentUser,
                             onGoHome = onNavigateToHome
                         )
-                    }
-                }
-
-                if (state.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }

@@ -6,8 +6,9 @@
 //  Copyright © 2026 ITI. All rights reserved.
 //
 
-package com.iti.presentation.screens.payment
+package com.iti.presentation.screens.checkout
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,33 +33,70 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.iti.presentation.screens.payment.PaymentMethodContract.Intent
-import com.iti.presentation.screens.payment.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.screens.payment.components.PaymentMethodCard
-import com.iti.presentation.screens.payment.components.LogoContainer
+import com.iti.presentation.screens.checkout.PaymentMethodContract.Intent
+import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.screens.checkout.components.PaymentMethodCard
 import com.iti.presentation.ui.theme.SearchFieldLight
+
+@Composable
+fun LogoContainer(content: @Composable () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        color = MaterialTheme.colorScheme.background,
+        border = BorderStroke(1.dp, SearchFieldLight),
+        shadowElevation = 0.5.dp
+    ) {
+        Box(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
+            content()
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentMethodScreen(
     viewModel: PaymentMethodViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToNextStep: (PaymentMethodType) -> Unit
+    onNavigateToNextStep: (PaymentMethodContract.PaymentMethodType,Long) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // Handle Side Effects (Navigation)
+    // Handle Side Effects (Navigation + Snackbar)
     LaunchedEffect(viewModel.effect) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is PaymentMethodContract.Effect.NavigateBack -> onNavigateBack()
-                is PaymentMethodContract.Effect.NavigateToNextStep -> onNavigateToNextStep(effect.methodType)
+                is PaymentMethodContract.Effect.NavigateToNextStep -> onNavigateToNextStep(effect.methodType,effect.amountCents)
+                is PaymentMethodContract.Effect.ShowCodLimitError -> {
+                    snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        duration = SnackbarDuration.Long
+                    )
+                }
             }
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(top = 8.dp),
+                snackbar = { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        shape = RoundedCornerShape(12.dp),
+                        containerColor = Color(0xFFD32F2F),
+                        contentColor = Color.White,
+                        actionColor = Color.White
+                    )
+                }
+            )
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -188,7 +227,7 @@ fun PaymentMethodScreen(
 
                     // Apple Pay
                     LogoContainer {
-                        Text(text = "Pay", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                        Text(text = "Pay", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Black)
                     }
                     
                     Text(

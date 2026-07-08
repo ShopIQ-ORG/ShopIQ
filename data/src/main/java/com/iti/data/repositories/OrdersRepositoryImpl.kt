@@ -16,12 +16,16 @@ class OrdersRepositoryImpl(
     private val tokenProvider: ShopifyTokenProvider
 ) : OrdersRepository {
 
-    override suspend fun getOrders(): Result<List<Order>> = safeCall {
-        val tokenResult = tokenProvider.getValidToken()
-        val accessToken = (tokenResult as? Result.Success)?.data?.accessToken
-            ?: throw OrderException.UnauthorizedAccess()
+    override suspend fun getOrders(): Result<List<Order>> {
+        val accessToken = when (val tokenResult = tokenProvider.getValidToken()) {
+            is Result.Success -> tokenResult.data.accessToken
+            is Result.Failure -> return tokenResult
+            is Result.Loading -> return Result.Loading
+        }
 
-        remote.getOrders(accessToken).map { it.toDomain() }
+        return safeCall {
+            remote.getOrders(accessToken).map { it.toDomain() }
+        }
     }
 
     private inline fun <T> safeCall(block: () -> T): Result<T> {

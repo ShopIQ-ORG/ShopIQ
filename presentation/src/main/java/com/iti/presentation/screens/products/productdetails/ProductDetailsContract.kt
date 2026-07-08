@@ -3,6 +3,8 @@ package com.iti.presentation.screens.products.productdetails
 import com.iti.domain.models.Product
 import com.iti.presentation.util.UiText
 
+enum class SnackbarKind { Success, Error }
+
 data class ProductDetailsUiState(
     val isLoading: Boolean = false,
     val product: Product? = null,
@@ -35,8 +37,12 @@ sealed interface ProductDetailsIntent {
     data class DeleteReview(val reviewId: String) : ProductDetailsIntent
 }
 
-
 sealed interface ProductDetailsSideEffect {
-    data class ShowToast(val message: UiText) : ProductDetailsSideEffect
+    data class ShowSnackbar(
+        val message: UiText,
+        val kind: SnackbarKind = SnackbarKind.Success,
+        val actionLabel: UiText? = null,
+        val isCartAction: Boolean = false
+    ) : ProductDetailsSideEffect
     object NavigateToAuth : ProductDetailsSideEffect
 }

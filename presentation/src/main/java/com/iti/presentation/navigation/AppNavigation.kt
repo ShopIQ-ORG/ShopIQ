@@ -8,6 +8,7 @@
 
 package com.iti.presentation.navigation
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,20 +44,22 @@ import com.iti.presentation.screens.categorydetails.CategoryDetailsScreen
 import com.iti.presentation.screens.orderdetails.OrderDetailsScreen
 import com.iti.presentation.screens.orders.OrdersScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsScreen
-import com.iti.presentation.screens.payment.PaymentMethodScreen
-import com.iti.presentation.screens.payment.CODPaymentScreen
-import com.iti.presentation.screens.payment.OnlinePaymentScreen
-import com.iti.presentation.screens.payment.PaymentMethodViewModel
-import com.iti.presentation.screens.payment.PaymentMethodContract.PaymentMethodType
-import com.iti.presentation.screens.checkout.CheckoutScreen
-import com.iti.presentation.screens.checkout.CheckoutViewModel
+import com.iti.presentation.screens.checkout.PaymentMethodViewModel
+import com.iti.presentation.screens.payment.PaymentScreen
+import com.iti.presentation.screens.payment.PaymentViewModel
 import com.iti.presentation.screens.profile.AccountSettingsScreen
 import com.iti.presentation.screens.profile.EditProfileScreen
 import com.iti.presentation.screens.profile.LocalizationCurrencyScreen
 import com.iti.presentation.screens.profile.AddressManagementScreen
 import com.iti.presentation.screens.profile.AddEditAddressScreen
 import com.iti.presentation.screens.address.components.AddressMapPicker
+import com.iti.presentation.screens.checkout.PaymentMethodContract
+import com.iti.presentation.screens.checkout.PaymentMethodScreen
+import com.iti.presentation.screens.checkout.CheckoutScreen
+import com.iti.presentation.screens.checkout.CheckoutViewModel
 import com.iti.presentation.screens.profile.ProfileViewModel
+import com.iti.presentation.screens.checkout.summary.CheckoutSummaryScreen
+import com.iti.presentation.screens.checkout.summary.OrderSuccessScreen
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -281,6 +284,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 ProductDetailsScreen(
                     productId = screen.productId,
                     onBackClick = ::navigateBack,
+                    onNavigateToCart = {
+                        if (backStack.lastOrNull() !is Screen.Cart) {
+                            navigate(Screen.Cart)
+                        }
+                    },
                     onLogin = {
                         replaceRoot(Screen.SignIn)
                     }
@@ -337,14 +345,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 PaymentMethodScreen(
                     viewModel = paymentViewModel,
                     onNavigateBack = ::navigateBack,
-                    onNavigateToNextStep = { methodType ->
+                    onNavigateToNextStep = { methodType: PaymentMethodContract.PaymentMethodType, amountCents: Long ->
                         when (methodType) {
-                            PaymentMethodType.COD -> {
+                            PaymentMethodContract.PaymentMethodType.COD -> {
                                 navigate(Screen.CODPayment)
                             }
 
-                            PaymentMethodType.ONLINE -> {
-                                navigate(Screen.OnlinePayment)
+                            PaymentMethodContract.PaymentMethodType.ONLINE -> {
+                                navigate(Screen.OnlinePayment(amountCents))
                             }
                         }
                     }
@@ -352,11 +360,49 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             }
 
             entry<Screen.CODPayment> {
-                CODPaymentScreen(onNavigateBack = ::navigateBack)
+                CheckoutSummaryScreen(
+                    paymentMethod = PaymentMethodContract.PaymentMethodType.COD,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToOrderConfirmation = {
+                        navigate(Screen.OrderSuccess)
+                    }
+                )
             }
 
-            entry<Screen.OnlinePayment> {
-                OnlinePaymentScreen(onNavigateBack = ::navigateBack)
+            entry<Screen.OnlinePayment> { screen ->
+                val paymentViewModel: PaymentViewModel = koinViewModel()
+
+                PaymentScreen(
+                    viewModel = paymentViewModel,
+                    amountCents = screen.amountCents,
+                    integrationId = com.iti.data.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242,
+                    onPaymentSuccess = {
+                        navigate(Screen.OnlinePaymentSummary)
+                    },
+                    onNavigateBack = ::navigateBack
+                )
+            }
+
+            entry<Screen.OnlinePaymentSummary> {
+                CheckoutSummaryScreen(
+                    paymentMethod = PaymentMethodContract.PaymentMethodType.ONLINE,
+                    onNavigateBack = ::navigateBack,
+                    onNavigateToOrderConfirmation = {
+                        navigate(Screen.OrderSuccess)
+                    }
+                )
+            }
+
+            entry<Screen.OrderSuccess> {
+                OrderSuccessScreen(
+                    onNavigateToHome = {
+                        replaceRoot(Screen.Home)
+                    },
+                    onNavigateToOrders = {
+                        replaceRoot(Screen.Home)
+                        navigate(Screen.Orders)
+                    }
+                )
             }
 
             entry<Screen.Orders> {
