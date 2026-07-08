@@ -11,6 +11,7 @@ import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatContract.ChatMessageUi
 import com.iti.presentation.screens.ai.AiChatContract.ChatProductUi
+import com.iti.presentation.util.NetworkMonitor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +22,8 @@ import kotlinx.coroutines.launch
 class AiChatViewModel(
     private val getChatHistoryUseCase: GetChatHistoryUseCase,
     private val sendChatMessageUseCase: SendChatMessageUseCase,
-    private val productsRepository: ProductsRepository
+    private val productsRepository: ProductsRepository,
+    private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AiChatContract.State())
@@ -141,6 +143,30 @@ class AiChatViewModel(
         currencyCode: String? = null
     ) {
         viewModelScope.launch {
+            if (!networkMonitor.isCurrentlyConnected()) {
+                val userMsgUi = ChatMessageUi(
+                    id = "temp_user_${System.currentTimeMillis()}",
+                    sender = "user",
+                    text = text,
+                    timestamp = System.currentTimeMillis(),
+                    voiceDuration = voiceDuration,
+                    attachedImageUrl = attachedImageUrl
+                )
+                val errorMsgUi = ChatMessageUi(
+                    id = "temp_bot_${System.currentTimeMillis()}",
+                    sender = "ai",
+                    text = "ERROR_NETWORK",
+                    timestamp = System.currentTimeMillis() + 10
+                )
+                _state.update {
+                    it.copy(
+                        messages = it.messages + userMsgUi + errorMsgUi,
+                        isBotTyping = false
+                    )
+                }
+                return@launch
+            }
+
             val userMsg = ChatMessage(
                 sender = "user",
                 text = text,

@@ -575,9 +575,9 @@
     <string name="rating_out_of_5">out of 5</string>
     <string name="ratings_count">ratings</string>
     <string name="all_reviews">All Reviews</string>
-    <string name="sort_latest">الأحدث</string>
-    <string name="sort_oldest">الأقدم</string>
-    <string name="sort_highest_rating">أعلى تقييم</string>
+    <string name="sort_latest">Latest</string>
+    <string name="sort_oldest">Oldest</string>
+    <string name="sort_highest_rating">Highest Rating</string>
     <string name="verified_purchase">Verified Purchase</string>
     <string name="was_review_helpful">Was this review helpful?</string>
     <string name="review_submitted_successfully">Review submitted successfully!</string>
@@ -604,4 +604,9 @@
     <string name="remove_favorite_message">Are you sure you want to remove this item from your favorites?</string>
     <string name="remove_favorite_confirm">Remove</string>
     <string name="remove_favorite_cancel">Cancel</string>
+    <string name="payment_successful">Payment Successful</string>
+    <string name="payment_failed">Payment Failed: %1$s</string>
+    <string name="payment_pending">Payment Pending</string>
+    <string name="payment_sdk_error">Error starting SDK: %1$s</string>
+    <string name="pay_now_amount">Pay Now $%1$s</string>
 </resources>

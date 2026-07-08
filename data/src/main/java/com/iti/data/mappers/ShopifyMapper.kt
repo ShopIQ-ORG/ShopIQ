@@ -58,7 +58,22 @@ fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
                             )
                         )
                     }
-                )
+                ),
+                reviews = edge.node.metafield?.references?.edges?.mapNotNull { metafieldEdge ->
+                    val metaobject = metafieldEdge.node.onMetaobject
+                    if (metaobject != null) {
+                        ReviewDto(
+                            id = metaobject.id,
+                            customerName = metaobject.customerName?.value ?: "Anonymous",
+                            rating = metaobject.rating?.value?.toIntOrNull() ?: 5,
+                            title = metaobject.title?.value ?: "",
+                            body = metaobject.body?.value ?: "",
+                            createdAt = metaobject.createdAt?.value ?: "",
+                            approved = metaobject.approved?.value?.lowercase() == "true",
+                            avatarUrl = metaobject.avatarUrl?.value
+                        )
+                    } else null
+                } ?: emptyList()
             )
         )
     }
@@ -117,6 +132,18 @@ fun ShopifyResponse.toDomainProducts(): List<Product> {
                         currencyCode = variantEdge.node.price.currencyCode
                     ),
                     availableForSale = variantEdge.node.availableForSale
+                )
+            },
+            reviews = node.reviews.map { review ->
+                ProductReview(
+                    id = review.id,
+                    customerName = review.customerName,
+                    rating = review.rating,
+                    title = review.title,
+                    body = review.body,
+                    createdAt = review.createdAt,
+                    approved = review.approved,
+                    avatarUrl = review.avatarUrl
                 )
             }
         )
@@ -266,23 +293,52 @@ fun GetProductsInCollectionQuery.Data.toDomainProducts(): List<Product> {
             amount = node.priceRangeV2.minVariantPrice.amount,
             currencyCode = node.priceRangeV2.minVariantPrice.currencyCode.name
         )
+        val maxPrice = Money(
+            amount = node.priceRangeV2.maxVariantPrice.amount,
+            currencyCode = node.priceRangeV2.maxVariantPrice.currencyCode.name
+        )
         Product(
             id = node.id,
             title = node.title,
-            description = "",
-            handle = "",
+            description = node.description,
+            handle = node.handle,
             productType = node.productType,
-            vendor = "",
-            tags = emptyList(),
+            vendor = node.vendor,
+            tags = node.tags,
             minPrice = minPrice,
-            maxPrice = minPrice,
+            maxPrice = maxPrice,
             images = node.images.edges.map { imageEdge ->
                 ProductImage(
                     url = imageEdge.node.url.toString(),
-                    altText = null
+                    altText = imageEdge.node.altText
                 )
             },
-            variants = emptyList()
+            variants = node.variants.edges.map { variantEdge ->
+                ProductVariant(
+                    id = variantEdge.node.id,
+                    title = variantEdge.node.title,
+                    price = Money(
+                        amount = variantEdge.node.price.toString(),
+                        currencyCode = node.priceRangeV2.minVariantPrice.currencyCode.name
+                    ),
+                    availableForSale = variantEdge.node.availableForSale
+                )
+            },
+            reviews = node.metafield?.references?.edges?.mapNotNull { metafieldEdge ->
+                val metaobject = metafieldEdge.node.onMetaobject
+                if (metaobject != null) {
+                    ProductReview(
+                        id = metaobject.id,
+                        customerName = metaobject.customerName?.value ?: "Anonymous",
+                        rating = metaobject.rating?.value?.toIntOrNull() ?: 5,
+                        title = metaobject.title?.value ?: "",
+                        body = metaobject.body?.value ?: "",
+                        createdAt = metaobject.createdAt?.value ?: "",
+                        approved = metaobject.approved?.value?.lowercase() == "true",
+                        avatarUrl = metaobject.avatarUrl?.value
+                    )
+                } else null
+            } ?: emptyList()
         )
     } ?: emptyList()
 }

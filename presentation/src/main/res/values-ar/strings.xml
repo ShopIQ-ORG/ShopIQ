@@ -567,5 +567,9 @@
     <string name="delete_review_label">حذف التقييم</string>
     <string name="review_title_placeholder">عنوان التقييم</string>
     <string name="review_body_placeholder">اكتب تفاصيل تقييمك هنا…</string>
-
+    <string name="payment_successful">تم الدفع بنجاح</string>
+    <string name="payment_failed">فشلت عملية الدفع: %1$s</string>
+    <string name="payment_pending">عملية الدفع قيد الانتظار</string>
+    <string name="payment_sdk_error">حدث خطأ أثناء تشغيل بوابة الدفع: %1$s</string>
+    <string name="pay_now_amount">ادفع الآن $%1$s</string>
 </resources>
