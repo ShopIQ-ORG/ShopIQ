@@ -22,6 +22,7 @@ data class Product(
 data class ProductReview(
     val id: String,
     val customerName: String,
+    val customerId: String,
     val rating: Int,
     val title: String,
     val body: String,

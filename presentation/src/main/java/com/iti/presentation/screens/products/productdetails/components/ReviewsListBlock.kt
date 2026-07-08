@@ -19,12 +19,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.domain.models.ProductReview
+import com.iti.domain.models.User
 import com.iti.presentation.R
 
 @Composable
 fun ReviewsListBlock(
     reviews: List<ProductReview>,
-    currentUserName: String?,
+    currentUser: User?,
     onWriteReviewClick: () -> Unit,
     onEditReviewClick: (ProductReview) -> Unit,
     onDeleteReviewClick: (ProductReview) -> Unit,
@@ -71,7 +72,11 @@ fun ReviewsListBlock(
                 Box {
                     Row(
                         modifier = Modifier
-                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                RoundedCornerShape(8.dp)
+                            )
                             .clickable { showSortMenu = true }
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -101,7 +106,7 @@ fun ReviewsListBlock(
                                         text = label,
                                         fontSize = 13.sp,
                                         color = if (index == sortIndex) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.onSurface
+                                        else MaterialTheme.colorScheme.onSurface
                                     )
                                 },
                                 onClick = {
@@ -116,27 +121,29 @@ fun ReviewsListBlock(
         }
 
         // Write Review button
-        OutlinedButton(
-            onClick = onWriteReviewClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.primary
-            ),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Edit,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(id = R.string.write_review_btn),
-                fontWeight = FontWeight.Bold
-            )
+        if (currentUser is User.AuthenticatedUser) {
+            OutlinedButton(
+                onClick = onWriteReviewClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(id = R.string.write_review_btn),
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -148,7 +155,11 @@ fun ReviewsListBlock(
                     .fillMaxWidth()
                     .padding(vertical = 12.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                        alpha = 0.2f
+                    )
+                )
             ) {
                 Text(
                     text = stringResource(id = R.string.no_reviews_yet),
@@ -163,8 +174,9 @@ fun ReviewsListBlock(
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 finalReviews.forEach { review ->
-                    val isOwnReview = currentUserName != null &&
-                        review.customerName.trim().equals(currentUserName.trim(), ignoreCase = true)
+                    val isOwnReview =
+                        currentUser != null && currentUser is User.AuthenticatedUser &&
+                                review.customerId.trim().equals(currentUser.uid, ignoreCase = true)
                     ReviewItem(
                         review = review,
                         isOwnReview = isOwnReview,

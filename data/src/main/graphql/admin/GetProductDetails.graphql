@@ -59,6 +59,11 @@ query GetProductDetails($id: ID!) {
                                 type
                                 value
                             }
+                            customerId: field(key: "customer_id") {
+                                key
+                                type
+                                value
+                            }
                             rating: field(key: "rating") {
                                 key
                                 type

@@ -79,7 +79,7 @@ class ProductDetailsViewModel(
             val userRes = getCurrentUserUseCase()
             if (userRes is Result.Success && userRes.data is User.AuthenticatedUser) {
                 val user = userRes.data as User.AuthenticatedUser
-                _state.update { it.copy(currentUserName = user.fullName) }
+                _state.update { it.copy(currentUser = user) }
                 observeFavoriteStatus(productId.toString())
             }
         }
@@ -306,6 +306,7 @@ class ProductDetailsViewModel(
             addProductReviewUseCase(
                 productId = product.id,
                 customerName = user.fullName,
+                customerId = user.uid,
                 rating = rating,
                 title = title,
                 body = body,
@@ -322,6 +323,7 @@ class ProductDetailsViewModel(
                                 val newReview = com.iti.domain.models.ProductReview(
                                     id = "temp_${System.currentTimeMillis()}",
                                     customerName = user.fullName,
+                                    customerId = user.uid,
                                     rating = rating,
                                     title = title,
                                     body = body,
@@ -377,6 +379,7 @@ class ProductDetailsViewModel(
             updateProductReviewUseCase(
                 reviewId = reviewId,
                 customerName = user.fullName,
+                customerId = user.uid,
                 rating = rating,
                 title = title,
                 body = body,

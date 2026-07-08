@@ -1,6 +1,9 @@
 package com.iti.presentation.screens.auth.emailverification
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -9,8 +12,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -50,24 +55,32 @@ fun EmailVerificationScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { ShopIQSnackBarHost(hostState = snackbarHostState) }
-    ) { padding ->
-        EmailVerificationContent(
-            modifier = Modifier.padding(padding),
-            email = state.email,
-            resendCooldownSeconds = state.resendCooldownSeconds,
-            isSendingLink = state.isSendingLink,
-            isCheckingVerification = state.isCheckingVerification,
-            onResendClick = {
-                viewModel.onEvent(EmailVerificationContract.Event.SendVerificationLink)
-            },
-            onContinueClick = {
-                viewModel.onEvent(EmailVerificationContract.Event.CheckVerification)
-            },
-            onBackToLoginClick = {
-                viewModel.onEvent(EmailVerificationContract.Event.BackToLogin)
-            }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold { padding ->
+            EmailVerificationContent(
+                modifier = Modifier.padding(padding),
+                email = state.email,
+                resendCooldownSeconds = state.resendCooldownSeconds,
+                isSendingLink = state.isSendingLink,
+                isCheckingVerification = state.isCheckingVerification,
+                onResendClick = {
+                    viewModel.onEvent(EmailVerificationContract.Event.SendVerificationLink)
+                },
+                onContinueClick = {
+                    viewModel.onEvent(EmailVerificationContract.Event.CheckVerification)
+                },
+                onBackToLoginClick = {
+                    viewModel.onEvent(EmailVerificationContract.Event.BackToLogin)
+                }
+            )
+        }
+
+        ShopIQSnackBarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
         )
     }
 }

@@ -91,7 +91,7 @@ val dataModule = module {
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get()) }
+    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get(), get()) }
     single<FavoriteRemoteDataSource> { FavoriteRemoteDataSourceImpl(get()) }
 
     // DataStore

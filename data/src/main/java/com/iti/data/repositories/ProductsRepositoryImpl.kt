@@ -3,6 +3,7 @@ package com.iti.data.repositories
 import com.iti.data.utils.handleException
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSource
+import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.data.mappers.toDomainAd
 import com.iti.data.mappers.toDomainBrand
 import com.iti.data.mappers.toDomainProducts
@@ -14,6 +15,7 @@ import com.iti.domain.models.User
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
 import com.iti.domain.models.Product
+import com.iti.domain.models.ProductReview
 import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Category
 import com.iti.domain.models.Result
@@ -32,7 +34,8 @@ class ProductsRepositoryImpl(
     private val remoteDataSource: ProductsRemoteDataSource,
     private val favoriteDao: FavoriteDao,
     private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRemoteDataSource: UserRemoteDataSource
 ) : ProductsRepository {
 
     override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
@@ -48,28 +51,29 @@ class ProductsRepositoryImpl(
         }
     }
 
-    override fun getProductsPaginated(count: Int, after: String?): Flow<Result<PaginatedProducts>> = flow {
-        emit(Result.Loading)
-        try {
-            val shopifyResponse = remoteDataSource.getProductsByNumber(count, after)
-            val domainProducts = shopifyResponse.toDomainProducts()
-            val hasNextPage = shopifyResponse.data.products?.pageInfo?.hasNextPage ?: false
-            val endCursor = shopifyResponse.data.products?.pageInfo?.endCursor
-            emit(
-                Result.Success(
-                    PaginatedProducts(
-                        products = domainProducts,
-                        hasNextPage = hasNextPage,
-                        endCursor = endCursor
+    override fun getProductsPaginated(count: Int, after: String?): Flow<Result<PaginatedProducts>> =
+        flow {
+            emit(Result.Loading)
+            try {
+                val shopifyResponse = remoteDataSource.getProductsByNumber(count, after)
+                val domainProducts = shopifyResponse.toDomainProducts()
+                val hasNextPage = shopifyResponse.data.products?.pageInfo?.hasNextPage ?: false
+                val endCursor = shopifyResponse.data.products?.pageInfo?.endCursor
+                emit(
+                    Result.Success(
+                        PaginatedProducts(
+                            products = domainProducts,
+                            hasNextPage = hasNextPage,
+                            endCursor = endCursor
+                        )
                     )
                 )
-            )
-        } catch (e: kotlinx.coroutines.CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            emit(Result.Failure(e.handleException()))
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                emit(Result.Failure(e.handleException()))
+            }
         }
-    }
 
     companion object {
         private val EXCLUDED_CATEGORIES = setOf(
@@ -113,13 +117,28 @@ class ProductsRepositoryImpl(
         try {
             val response = remoteDataSource.getProductDetails(productId)
             val domainProduct = response.toDomainProduct()
-            emit(Result.Success(domainProduct))
+            val enrichedReviews = resolveReviewAvatars(domainProduct.reviews)
+            emit(Result.Success(domainProduct.copy(reviews = enrichedReviews)))
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
     }
+
+    private suspend fun resolveReviewAvatars(reviews: List<ProductReview>): List<ProductReview> =
+        coroutineScope {
+            reviews.map { review ->
+                async {
+                    val avatarUrl = try {
+                        userRemoteDataSource.getUserOrNull(review.customerId)?.avatarUrl
+                    } catch (e: Exception) {
+                        null
+                    }
+                    if (avatarUrl != null) review.copy(avatarUrl = avatarUrl) else review
+                }
+            }.awaitAll()
+        }
 
     override fun getMainCategories(): Flow<Result<List<Category>>> = flow {
         emit(Result.Loading)
@@ -144,7 +163,10 @@ class ProductsRepositoryImpl(
 
             try {
                 favoriteRemoteDataSource.addFavorite(userId, cleanId)
-                android.util.Log.d("ProductsRepository", "Firestore addToFavorites OK: cleanId=$cleanId")
+                android.util.Log.d(
+                    "ProductsRepository",
+                    "Firestore addToFavorites OK: cleanId=$cleanId"
+                )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -163,7 +185,10 @@ class ProductsRepositoryImpl(
 
             try {
                 favoriteRemoteDataSource.removeFavorite(userId, cleanId)
-                android.util.Log.d("ProductsRepository", "Firestore removeFromFavorites OK: cleanId=$cleanId")
+                android.util.Log.d(
+                    "ProductsRepository",
+                    "Firestore removeFromFavorites OK: cleanId=$cleanId"
+                )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -204,7 +229,11 @@ class ProductsRepositoryImpl(
                                     null
                                 }
                             } catch (e: Exception) {
-                                android.util.Log.e("ProductsRepository", "Failed to fetch product details from Shopify for ID: $cleanId", e)
+                                android.util.Log.e(
+                                    "ProductsRepository",
+                                    "Failed to fetch product details from Shopify for ID: $cleanId",
+                                    e
+                                )
                                 null
                             }
                         }
@@ -213,7 +242,10 @@ class ProductsRepositoryImpl(
 
                 favoriteDao.deleteFavoritesForUser(userId)
                 favorites.forEach { favoriteDao.insertFavorite(it) }
-                android.util.Log.d("ProductsRepository", "Firestore getFavorites synced ${favorites.size} items from favorites list for users/$userId")
+                android.util.Log.d(
+                    "ProductsRepository",
+                    "Firestore getFavorites synced ${favorites.size} items from favorites list for users/$userId"
+                )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -270,7 +302,10 @@ class ProductsRepositoryImpl(
         }
     }
 
-    override fun getProductsByCategory(categoryId: String, count: Int): Flow<Result<List<Product>>> = flow {
+    override fun getProductsByCategory(
+        categoryId: String,
+        count: Int
+    ): Flow<Result<List<Product>>> = flow {
         emit(Result.Loading)
         try {
             val response = remoteDataSource.getProductsByCategory(categoryId, count)
@@ -289,6 +324,7 @@ class ProductsRepositoryImpl(
     override fun addProductReview(
         productId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
@@ -296,18 +332,20 @@ class ProductsRepositoryImpl(
     ): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
         try {
-            val numericId = productId.substringAfterLast("/").toLongOrNull() 
+            val numericId = productId.substringAfterLast("/").toLongOrNull()
                 ?: throw Exception("Invalid product ID: $productId")
             val productDetails = remoteDataSource.getProductDetails(numericId)
             val existingIds = productDetails.data.product?.reviews?.map { it.id } ?: emptyList()
 
-            val formatter = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+            val formatter =
+                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
             formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
             val createdAt = formatter.format(java.util.Date())
 
             val newReviewId = remoteDataSource.createProductReview(
                 productId = productId,
                 customerName = customerName,
+                customerId = customerId,
                 rating = rating,
                 title = title,
                 body = body,
@@ -329,6 +367,7 @@ class ProductsRepositoryImpl(
     override fun updateProductReview(
         reviewId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
@@ -336,13 +375,15 @@ class ProductsRepositoryImpl(
     ): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
         try {
-            val formatter = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+            val formatter =
+                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
             formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
             val createdAt = formatter.format(java.util.Date())
 
             remoteDataSource.updateProductReview(
                 reviewId = reviewId,
                 customerName = customerName,
+                customerId = customerId,
                 rating = rating,
                 title = title,
                 body = body,

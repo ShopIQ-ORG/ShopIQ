@@ -1,6 +1,7 @@
 package com.iti.presentation.screens.products.productdetails
 
 import com.iti.domain.models.Product
+import com.iti.domain.models.User
 import com.iti.presentation.util.UiText
 
 enum class SnackbarKind { Success, Error }
@@ -17,7 +18,7 @@ data class ProductDetailsUiState(
     val showUnauthorizedDialog: Boolean = false,
     val isSubmittingReview: Boolean = false,
     val reviewError: String? = null,
-    val currentUserName: String? = null,
+    val currentUser: User? = null,
     val selectedVariantId: String? = null,
     val translatedTitle: String? = null,
     val translatedDescription: String? = null

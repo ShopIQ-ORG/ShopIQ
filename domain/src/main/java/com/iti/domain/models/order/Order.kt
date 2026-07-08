@@ -17,15 +17,17 @@ data class Order(
     val itemsCount: Int
         get() = lineItems.sumOf { it.quantity }
 
-    val totalDiscount: Money
-        get() {
-            val originalSubtotal = lineItems.sumOf { it.originalTotalPrice.amount }
+    val originalSubtotal: Money
+        get() = Money(
+            amount = lineItems.sumOf { it.originalTotalPrice.amount },
+            currencyCode = subtotalPrice.currencyCode
+        )
 
-            return Money(
-                amount = (originalSubtotal - subtotalPrice.amount).coerceAtLeast(0.0),
-                currencyCode = subtotalPrice.currencyCode
-            )
-        }
+    val totalDiscount: Money
+        get() = Money(
+            amount = (originalSubtotal.amount - subtotalPrice.amount).coerceAtLeast(0.0),
+            currencyCode = subtotalPrice.currencyCode
+        )
 }
 
 data class Money(

@@ -96,6 +96,7 @@ data class ThrottleStatus(
 data class ReviewDto(
     val id: String,
     val customerName: String,
+    val customerId: String,
     val rating: Int,
     val title: String,
     val body: String,
