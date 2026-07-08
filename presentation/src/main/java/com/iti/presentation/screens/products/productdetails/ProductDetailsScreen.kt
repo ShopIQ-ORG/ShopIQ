@@ -328,7 +328,7 @@ private fun ProductDetailsContent(
             item {
                 ReviewsListBlock(
                     reviews = product.reviews,
-                    currentUserName = state.currentUserName,
+                    currentUser = state.currentUser,
                     onWriteReviewClick = onWriteReviewClick,
                     onEditReviewClick = onEditReviewClick,
                     onDeleteReviewClick = onDeleteReviewClick

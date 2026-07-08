@@ -1,6 +1,5 @@
 package com.iti.presentation.screens.orderdetails.components
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -52,12 +51,7 @@ fun OrderSummaryCard(order: Order) {
 
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_subtotal),
-                value = order.subtotalPrice.toCurrency()
-            )
-            Spacer(Modifier.height(8.dp))
-            OrderSummaryRow(
-                label = stringResource(R.string.order_summary_shipping_fee),
-                value = order.totalShippingPrice.toCurrency()
+                value = order.originalSubtotal.toCurrency()
             )
 
             val discount = order.totalDiscount
@@ -70,6 +64,12 @@ fun OrderSummaryCard(order: Order) {
                     valueColor = if (isDark) SuccessDark else SuccessLight
                 )
             }
+
+            Spacer(Modifier.height(8.dp))
+            OrderSummaryRow(
+                label = stringResource(R.string.order_summary_shipping_fee),
+                value = order.totalShippingPrice.toCurrency()
+            )
 
             if (order.totalTax.amount > 0) {
                 Spacer(Modifier.height(8.dp))
@@ -146,7 +146,6 @@ private fun OrderSummaryCardNoDiscountPreview() {
         )
     }
 }
-
 
 private fun Order.withDiscountedLineItem(): Order = copy(
     lineItems = listOf(

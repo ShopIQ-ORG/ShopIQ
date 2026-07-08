@@ -22,6 +22,7 @@ interface ProductsRemoteDataSource {
     suspend fun createProductReview(
         productId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
@@ -35,6 +36,7 @@ interface ProductsRemoteDataSource {
     suspend fun updateProductReview(
         reviewId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,

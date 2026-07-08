@@ -10,11 +10,20 @@ class AddProductReviewUseCase(
     operator fun invoke(
         productId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
         avatarUrl: String? = null
     ): Flow<Result<Unit>> {
-        return repository.addProductReview(productId, customerName, rating, title, body, avatarUrl)
+        return repository.addProductReview(
+            productId,
+            customerName,
+            customerId,
+            rating,
+            title,
+            body,
+            avatarUrl
+        )
     }
 }

@@ -65,6 +65,7 @@ fun GetProductsQuery.Data.toShopifyResponse(): ShopifyResponse {
                         ReviewDto(
                             id = metaobject.id,
                             customerName = metaobject.customerName?.value ?: "Anonymous",
+                            customerId = metaobject.customerId?.value ?: "",
                             rating = metaobject.rating?.value?.toIntOrNull() ?: 5,
                             title = metaobject.title?.value ?: "",
                             body = metaobject.body?.value ?: "",
@@ -138,6 +139,7 @@ fun ShopifyResponse.toDomainProducts(): List<Product> {
                 ProductReview(
                     id = review.id,
                     customerName = review.customerName,
+                    customerId = review.customerId,
                     rating = review.rating,
                     title = review.title,
                     body = review.body,
@@ -200,6 +202,7 @@ fun GetProductDetailsQuery.Product.toShopifyResponse(): ShopifyResponse {
                 ReviewDto(
                     id = metaobject.id,
                     customerName = metaobject.customerName?.value ?: "Anonymous",
+                    customerId = metaobject.customerId?.value ?: "",
                     rating = metaobject.rating?.value?.toIntOrNull() ?: 5,
                     title = metaobject.title?.value ?: "",
                     body = metaobject.body?.value ?: "",
@@ -264,6 +267,7 @@ fun ShopifyResponse.toDomainProduct(): Product {
             com.iti.domain.models.ProductReview(
                 id = review.id,
                 customerName = review.customerName,
+                customerId = review.customerId,
                 rating = review.rating,
                 title = review.title,
                 body = review.body,
@@ -330,6 +334,7 @@ fun GetProductsInCollectionQuery.Data.toDomainProducts(): List<Product> {
                     ProductReview(
                         id = metaobject.id,
                         customerName = metaobject.customerName?.value ?: "Anonymous",
+                        customerId = metaobject.customerId?.value ?: "",
                         rating = metaobject.rating?.value?.toIntOrNull() ?: 5,
                         title = metaobject.title?.value ?: "",
                         body = metaobject.body?.value ?: "",

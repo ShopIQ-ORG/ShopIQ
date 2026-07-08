@@ -27,6 +27,7 @@ interface ProductsRepository {
     fun addProductReview(
         productId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
@@ -35,6 +36,7 @@ interface ProductsRepository {
     fun updateProductReview(
         reviewId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,

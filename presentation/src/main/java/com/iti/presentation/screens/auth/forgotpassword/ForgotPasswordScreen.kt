@@ -1,6 +1,9 @@
 package com.iti.presentation.screens.auth.forgotpassword
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -9,9 +12,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError
 import com.iti.presentation.components.showSuccess
@@ -43,18 +48,27 @@ fun ForgotPasswordScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { ShopIQSnackBarHost(hostState = snackBarHostState) },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        ForgotPasswordContent(
-            modifier = Modifier.padding(innerPadding),
-            emailValue = state.email,
-            onEmailChange = { viewModel.onEvent(ForgotPasswordContract.Event.EmailChanged(it)) },
-            emailError = state.fieldErrors[AuthField.EMAIL]?.resolve(context),
-            isLoading = state.isLoading,
-            onSendResetLinkClick = { viewModel.onEvent(ForgotPasswordContract.Event.SendResetLink) },
-            onBackToLoginClick = { viewModel.onEvent(ForgotPasswordContract.Event.BackToLogin) }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background
+        ) { innerPadding ->
+            ForgotPasswordContent(
+                modifier = Modifier.padding(innerPadding),
+                emailValue = state.email,
+                onEmailChange = { viewModel.onEvent(ForgotPasswordContract.Event.EmailChanged(it)) },
+                emailError = state.fieldErrors[AuthField.EMAIL]?.resolve(context),
+                isLoading = state.isLoading,
+                onSendResetLinkClick = { viewModel.onEvent(ForgotPasswordContract.Event.SendResetLink) },
+                onBackToLoginClick = { viewModel.onEvent(ForgotPasswordContract.Event.BackToLogin) }
+            )
+        }
+
+        ShopIQSnackBarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
         )
     }
 }

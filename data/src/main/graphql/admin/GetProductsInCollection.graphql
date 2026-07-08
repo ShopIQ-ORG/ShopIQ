@@ -64,6 +64,13 @@ query GetProductsInCollection($id: ID!, $first: Int = 50) {
                                   type
                                   value
                               }
+                              customerId: field(key: "customer_id") {
+                                  key
+                                  type
+                                  value
+                              }
+
+
                               rating: field(key: "rating") {
                                   key
                                   type

@@ -1,6 +1,9 @@
 package com.iti.presentation.screens.auth.signin
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -10,9 +13,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError
 import com.iti.presentation.screens.auth.rememberGoogleSignInHelper
@@ -63,24 +68,33 @@ fun SignInScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { ShopIQSnackBarHost(hostState = snackBarHostState) },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        SignInContent(
-            modifier = Modifier.padding(innerPadding),
-            emailValue = state.email,
-            onEmailChange = { viewModel.onEvent(SignInContract.Event.EmailChanged(it)) },
-            emailError = state.fieldErrors[AuthField.EMAIL]?.resolve(context),
-            passwordValue = state.password,
-            onPasswordChange = { viewModel.onEvent(SignInContract.Event.PasswordChanged(it)) },
-            passwordError = state.fieldErrors[AuthField.PASSWORD]?.resolve(context),
-            isLoading = state.isLoading,
-            onForgotPasswordClick = { viewModel.onEvent(SignInContract.Event.ForgotPassword) },
-            onLoginClick = rememberSubmitAction { viewModel.onEvent(SignInContract.Event.Login) },
-            onGoogleClick = { googleHelper.signIn() },
-            onGuestClick = { viewModel.onEvent(SignInContract.Event.LoginAsGuest) },
-            onSignUpClick = onNavigateToSignUp
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background
+        ) { innerPadding ->
+            SignInContent(
+                modifier = Modifier.padding(innerPadding),
+                emailValue = state.email,
+                onEmailChange = { viewModel.onEvent(SignInContract.Event.EmailChanged(it)) },
+                emailError = state.fieldErrors[AuthField.EMAIL]?.resolve(context),
+                passwordValue = state.password,
+                onPasswordChange = { viewModel.onEvent(SignInContract.Event.PasswordChanged(it)) },
+                passwordError = state.fieldErrors[AuthField.PASSWORD]?.resolve(context),
+                isLoading = state.isLoading,
+                onForgotPasswordClick = { viewModel.onEvent(SignInContract.Event.ForgotPassword) },
+                onLoginClick = rememberSubmitAction { viewModel.onEvent(SignInContract.Event.Login) },
+                onGoogleClick = { googleHelper.signIn() },
+                onGuestClick = { viewModel.onEvent(SignInContract.Event.LoginAsGuest) },
+                onSignUpClick = onNavigateToSignUp
+            )
+        }
+
+        ShopIQSnackBarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
         )
     }
 }

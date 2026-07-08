@@ -126,6 +126,7 @@ class ProductsRemoteDataSourceImpl(
     override suspend fun createProductReview(
         productId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
@@ -134,6 +135,7 @@ class ProductsRemoteDataSourceImpl(
     ): String {
         val fields = listOf(
             com.iti.data.type.MetaobjectFieldInput(key = "product", value = com.apollographql.apollo.api.Optional.present(productId)),
+            com.iti.data.type.MetaobjectFieldInput(key = "customer_id", value = com.apollographql.apollo.api.Optional.present(customerId)),
             com.iti.data.type.MetaobjectFieldInput(key = "customer_name", value = com.apollographql.apollo.api.Optional.present(customerName)),
             com.iti.data.type.MetaobjectFieldInput(key = "rating", value = com.apollographql.apollo.api.Optional.present(rating.toString())),
             com.iti.data.type.MetaobjectFieldInput(key = "title", value = com.apollographql.apollo.api.Optional.present(title)),
@@ -194,6 +196,7 @@ class ProductsRemoteDataSourceImpl(
     override suspend fun updateProductReview(
         reviewId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
@@ -202,6 +205,7 @@ class ProductsRemoteDataSourceImpl(
     ) {
         val fields = listOf(
             com.iti.data.type.MetaobjectFieldInput(key = "customer_name", value = com.apollographql.apollo.api.Optional.present(customerName)),
+            com.iti.data.type.MetaobjectFieldInput(key = "customer_id", value = com.apollographql.apollo.api.Optional.present(customerId)),
             com.iti.data.type.MetaobjectFieldInput(key = "rating", value = com.apollographql.apollo.api.Optional.present(rating.toString())),
             com.iti.data.type.MetaobjectFieldInput(key = "title", value = com.apollographql.apollo.api.Optional.present(title)),
             com.iti.data.type.MetaobjectFieldInput(key = "body", value = com.apollographql.apollo.api.Optional.present(body)),

@@ -10,11 +10,12 @@ class UpdateProductReviewUseCase(
     operator fun invoke(
         reviewId: String,
         customerName: String,
+        customerId: String,
         rating: Int,
         title: String,
         body: String,
         avatarUrl: String? = null
     ): Flow<Result<Unit>> {
-        return repository.updateProductReview(reviewId, customerName, rating, title, body, avatarUrl)
+        return repository.updateProductReview(reviewId, customerName, customerId, rating, title, body, avatarUrl)
     }
 }
