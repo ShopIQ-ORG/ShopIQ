@@ -20,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,6 +41,8 @@ import com.iti.presentation.screens.products.productdetails.components.ColorSele
 import com.iti.presentation.screens.products.productdetails.components.ProductImageGallery
 import com.iti.presentation.screens.products.productdetails.components.ProductInfoBlock
 import com.iti.presentation.screens.products.productdetails.components.SingleProductImage
+import com.iti.presentation.screens.products.productdetails.components.RatingSummaryBlock
+import com.iti.presentation.screens.products.productdetails.components.ReviewsListBlock
 import com.iti.presentation.ui.theme.ShopIQTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -52,6 +56,16 @@ fun ProductDetailsScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+
+    var showAddReviewDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
+    var reviewToEdit by remember { androidx.compose.runtime.mutableStateOf<com.iti.domain.models.ProductReview?>(null) }
+
+    LaunchedEffect(state.isSubmittingReview) {
+        if (!state.isSubmittingReview && state.reviewError == null) {
+            showAddReviewDialog = false
+            reviewToEdit = null
+        }
+    }
 
     LaunchedEffect(productId) {
         viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId))
@@ -75,6 +89,28 @@ fun ProductDetailsScreen(
                 viewModel.handleIntent(ProductDetailsIntent.DismissUnauthorizedDialog)
                 onLogin()
             }
+        )
+    }
+
+    if (showAddReviewDialog) {
+        com.iti.presentation.screens.products.productdetails.components.AddReviewDialog(
+            onDismiss = { 
+                showAddReviewDialog = false
+                reviewToEdit = null
+            },
+            onSubmit = { rating, title, body ->
+                val editReview = reviewToEdit
+                if (editReview != null) {
+                    viewModel.handleIntent(ProductDetailsIntent.EditReview(editReview.id, rating, title, body))
+                } else {
+                    viewModel.handleIntent(ProductDetailsIntent.SubmitReview(rating, title, body))
+                }
+            },
+            isSubmitting = state.isSubmittingReview,
+            error = state.reviewError,
+            initialRating = reviewToEdit?.rating ?: 5,
+            initialTitle = reviewToEdit?.title ?: "",
+            initialBody = reviewToEdit?.body ?: ""
         )
     }
 
@@ -113,6 +149,14 @@ fun ProductDetailsScreen(
             state.product != null -> ProductDetailsContent(
                 state = state,
                 onIntent = viewModel::handleIntent,
+                onWriteReviewClick = { showAddReviewDialog = true },
+                onEditReviewClick = { review ->
+                    reviewToEdit = review
+                    showAddReviewDialog = true
+                },
+                onDeleteReviewClick = { review ->
+                    viewModel.handleIntent(ProductDetailsIntent.DeleteReview(review.id))
+                },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
@@ -125,6 +169,9 @@ fun ProductDetailsScreen(
 private fun ProductDetailsContent(
     state: ProductDetailsUiState,
     onIntent: (ProductDetailsIntent) -> Unit,
+    onWriteReviewClick: () -> Unit,
+    onEditReviewClick: (com.iti.domain.models.ProductReview) -> Unit,
+    onDeleteReviewClick: (com.iti.domain.models.ProductReview) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val product = state.product!!
@@ -156,18 +203,32 @@ private fun ProductDetailsContent(
                 val convertedMinPrice = CurrencyManager.convertFromUsd(product.minPrice.amount.toDoubleOrNull() ?: 0.0)
                 val currentCurrency by CurrencyManager.selectedCurrency.collectAsState()
                 val minPriceStr = if (convertedMinPrice % 1.0 == 0.0) "%.0f".format(convertedMinPrice) else "%.2f".format(convertedMinPrice)
+
+                val totalReviews = product.reviews.size
+                val averageRating = if (totalReviews > 0) product.reviews.map { it.rating }.average() else 0.0
+
                 ProductInfoBlock(
                     title = product.title,
                     currencyCode = currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current),
                     amount = minPriceStr,
-                    description = product.description
+                    description = product.description,
+                    rating = averageRating,
+                    reviewsCount = totalReviews
                 )
             }
 
+
             item {
-                ColorSelectionSection(
-                    selectedColor = state.selectedColor ?: "Beige",
-                    onColorSelect = { onIntent(ProductDetailsIntent.SelectColor(it)) }
+                RatingSummaryBlock(reviews = product.reviews)
+            }
+
+            item {
+                ReviewsListBlock(
+                    reviews = product.reviews,
+                    currentUserName = state.currentUserName,
+                    onWriteReviewClick = onWriteReviewClick,
+                    onEditReviewClick = onEditReviewClick,
+                    onDeleteReviewClick = onDeleteReviewClick
                 )
             }
         }
@@ -190,7 +251,10 @@ private fun ProductDetailsContentPreview() {
     ShopIQTheme {
         ProductDetailsContent(
             state = previewUiState(),
-            onIntent = {}
+            onIntent = {},
+            onWriteReviewClick = {},
+            onEditReviewClick = {},
+            onDeleteReviewClick = {}
         )
     }
 }

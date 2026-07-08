@@ -1,12 +1,18 @@
 package com.iti.presentation.screens.products.productdetails.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,7 +30,9 @@ fun ProductInfoBlock(
     title: String,
     currencyCode: String,
     amount: String,
-    description: String
+    description: String,
+    rating: Double,
+    reviewsCount: Int
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
@@ -41,7 +49,7 @@ fun ProductInfoBlock(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "$currencyCode $amount",
+                text = "$amount $currencyCode",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -53,27 +61,46 @@ fun ProductInfoBlock(
             ) {
                 Text(text = "★", color = WarningLight, fontSize = 13.sp)
                 Text(
-                    text = "4.6",
+                    text = String.format(java.util.Locale.US, "%.1f", rating),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "(128 reviews)",
+                    text = "($reviewsCount ${stringResource(id = R.string.ratings_count)})",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
-        Text(
-            text = description.ifEmpty { stringResource(id = R.string.no_description) },
-            fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 19.sp,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
+        var isExpanded by remember { mutableStateOf(false) }
+        val trimmedDesc = description.trim()
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isExpanded = !isExpanded }
+                .padding(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = trimmedDesc.ifEmpty { stringResource(id = R.string.no_description) },
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 19.sp,
+                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (trimmedDesc.length > 100) {
+                Text(
+                    text = if (isExpanded) stringResource(id = R.string.read_less) else stringResource(id = R.string.read_more),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 
@@ -87,7 +114,9 @@ private fun ProductInfoBlockLongTitlePreview() {
             currencyCode = "EGP",
             amount = "1,299.00",
             description = "A relaxed-fit hoodie made from heavyweight cotton fleece, " +
-                    "featuring a kangaroo pocket and ribbed cuffs."
+                    "featuring a kangaroo pocket and ribbed cuffs.",
+            rating = 4.6,
+            reviewsCount = 128
         )
     }
 }

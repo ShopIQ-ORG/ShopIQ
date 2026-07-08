@@ -149,6 +149,9 @@ fun ProductCard(
 
         Spacer(modifier = Modifier.height(6.dp))
 
+        val totalReviews = product.reviews.size
+        val averageRating = if (totalReviews > 0) product.reviews.map { it.rating }.average() else 0.0
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
@@ -163,7 +166,7 @@ fun ProductCard(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "4.6",
+                text = String.format(java.util.Locale.US, "%.1f", averageRating),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -171,7 +174,7 @@ fun ProductCard(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "(128)",
+                text = "($totalReviews)",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

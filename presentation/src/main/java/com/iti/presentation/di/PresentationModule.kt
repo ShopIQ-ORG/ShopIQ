@@ -48,7 +48,7 @@ val presentationModule = module {
     viewModel { AllBrandsViewModel(get()) }
     factory { AllProductsFilterManager() }
     viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CartViewModel(get(), get(), get(), get()) }
     viewModel { SplashViewModel(get(), get(), get()) }
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }

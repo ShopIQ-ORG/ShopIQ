@@ -24,5 +24,25 @@ interface ProductsRepository {
     fun getPopularProducts(count: Int = 10): Flow<Result<List<Product>>>
     fun getProductsByCategory(categoryId: String, count: Int = 10): Flow<Result<List<Product>>>
     fun getBestSellers(count: Int = 10): Flow<Result<List<Product>>>
+    fun addProductReview(
+        productId: String,
+        customerName: String,
+        rating: Int,
+        title: String,
+        body: String,
+        avatarUrl: String? = null
+    ): Flow<Result<Unit>>
+    fun updateProductReview(
+        reviewId: String,
+        customerName: String,
+        rating: Int,
+        title: String,
+        body: String,
+        avatarUrl: String? = null
+    ): Flow<Result<Unit>>
+    fun deleteProductReview(
+        productId: String,
+        reviewId: String
+    ): Flow<Result<Unit>>
 }
 

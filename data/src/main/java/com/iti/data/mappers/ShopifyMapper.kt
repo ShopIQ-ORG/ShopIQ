@@ -166,7 +166,22 @@ fun GetProductDetailsQuery.Product.toShopifyResponse(): ShopifyResponse {
                     )
                 )
             }
-        )
+        ),
+        reviews = this.metafield?.references?.edges?.mapNotNull { edge ->
+            val metaobject = edge.node.onMetaobject
+            if (metaobject != null) {
+                ReviewDto(
+                    id = metaobject.id,
+                    customerName = metaobject.customerName?.value ?: "Anonymous",
+                    rating = metaobject.rating?.value?.toIntOrNull() ?: 5,
+                    title = metaobject.title?.value ?: "",
+                    body = metaobject.body?.value ?: "",
+                    createdAt = metaobject.createdAt?.value ?: "",
+                    approved = metaobject.approved?.value?.lowercase() == "true",
+                    avatarUrl = metaobject.avatarUrl?.value
+                )
+            } else null
+        } ?: emptyList()
     )
 
     return ShopifyResponse(
@@ -216,6 +231,18 @@ fun ShopifyResponse.toDomainProduct(): Product {
                     currencyCode = variantEdge.node.price.currencyCode
                 ),
                 availableForSale = variantEdge.node.availableForSale
+            )
+        },
+        reviews = node.reviews.map { review ->
+            com.iti.domain.models.ProductReview(
+                id = review.id,
+                customerName = review.customerName,
+                rating = review.rating,
+                title = review.title,
+                body = review.body,
+                createdAt = review.createdAt,
+                approved = review.approved,
+                avatarUrl = review.avatarUrl
             )
         }
     )

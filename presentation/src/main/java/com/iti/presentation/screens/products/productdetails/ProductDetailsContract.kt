@@ -12,7 +12,10 @@ data class ProductDetailsUiState(
     val selectedImageIndex: Int = 0,
     val isWishlisted: Boolean = false,
     val isAddingToCart: Boolean = false,
-    val showUnauthorizedDialog: Boolean = false
+    val showUnauthorizedDialog: Boolean = false,
+    val isSubmittingReview: Boolean = false,
+    val reviewError: String? = null,
+    val currentUserName: String? = null
 )
 
 sealed interface ProductDetailsIntent {
@@ -23,6 +26,9 @@ sealed interface ProductDetailsIntent {
     object ToggleWishlist : ProductDetailsIntent
     object AddToCart : ProductDetailsIntent
     object DismissUnauthorizedDialog : ProductDetailsIntent
+    data class SubmitReview(val rating: Int, val title: String, val body: String) : ProductDetailsIntent
+    data class EditReview(val reviewId: String, val rating: Int, val title: String, val body: String) : ProductDetailsIntent
+    data class DeleteReview(val reviewId: String) : ProductDetailsIntent
 }
 
 

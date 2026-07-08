@@ -12,7 +12,19 @@ data class Product(
     val maxPrice: Money,
     val images: List<ProductImage>,
     val variants: List<ProductVariant>,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val reviews: List<ProductReview> = emptyList()
+)
+
+data class ProductReview(
+    val id: String,
+    val customerName: String,
+    val rating: Int,
+    val title: String,
+    val body: String,
+    val createdAt: String,
+    val approved: Boolean,
+    val avatarUrl: String? = null
 )
 
 data class Money(

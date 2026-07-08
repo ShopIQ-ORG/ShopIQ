@@ -23,6 +23,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import com.iti.presentation.util.UiText
 import com.iti.presentation.R
+import com.iti.domain.usecases.products.AddProductReviewUseCase
+import com.iti.domain.usecases.products.UpdateProductReviewUseCase
+import com.iti.domain.usecases.products.DeleteProductReviewUseCase
 import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
@@ -32,7 +35,10 @@ class ProductDetailsViewModel(
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val authRepository: AuthRepository,
-    private val addToCartUseCase: AddCartItemUseCase
+    private val addToCartUseCase: AddCartItemUseCase,
+    private val addProductReviewUseCase: AddProductReviewUseCase,
+    private val updateProductReviewUseCase: UpdateProductReviewUseCase,
+    private val deleteProductReviewUseCase: DeleteProductReviewUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -42,6 +48,7 @@ class ProductDetailsViewModel(
     val sideEffects: SharedFlow<ProductDetailsSideEffect> = _sideEffects.asSharedFlow()
 
     private val favoriteOverride = MutableStateFlow<Boolean?>(null)
+    private var loadProductDetailsJob: kotlinx.coroutines.Job? = null
 
     fun handleIntent(intent: ProductDetailsIntent) {
         when (intent) {
@@ -52,6 +59,9 @@ class ProductDetailsViewModel(
             is ProductDetailsIntent.ToggleWishlist -> toggleWishlist()
             is ProductDetailsIntent.AddToCart -> addToCart()
             is ProductDetailsIntent.DismissUnauthorizedDialog -> dismissUnauthorizedDialog()
+            is ProductDetailsIntent.SubmitReview -> submitReview(intent.rating, intent.title, intent.body)
+            is ProductDetailsIntent.EditReview -> editReview(intent.reviewId, intent.rating, intent.title, intent.body)
+            is ProductDetailsIntent.DeleteReview -> deleteReview(intent.reviewId)
         }
     }
 
@@ -59,14 +69,19 @@ class ProductDetailsViewModel(
         viewModelScope.launch {
             val userRes = getCurrentUserUseCase()
             if (userRes is Result.Success && userRes.data is User.AuthenticatedUser) {
+                val user = userRes.data as User.AuthenticatedUser
+                _state.update { it.copy(currentUserName = user.fullName) }
                 observeFavoriteStatus(productId.toString())
             }
         }
-        viewModelScope.launch {
+        loadProductDetailsJob?.cancel()
+        loadProductDetailsJob = viewModelScope.launch {
             getProductDetailsUseCase(productId).collect { result ->
                 when (result) {
                     is Result.Loading -> {
-                        _state.update { it.copy(isLoading = true, product = null, error = null) }
+                        if (_state.value.product == null) {
+                            _state.update { it.copy(isLoading = true, product = null, error = null) }
+                        }
                     }
                     is Result.Success -> {
                         val product = result.data
@@ -204,6 +219,176 @@ class ProductDetailsViewModel(
 
     private fun dismissUnauthorizedDialog() {
         _state.update { it.copy(showUnauthorizedDialog = false) }
+    }
+
+    private fun submitReview(rating: Int, title: String, body: String) {
+        val product = _state.value.product ?: return
+        viewModelScope.launch {
+            val userRes = getCurrentUserUseCase()
+            if (userRes !is Result.Success || userRes.data !is User.AuthenticatedUser) {
+                _state.update { it.copy(showUnauthorizedDialog = true) }
+                return@launch
+            }
+            
+            val user = userRes.data as User.AuthenticatedUser
+            _state.update { it.copy(isSubmittingReview = true, reviewError = null) }
+
+            addProductReviewUseCase(
+                productId = product.id,
+                customerName = user.fullName,
+                rating = rating,
+                title = title,
+                body = body,
+                avatarUrl = user.avatarUrl
+            ).collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        _state.update { it.copy(isSubmittingReview = true) }
+                    }
+                    is Result.Success -> {
+                        _state.update { currentState ->
+                            val currentProduct = currentState.product
+                            val updatedProduct = if (currentProduct != null) {
+                                val newReview = com.iti.domain.models.ProductReview(
+                                    id = "temp_${System.currentTimeMillis()}",
+                                    customerName = user.fullName,
+                                    rating = rating,
+                                    title = title,
+                                    body = body,
+                                    createdAt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).format(java.util.Date()),
+                                    approved = true,
+                                    avatarUrl = user.avatarUrl
+                                )
+                                currentProduct.copy(reviews = currentProduct.reviews + newReview)
+                            } else null
+
+                            currentState.copy(
+                                isSubmittingReview = false,
+                                reviewError = null,
+                                product = updatedProduct
+                            )
+                        }
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.StringResource(R.string.review_submitted_successfully)))
+                        // Re-load product details to fetch new reviews in the background
+                        val numericId = product.id.substringAfterLast("/").toLongOrNull()
+                        if (numericId != null) {
+                            loadProductDetails(numericId)
+                        }
+                    }
+                    is Result.Failure -> {
+                        _state.update { it.copy(isSubmittingReview = false, reviewError = result.exception.message) }
+                        _sideEffects.emit(
+                            ProductDetailsSideEffect.ShowToast(
+                                UiText.Plain(result.exception.message ?: "Failed to submit review")
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun editReview(reviewId: String, rating: Int, title: String, body: String) {
+        val product = _state.value.product ?: return
+        viewModelScope.launch {
+            val userRes = getCurrentUserUseCase()
+            if (userRes !is Result.Success || userRes.data !is User.AuthenticatedUser) {
+                _state.update { it.copy(showUnauthorizedDialog = true) }
+                return@launch
+            }
+
+            val user = userRes.data as User.AuthenticatedUser
+            _state.update { it.copy(isSubmittingReview = true, reviewError = null) }
+
+            updateProductReviewUseCase(
+                reviewId = reviewId,
+                customerName = user.fullName,
+                rating = rating,
+                title = title,
+                body = body,
+                avatarUrl = user.avatarUrl
+            ).collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        _state.update { it.copy(isSubmittingReview = true) }
+                    }
+                    is Result.Success -> {
+                        _state.update { currentState ->
+                            val currentProduct = currentState.product
+                            val updatedProduct = if (currentProduct != null) {
+                                val updatedList = currentProduct.reviews.map { review ->
+                                    if (review.id == reviewId) {
+                                        review.copy(
+                                            rating = rating,
+                                            title = title,
+                                            body = body,
+                                            createdAt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).format(java.util.Date())
+                                        )
+                                    } else review
+                                }
+                                currentProduct.copy(reviews = updatedList)
+                            } else null
+
+                            currentState.copy(
+                                isSubmittingReview = false,
+                                reviewError = null,
+                                product = updatedProduct
+                            )
+                        }
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Review updated successfully!")))
+                        val numericId = product.id.substringAfterLast("/").toLongOrNull()
+                        if (numericId != null) {
+                            loadProductDetails(numericId)
+                        }
+                    }
+                    is Result.Failure -> {
+                        _state.update { it.copy(isSubmittingReview = false, reviewError = result.exception.message) }
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain(result.exception.message ?: "Failed to update review")))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteReview(reviewId: String) {
+        val product = _state.value.product ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isSubmittingReview = true) }
+
+            deleteProductReviewUseCase(
+                productId = product.id,
+                reviewId = reviewId
+            ).collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        _state.update { it.copy(isSubmittingReview = true) }
+                    }
+                    is Result.Success -> {
+                        _state.update { currentState ->
+                            val currentProduct = currentState.product
+                            val updatedProduct = if (currentProduct != null) {
+                                val filteredList = currentProduct.reviews.filter { it.id != reviewId }
+                                currentProduct.copy(reviews = filteredList)
+                            } else null
+
+                            currentState.copy(
+                                isSubmittingReview = false,
+                                product = updatedProduct
+                            )
+                        }
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Review deleted!")))
+                        val numericId = product.id.substringAfterLast("/").toLongOrNull()
+                        if (numericId != null) {
+                            loadProductDetails(numericId)
+                        }
+                    }
+                    is Result.Failure -> {
+                        _state.update { it.copy(isSubmittingReview = false) }
+                        _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain(result.exception.message ?: "Failed to delete review")))
+                    }
+                }
+            }
+        }
     }
 
     private fun selectedVariantId(): String? {
