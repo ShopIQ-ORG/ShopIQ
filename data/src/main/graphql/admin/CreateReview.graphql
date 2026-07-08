@@ -1,0 +1,60 @@
+mutation CreateProductReview($metaobject: MetaobjectCreateInput!) {
+    metaobjectCreate(metaobject: $metaobject) {
+        metaobject {
+            id
+        }
+        userErrors {
+            field
+            message
+            code
+        }
+    }
+}
+
+mutation SetProductReviews($productId: ID!, $reviewIdsJson: String!) {
+    metafieldsSet(
+        metafields: [
+            {
+                ownerId: $productId
+                namespace: "reviews"
+                key: "items"
+                type: "list.metaobject_reference"
+                value: $reviewIdsJson
+            }
+        ]
+    ) {
+        metafields {
+            id
+            value
+        }
+        userErrors {
+            field
+            message
+            code
+        }
+    }
+}
+
+mutation UpdateProductReview($id: ID!, $metaobject: MetaobjectUpdateInput!) {
+    metaobjectUpdate(id: $id, metaobject: $metaobject) {
+        metaobject {
+            id
+        }
+        userErrors {
+            field
+            message
+            code
+        }
+    }
+}
+
+mutation DeleteProductReview($id: ID!) {
+    metaobjectDelete(id: $id) {
+        deletedId
+        userErrors {
+            field
+            message
+            code
+        }
+    }
+}

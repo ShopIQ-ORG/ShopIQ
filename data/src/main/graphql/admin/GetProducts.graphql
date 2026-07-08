@@ -37,6 +37,65 @@ query GetProducts($first: Int!, $after: String, $query: String, $sortKey: Produc
                         }
                     }
                 }
+                metafield(namespace: "reviews", key: "items") {
+                    id
+                    namespace
+                    key
+                    type
+                    value
+                    references(first: 20) {
+                        edges {
+                            node {
+                                ... on Metaobject {
+                                    id
+                                    handle
+                                    type
+                                    updatedAt
+                                    product: field(key: "product") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    customerName: field(key: "customer_name") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    rating: field(key: "rating") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    title: field(key: "title") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    body: field(key: "body") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    createdAt: field(key: "created_at") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    approved: field(key: "approved") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                    avatarUrl: field(key: "avatar_url") {
+                                        key
+                                        type
+                                        value
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         pageInfo {

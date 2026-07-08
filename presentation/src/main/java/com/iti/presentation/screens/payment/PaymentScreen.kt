@@ -9,16 +9,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import com.paymob.paymob_sdk.PaymobSdk
 import com.paymob.paymob_sdk.ui.PaymobSdkListener
+import com.iti.presentation.R
 
 @Composable
 fun PaymentScreen(
@@ -31,6 +38,11 @@ fun PaymentScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.paymentUiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    val paymentSuccessfulText = stringResource(id = R.string.payment_successful)
+    val paymentPendingText = stringResource(id = R.string.payment_pending)
 
     // Auto-start payment flow on entry
     LaunchedEffect(Unit) {
@@ -53,24 +65,26 @@ fun PaymentScreen(
                     paymobSdkListener = object : PaymobSdkListener {
                         override fun onSuccess(payResponse: HashMap<String, String?>) {
                             viewModel.resetState()
-                            Toast.makeText(context, "Payment Successful", Toast.LENGTH_LONG).show()
+                            scope.launch { snackbarHostState.showSnackbar(paymentSuccessfulText) }
                             onPaymentSuccess()
                         }
 
                         override fun onFailure(msg: String?) {
                             viewModel.resetState()
-                            Toast.makeText(context, "Payment Failed: $msg", Toast.LENGTH_LONG).show()
+                            val failureText = context.getString(R.string.payment_failed, msg ?: "")
+                            scope.launch { snackbarHostState.showSnackbar(failureText) }
                         }
 
                         override fun onPending() {
                             viewModel.resetState()
-                            Toast.makeText(context, "Payment Pending", Toast.LENGTH_LONG).show()
+                            scope.launch { snackbarHostState.showSnackbar(paymentPendingText) }
                         }
                     }
                 ).build().start()
             } catch (e: Exception) {
                 viewModel.resetState()
-                Toast.makeText(context, "Error starting SDK: ${e.message}", Toast.LENGTH_LONG).show()
+                val errorText = context.getString(R.string.payment_sdk_error, e.message ?: "")
+                scope.launch { snackbarHostState.showSnackbar(errorText) }
             }
         }
     }
@@ -89,18 +103,23 @@ fun PaymentScreen(
             }
             else -> {
                 Button(
-                    onClick = { 
+                    onClick = {
                         viewModel.startPaymentFlow(
                             amountCents = amountCents,
                             currency = currency,
                             integrationId = integrationId
-                        ) 
+                        )
                     },
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(text = "Pay Now $${amountCents / 100.0}")
+                    Text(text = stringResource(id = R.string.pay_now_amount, amountCents / 100.0))
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)
+        )
     }
 }

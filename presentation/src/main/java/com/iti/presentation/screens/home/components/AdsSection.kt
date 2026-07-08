@@ -76,7 +76,7 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f))
+                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.4f))
                 )
                 Column(
                     modifier = Modifier
@@ -87,14 +87,15 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                     Text(
                         text = ad.title,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = androidx.compose.ui.graphics.Color.White,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = ad.subtitle,
                         style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.surface
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(14.dp))
                     Button(

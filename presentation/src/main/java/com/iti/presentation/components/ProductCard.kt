@@ -49,6 +49,7 @@ import com.iti.presentation.util.CurrencyManager
 import com.iti.presentation.util.compareAtPrice
 import com.iti.presentation.util.discountPercent
 import com.iti.presentation.util.getLocalizedCode
+import com.iti.presentation.util.ReviewsCache
 
 
 @Composable
@@ -65,6 +66,11 @@ fun ProductCard(
     val onCardPrimaryText = MaterialTheme.colorScheme.onSurface
     val onCardSecondaryText = MaterialTheme.colorScheme.onSurfaceVariant
     val discountColor = MaterialTheme.colorScheme.error
+
+    // Observe ReviewsCache: shows fresh reviews immediately after a review is submitted
+    val reviewsCacheMap by ReviewsCache.cache.collectAsState()
+    val cleanProductId = product.id.substringAfterLast("/")
+    val effectiveReviews = reviewsCacheMap[cleanProductId] ?: product.reviews
 
     Column(
         modifier = modifier
@@ -154,6 +160,9 @@ fun ProductCard(
                 )
             }
 
+            val totalReviews = effectiveReviews.size
+            val averageRating = if (totalReviews > 0) effectiveReviews.map { it.rating }.average() else 0.0
+
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -171,7 +180,11 @@ fun ProductCard(
                     modifier = Modifier.size(11.dp)
                 )
                 Text(
-                    text = stringResource(id = R.string.product_rating_placeholder),
+                    text = if (totalReviews > 0) {
+                        String.format(java.util.Locale.US, "%.1f (%d)", averageRating, totalReviews)
+                    } else {
+                        "0.0"
+                    },
                     color = Color.White,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold
@@ -187,7 +200,7 @@ fun ProductCard(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = product.title,
+                text = product.arTitle ?: product.title,
                 style = MaterialTheme.typography.bodyMedium,
                 color = onCardPrimaryText,
                 fontWeight = FontWeight.SemiBold,

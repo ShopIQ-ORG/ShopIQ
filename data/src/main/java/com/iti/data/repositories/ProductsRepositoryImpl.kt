@@ -285,4 +285,112 @@ class ProductsRepositoryImpl(
     override fun getBestSellers(count: Int): Flow<Result<List<Product>>> {
         return getProductsByCategory("gid://shopify/Collection/493787218155", count)
     }
+
+    override fun addProductReview(
+        productId: String,
+        customerName: String,
+        rating: Int,
+        title: String,
+        body: String,
+        avatarUrl: String?
+    ): Flow<Result<Unit>> = flow {
+        emit(Result.Loading)
+        try {
+            val numericId = productId.substringAfterLast("/").toLongOrNull() 
+                ?: throw Exception("Invalid product ID: $productId")
+            val productDetails = remoteDataSource.getProductDetails(numericId)
+            val existingIds = productDetails.data.product?.reviews?.map { it.id } ?: emptyList()
+
+            val formatter = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+            formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            val createdAt = formatter.format(java.util.Date())
+
+            val newReviewId = remoteDataSource.createProductReview(
+                productId = productId,
+                customerName = customerName,
+                rating = rating,
+                title = title,
+                body = body,
+                createdAt = createdAt,
+                avatarUrl = avatarUrl ?: ""
+            )
+
+            val updatedIds = existingIds + newReviewId
+            remoteDataSource.setProductReviews(productId, updatedIds)
+
+            emit(Result.Success(Unit))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun updateProductReview(
+        reviewId: String,
+        customerName: String,
+        rating: Int,
+        title: String,
+        body: String,
+        avatarUrl: String?
+    ): Flow<Result<Unit>> = flow {
+        emit(Result.Loading)
+        try {
+            val formatter = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+            formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            val createdAt = formatter.format(java.util.Date())
+
+            remoteDataSource.updateProductReview(
+                reviewId = reviewId,
+                customerName = customerName,
+                rating = rating,
+                title = title,
+                body = body,
+                createdAt = createdAt,
+                avatarUrl = avatarUrl ?: ""
+            )
+
+            emit(Result.Success(Unit))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun deleteProductReview(
+        productId: String,
+        reviewId: String
+    ): Flow<Result<Unit>> = flow {
+        emit(Result.Loading)
+        try {
+            val numericId = productId.substringAfterLast("/").toLongOrNull()
+                ?: throw Exception("Invalid product ID: $productId")
+            val productDetails = remoteDataSource.getProductDetails(numericId)
+            val existingIds = productDetails.data.product?.reviews?.map { it.id } ?: emptyList()
+
+            val updatedIds = existingIds.filter { it != reviewId }
+
+            remoteDataSource.deleteProductReview(reviewId)
+            remoteDataSource.setProductReviews(productId, updatedIds)
+
+            emit(Result.Success(Unit))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun getProductTranslations(productId: String): Flow<Result<Map<String, String>>> = flow {
+        emit(Result.Loading)
+        try {
+            val translations = remoteDataSource.getProductTranslations(productId)
+            emit(Result.Success(translations))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
 }

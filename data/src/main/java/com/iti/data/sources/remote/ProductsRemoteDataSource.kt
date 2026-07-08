@@ -19,4 +19,28 @@ interface ProductsRemoteDataSource {
     suspend fun getProductsByCategory(categoryId: String, first: Int = 10): GetProductsInCollectionQuery.Data
     suspend fun getBrands(): List<BrandDto>
     suspend fun getAds(): List<AdDto>
+    suspend fun createProductReview(
+        productId: String,
+        customerName: String,
+        rating: Int,
+        title: String,
+        body: String,
+        createdAt: String,
+        avatarUrl: String
+    ): String
+    suspend fun setProductReviews(
+        productId: String,
+        reviewIds: List<String>
+    )
+    suspend fun updateProductReview(
+        reviewId: String,
+        customerName: String,
+        rating: Int,
+        title: String,
+        body: String,
+        createdAt: String,
+        avatarUrl: String
+    )
+    suspend fun deleteProductReview(reviewId: String)
+    suspend fun getProductTranslations(productId: String): Map<String, String>
 }

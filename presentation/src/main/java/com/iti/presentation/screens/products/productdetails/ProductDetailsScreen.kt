@@ -53,9 +53,15 @@ import com.iti.presentation.screens.products.productdetails.components.ColorSele
 import com.iti.presentation.screens.products.productdetails.components.ProductImageGallery
 import com.iti.presentation.screens.products.productdetails.components.ProductInfoBlock
 import com.iti.presentation.screens.products.productdetails.components.SingleProductImage
+import com.iti.presentation.screens.products.productdetails.components.RatingSummaryBlock
+import com.iti.presentation.screens.products.productdetails.components.ReviewsListBlock
 import com.iti.presentation.ui.theme.ShopIQTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.core.tween
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +77,23 @@ fun ProductDetailsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var showRemoveFavoriteConfirmation by remember { mutableStateOf(false) }
+
+    var showAddReviewDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
+    var reviewToEdit by remember { androidx.compose.runtime.mutableStateOf<com.iti.domain.models.ProductReview?>(null) }
+    var animateIn by remember { androidx.compose.runtime.mutableStateOf(false) }
+
+    LaunchedEffect(state.isLoading) {
+        if (!state.isLoading && state.product != null) {
+            animateIn = true
+        }
+    }
+
+    LaunchedEffect(state.isSubmittingReview) {
+        if (!state.isSubmittingReview && state.reviewError == null) {
+            showAddReviewDialog = false
+            reviewToEdit = null
+        }
+    }
 
     LaunchedEffect(productId) {
         viewModel.handleIntent(ProductDetailsIntent.LoadProductDetails(productId))
@@ -104,6 +127,28 @@ fun ProductDetailsScreen(
                 viewModel.handleIntent(ProductDetailsIntent.DismissUnauthorizedDialog)
                 onLogin()
             }
+        )
+    }
+
+    if (showAddReviewDialog) {
+        com.iti.presentation.screens.products.productdetails.components.AddReviewDialog(
+            onDismiss = { 
+                showAddReviewDialog = false
+                reviewToEdit = null
+            },
+            onSubmit = { rating, title, body ->
+                val editReview = reviewToEdit
+                if (editReview != null) {
+                    viewModel.handleIntent(ProductDetailsIntent.EditReview(editReview.id, rating, title, body))
+                } else {
+                    viewModel.handleIntent(ProductDetailsIntent.SubmitReview(rating, title, body))
+                }
+            },
+            isSubmitting = state.isSubmittingReview,
+            error = state.reviewError,
+            initialRating = reviewToEdit?.rating ?: 5,
+            initialTitle = reviewToEdit?.title ?: "",
+            initialBody = reviewToEdit?.body ?: ""
         )
     }
 
@@ -162,13 +207,31 @@ fun ProductDetailsScreen(
                         .padding(innerPadding)
                 )
 
-                state.product != null -> ProductDetailsContent(
-                    state = state,
-                    onIntent = viewModel::handleIntent,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                )
+                state.product != null -> {
+                    AnimatedVisibility(
+                        visible = animateIn,
+                        enter = fadeIn(animationSpec = tween(400)) + slideInVertically(
+                            initialOffsetY = { it / 6 },
+                            animationSpec = tween(400)
+                        )
+                    ) {
+                        ProductDetailsContent(
+                            state = state,
+                            onIntent = viewModel::handleIntent,
+                            onWriteReviewClick = { showAddReviewDialog = true },
+                            onEditReviewClick = { review ->
+                                reviewToEdit = review
+                                showAddReviewDialog = true
+                            },
+                            onDeleteReviewClick = { review ->
+                                viewModel.handleIntent(ProductDetailsIntent.DeleteReview(review.id))
+                            },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        )
+                    }
+                }
             }
         }
 
@@ -186,6 +249,9 @@ fun ProductDetailsScreen(
 private fun ProductDetailsContent(
     state: ProductDetailsUiState,
     onIntent: (ProductDetailsIntent) -> Unit,
+    onWriteReviewClick: () -> Unit,
+    onEditReviewClick: (com.iti.domain.models.ProductReview) -> Unit,
+    onDeleteReviewClick: (com.iti.domain.models.ProductReview) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val product = state.product!!
@@ -213,6 +279,7 @@ private fun ProductDetailsContent(
                 }
             }
 
+
             item {
                 val currentCurrency by CurrencyManager.selectedCurrency.collectAsState()
                 val currencyLabel = currentCurrency.getLocalizedCode(LocalContext.current)
@@ -238,20 +305,33 @@ private fun ProductDetailsContent(
                     null
                 }
 
+                val totalReviews = product.reviews.size
+                val averageRating = if (totalReviews > 0) product.reviews.map { it.rating }.average() else 0.0
+
                 ProductInfoBlock(
-                    title = product.title,
+                    title = state.translatedTitle ?: product.title,
                     currencyCode = currencyLabel,
                     amount = minPriceStr,
-                    description = product.description,
+                    description = state.translatedDescription ?: product.description,
+                    rating = averageRating,
+                    reviewsCount = totalReviews,
                     compareAtAmount = compareAtStr,
                     discountPercent = product.discountPercent
                 )
             }
 
+
             item {
-                ColorSelectionSection(
-                    selectedColor = state.selectedColor ?: "Beige",
-                    onColorSelect = { onIntent(ProductDetailsIntent.SelectColor(it)) }
+                RatingSummaryBlock(reviews = product.reviews)
+            }
+
+            item {
+                ReviewsListBlock(
+                    reviews = product.reviews,
+                    currentUserName = state.currentUserName,
+                    onWriteReviewClick = onWriteReviewClick,
+                    onEditReviewClick = onEditReviewClick,
+                    onDeleteReviewClick = onDeleteReviewClick
                 )
             }
         }
@@ -272,7 +352,10 @@ private fun ProductDetailsContentPreview() {
     ShopIQTheme {
         ProductDetailsContent(
             state = previewUiState(),
-            onIntent = {}
+            onIntent = {},
+            onWriteReviewClick = {},
+            onEditReviewClick = {},
+            onDeleteReviewClick = {}
         )
     }
 }

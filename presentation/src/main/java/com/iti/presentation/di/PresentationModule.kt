@@ -40,9 +40,9 @@ val presentationModule = module {
     single { GetChatHistoryUseCase(get()) }
     single { SendChatMessageUseCase(get()) }
     single { com.iti.domain.usecases.ai.ClearChatHistoryUseCase(get()) }
-    viewModel { AiChatViewModel(get(), get(), get()) }
+    viewModel { AiChatViewModel(get(), get(), get(), get()) }
     viewModel { AiHistoryViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get(), get()) }
     viewModel { SignInViewModel(get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
@@ -50,8 +50,8 @@ val presentationModule = module {
     viewModel { CategoryDetailsViewModel(get(), get(), get(), get(), get()) }
     viewModel { AllBrandsViewModel(get()) }
     factory { AllProductsFilterManager() }
-    viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { CartViewModel(get(), get(), get(), get()) }
     viewModel { SplashViewModel(get(), get(), get()) }
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }

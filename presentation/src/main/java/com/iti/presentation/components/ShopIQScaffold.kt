@@ -12,12 +12,14 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.iti.presentation.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShopIQScaffold(
     modifier: Modifier = Modifier,
-    title: String = "ShopIQ",
+    title: String = stringResource(id = R.string.app_name),
     cartItemCount: Int = 0,
     onCartClick: () -> Unit = {},
     onMenuClick: () -> Unit = {},

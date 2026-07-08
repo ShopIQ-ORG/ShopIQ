@@ -7,19 +7,97 @@ query GetProductsInCollection($id: ID!, $first: Int = 50) {
         node {
           id
           title
+          description
+          handle
           productType
+          vendor
+          tags
           priceRangeV2 {
             minVariantPrice {
               amount
               currencyCode
             }
+            maxVariantPrice {
+              amount
+              currencyCode
+            }
           }
-          images(first: 1) {
+          images(first: 5) {
             edges {
               node {
                 url
+                altText
               }
             }
+          }
+          variants(first: 5) {
+            edges {
+              node {
+                id
+                title
+                price
+                availableForSale
+              }
+            }
+          }
+          metafield(namespace: "reviews", key: "items") {
+              id
+              namespace
+              key
+              type
+              value
+              references(first: 20) {
+                  edges {
+                      node {
+                          ... on Metaobject {
+                              id
+                              handle
+                              type
+                              updatedAt
+                              product: field(key: "product") {
+                                  key
+                                  type
+                                  value
+                              }
+                              customerName: field(key: "customer_name") {
+                                  key
+                                  type
+                                  value
+                              }
+                              rating: field(key: "rating") {
+                                  key
+                                  type
+                                  value
+                              }
+                              title: field(key: "title") {
+                                  key
+                                  type
+                                  value
+                              }
+                              body: field(key: "body") {
+                                  key
+                                  type
+                                  value
+                              }
+                              createdAt: field(key: "created_at") {
+                                  key
+                                  type
+                                  value
+                              }
+                              approved: field(key: "approved") {
+                                  key
+                                  type
+                                  value
+                              }
+                              avatarUrl: field(key: "avatar_url") {
+                                  key
+                                  type
+                                  value
+                              }
+                          }
+                      }
+                  }
+              }
           }
         }
       }

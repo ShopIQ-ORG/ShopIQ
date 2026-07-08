@@ -1,5 +1,6 @@
 schema {
   query: QueryRoot
+  mutation: Mutation
 }
 
 scalar DateTime
@@ -25,6 +26,18 @@ type QueryRoot {
     query: String
   ): CollectionConnection!
   collection(id: ID!): Collection
+  translatableResource(resourceId: ID!): TranslatableResource
+}
+
+type TranslatableResource {
+  resourceId: ID!
+  translations(locale: String!): [Translation!]!
+}
+
+type Translation {
+  key: String!
+  value: String!
+  outdated: Boolean!
 }
 
 enum ProductSortKeys {
@@ -63,6 +76,7 @@ type Product {
   variants(first: Int, after: String): ProductVariantConnection!
   createdAt: DateTime!
   updatedAt: DateTime!
+  metafield(namespace: String!, key: String!): Metafield
 }
 
 type ProductPriceRange {
@@ -164,4 +178,116 @@ type Collection {
 
 type CollectionProductsCount {
   count: Int!
+}
+
+type Metafield {
+  id: ID!
+  namespace: String!
+  key: String!
+  value: String!
+  type: String!
+  references(first: Int, after: String, last: Int, before: String): MetafieldReferenceConnection
+}
+
+type MetafieldReferenceConnection {
+  edges: [MetafieldReferenceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type MetafieldReferenceEdge {
+  cursor: String!
+  node: MetafieldReference!
+}
+
+union MetafieldReference = Metaobject | Product
+
+type Metaobject {
+  id: ID!
+  handle: String!
+  type: String!
+  updatedAt: DateTime
+  field(key: String!): MetaobjectField
+}
+
+type MetaobjectField {
+  key: String!
+  value: String
+  type: String!
+}
+
+type Mutation {
+  metaobjectCreate(metaobject: MetaobjectCreateInput!): MetaobjectCreatePayload
+  metafieldsSet(metafields: [MetafieldsSetInput!]!): MetafieldsSetPayload
+  metaobjectUpdate(id: ID!, metaobject: MetaobjectUpdateInput!): MetaobjectUpdatePayload
+  metaobjectDelete(id: ID!): MetaobjectDeletePayload
+}
+
+input MetaobjectCreateInput {
+  type: String!
+  handle: String
+  capabilities: MetaobjectCapabilitiesInput
+  fields: [MetaobjectFieldInput!]
+}
+
+input MetaobjectCapabilitiesInput {
+  publishable: MetaobjectPublishableCapabilityInput
+}
+
+input MetaobjectPublishableCapabilityInput {
+  status: MetaobjectPublishableStatus!
+}
+
+enum MetaobjectPublishableStatus {
+  ACTIVE
+  DRAFT
+}
+
+input MetaobjectFieldInput {
+  key: String!
+  value: String
+}
+
+type MetaobjectCreatePayload {
+  metaobject: Metaobject
+  userErrors: [MetaobjectUserError!]!
+}
+
+type MetaobjectUserError {
+  field: [String!]
+  message: String!
+  code: String
+}
+
+input MetafieldsSetInput {
+  ownerId: ID!
+  namespace: String!
+  key: String!
+  value: String!
+  type: String!
+}
+
+type MetafieldsSetPayload {
+  metafields: [Metafield!]
+  userErrors: [MetafieldUserError!]!
+}
+
+type MetafieldUserError {
+  field: [String!]
+  message: String!
+  code: String
+}
+
+input MetaobjectUpdateInput {
+  capabilities: MetaobjectCapabilitiesInput
+  fields: [MetaobjectFieldInput!]
+}
+
+type MetaobjectUpdatePayload {
+  metaobject: Metaobject
+  userErrors: [MetaobjectUserError!]!
+}
+
+type MetaobjectDeletePayload {
+  deletedId: ID
+  userErrors: [MetaobjectUserError!]!
 }

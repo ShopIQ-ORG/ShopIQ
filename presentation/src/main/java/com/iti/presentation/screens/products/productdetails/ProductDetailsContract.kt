@@ -14,7 +14,13 @@ data class ProductDetailsUiState(
     val selectedImageIndex: Int = 0,
     val isWishlisted: Boolean = false,
     val isAddingToCart: Boolean = false,
-    val showUnauthorizedDialog: Boolean = false
+    val showUnauthorizedDialog: Boolean = false,
+    val isSubmittingReview: Boolean = false,
+    val reviewError: String? = null,
+    val currentUserName: String? = null,
+    val selectedVariantId: String? = null,
+    val translatedTitle: String? = null,
+    val translatedDescription: String? = null
 )
 
 sealed interface ProductDetailsIntent {
@@ -22,9 +28,13 @@ sealed interface ProductDetailsIntent {
     data class SelectColor(val color: String) : ProductDetailsIntent
     data class SelectSize(val size: String) : ProductDetailsIntent
     data class SelectImage(val index: Int) : ProductDetailsIntent
+    data class SelectVariant(val variantId: String) : ProductDetailsIntent
     object ToggleWishlist : ProductDetailsIntent
     object AddToCart : ProductDetailsIntent
     object DismissUnauthorizedDialog : ProductDetailsIntent
+    data class SubmitReview(val rating: Int, val title: String, val body: String) : ProductDetailsIntent
+    data class EditReview(val reviewId: String, val rating: Int, val title: String, val body: String) : ProductDetailsIntent
+    data class DeleteReview(val reviewId: String) : ProductDetailsIntent
 }
 
 sealed interface ProductDetailsSideEffect {

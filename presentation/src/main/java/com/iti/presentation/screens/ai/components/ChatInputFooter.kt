@@ -44,7 +44,8 @@ fun ChatInputFooter(
     isDark: Boolean,
     onAttachmentClick: () -> Unit,
     onSendMessage: (String) -> Unit,
-    onSendVoiceMessage: (String, String) -> Unit
+    onSendVoiceMessage: (String, String) -> Unit,
+    onShowSnackbar: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val containerBg = if (isDark) Color(0xFF1E242B) else Color(0xFFF9FAFB)
@@ -61,7 +62,7 @@ fun ChatInputFooter(
         if (isGranted) {
             // Start listening directly or wait for next click
         } else {
-            Toast.makeText(context, context.getString(R.string.ai_permission_record_audio_required), Toast.LENGTH_SHORT).show()
+            onShowSnackbar(context.getString(R.string.ai_permission_record_audio_required))
         }
     }
 

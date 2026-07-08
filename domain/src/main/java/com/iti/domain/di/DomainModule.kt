@@ -103,4 +103,10 @@ val domainModule = module {
     factory { CreateDraftOrderUseCase(get()) }
     factory { CompleteDraftOrderUseCase(get()) }
     factory { ClearCartUseCase(get()) }
+
+    // Reviews Use Cases
+    factory { com.iti.domain.usecases.products.AddProductReviewUseCase(get()) }
+    factory { com.iti.domain.usecases.products.UpdateProductReviewUseCase(get()) }
+    factory { com.iti.domain.usecases.products.DeleteProductReviewUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetProductTranslationsUseCase(get()) }
 }

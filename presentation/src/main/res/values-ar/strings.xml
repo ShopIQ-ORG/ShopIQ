@@ -544,4 +544,32 @@
     <string name="remove_favorite_confirm">إزالة</string>
     <string name="remove_favorite_cancel">إلغاء</string>
 
+    <!-- Product Reviews -->
+    <string name="rating_out_of_5">من 5</string>
+    <string name="ratings_count">تقييم</string>
+    <string name="all_reviews">كل التقييمات</string>
+    <string name="sort_latest">الأحدث</string>
+    <string name="sort_oldest">الأقدم</string>
+    <string name="sort_highest_rating">أعلى تقييم</string>
+    <string name="verified_purchase">شراء موثق</string>
+    <string name="was_review_helpful">هل كان هذا التقييم مفيداً؟</string>
+    <string name="review_submitted_successfully">تم إرسال التقييم بنجاح!</string>
+    <string name="write_review_btn">اكتب تقييمك لهذا المنتج</string>
+    <string name="add_review_title">أضف تقييمًا</string>
+    <string name="rating_label">التقييم:</string>
+    <string name="title_label">عنوان التقييم:</string>
+    <string name="body_label">محتوى التقييم:</string>
+    <string name="submit_btn">إرسال</string>
+    <string name="no_reviews_yet">لا توجد تقييمات بعد لهذا المنتج. كن أول من يضيف تقييمًا!</string>
+    <string name="read_more">عرض المزيد</string>
+    <string name="read_less">عرض أقل</string>
+    <string name="edit_review_label">تعديل التقييم</string>
+    <string name="delete_review_label">حذف التقييم</string>
+    <string name="review_title_placeholder">عنوان التقييم</string>
+    <string name="review_body_placeholder">اكتب تفاصيل تقييمك هنا…</string>
+    <string name="payment_successful">تم الدفع بنجاح</string>
+    <string name="payment_failed">فشلت عملية الدفع: %1$s</string>
+    <string name="payment_pending">عملية الدفع قيد الانتظار</string>
+    <string name="payment_sdk_error">حدث خطأ أثناء تشغيل بوابة الدفع: %1$s</string>
+    <string name="pay_now_amount">ادفع الآن $%1$s</string>
 </resources>

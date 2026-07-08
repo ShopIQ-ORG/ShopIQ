@@ -30,7 +30,8 @@ data class ProductNode(
     val tags: List<String>,
     val priceRangeV2: PriceRangeV2,
     val images: ImageConnection,
-    val variants: VariantConnection
+    val variants: VariantConnection,
+    val reviews: List<ReviewDto> = emptyList()
 )
 
 data class PriceRangeV2(
@@ -90,4 +91,15 @@ data class ThrottleStatus(
     val maximumAvailable: Double,
     val currentlyAvailable: Int,
     val restoreRate: Double
+)
+
+data class ReviewDto(
+    val id: String,
+    val customerName: String,
+    val rating: Int,
+    val title: String,
+    val body: String,
+    val createdAt: String,
+    val approved: Boolean,
+    val avatarUrl: String? = null
 )

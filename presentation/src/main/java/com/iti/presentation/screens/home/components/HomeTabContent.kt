@@ -24,6 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
@@ -70,19 +73,33 @@ fun HomeTabContent(
                 val data = screenState.data
                 val stableShuffled = remember(data.products) { data.products.shuffled() }
                 val discountProducts = remember(data.products) { data.products.filter { it.hasDiscount } }
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
-                        .nestedScroll(scrollBehavior.nestedScrollConnection),
-                    contentPadding = PaddingValues(
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = bottomPadding + 16.dp
-                    )
+
+                var isRefreshing by remember { mutableStateOf(false) }
+                LaunchedEffect(state.screenState) {
+                    isRefreshing = false
+                }
+
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        isRefreshing = true
+                        onIntent(HomeContract.Intent.LoadData)
+                    },
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    item {
-                        SearchBar(
-                            value = query,
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        contentPadding = PaddingValues(
+                            top = innerPadding.calculateTopPadding(),
+                            bottom = bottomPadding + 16.dp
+                        )
+                    ) {
+                        item {
+                            SearchBar(
+                                value = query,
                             onValueChanged = {},
                             enabled = false,
                             onClick = {
@@ -210,6 +227,7 @@ fun HomeTabContent(
                         }
                     }
                 }
+            }
             }
         }
     }

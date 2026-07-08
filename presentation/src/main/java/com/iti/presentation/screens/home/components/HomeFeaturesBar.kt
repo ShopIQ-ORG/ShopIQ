@@ -30,13 +30,14 @@ import com.iti.presentation.R
 fun HomeFeaturesBar(
     modifier: Modifier = Modifier
 ) {
+    val isDark = com.iti.presentation.ui.theme.LocalDarkTheme.current
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.White
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -52,6 +53,7 @@ fun HomeFeaturesBar(
                 icon = Icons.Default.LocalShipping,
                 title = stringResource(R.string.free_delivery_title),
                 subtitle = stringResource(R.string.free_delivery_desc),
+                isDark = isDark,
                 modifier = Modifier.weight(1f)
             )
 
@@ -60,7 +62,7 @@ fun HomeFeaturesBar(
                 modifier = Modifier
                     .width(1.dp)
                     .height(30.dp)
-                    .background(Color(0xFFE5E7EB))
+                    .background(if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) else Color(0xFFE5E7EB))
             )
 
             // Easy Returns Feature
@@ -68,6 +70,7 @@ fun HomeFeaturesBar(
                 icon = Icons.AutoMirrored.Filled.AssignmentReturn,
                 title = stringResource(R.string.easy_returns_title),
                 subtitle = stringResource(R.string.easy_returns_desc),
+                isDark = isDark,
                 modifier = Modifier.weight(1f)
             )
 
@@ -76,7 +79,7 @@ fun HomeFeaturesBar(
                 modifier = Modifier
                     .width(1.dp)
                     .height(30.dp)
-                    .background(Color(0xFFE5E7EB))
+                    .background(if (isDark) MaterialTheme.colorScheme.outline.copy(alpha = 0.2f) else Color(0xFFE5E7EB))
             )
 
             // Secure Payment Feature
@@ -84,6 +87,7 @@ fun HomeFeaturesBar(
                 icon = Icons.Default.Lock,
                 title = stringResource(R.string.secure_payment_title),
                 subtitle = stringResource(R.string.secure_payment_desc),
+                isDark = isDark,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -95,6 +99,7 @@ private fun FeatureItem(
     icon: ImageVector,
     title: String,
     subtitle: String,
+    isDark: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -105,7 +110,7 @@ private fun FeatureItem(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = Color.Black,
+            tint = if (isDark) MaterialTheme.colorScheme.primary else Color.Black,
             modifier = Modifier.size(22.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -116,7 +121,7 @@ private fun FeatureItem(
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp
                 ),
-                color = Color(0xFF1F2937)
+                color = if (isDark) MaterialTheme.colorScheme.onSurface else Color(0xFF1F2937)
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
@@ -125,7 +130,7 @@ private fun FeatureItem(
                     fontSize = 8.sp,
                     lineHeight = 10.sp
                 ),
-                color = Color(0xFF6B7280)
+                color = if (isDark) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFF6B7280)
             )
         }
     }
