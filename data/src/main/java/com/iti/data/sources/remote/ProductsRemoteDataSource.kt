@@ -43,4 +43,6 @@ interface ProductsRemoteDataSource {
     )
     suspend fun deleteProductReview(reviewId: String)
     suspend fun getProductTranslations(productId: String): Map<String, String>
+    suspend fun getCollectionTranslations(collectionId: String, locale: String): Map<String, String>?
+    suspend fun saveCollectionTranslation(collectionId: String, locale: String, title: String, bodyHtml: String)
 }

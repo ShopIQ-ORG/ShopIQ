@@ -72,7 +72,7 @@ fun HomeTabContent(
             is HomeContract.ScreenState.Success -> {
                 val data = screenState.data
                 val stableShuffled = remember(data.products) { data.products.shuffled() }
-                val discountProducts = remember(data.products) { data.products.filter { it.hasDiscount } }
+                val discountProducts = remember(data.products) { data.products.filter { it.hasDiscount }.take(6) }
 
                 var isRefreshing by remember { mutableStateOf(false) }
                 LaunchedEffect(state.screenState) {
@@ -192,7 +192,9 @@ fun HomeTabContent(
                         BrandsRow(
                             brands = data.brands,
                             onBrandClick = { brand ->
-                                onIntent(HomeContract.Intent.BrandClicked(brand.name))
+                                val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
+                                val displayTitle = if (isArabic) (brand.arTitle ?: brand.name) else brand.name
+                                onIntent(HomeContract.Intent.BrandClicked(brand.name, displayTitle))
                             }
                         )
                     }

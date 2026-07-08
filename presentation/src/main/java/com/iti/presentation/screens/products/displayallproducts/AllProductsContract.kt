@@ -29,7 +29,8 @@ object AllProductsContract {
     data class State(
         val screenState: ScreenState = ScreenState.Loading,
         // filtering / sorting
-        val activeBrand: String? = null,          // legacy brand from Home navigation
+        val activeBrand: String? = null,          // legacy brand from Home navigation (EN, used for filter matching)
+        val activeBrandDisplayTitle: String? = null, // localized title for the header only
         val activeSubCategory: String? = null,    // legacy subcategory from Home navigation
         val searchQuery: String = "",
         val filterState: FilterState = FilterState(),
@@ -55,7 +56,7 @@ object AllProductsContract {
     // ─── Intents ─────────────────────────────────────────────────────────────────
     sealed class Intent {
         // load
-        data class LoadData(val brandName: String?, val subCategoryName: String? = null) : Intent()
+        data class LoadData(val brandName: String?, val subCategoryName: String? = null, val displayTitle: String? = null) : Intent()
         data object Retry : Intent()
         data object LoadMore : Intent()
 

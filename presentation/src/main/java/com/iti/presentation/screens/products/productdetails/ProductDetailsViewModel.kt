@@ -97,8 +97,8 @@ class ProductDetailsViewModel(
                         // Update ReviewsCache with the loaded product's reviews
                         ReviewsCache.updateReviews(product.id, product.reviews)
 
-                        val currentLanguage = java.util.Locale.getDefault().language
-                        if (currentLanguage == "ar") {
+                        val currentLanguage = com.iti.presentation.util.LocaleHelper.getCurrentLanguage()
+                        if (com.iti.presentation.util.LocaleHelper.isArabic()) {
                             viewModelScope.launch {
                                 val transResult = getProductTranslationsUseCase(product.id)
                                     .first { it !is Result.Loading }

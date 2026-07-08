@@ -49,7 +49,8 @@ fun CategoryScreen(
     val filteredCategories = remember(state.categories, state.searchQuery) {
         if (state.searchQuery.isEmpty()) state.categories
         else state.categories.filter {
-            it.title.contains(state.searchQuery, ignoreCase = true)
+            it.title.contains(state.searchQuery, ignoreCase = true) ||
+                    (it.arTitle?.contains(state.searchQuery, ignoreCase = true) == true)
         }
     }
 

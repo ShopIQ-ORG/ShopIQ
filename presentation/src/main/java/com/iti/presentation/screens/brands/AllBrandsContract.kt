@@ -26,11 +26,11 @@ object AllBrandsContract {
     sealed class Intent {
         data object LoadData : Intent()
         data object Retry : Intent()
-        data class BrandClicked(val brandName: String) : Intent()
+        data class BrandClicked(val brandName: String, val displayTitle: String? = null) : Intent()
         data class QueryChanged(val query: String) : Intent()
     }
 
     sealed class Effect {
-        data class NavigateToProducts(val brandName: String) : Effect()
+        data class NavigateToProducts(val brandName: String, val displayTitle: String? = null) : Effect()
     }
 }

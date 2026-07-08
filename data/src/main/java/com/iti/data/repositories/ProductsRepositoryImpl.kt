@@ -393,4 +393,33 @@ class ProductsRepositoryImpl(
             emit(Result.Failure(e))
         }
     }
+
+    override fun getCollectionTranslations(collectionId: String, locale: String): Flow<Result<Map<String, String>?>> = flow {
+        emit(Result.Loading)
+        try {
+            val translations = remoteDataSource.getCollectionTranslations(collectionId, locale)
+            emit(Result.Success(translations))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun saveCollectionTranslation(
+        collectionId: String,
+        locale: String,
+        title: String,
+        bodyHtml: String
+    ): Flow<Result<Unit>> = flow {
+        emit(Result.Loading)
+        try {
+            remoteDataSource.saveCollectionTranslation(collectionId, locale, title, bodyHtml)
+            emit(Result.Success(Unit))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
 }

@@ -33,7 +33,7 @@ import org.koin.compose.koinInject
 @Composable
 fun AllBrandsScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToAllProducts: (String) -> Unit,
+    onNavigateToAllProducts: (brandName: String, displayTitle: String?) -> Unit,
     onCartClick: () -> Unit,
     viewModel: AllBrandsViewModel = koinViewModel(),
     cartBadgeViewModel: CartBadgeViewModel = koinViewModel()
@@ -48,7 +48,7 @@ fun AllBrandsScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is AllBrandsContract.Effect.NavigateToProducts ->
-                    onNavigateToAllProducts(effect.brandName)
+                    onNavigateToAllProducts(effect.brandName, effect.displayTitle)
             }
         }
     }
@@ -115,8 +115,8 @@ fun AllBrandsScreen(
                             onQueryChanged = {
                                 viewModel.sendIntent(AllBrandsContract.Intent.QueryChanged(it))
                             },
-                            onBrandClick = { brandName ->
-                                viewModel.sendIntent(AllBrandsContract.Intent.BrandClicked(brandName))
+                            onBrandClick = { brandName, displayTitle ->
+                                viewModel.sendIntent(AllBrandsContract.Intent.BrandClicked(brandName, displayTitle))
                             },
                             scrollBehavior = scrollBehavior,
                             modifier = Modifier.padding(innerPadding)

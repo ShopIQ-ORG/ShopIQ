@@ -36,7 +36,7 @@ fun BrandsContent(
     brands: List<Brand>,
     query: String,
     onQueryChanged: (String) -> Unit,
-    onBrandClick: (String) -> Unit,
+    onBrandClick: (brandName: String, displayTitle: String) -> Unit,
     scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
@@ -66,10 +66,12 @@ fun BrandsContent(
             items = brands,
             key = { _, brand -> brand.id }
         ) { _, brand ->
+            val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
+            val displayName = if (isArabic) (brand.arTitle ?: brand.name) else brand.name
             BrandBannerCard(
-                brandName = brand.name,
+                brandName = displayName,
                 imageUrl = brand.mappedImageUrl,
-                onClick = { onBrandClick(brand.name) },
+                onClick = { onBrandClick(brand.name, displayName) }, // EN name for filtering, localized name for display
                 modifier = Modifier.animateItem()
             )
         }
@@ -98,7 +100,7 @@ private fun BrandsContentPreview() {
                 brands = mockBrands,
                 query = "",
                 onQueryChanged = {},
-                onBrandClick = {},
+                onBrandClick = { _, _ -> },
                 scrollBehavior = scrollBehavior
             )
         }
