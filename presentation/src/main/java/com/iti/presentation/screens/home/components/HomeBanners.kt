@@ -27,6 +27,20 @@ fun HomeBanners(
     onShopNowClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = com.iti.presentation.ui.theme.LocalDarkTheme.current
+
+    val newArrivalsBg = if (isDark) Color(0xFF1B3B2B) else Color(0xFFE8F5E9)
+    val newArrivalsTitle = if (isDark) Color(0xFF81C784) else Color(0xFF0F5132)
+    val newArrivalsDesc = if (isDark) Color(0xFFA5D6A7) else Color(0xFF2E6540)
+    val newArrivalsBtnBg = if (isDark) Color(0xFF2E6540) else Color(0xFFA3E2B6)
+    val newArrivalsBtnText = if (isDark) Color.White else Color(0xFF0F5132)
+
+    val summerSaleBg = if (isDark) Color(0xFF3E2723) else Color(0xFFFFF9E6)
+    val summerSaleTitle = if (isDark) Color(0xFFFFB74D) else Color(0xFF6B4B02)
+    val summerSaleDesc = if (isDark) Color(0xFFFFCC80) else Color(0xFF9E7E38)
+    val summerSaleBtnBg = if (isDark) Color(0xFF9E7E38) else Color(0xFFFFD54F)
+    val summerSaleBtnText = if (isDark) Color.White else Color(0xFF5D4037)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -41,7 +55,7 @@ fun HomeBanners(
                 .clickable { onExploreClick() },
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFE8F5E9) // Soft mint green background
+                containerColor = newArrivalsBg
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
@@ -71,7 +85,7 @@ fun HomeBanners(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
                             ),
-                            color = Color(0xFF0F5132) // Dark green
+                            color = newArrivalsTitle
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
@@ -79,13 +93,13 @@ fun HomeBanners(
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 12.sp
                             ),
-                            color = Color(0xFF2E6540)
+                            color = newArrivalsDesc
                         )
                     }
 
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFA3E2B6), RoundedCornerShape(8.dp))
+                            .background(newArrivalsBtnBg, RoundedCornerShape(8.dp))
                             .padding(horizontal = 16.dp, vertical = 6.dp)
                     ) {
                         Text(
@@ -94,7 +108,7 @@ fun HomeBanners(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 11.sp
                             ),
-                            color = Color(0xFF0F5132)
+                            color = newArrivalsBtnText
                         )
                     }
                 }
@@ -109,7 +123,7 @@ fun HomeBanners(
                 .clickable { onShopNowClick() },
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFFFF9E6) // Soft yellow/cream background
+                containerColor = summerSaleBg
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
@@ -139,7 +153,7 @@ fun HomeBanners(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
                             ),
-                            color = Color(0xFF6B4B02) // Dark bronze/brown
+                            color = summerSaleTitle
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
@@ -147,13 +161,13 @@ fun HomeBanners(
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 12.sp
                             ),
-                            color = Color(0xFF9E7E38)
+                            color = summerSaleDesc
                         )
                     }
 
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFFFD54F), RoundedCornerShape(8.dp))
+                            .background(summerSaleBtnBg, RoundedCornerShape(8.dp))
                             .padding(horizontal = 16.dp, vertical = 6.dp)
                     ) {
                         Text(
@@ -162,7 +176,7 @@ fun HomeBanners(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 11.sp
                             ),
-                            color = Color(0xFF5D4037)
+                            color = summerSaleBtnText
                         )
                     }
                 }

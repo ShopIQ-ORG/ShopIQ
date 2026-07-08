@@ -538,6 +538,8 @@
     <string name="ratings_count">تقييم</string>
     <string name="all_reviews">كل التقييمات</string>
     <string name="sort_latest">الأحدث</string>
+    <string name="sort_oldest">الأقدم</string>
+    <string name="sort_highest_rating">أعلى تقييم</string>
     <string name="verified_purchase">شراء موثق</string>
     <string name="was_review_helpful">هل كان هذا التقييم مفيداً؟</string>
     <string name="review_submitted_successfully">تم إرسال التقييم بنجاح!</string>

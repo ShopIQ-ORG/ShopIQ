@@ -68,10 +68,9 @@ import com.iti.presentation.screens.products.displayallproducts.components.Activ
 import com.iti.presentation.screens.products.displayallproducts.components.FilterBanner
 import com.iti.presentation.screens.products.displayallproducts.components.ProductsHeaderControls
 import com.iti.presentation.screens.products.displayallproducts.components.AllProductsShimmer
-import androidx.compose.foundation.ExperimentalFoundationApi
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllProductsScreen(
     brandName: String? = null,
@@ -121,7 +120,8 @@ fun AllProductsScreen(
     }
 
     LaunchedEffect(shouldLoadMore.value) {
-        if (shouldLoadMore.value && state.hasNextPage && !state.isLoadingMore) {
+        val currentProducts = (state.screenState as? AllProductsContract.ScreenState.Success)?.products?.size ?: 0
+        if (shouldLoadMore.value && state.hasNextPage && !state.isLoadingMore && currentProducts >= 10) {
             viewModel.sendIntent(AllProductsContract.Intent.LoadMore)
         }
     }
@@ -223,7 +223,6 @@ fun AllProductsScreen(
                             items(products, key = { it.id }) { product ->
                                 ProductCard(
                                     product = product,
-                                    modifier = Modifier.animateItem(),
                                     onClick = {
                                         viewModel.sendIntent(AllProductsContract.Intent.ProductClicked(product))
                                     },
@@ -234,7 +233,7 @@ fun AllProductsScreen(
                             }
 
                             // ── Loading More Indicator ──────────────────
-                            if (state.isLoadingMore) {
+                            if (state.isLoadingMore && products.size >= 10) {
                                 item(span = { GridItemSpan(2) }) {
                                     Box(
                                         modifier = Modifier

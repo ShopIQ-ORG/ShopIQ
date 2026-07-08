@@ -16,9 +16,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -180,8 +178,26 @@ fun ReviewsListBlock(
     onDeleteReviewClick: (ProductReview) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val finalReviews = getReviewsOrDefault(reviews)
-    val totalCount = finalReviews.size
+    val baseReviews = getReviewsOrDefault(reviews)
+    val totalCount = baseReviews.size
+
+    // Sort state: 0 = newest first, 1 = oldest first, 2 = highest rating
+    var sortIndex by remember { mutableStateOf(0) }
+    var showSortMenu by remember { mutableStateOf(false) }
+
+    val sortLabels = listOf(
+        stringResource(id = R.string.sort_latest),
+        stringResource(id = R.string.sort_oldest),
+        stringResource(id = R.string.sort_highest_rating)
+    )
+
+    val finalReviews = remember(baseReviews, sortIndex) {
+        when (sortIndex) {
+            1 -> baseReviews.sortedBy { it.createdAt }
+            2 -> baseReviews.sortedByDescending { it.rating }
+            else -> baseReviews.sortedByDescending { it.createdAt }
+        }
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         // Section Header
@@ -200,34 +216,50 @@ fun ReviewsListBlock(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Sort Dropdown
-                Row(
-                    modifier = Modifier
-                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
-                        .clickable { /* Handle sort */ }
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.sort_latest),
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Box {
+                    Row(
+                        modifier = Modifier
+                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                            .clickable { showSortMenu = true }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = sortLabels[sortIndex],
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showSortMenu,
+                        onDismissRequest = { showSortMenu = false },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        sortLabels.forEachIndexed { index, label ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = label,
+                                        fontSize = 13.sp,
+                                        color = if (index == sortIndex) MaterialTheme.colorScheme.primary
+                                                else MaterialTheme.colorScheme.onSurface
+                                    )
+                                },
+                                onClick = {
+                                    sortIndex = index
+                                    showSortMenu = false
+                                }
+                            )
+                        }
+                    }
                 }
-                
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Icon(
-                    imageVector = Icons.Outlined.FilterList,
-                    contentDescription = "Filter",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
             }
         }
 
@@ -398,12 +430,12 @@ fun ReviewItem(
                 Box {
                     IconButton(
                         onClick = { if (isOwnReview) showMenu = true },
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "Options",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isOwnReview) 0.6f else 0.2f),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isOwnReview) 0.7f else 0.2f),
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -561,9 +593,9 @@ fun AddReviewDialog(
     initialTitle: String = "",
     initialBody: String = ""
 ) {
-    var rating by remember { mutableStateOf(initialRating) }
-    var title by remember { mutableStateOf(initialTitle) }
-    var body by remember { mutableStateOf(initialBody) }
+    var rating by remember(initialRating) { mutableStateOf(initialRating) }
+    var title by remember(initialTitle) { mutableStateOf(initialTitle) }
+    var body by remember(initialBody) { mutableStateOf(initialBody) }
     var titleError by remember { mutableStateOf<String?>(null) }
     var bodyError by remember { mutableStateOf<String?>(null) }
 
