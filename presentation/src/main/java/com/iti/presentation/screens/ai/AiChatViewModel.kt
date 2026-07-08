@@ -33,13 +33,11 @@ class AiChatViewModel(
     private var historyJob: Job? = null
     private var currencyObserverJob: Job? = null
 
-    // Observe currency changes and invalidate cache so prices are recalculated
     private fun observeCurrencyChanges(userId: String) {
         currencyObserverJob?.cancel()
         currencyObserverJob = viewModelScope.launch {
             CurrencyManager.selectedCurrency.collect {
                 productCache.clear()
-                // Re-resolve products with new currency if we have messages
                 val currentMessages = _state.value.messages
                 if (currentMessages.isNotEmpty()) {
                     observeChatHistory(userId)
@@ -71,7 +69,7 @@ class AiChatViewModel(
                         intent.imageBytes,
                         intent.attachedImageUrl,
                         intent.voiceDuration,
-                        com.iti.presentation.util.CurrencyManager.selectedCurrency.value.code
+                        CurrencyManager.selectedCurrency.value.code,
                     )
                 }
             }
@@ -103,7 +101,6 @@ class AiChatViewModel(
 
     private fun resolveProductsAndEmit(messages: List<ChatMessage>) {
         viewModelScope.launch {
-            // Perform background API calls to fetch product details before emitting
             val mappedMessages = messages.map { msg ->
                 val productsUi = msg.recommendedProductIds.mapNotNull { id ->
                     if (productCache.containsKey(id)) {
@@ -116,7 +113,6 @@ class AiChatViewModel(
                                 productsRepository.getProductDetails(longId).collect { res ->
                                     if (res is Result.Success) {
                                         val prod = res.data
-                                        // Convert price from USD to selected currency
                                         val selectedCurrency = CurrencyManager.selectedCurrency.value
                                         val rawAmountUsd = prod.minPrice.amount.toDoubleOrNull() ?: 0.0
                                         val convertedAmount = CurrencyManager.convertFromUsd(rawAmountUsd)
@@ -168,7 +164,8 @@ class AiChatViewModel(
         imageBytes: ByteArray?,
         attachedImageUrl: String?,
         voiceDuration: String?,
-        currencyCode: String? = null
+        currencyCode: String? = null,
+        rate: Double = 1.0
     ) {
         viewModelScope.launch {
             if (!networkMonitor.isCurrentlyConnected()) {
@@ -203,7 +200,8 @@ class AiChatViewModel(
                 voiceDuration = voiceDuration
             )
 
-            sendChatMessageUseCase(userId, userMsg, imageBytes, currencyCode).collect { result ->
+            // ✅ التعديل هنا - إضافة rate
+            sendChatMessageUseCase(userId, userMsg, imageBytes, currencyCode, rate).collect { result ->
                 when (result) {
                     is Result.Loading -> {
                         _state.update { it.copy(isBotTyping = true) }

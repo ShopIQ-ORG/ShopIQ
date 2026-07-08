@@ -79,7 +79,8 @@ class ChatbotRepositoryImpl(
         userId: String,
         userMessage: ChatMessage,
         imageBytes: ByteArray?,
-        currencyContext: String?
+        currencyContext: String?,
+        exchangeRate: Double
     ): Flow<Result<ChatMessage>> = flow {
         emit(Result.Loading)
         
@@ -103,8 +104,9 @@ class ChatbotRepositoryImpl(
 
             val catalogText = if (productsList.isNotEmpty()) {
                 productsList.joinToString("\n") { prod ->
-                    val price = prod.minPrice.amount
-                    val currency = prod.minPrice.currencyCode
+                    val originalPrice = prod.minPrice.amount.toDoubleOrNull() ?: 0.0
+                    val price = String.format(java.util.Locale.US, "%.2f", originalPrice * exchangeRate)
+                    val currency = currencyContext ?: prod.minPrice.currencyCode
                     val isAvailable = if (prod.variants.any { it.availableForSale }) "In Stock" else "Out of Stock"
                     "- ID: ${prod.id}, Name: ${prod.title}, Price: $price $currency, Stock: $isAvailable, Details: Vendor=${prod.vendor}, Type=${prod.productType}"
                 }
@@ -113,7 +115,7 @@ class ChatbotRepositoryImpl(
             }
 
             val systemInstructionText = ChatbotSystemPrompt.getSystemPrompt(catalogText) + 
-                if (currencyContext != null) "\n\nCRITICAL RULE: The user has selected their currency as $currencyContext. You MUST use this currency when mentioning prices. For example, if the catalog says 'Price: 100 USD', and currency is EGP, DO NOT say USD. State the price strictly in $currencyContext by multiplying the USD price by the exchange rate if you know it, OR just state the price if you don't know the exact rate but emphasize it is in $currencyContext." else ""
+                if (currencyContext != null) "\n\nCRITICAL RULE: The user has selected their currency as $currencyContext. The prices in the catalog above have already been converted to $currencyContext for you. You MUST state the prices exactly as shown in the catalog, ensuring you use the $currencyContext currency symbol/code." else ""
 
             val historySnapshot = firestore.collection("users")
                 .document(userId)

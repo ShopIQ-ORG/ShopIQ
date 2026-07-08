@@ -99,8 +99,6 @@ fun EditProfileScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
-    var topSnackbarMessage by remember { mutableStateOf<String?>(null) }
-    var topSnackbarIsSuccess by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
@@ -108,19 +106,15 @@ fun EditProfileScreen(
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    topSnackbarMessage = effect.message.resolve(context)
-                    topSnackbarIsSuccess = false
+                    val msg = effect.message.resolve(context)
                     scope.launch {
-                        delay(3000)
-                        topSnackbarMessage = null
+                        showError(snackbarHostState, msg)
                     }
                 }
                 ProfileContract.Effect.ShowSuccessMessage -> {
-                    topSnackbarMessage = context.getString(R.string.profile_updated_successfully)
-                    topSnackbarIsSuccess = true
+                    val msg = context.getString(R.string.profile_updated_successfully)
                     scope.launch {
-                        delay(3000)
-                        topSnackbarMessage = null
+                        showSuccess(snackbarHostState, msg)
                     }
                 }
                 else -> Unit
@@ -131,9 +125,6 @@ fun EditProfileScreen(
     EditProfileContent(
         state = state,
         snackbarHostState = snackbarHostState,
-        topSnackbarMessage = topSnackbarMessage,
-        topSnackbarIsSuccess = topSnackbarIsSuccess,
-        onTopSnackbarDismiss = { topSnackbarMessage = null },
         onIntent = viewModel::sendIntent,
         onNavigateBack = onNavigateBack,
         modifier = modifier
@@ -147,10 +138,7 @@ fun EditProfileContent(
     snackbarHostState: SnackbarHostState,
     onIntent: (ProfileContract.Intent) -> Unit,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    topSnackbarMessage: String? = null,
-    topSnackbarIsSuccess: Boolean = false,
-    onTopSnackbarDismiss: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
@@ -488,30 +476,12 @@ fun EditProfileContent(
                 )
             }
 
-            // ✅ Top snackbar overlay (same pattern as AddressScreen)
-            AnimatedVisibility(
-                visible = topSnackbarMessage != null,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
-                exit = fadeOut() + slideOutVertically(targetOffsetY = { -it }),
+            com.iti.presentation.components.ShopIQSnackBarHost(
+                hostState = snackbarHostState,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                androidx.compose.material3.Surface(
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                    color = if (topSnackbarIsSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error,
-                    shadowElevation = 8.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onTopSnackbarDismiss() }
-                ) {
-                    Text(
-                        text = topSnackbarMessage ?: "",
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-                    )
-                }
-            }
+                    .padding(top = 8.dp)
+            )
         } // close Box
     }
 }
