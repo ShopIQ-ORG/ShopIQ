@@ -14,7 +14,7 @@ object SignInContract {
     sealed class Event {
         data class EmailChanged(val email: String) : Event()
         data class PasswordChanged(val password: String) : Event()
-        data class LoginWithGoogle(val idToken: String) : Event()
+        data class LoginWithGoogle(val idToken: String, val photoUrl: String? = null) : Event()
         object Login : Event()
         object LoginAsGuest : Event()
         object ForgotPassword : Event()

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class GoogleSignInHelper(
     private val context: Context,
     private val scope: CoroutineScope,
-    private val onSuccess: (idToken: String) -> Unit,
+    private val onSuccess: (idToken: String, photoUrl: String?) -> Unit,
     private val onError: (message: String) -> Unit
 ) {
 
@@ -44,11 +44,11 @@ class GoogleSignInHelper(
                 val result = CredentialManager.create(context)
                     .getCredential(request = request, context = context)
 
-                val idToken = GoogleIdTokenCredential
-                    .createFrom(result.credential.data)
-                    .idToken
+                val googleCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
+                val idToken = googleCredential.idToken
+                val photoUrl = googleCredential.profilePictureUri?.toString()
 
-                onSuccess(idToken)
+                onSuccess(idToken, photoUrl)
             } catch (e: GetCredentialException) {
                 onError(e.localizedMessage ?: context.getString(R.string.error_google_sign_in_failed))
             } catch (e: GoogleIdTokenParsingException) {
@@ -60,7 +60,7 @@ class GoogleSignInHelper(
 
 @Composable
 fun rememberGoogleSignInHelper(
-    onSuccess: (idToken: String) -> Unit,
+    onSuccess: (idToken: String, photoUrl: String?) -> Unit,
     onError: (message: String) -> Unit
 ): GoogleSignInHelper {
     val context = LocalContext.current

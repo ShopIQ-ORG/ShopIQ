@@ -64,6 +64,9 @@ fun AddressScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // ✅ FIX: Moved screenState declaration here, before its first use below
+    val screenState = state.screenState
+
     var isSuccessSnackbarVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.showSuccessBadge) {
@@ -90,19 +93,22 @@ fun AddressScreen(
         }
     }
 
-    // Connect permission requests with standard system handler
-    LocationPermissionHandler(
-        onPermissionGranted = {
-            viewModel.sendIntent(AddressContract.Intent.PermissionGranted)
-        },
-        onPermissionDenied = {
-            viewModel.sendIntent(AddressContract.Intent.PermissionDenied)
-        },
-        triggerRequest = state.triggerPermissionRequest,
-    )
+    // Connect permission requests with standard system handler.
+    // Only mount when NOT in MapPicker state — AddressMapPicker has its own handler,
+    // and having two handlers active simultaneously would show duplicate permission dialogs.
+    if (screenState !is AddressContract.ScreenState.MapPicker) {
+        LocationPermissionHandler(
+            onPermissionGranted = {
+                viewModel.sendIntent(AddressContract.Intent.PermissionGranted)
+            },
+            onPermissionDenied = {
+                viewModel.sendIntent(AddressContract.Intent.PermissionDenied)
+            },
+            triggerRequest = state.triggerPermissionRequest,
+        )
+    }
 
     // Determine titles and top bar actions dynamically based on state
-    val screenState = state.screenState
     val topBarTitle = when (screenState) {
         is AddressContract.ScreenState.LocationDetected -> {
             if (screenState.isFromGps) {
@@ -131,8 +137,8 @@ fun AddressScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            if (onAddressSelected == null && 
-                screenState !is AddressContract.ScreenState.MapPicker && 
+            if (onAddressSelected == null &&
+                screenState !is AddressContract.ScreenState.MapPicker &&
                 screenState !is AddressContract.ScreenState.LocationDetected) {
                 BackTopBar(
                     title = topBarTitle,
@@ -157,8 +163,8 @@ fun AddressScreen(
             }
         }
     ) { innerPadding ->
-        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker || 
-                                 screenState is AddressContract.ScreenState.LocationDetected) {
+        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker ||
+            screenState is AddressContract.ScreenState.LocationDetected) {
             PaddingValues(0.dp)
         } else {
             innerPadding

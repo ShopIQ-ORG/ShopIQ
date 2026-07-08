@@ -173,7 +173,7 @@ fun HomeTabContent(
                     // 3. New Arrivals & Summer Sale Banners
                     item {
                         HomeBanners(
-                            onExploreClick = { onIntent(HomeContract.Intent.SubCategoryClicked("T-SHIRTS")) },
+                            onExploreClick = { onIntent(HomeContract.Intent.ViewAllProductsClicked) },
                             onShopNowClick = { onIntent(HomeContract.Intent.SubCategoryClicked("ACCESSORIES")) }
                         )
                     }

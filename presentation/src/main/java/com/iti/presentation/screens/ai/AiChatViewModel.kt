@@ -2,7 +2,6 @@ package com.iti.presentation.screens.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.facebook.appevents.codeless.internal.UnityReflection.sendMessage
 import com.iti.domain.models.ChatMessage
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
@@ -11,6 +10,7 @@ import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatContract.ChatMessageUi
 import com.iti.presentation.screens.ai.AiChatContract.ChatProductUi
+import com.iti.presentation.util.CurrencyManager
 import com.iti.presentation.util.NetworkMonitor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +31,22 @@ class AiChatViewModel(
 
     private val productCache = mutableMapOf<String, ChatProductUi>()
     private var historyJob: Job? = null
+    private var currencyObserverJob: Job? = null
+
+    // Observe currency changes and invalidate cache so prices are recalculated
+    private fun observeCurrencyChanges(userId: String) {
+        currencyObserverJob?.cancel()
+        currencyObserverJob = viewModelScope.launch {
+            CurrencyManager.selectedCurrency.collect {
+                productCache.clear()
+                // Re-resolve products with new currency if we have messages
+                val currentMessages = _state.value.messages
+                if (currentMessages.isNotEmpty()) {
+                    observeChatHistory(userId)
+                }
+            }
+        }
+    }
 
     fun sendIntent(intent: AiChatContract.Intent) {
         when (intent) {
@@ -38,8 +54,11 @@ class AiChatViewModel(
                 _state.update { it.copy(currentUser = intent.user) }
                 if (intent.user is User.AuthenticatedUser) {
                     observeChatHistory(intent.user.uid)
+                    observeCurrencyChanges(intent.user.uid)
                 } else {
                     historyJob?.cancel()
+                    currencyObserverJob?.cancel()
+                    productCache.clear()
                     _state.update { it.copy(messages = emptyList()) }
                 }
             }
@@ -97,7 +116,16 @@ class AiChatViewModel(
                                 productsRepository.getProductDetails(longId).collect { res ->
                                     if (res is Result.Success) {
                                         val prod = res.data
-                                        val price = "${prod.minPrice.amount} ${prod.minPrice.currencyCode}"
+                                        // Convert price from USD to selected currency
+                                        val selectedCurrency = CurrencyManager.selectedCurrency.value
+                                        val rawAmountUsd = prod.minPrice.amount.toDoubleOrNull() ?: 0.0
+                                        val convertedAmount = CurrencyManager.convertFromUsd(rawAmountUsd)
+                                        val formattedAmount = if (convertedAmount % 1.0 == 0.0) {
+                                            convertedAmount.toLong().toString()
+                                        } else {
+                                            String.format("%.2f", convertedAmount)
+                                        }
+                                        val price = "$formattedAmount ${selectedCurrency.code}"
                                         val img = prod.images.firstOrNull()?.url ?: ""
                                         val stock = if (prod.variants.any { it.availableForSale }) "In Stock" else "Out of Stock"
                                         val ui = ChatProductUi(
@@ -174,7 +202,7 @@ class AiChatViewModel(
                 attachedImageUrl = attachedImageUrl,
                 voiceDuration = voiceDuration
             )
-            
+
             sendChatMessageUseCase(userId, userMsg, imageBytes, currencyCode).collect { result ->
                 when (result) {
                     is Result.Loading -> {

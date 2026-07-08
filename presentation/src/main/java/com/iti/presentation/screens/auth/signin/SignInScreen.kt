@@ -49,8 +49,8 @@ fun SignInScreen(
     }
 
     val googleHelper = rememberGoogleSignInHelper(
-        onSuccess = { idToken ->
-            viewModel.onEvent(SignInContract.Event.LoginWithGoogle(idToken))
+        onSuccess = { idToken, photoUrl ->
+            viewModel.onEvent(SignInContract.Event.LoginWithGoogle(idToken, photoUrl))
         },
         onError = onSocialError
     )
