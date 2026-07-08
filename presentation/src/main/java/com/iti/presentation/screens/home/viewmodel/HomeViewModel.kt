@@ -36,6 +36,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+import com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase
+
 class HomeViewModel(
     private val getProductsByNumberUseCase: GetProductsByNumberUseCase,
     private val getBrandsUseCase: GetBrandsUseCase,
@@ -50,7 +52,8 @@ class HomeViewModel(
     private val getBestSellersUseCase: GetBestSellersUseCase,
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val searchProductsUseCase: SearchProductsUseCase,
-    private val getProductTranslationsUseCase: GetProductTranslationsUseCase
+    private val getProductTranslationsUseCase: GetProductTranslationsUseCase,
+    private val getCollectionTranslationsUseCase: GetCollectionTranslationsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeContract.State())
@@ -161,7 +164,7 @@ class HomeViewModel(
 
                         val finalProducts = resolvedProducts.distinctBy { it.id }.take(10)
 
-                        val productsToEmit = if (java.util.Locale.getDefault().language == "ar") {
+                        val productsToEmit = if (com.iti.presentation.util.LocaleHelper.isArabic()) {
                             finalProducts.map { product ->
                                 try {
                                     val transResult = getProductTranslationsUseCase(product.id)
@@ -217,7 +220,10 @@ class HomeViewModel(
             is HomeContract.Intent.ProductFavoriteClicked -> toggleFavorite(intent.product)
 
             is HomeContract.Intent.BrandClicked ->
-                emitEffect(HomeContract.Effect.NavigateToProducts(brandName = intent.brandName))
+                emitEffect(HomeContract.Effect.NavigateToProducts(
+                    brandName = intent.brandName,
+                    displayTitle = intent.displayTitle ?: intent.brandName
+                ))
 
             is HomeContract.Intent.SubCategoryClicked ->
                 emitEffect(HomeContract.Effect.NavigateToProducts(subCategoryName = intent.subCategoryName))
@@ -295,7 +301,7 @@ class HomeViewModel(
         _state.update { it.copy(screenState = HomeContract.ScreenState.Loading) }
         viewModelScope.launch {
             val flow1 = combine(
-                getProductsByNumberUseCase(),
+                getProductsByNumberUseCase(50),
                 getBrandsUseCase(),
                 getAdsUseCase()
             ) { p, b, a -> Triple(p, b, a) }
@@ -381,8 +387,9 @@ class HomeViewModel(
                             )
                         ).also {
                             // Batch-fetch Arabic translations if device locale is AR
-                            if (java.util.Locale.getDefault().language == "ar") {
+                            if (com.iti.presentation.util.LocaleHelper.isArabic()) {
                                 fetchTranslationsForProducts(updatedProducts + updatedBestSellers)
+                                fetchTranslationsForBrands(mainData.brandsResult.data)
                             }
                         }
                     }
@@ -403,10 +410,7 @@ class HomeViewModel(
     private fun emitEffect(effect: HomeContract.Effect) {
         viewModelScope.launch { _effect.send(effect) }
     }
-    /**
-     * Concurrently fetches Arabic translations for a batch of products and updates
-     * the products list in the state so that [ProductCard] shows translated titles.
-     */
+
     private fun fetchTranslationsForProducts(products: List<Product>) {
         viewModelScope.launch {
             val translatedMap = products.distinctBy { it.id }.map { product ->
@@ -435,6 +439,41 @@ class HomeViewModel(
                         data = data.copy(
                             products = data.products.map { translatedMap[it.id] ?: it },
                             bestSellers = data.bestSellers.map { translatedMap[it.id] ?: it }
+                        )
+                    ).let { newScreenState ->
+                        currentState.copy(screenState = newScreenState)
+                    }
+                } else currentState
+            }
+        }
+    }
+
+    private fun fetchTranslationsForBrands(brands: List<com.iti.domain.models.Brand>) {
+        viewModelScope.launch {
+            val translatedMap = brands.distinctBy { it.id }.map { brand ->
+                async {
+                    try {
+                        val result = getCollectionTranslationsUseCase(brand.id, "ar")
+                            .first { it !is Result.Loading }
+                        if (result is Result.Success) {
+                            val map = result.data
+                            brand.id to brand.copy(
+                                arTitle = map?.get("title")?.takeIf { it.isNotBlank() }
+                            )
+                        } else brand.id to brand
+                    } catch (_: Exception) {
+                        brand.id to brand
+                    }
+                }
+            }.awaitAll().toMap()
+
+            _state.update { currentState ->
+                val screenState = currentState.screenState
+                if (screenState is HomeContract.ScreenState.Success) {
+                    val data = screenState.data
+                    screenState.copy(
+                        data = data.copy(
+                            brands = data.brands.map { translatedMap[it.id] ?: it }
                         )
                     ).let { newScreenState ->
                         currentState.copy(screenState = newScreenState)

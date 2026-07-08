@@ -12,8 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
+import com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase
+import kotlinx.coroutines.flow.update
+
 class CategoryViewModel(
-    private val getCategoriesUseCase: GetCategoriesUseCase
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val getCollectionTranslationsUseCase: GetCollectionTranslationsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CategoryContract.State())
@@ -49,7 +53,8 @@ class CategoryViewModel(
                             CategoryItem(
                                 id = category.id,
                                 title = category.title,
-                                imageAssetPath = category.imageAssetPath
+                                imageAssetPath = category.imageAssetPath,
+                                arTitle = category.arTitle
                             )
                         }
                         _state.value = _state.value.copy(
@@ -57,6 +62,9 @@ class CategoryViewModel(
                             isLoading = false,
                             errorMessage = null
                         )
+                        if (com.iti.presentation.util.LocaleHelper.isArabic()) {
+                            fetchTranslationsForCategories(result.data)
+                        }
                     }
                     is Result.Failure -> {
                         _state.value = _state.value.copy(
@@ -69,13 +77,40 @@ class CategoryViewModel(
         }
     }
 
+    private fun fetchTranslationsForCategories(categories: List<com.iti.domain.models.Category>) {
+        categories.forEach { category ->
+            viewModelScope.launch {
+                getCollectionTranslationsUseCase(category.id, "ar").collect { res ->
+                    if (res is Result.Success) {
+                        val map = res.data
+                        val translatedTitle = map?.get("title")
+                        if (!translatedTitle.isNullOrBlank()) {
+                            _state.update { currentState ->
+                                val updatedList = currentState.categories.map { item ->
+                                    if (item.id == category.id) {
+                                        item.copy(arTitle = translatedTitle)
+                                    } else {
+                                        item
+                                    }
+                                }
+                                currentState.copy(categories = updatedList)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun handleSearchQueryChanged(query: String) {
         _state.value = _state.value.copy(searchQuery = query)
     }
 
     private fun handleCategoryClicked(categoryId: String) {
         viewModelScope.launch {
-            val title = _state.value.categories.find { it.id == categoryId }?.title ?: categoryId
+            val category = _state.value.categories.find { it.id == categoryId }
+            val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
+            val title = if (isArabic) (category?.arTitle ?: category?.title ?: categoryId) else (category?.title ?: categoryId)
             _effect.send(CategoryContract.Effect.NavigateToCategoryProducts(categoryId, title))
         }
     }

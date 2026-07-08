@@ -46,7 +46,7 @@ object HomeContract {
         data class ProductFavoriteClicked(val product: Product) : Intent()
         data class ProductClicked(val product: Product) : Intent()
         data class AiRecommendedProductClicked(val product: Product) : Intent()
-        data class BrandClicked(val brandName: String) : Intent()
+        data class BrandClicked(val brandName: String, val displayTitle: String? = null) : Intent()
         data class SubCategoryClicked(val subCategoryName: String) : Intent()
         data class AdClicked(val ad: Ad) : Intent()
         data object ViewAllBrandsClicked : Intent()
@@ -58,7 +58,7 @@ object HomeContract {
 
     sealed class Effect {
         data class NavigateToAllBrands(val brandName: String? = null) : Effect()
-        data class NavigateToProducts(val brandName: String? = null, val subCategoryName: String? = null) : Effect()
+        data class NavigateToProducts(val brandName: String? = null, val subCategoryName: String? = null, val displayTitle: String? = null) : Effect()
         data class NavigateToProduct(val productId: Long) : Effect()
         data object NavigateToAllProducts : Effect()
         data object ShowAuthRequired : Effect()

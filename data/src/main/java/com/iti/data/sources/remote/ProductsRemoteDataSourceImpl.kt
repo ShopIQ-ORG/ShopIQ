@@ -253,4 +253,30 @@ class ProductsRemoteDataSourceImpl(
         val translations = response.data?.translatableResource?.translations ?: return emptyMap()
         return translations.associate { it.key to it.value }
     }
+
+    override suspend fun getCollectionTranslations(collectionId: String, locale: String): Map<String, String>? {
+        return try {
+            // Ensure it is a full GID
+            val globalId = if (collectionId.startsWith("gid://")) collectionId
+            else "gid://shopify/Collection/$collectionId"
+            val response = apolloClient.query(
+                com.iti.data.GetCollectionTranslationsQuery(globalId)
+            ).execute()
+            if (response.hasErrors()) return null
+            val translations = response.data?.translatableResource?.translations ?: return null
+            val map = translations.associate { it.key to it.value }
+            map.ifEmpty { null }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun saveCollectionTranslation(
+        collectionId: String,
+        locale: String,
+        title: String,
+        bodyHtml: String
+    ) {
+        // Kept for future backend use — no-op for now
+    }
 }

@@ -75,6 +75,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AllProductsScreen(
     brandName: String? = null,
     subCategoryName: String? = null,
+    displayTitle: String? = null,
     onNavigateBack: () -> Unit,
     onNavigateToProduct: (Long) -> Unit,
     onNavigateToAuth: () -> Unit,
@@ -85,8 +86,8 @@ fun AllProductsScreen(
     val gridState = rememberLazyGridState()
     var showAuthDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(brandName, subCategoryName) {
-        viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName, subCategoryName))
+    LaunchedEffect(brandName, subCategoryName, displayTitle) {
+        viewModel.sendIntent(AllProductsContract.Intent.LoadData(brandName, subCategoryName, displayTitle))
     }
 
     LaunchedEffect(state.filterState, state.sortOption, state.activeBrand, state.searchQuery) {
@@ -138,7 +139,7 @@ fun AllProductsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             BackTopBar(
-                title = state.activeSubCategory ?: state.activeBrand ?: stringResource(R.string.all_products_title),
+                title = state.activeSubCategory ?: state.activeBrandDisplayTitle ?: state.activeBrand ?: stringResource(R.string.all_products_title),
                 onBack = onNavigateBack,
                 scrollBehavior = scrollBehavior
             )

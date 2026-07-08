@@ -150,8 +150,10 @@ fun CategoryCard(
                     )
             )
 
+            val isArabic = com.iti.presentation.util.LocaleHelper.isArabic()
+            val displayName = if (isArabic) (category.arTitle ?: category.title) else category.title
             Text(
-                text = category.title,
+                text = displayName,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

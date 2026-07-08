@@ -42,13 +42,13 @@ val presentationModule = module {
     single { com.iti.domain.usecases.ai.ClearChatHistoryUseCase(get()) }
     viewModel { AiChatViewModel(get(), get(), get(), get()) }
     viewModel { AiHistoryViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { OnboardingViewModel(get(), get()) }
     viewModel { SignInViewModel(get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
-    viewModel { CategoryViewModel(get()) }
+    viewModel { CategoryViewModel(get(), get()) }
     viewModel { CategoryDetailsViewModel(get(), get(), get(), get(), get()) }
-    viewModel { AllBrandsViewModel(get()) }
+    viewModel { AllBrandsViewModel(get(), get()) }
     factory { AllProductsFilterManager() }
     viewModel { AllProductsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ProductDetailsViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
