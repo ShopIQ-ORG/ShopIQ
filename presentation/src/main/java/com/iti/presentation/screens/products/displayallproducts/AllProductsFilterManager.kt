@@ -18,6 +18,7 @@ class AllProductsFilterManager {
         if (trimmedQuery.isNotEmpty()) {
             result = result.filter { product ->
                 product.title.contains(trimmedQuery, ignoreCase = true) ||
+                (product.arTitle?.contains(trimmedQuery, ignoreCase = true) == true) ||
                 product.vendor.contains(trimmedQuery, ignoreCase = true) ||
                 product.productType.contains(trimmedQuery, ignoreCase = true) ||
                 product.tags.any { it.contains(trimmedQuery, ignoreCase = true) }

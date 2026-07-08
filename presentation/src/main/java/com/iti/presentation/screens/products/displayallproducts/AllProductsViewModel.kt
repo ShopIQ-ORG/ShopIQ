@@ -11,15 +11,19 @@ import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
+import com.iti.domain.usecases.products.GetProductTranslationsUseCase
 import com.iti.presentation.R
 import com.iti.presentation.util.UiText
 import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.FilterState
 import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.SortOption
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,7 +35,8 @@ class AllProductsViewModel(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val authRepository: AuthRepository,
     private val getProductsPaginatedUseCase: GetProductsPaginatedUseCase,
-    private val filterManager: AllProductsFilterManager
+    private val filterManager: AllProductsFilterManager,
+    private val getProductTranslationsUseCase: GetProductTranslationsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AllProductsContract.State())
@@ -239,6 +244,10 @@ class AllProductsViewModel(
                                 endCursor = result.data.endCursor
                             )
                         }
+                        // Batch-fetch Arabic translations if device is in Arabic
+                        if (java.util.Locale.getDefault().language == "ar") {
+                            fetchTranslationsForProducts(result.data.products)
+                        }
                     }
                     is Result.Failure -> _state.update {
                         it.copy(
@@ -265,14 +274,8 @@ class AllProductsViewModel(
                     is Result.Loading -> { /* Handled by isLoadingMore state */ }
                     is Result.Success -> {
                         allProductsStateFlow.value = allProductsStateFlow.value + result.data.products
-                        val categories = allProductsStateFlow.value.flatMap { it.tags }.distinct().filter { it.isNotBlank() }.sorted()
-                        val subCategories = allProductsStateFlow.value.map { it.productType }.distinct().filter { it.isNotBlank() }.sorted()
-                        val brands = allProductsStateFlow.value.map { it.vendor }.distinct().filter { it.isNotBlank() }.sorted()
                         _state.update {
                             it.copy(
-                                availableCategories = categories,
-                                availableSubCategories = subCategories,
-                                availableBrands = brands,
                                 hasNextPage = result.data.hasNextPage,
                                 endCursor = result.data.endCursor,
                                 isLoadingMore = false
@@ -298,6 +301,34 @@ class AllProductsViewModel(
         )
         _state.update { it.copy(screenState = AllProductsContract.ScreenState.Success(filteredProducts)) }
     }
+
+    /**
+     * Concurrently fetches Arabic translations for each product and updates
+     * [allProductsStateFlow] so cards show translated titles/descriptions.
+     * Only called when the device locale is Arabic.
+     */
+    private fun fetchTranslationsForProducts(products: List<Product>) {
+        viewModelScope.launch {
+            val translatedProducts = products.map { product ->
+                async {
+                    try {
+                        val result = getProductTranslationsUseCase(product.id).first { it !is Result.Loading }
+                        if (result is Result.Success) {
+                            val map = result.data
+                            product.copy(
+                                arTitle = map["title"]?.takeIf { it.isNotBlank() },
+                                arDescription = (map["body_html"] ?: map["description"])?.takeIf { it.isNotBlank() }
+                            )
+                        } else product
+                    } catch (e: Exception) {
+                        product
+                    }
+                }
+            }.awaitAll()
+            allProductsStateFlow.value = translatedProducts
+        }
+    }
+
 
     private fun onSearchQueryChanged(query: String) {
         _state.update { it.copy(searchQuery = query, isSearchActive = true) }

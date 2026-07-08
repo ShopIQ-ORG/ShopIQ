@@ -139,8 +139,7 @@ class ProductsRemoteDataSourceImpl(
             com.iti.data.type.MetaobjectFieldInput(key = "title", value = com.apollographql.apollo.api.Optional.present(title)),
             com.iti.data.type.MetaobjectFieldInput(key = "body", value = com.apollographql.apollo.api.Optional.present(body)),
             com.iti.data.type.MetaobjectFieldInput(key = "created_at", value = com.apollographql.apollo.api.Optional.present(createdAt)),
-            com.iti.data.type.MetaobjectFieldInput(key = "approved", value = com.apollographql.apollo.api.Optional.present("true")),
-            com.iti.data.type.MetaobjectFieldInput(key = "avatar_url", value = com.apollographql.apollo.api.Optional.present(avatarUrl))
+            com.iti.data.type.MetaobjectFieldInput(key = "approved", value = com.apollographql.apollo.api.Optional.present("true"))
         )
 
         val metaobject = com.iti.data.type.MetaobjectCreateInput(
@@ -207,8 +206,7 @@ class ProductsRemoteDataSourceImpl(
             com.iti.data.type.MetaobjectFieldInput(key = "title", value = com.apollographql.apollo.api.Optional.present(title)),
             com.iti.data.type.MetaobjectFieldInput(key = "body", value = com.apollographql.apollo.api.Optional.present(body)),
             com.iti.data.type.MetaobjectFieldInput(key = "created_at", value = com.apollographql.apollo.api.Optional.present(createdAt)),
-            com.iti.data.type.MetaobjectFieldInput(key = "approved", value = com.apollographql.apollo.api.Optional.present("true")),
-            com.iti.data.type.MetaobjectFieldInput(key = "avatar_url", value = com.apollographql.apollo.api.Optional.present(avatarUrl))
+            com.iti.data.type.MetaobjectFieldInput(key = "approved", value = com.apollographql.apollo.api.Optional.present("true"))
         )
 
         val metaobject = com.iti.data.type.MetaobjectUpdateInput(
@@ -240,5 +238,15 @@ class ProductsRemoteDataSourceImpl(
         if (userError != null) {
             throw Exception(userError.message)
         }
+    }
+
+    override suspend fun getProductTranslations(productId: String): Map<String, String> {
+        val globalId = if (productId.startsWith("gid://")) productId else "gid://shopify/Product/$productId"
+        val response = apolloClient.query(com.iti.data.GetProductTranslationsQuery(globalId)).execute()
+        if (response.hasErrors()) {
+            throw Exception(response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error")
+        }
+        val translations = response.data?.translatableResource?.translations ?: return emptyMap()
+        return translations.associate { it.key to it.value }
     }
 }

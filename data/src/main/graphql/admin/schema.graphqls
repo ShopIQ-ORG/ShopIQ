@@ -26,6 +26,18 @@ type QueryRoot {
     query: String
   ): CollectionConnection!
   collection(id: ID!): Collection
+  translatableResource(resourceId: ID!): TranslatableResource
+}
+
+type TranslatableResource {
+  resourceId: ID!
+  translations(locale: String!): [Translation!]!
+}
+
+type Translation {
+  key: String!
+  value: String!
+  outdated: Boolean!
 }
 
 enum ProductSortKeys {

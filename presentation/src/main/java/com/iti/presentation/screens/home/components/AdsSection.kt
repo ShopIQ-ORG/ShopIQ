@@ -94,7 +94,8 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                     Text(
                         text = ad.subtitle,
                         style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.surface
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(14.dp))
                     Button(

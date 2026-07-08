@@ -45,6 +45,10 @@ import com.iti.presentation.screens.products.productdetails.components.RatingSum
 import com.iti.presentation.screens.products.productdetails.components.ReviewsListBlock
 import com.iti.presentation.ui.theme.ShopIQTheme
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.core.tween
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +63,13 @@ fun ProductDetailsScreen(
 
     var showAddReviewDialog by remember { androidx.compose.runtime.mutableStateOf(false) }
     var reviewToEdit by remember { androidx.compose.runtime.mutableStateOf<com.iti.domain.models.ProductReview?>(null) }
+    var animateIn by remember { androidx.compose.runtime.mutableStateOf(false) }
+
+    LaunchedEffect(state.isLoading) {
+        if (!state.isLoading && state.product != null) {
+            animateIn = true
+        }
+    }
 
     LaunchedEffect(state.isSubmittingReview) {
         if (!state.isSubmittingReview && state.reviewError == null) {
@@ -146,21 +157,31 @@ fun ProductDetailsScreen(
                     .padding(innerPadding)
             )
 
-            state.product != null -> ProductDetailsContent(
-                state = state,
-                onIntent = viewModel::handleIntent,
-                onWriteReviewClick = { showAddReviewDialog = true },
-                onEditReviewClick = { review ->
-                    reviewToEdit = review
-                    showAddReviewDialog = true
-                },
-                onDeleteReviewClick = { review ->
-                    viewModel.handleIntent(ProductDetailsIntent.DeleteReview(review.id))
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            )
+            state.product != null -> {
+                AnimatedVisibility(
+                    visible = animateIn,
+                    enter = fadeIn(animationSpec = tween(400)) + slideInVertically(
+                        initialOffsetY = { it / 6 },
+                        animationSpec = tween(400)
+                    )
+                ) {
+                    ProductDetailsContent(
+                        state = state,
+                        onIntent = viewModel::handleIntent,
+                        onWriteReviewClick = { showAddReviewDialog = true },
+                        onEditReviewClick = { review ->
+                            reviewToEdit = review
+                            showAddReviewDialog = true
+                        },
+                        onDeleteReviewClick = { review ->
+                            viewModel.handleIntent(ProductDetailsIntent.DeleteReview(review.id))
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    )
+                }
+            }
         }
     }
 }
@@ -199,6 +220,7 @@ private fun ProductDetailsContent(
                 }
             }
 
+
             item {
                 val convertedMinPrice = CurrencyManager.convertFromUsd(product.minPrice.amount.toDoubleOrNull() ?: 0.0)
                 val currentCurrency by CurrencyManager.selectedCurrency.collectAsState()
@@ -208,10 +230,10 @@ private fun ProductDetailsContent(
                 val averageRating = if (totalReviews > 0) product.reviews.map { it.rating }.average() else 0.0
 
                 ProductInfoBlock(
-                    title = product.title,
+                    title = state.translatedTitle ?: product.title,
                     currencyCode = currentCurrency.getLocalizedCode(androidx.compose.ui.platform.LocalContext.current),
                     amount = minPriceStr,
-                    description = product.description,
+                    description = state.translatedDescription ?: product.description,
                     rating = averageRating,
                     reviewsCount = totalReviews
                 )

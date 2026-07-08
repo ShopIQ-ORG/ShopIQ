@@ -15,7 +15,10 @@ data class ProductDetailsUiState(
     val showUnauthorizedDialog: Boolean = false,
     val isSubmittingReview: Boolean = false,
     val reviewError: String? = null,
-    val currentUserName: String? = null
+    val currentUserName: String? = null,
+    val selectedVariantId: String? = null,
+    val translatedTitle: String? = null,
+    val translatedDescription: String? = null
 )
 
 sealed interface ProductDetailsIntent {
@@ -23,6 +26,7 @@ sealed interface ProductDetailsIntent {
     data class SelectColor(val color: String) : ProductDetailsIntent
     data class SelectSize(val size: String) : ProductDetailsIntent
     data class SelectImage(val index: Int) : ProductDetailsIntent
+    data class SelectVariant(val variantId: String) : ProductDetailsIntent
     object ToggleWishlist : ProductDetailsIntent
     object AddToCart : ProductDetailsIntent
     object DismissUnauthorizedDialog : ProductDetailsIntent

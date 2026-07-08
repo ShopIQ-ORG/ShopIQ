@@ -44,5 +44,6 @@ interface ProductsRepository {
         productId: String,
         reviewId: String
     ): Flow<Result<Unit>>
+    fun getProductTranslations(productId: String): Flow<Result<Map<String, String>>>
 }
 

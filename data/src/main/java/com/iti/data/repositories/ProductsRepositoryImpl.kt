@@ -382,7 +382,7 @@ class ProductsRepositoryImpl(
     ): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
         try {
-            val numericId = productId.substringAfterLast("/").toLongOrNull() 
+            val numericId = productId.substringAfterLast("/").toLongOrNull()
                 ?: throw Exception("Invalid product ID: $productId")
             val productDetails = remoteDataSource.getProductDetails(numericId)
             val existingIds = productDetails.data.product?.reviews?.map { it.id } ?: emptyList()
@@ -393,6 +393,18 @@ class ProductsRepositoryImpl(
             remoteDataSource.setProductReviews(productId, updatedIds)
 
             emit(Result.Success(Unit))
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(Result.Failure(e))
+        }
+    }
+
+    override fun getProductTranslations(productId: String): Flow<Result<Map<String, String>>> = flow {
+        emit(Result.Loading)
+        try {
+            val translations = remoteDataSource.getProductTranslations(productId)
+            emit(Result.Success(translations))
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {

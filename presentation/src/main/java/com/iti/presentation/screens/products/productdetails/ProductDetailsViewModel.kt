@@ -27,6 +27,9 @@ import com.iti.domain.usecases.products.AddProductReviewUseCase
 import com.iti.domain.usecases.products.UpdateProductReviewUseCase
 import com.iti.domain.usecases.products.DeleteProductReviewUseCase
 import kotlinx.coroutines.launch
+import com.iti.domain.usecases.products.GetProductTranslationsUseCase
+import com.iti.presentation.util.ReviewsCache
+import kotlinx.coroutines.flow.first
 
 class ProductDetailsViewModel(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
@@ -38,7 +41,8 @@ class ProductDetailsViewModel(
     private val addToCartUseCase: AddCartItemUseCase,
     private val addProductReviewUseCase: AddProductReviewUseCase,
     private val updateProductReviewUseCase: UpdateProductReviewUseCase,
-    private val deleteProductReviewUseCase: DeleteProductReviewUseCase
+    private val deleteProductReviewUseCase: DeleteProductReviewUseCase,
+    private val getProductTranslationsUseCase: GetProductTranslationsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProductDetailsUiState())
@@ -56,6 +60,7 @@ class ProductDetailsViewModel(
             is ProductDetailsIntent.SelectColor -> selectColor(intent.color)
             is ProductDetailsIntent.SelectSize -> selectSize(intent.size)
             is ProductDetailsIntent.SelectImage -> selectImage(intent.index)
+            is ProductDetailsIntent.SelectVariant -> selectVariant(intent.variantId)
             is ProductDetailsIntent.ToggleWishlist -> toggleWishlist()
             is ProductDetailsIntent.AddToCart -> addToCart()
             is ProductDetailsIntent.DismissUnauthorizedDialog -> dismissUnauthorizedDialog()
@@ -63,6 +68,10 @@ class ProductDetailsViewModel(
             is ProductDetailsIntent.EditReview -> editReview(intent.reviewId, intent.rating, intent.title, intent.body)
             is ProductDetailsIntent.DeleteReview -> deleteReview(intent.reviewId)
         }
+    }
+
+    private fun selectVariant(variantId: String) {
+        _state.update { it.copy(selectedVariantId = variantId) }
     }
 
     private fun loadProductDetails(productId: Long) {
@@ -86,15 +95,46 @@ class ProductDetailsViewModel(
                     is Result.Success -> {
                         val product = result.data
                         
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                product = product,
-                                // Default selection logic
-                                selectedColor = "Beige", // default as per mockup
-                                selectedSize = "M",      // default as per mockup
-                                selectedImageIndex = 0
-                            )
+                        // Update ReviewsCache with the loaded product's reviews
+                        ReviewsCache.updateReviews(product.id, product.reviews)
+
+                        val currentLanguage = java.util.Locale.getDefault().language
+                        if (currentLanguage == "ar") {
+                            viewModelScope.launch {
+                                val transResult = getProductTranslationsUseCase(product.id)
+                                    .first { it !is Result.Loading }
+
+                                val (titleTrans, descTrans) = if (transResult is Result.Success) {
+                                    val map = transResult.data
+                                    Pair(map["title"], map["body_html"] ?: map["description"])
+                                } else {
+                                    Pair(null, null)
+                                }
+
+                                _state.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        product = product,
+                                        selectedColor = "Beige",
+                                        selectedSize = "M",
+                                        selectedVariantId = product.variants.firstOrNull()?.id,
+                                        selectedImageIndex = 0,
+                                        translatedTitle = titleTrans,
+                                        translatedDescription = descTrans
+                                    )
+                                }
+                            }
+                        } else {
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    product = product,
+                                    selectedColor = "Beige",
+                                    selectedSize = "M",
+                                    selectedVariantId = product.variants.firstOrNull()?.id,
+                                    selectedImageIndex = 0
+                                )
+                            }
                         }
                     }
                     is Result.Failure -> {
@@ -104,6 +144,24 @@ class ProductDetailsViewModel(
                                 error = result.exception.message ?: "Unknown error"
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadTranslations(productId: String) {
+        viewModelScope.launch {
+            getProductTranslationsUseCase(productId).collect { result ->
+                if (result is Result.Success) {
+                    val translationsMap = result.data
+                    val titleTrans = translationsMap["title"]
+                    val descTrans = translationsMap["body_html"] ?: translationsMap["description"]
+                    _state.update {
+                        it.copy(
+                            translatedTitle = titleTrans,
+                            translatedDescription = descTrans
+                        )
                     }
                 }
             }
@@ -268,6 +326,10 @@ class ProductDetailsViewModel(
                                 product = updatedProduct
                             )
                         }
+                        // Propagate fresh reviews to ReviewsCache so cards update immediately
+                        _state.value.product?.let { p ->
+                            ReviewsCache.updateReviews(p.id, p.reviews)
+                        }
                         _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.StringResource(R.string.review_submitted_successfully)))
                         // Re-load product details to fetch new reviews in the background
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
@@ -335,6 +397,10 @@ class ProductDetailsViewModel(
                                 product = updatedProduct
                             )
                         }
+                        // Propagate fresh reviews to ReviewsCache so cards update immediately
+                        _state.value.product?.let { p ->
+                            ReviewsCache.updateReviews(p.id, p.reviews)
+                        }
                         _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Review updated successfully!")))
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
                         if (numericId != null) {
@@ -376,6 +442,10 @@ class ProductDetailsViewModel(
                                 product = updatedProduct
                             )
                         }
+                        // Propagate fresh reviews to ReviewsCache so cards update immediately
+                        _state.value.product?.let { p ->
+                            ReviewsCache.updateReviews(p.id, p.reviews)
+                        }
                         _sideEffects.emit(ProductDetailsSideEffect.ShowToast(UiText.Plain("Review deleted!")))
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
                         if (numericId != null) {
@@ -392,9 +462,13 @@ class ProductDetailsViewModel(
     }
 
     private fun selectedVariantId(): String? {
-        val product = _state.value.product ?: return null
-        val color = _state.value.selectedColor
-        val size = _state.value.selectedSize
+        val stateVal = _state.value
+        val product = stateVal.product ?: return null
+        if (stateVal.selectedVariantId != null) {
+            return stateVal.selectedVariantId
+        }
+        val color = stateVal.selectedColor
+        val size = stateVal.selectedSize
 
         return product.variants.firstOrNull { variant ->
             val matchesColor = color == null || variant.title.contains(color, ignoreCase = true)

@@ -36,6 +36,7 @@ import com.iti.domain.models.Product
 import com.iti.presentation.util.compareAtPrice
 import com.iti.presentation.util.discountPercent
 import com.iti.presentation.util.getLocalizedCode
+import com.iti.presentation.util.ReviewsCache
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,6 +50,11 @@ fun ProductCard(
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+
+    // Observe ReviewsCache: shows fresh reviews immediately after a review is submitted
+    val reviewsCacheMap by ReviewsCache.cache.collectAsState()
+    val cleanProductId = product.id.substringAfterLast("/")
+    val effectiveReviews = reviewsCacheMap[cleanProductId] ?: product.reviews
 
     Column(
         modifier = modifier
@@ -117,7 +123,7 @@ fun ProductCard(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = product.title,
+            text = product.arTitle ?: product.title,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             maxLines = 1,
@@ -149,8 +155,8 @@ fun ProductCard(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        val totalReviews = product.reviews.size
-        val averageRating = if (totalReviews > 0) product.reviews.map { it.rating }.average() else 0.0
+        val totalReviews = effectiveReviews.size
+        val averageRating = if (totalReviews > 0) effectiveReviews.map { it.rating }.average() else 0.0
 
         Row(
             verticalAlignment = Alignment.CenterVertically,

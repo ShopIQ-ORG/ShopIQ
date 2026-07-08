@@ -108,4 +108,5 @@ val domainModule = module {
     factory { com.iti.domain.usecases.products.AddProductReviewUseCase(get()) }
     factory { com.iti.domain.usecases.products.UpdateProductReviewUseCase(get()) }
     factory { com.iti.domain.usecases.products.DeleteProductReviewUseCase(get()) }
+    factory { com.iti.domain.usecases.products.GetProductTranslationsUseCase(get()) }
 }

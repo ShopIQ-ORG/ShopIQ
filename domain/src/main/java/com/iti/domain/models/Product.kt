@@ -13,7 +13,10 @@ data class Product(
     val images: List<ProductImage>,
     val variants: List<ProductVariant>,
     val isFavorite: Boolean = false,
-    val reviews: List<ProductReview> = emptyList()
+    val reviews: List<ProductReview> = emptyList(),
+    // Arabic translations – populated when locale is AR
+    val arTitle: String? = null,
+    val arDescription: String? = null
 )
 
 data class ProductReview(

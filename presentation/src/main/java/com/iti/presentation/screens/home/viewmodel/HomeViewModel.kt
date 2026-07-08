@@ -16,6 +16,7 @@ import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.domain.usecases.products.GetBestSellersUseCase
 import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.products.SearchProductsUseCase
+import com.iti.domain.usecases.products.GetProductTranslationsUseCase
 import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.screens.home.HomeContract
@@ -47,7 +48,8 @@ class HomeViewModel(
     private val getChatHistoryUseCase: GetChatHistoryUseCase,
     private val getBestSellersUseCase: GetBestSellersUseCase,
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
-    private val searchProductsUseCase: SearchProductsUseCase
+    private val searchProductsUseCase: SearchProductsUseCase,
+    private val getProductTranslationsUseCase: GetProductTranslationsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeContract.State())
@@ -162,8 +164,28 @@ class HomeViewModel(
                         // Remove duplicates and limit to 10
                         val finalProducts = resolvedProducts.distinctBy { it.id }.take(10)
 
+                        val productsToEmit = if (java.util.Locale.getDefault().language == "ar") {
+                            finalProducts.map { product ->
+                                try {
+                                    val transResult = getProductTranslationsUseCase(product.id)
+                                        .first { it !is Result.Loading }
+                                    if (transResult is Result.Success) {
+                                        val map = transResult.data
+                                        product.copy(
+                                            arTitle = map["title"]?.takeIf { it.isNotBlank() },
+                                            arDescription = (map["body_html"] ?: map["description"])?.takeIf { it.isNotBlank() }
+                                        )
+                                    } else product
+                                } catch (_: Exception) {
+                                    product
+                                }
+                            }
+                        } else {
+                            finalProducts
+                        }
+
                         aiRecommendationsFlow.value = AiRecommendationsState(
-                            recommendedProducts = finalProducts,
+                            recommendedProducts = productsToEmit,
                             hasChatHistory = hasHistory,
                             isLoaded = true
                         )
@@ -348,7 +370,12 @@ class HomeViewModel(
                                 ads = (mainData.adsResult as Result.Success).data,
                                 bestSellers = updatedBestSellers
                             )
-                        )
+                        ).also {
+                            // Batch-fetch Arabic translations if device locale is AR
+                            if (java.util.Locale.getDefault().language == "ar") {
+                                fetchTranslationsForProducts(updatedProducts + updatedBestSellers)
+                            }
+                        }
                     }
                 }
                 Pair(screenState, recommendationsState)
@@ -366,5 +393,46 @@ class HomeViewModel(
 
     private fun emitEffect(effect: HomeContract.Effect) {
         viewModelScope.launch { _effect.send(effect) }
+    }
+
+    /**
+     * Concurrently fetches Arabic translations for a batch of products and updates
+     * the products list in the state so that [ProductCard] shows translated titles.
+     */
+    private fun fetchTranslationsForProducts(products: List<Product>) {
+        viewModelScope.launch {
+            val translatedMap = products.distinctBy { it.id }.map { product ->
+                async {
+                    try {
+                        val result = getProductTranslationsUseCase(product.id)
+                            .first { it !is Result.Loading }
+                        if (result is Result.Success) {
+                            val map = result.data
+                            product.id to product.copy(
+                                arTitle = map["title"]?.takeIf { it.isNotBlank() },
+                                arDescription = (map["body_html"] ?: map["description"])?.takeIf { it.isNotBlank() }
+                            )
+                        } else product.id to product
+                    } catch (_: Exception) {
+                        product.id to product
+                    }
+                }
+            }.awaitAll().toMap()
+
+            _state.update { currentState ->
+                val screenState = currentState.screenState
+                if (screenState is HomeContract.ScreenState.Success) {
+                    val data = screenState.data
+                    screenState.copy(
+                        data = data.copy(
+                            products = data.products.map { translatedMap[it.id] ?: it },
+                            bestSellers = data.bestSellers.map { translatedMap[it.id] ?: it }
+                        )
+                    ).let { newScreenState ->
+                        currentState.copy(screenState = newScreenState)
+                    }
+                } else currentState
+            }
+        }
     }
 }

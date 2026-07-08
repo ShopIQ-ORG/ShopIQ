@@ -47,9 +47,11 @@ object ShopifyNetworkConfig {
 
     private class AdminInterceptor : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
+            val language = java.util.Locale.getDefault().language
             val request = chain.request().newBuilder()
                 .addHeader("X-Shopify-Access-Token", ADMIN_ACCESS_TOKEN)
                 .addHeader("Content-Type", "application/json")
+                .addHeader("Accept-Language", language)
                 .build()
             return chain.proceed(request)
         }
@@ -57,9 +59,11 @@ object ShopifyNetworkConfig {
 
     private class StorefrontInterceptor : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
+            val language = java.util.Locale.getDefault().language
             val request = chain.request().newBuilder()
                 .addHeader("X-Shopify-Storefront-Access-Token", STOREFRONT_ACCESS_TOKEN)
                 .addHeader("Content-Type", "application/json")
+                .addHeader("Accept-Language", language)
                 .build()
             return chain.proceed(request)
         }
