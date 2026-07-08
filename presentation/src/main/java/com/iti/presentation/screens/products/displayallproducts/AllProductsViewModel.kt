@@ -79,8 +79,8 @@ class AllProductsViewModel(
     fun sendIntent(intent: AllProductsContract.Intent) {
         when (intent) {
             // load
-            is AllProductsContract.Intent.LoadData           -> load(intent.brandName, intent.subCategoryName)
-            is AllProductsContract.Intent.Retry              -> load(_state.value.activeBrand, _state.value.activeSubCategory)
+            is AllProductsContract.Intent.LoadData           -> load(intent.brandName, intent.subCategoryName, intent.displayTitle)
+            is AllProductsContract.Intent.Retry              -> load(_state.value.activeBrand, _state.value.activeSubCategory, _state.value.activeBrandDisplayTitle)
             is AllProductsContract.Intent.LoadMore           -> loadMore()
 
             // product interaction
@@ -197,7 +197,7 @@ class AllProductsViewModel(
 
     // ─── Private Helpers ─────────────────────────────────────────────────────────
 
-    private fun load(brandName: String?, subCategoryName: String? = null) {
+    private fun load(brandName: String?, subCategoryName: String? = null, displayTitle: String? = null) {
         isLoaded = false
         allProductsStateFlow.value = emptyList()
         allProducts = emptyList()
@@ -209,6 +209,7 @@ class AllProductsViewModel(
             it.copy(
                 screenState = AllProductsContract.ScreenState.Loading,
                 activeBrand = brandName,
+                activeBrandDisplayTitle = displayTitle,
                 activeSubCategory = subCategoryName,
                 isFilterSheetOpen = false,
                 isSortSheetOpen = false,
@@ -347,6 +348,7 @@ class AllProductsViewModel(
         _state.update {
             it.copy(
                 activeBrand = null,
+                activeBrandDisplayTitle = null,
                 filterState = it.filterState.copy(selectedBrands = emptySet()),
                 pendingFilterState = it.pendingFilterState.copy(selectedBrands = emptySet())
             )
@@ -392,6 +394,7 @@ class AllProductsViewModel(
                 isFilterSheetOpen = false,
                 recentSearches = recent,
                 activeBrand = if (isBrandStillActive) s.activeBrand else null,
+                activeBrandDisplayTitle = if (isBrandStillActive) s.activeBrandDisplayTitle else null,
                 activeSubCategory = if (isSubCategoryStillActive) s.activeSubCategory else null
             )
         }

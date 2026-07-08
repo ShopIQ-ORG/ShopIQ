@@ -48,7 +48,7 @@ class AllBrandsViewModel(
             is AllBrandsContract.Intent.LoadData,
             is AllBrandsContract.Intent.Retry -> loadBrands()
             is AllBrandsContract.Intent.BrandClicked -> emitEffect(
-                AllBrandsContract.Effect.NavigateToProducts(intent.brandName)
+                AllBrandsContract.Effect.NavigateToProducts(intent.brandName, intent.displayTitle)
             )
             is AllBrandsContract.Intent.QueryChanged -> filterBrands(intent.query)
         }

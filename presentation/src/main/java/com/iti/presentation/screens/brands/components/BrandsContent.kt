@@ -36,7 +36,7 @@ fun BrandsContent(
     brands: List<Brand>,
     query: String,
     onQueryChanged: (String) -> Unit,
-    onBrandClick: (String) -> Unit,
+    onBrandClick: (brandName: String, displayTitle: String) -> Unit,
     scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
@@ -71,7 +71,7 @@ fun BrandsContent(
             BrandBannerCard(
                 brandName = displayName,
                 imageUrl = brand.mappedImageUrl,
-                onClick = { onBrandClick(brand.name) }, // always pass EN name for product filtering
+                onClick = { onBrandClick(brand.name, displayName) }, // EN name for filtering, localized name for display
                 modifier = Modifier.animateItem()
             )
         }
@@ -100,7 +100,7 @@ private fun BrandsContentPreview() {
                 brands = mockBrands,
                 query = "",
                 onQueryChanged = {},
-                onBrandClick = {},
+                onBrandClick = { _, _ -> },
                 scrollBehavior = scrollBehavior
             )
         }
