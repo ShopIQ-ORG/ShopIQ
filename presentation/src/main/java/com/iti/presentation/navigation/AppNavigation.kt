@@ -34,7 +34,6 @@ import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.brands.AllBrandsScreen
 import com.iti.presentation.screens.search.SearchScreen
 import com.iti.presentation.screens.search.SearchViewModel
-import com.iti.presentation.screens.address.AddressScreen
 import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.auth.emailverification.EmailVerificationScreen
 import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordScreen
@@ -55,6 +54,7 @@ import com.iti.presentation.screens.profile.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.iti.presentation.screens.address.AddressScreen
 import com.iti.presentation.screens.products.displayallproducts.AllProductsViewModel
 
 class NavigationViewModel : ViewModel() {
