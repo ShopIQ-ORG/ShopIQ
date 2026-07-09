@@ -32,31 +32,31 @@ fun ShopIQScaffold(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopBar(
-                title = title,
-                scrollBehavior = scrollBehavior,
-                cartItemCount = cartItemCount,
-                onMenuClick = onMenuClick,
-                onCartClick = onCartClick
-            )
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            content(innerPadding, scrollBehavior)
-
-            snackbarHostState?.let {
-                ShopIQSnackBarHost(
-                    hostState = it,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .statusBarsPadding()
-                        .padding(top = 8.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                AppTopBar(
+                    title = title,
+                    scrollBehavior = scrollBehavior,
+                    cartItemCount = cartItemCount,
+                    onMenuClick = onMenuClick,
+                    onCartClick = onCartClick
                 )
             }
+        ) { innerPadding ->
+            content(innerPadding, scrollBehavior)
+        }
+
+        snackbarHostState?.let {
+            ShopIQSnackBarHost(
+                hostState = it,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(top = 8.dp)
+            )
         }
     }
 }
