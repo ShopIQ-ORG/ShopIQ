@@ -11,6 +11,7 @@ package com.iti.presentation.screens.profile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -38,7 +40,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Currency
 import com.iti.presentation.components.BackTopBar
+import com.iti.presentation.components.ShopIQSnackBarHost
+import com.iti.presentation.components.showError
+import com.iti.presentation.components.showSuccess
 import com.iti.presentation.screens.profile.components.ExchangeTrendChart
 import androidx.compose.ui.res.stringResource
 import com.iti.presentation.R
@@ -78,11 +82,11 @@ fun LocalizationCurrencyScreen(
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message.resolve(context))
+                    snackbarHostState.showError(effect.message.resolve(context))
                 }
                 is ProfileContract.Effect.ShowCurrencyUpdatedMessage -> {
                     val message = context.getString(R.string.currency_updated_to, effect.currencyCode)
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSuccess(message)
                 }
                 else -> Unit
             }
@@ -109,170 +113,173 @@ fun LocalizationCurrencyContent(
 ) {
     var currencyDropdownExpanded by remember { mutableStateOf(false) }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
-            BackTopBar(
-                title = stringResource(R.string.profile_localization_currency),
-                onBack = onNavigateBack
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(20.dp)
-        ) {
-            // Section: Current Currency Card
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                BackTopBar(
+                    title = stringResource(R.string.profile_localization_currency),
+                    onBack = onNavigateBack
+                )
+            }
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { currencyDropdownExpanded = true }
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.profile_localization_currency),
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.currency_current),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = getFlagEmoji(state.selectedCurrency.code),
-                                fontSize = 28.sp
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(
-                                text = state.selectedCurrency.code,
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "Change Currency",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
-                // Dropdown menu to change current currency
-                DropdownMenu(
-                    expanded = currencyDropdownExpanded,
-                    onDismissRequest = { currencyDropdownExpanded = false },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { currencyDropdownExpanded = true }
                 ) {
-                    state.popularCurrencies.forEach { currency ->
-                        DropdownMenuItem(
-                            text = { Text("${currency.code} ${getFlagEmoji(currency.code)}") },
-                            onClick = {
-                                onIntent(ProfileContract.Intent.ChangeCurrency(currency.code))
-                                currencyDropdownExpanded = false
-                            }
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.profile_localization_currency),
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.currency_current),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = getFlagEmoji(state.selectedCurrency.code),
+                                    fontSize = 28.sp
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(
+                                    text = state.selectedCurrency.code,
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = "Change Currency",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                }
-            }
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // Section: Popular Currencies
-            Text(
-                text = stringResource(R.string.currency_popular),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column {
-                    state.popularCurrencies.forEachIndexed { index, currency ->
-                        PopularCurrencyRow(
-                            flagEmoji = getFlagEmoji(currency.code),
-                            code = currency.code,
-                            name = currency.name,
-                            symbol = currency.symbol,
-                            rateToUsd = currency.rateToUsd,
-                            onClick = {
-                                onIntent(ProfileContract.Intent.ChangeCurrency(currency.code))
-                            }
-                        )
-                        if (index < state.popularCurrencies.size - 1) {
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
+                    DropdownMenu(
+                        expanded = currencyDropdownExpanded,
+                        onDismissRequest = { currencyDropdownExpanded = false },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        state.popularCurrencies.forEach { currency ->
+                            DropdownMenuItem(
+                                text = { Text("${currency.code} ${getFlagEmoji(currency.code)}") },
+                                onClick = {
+                                    onIntent(ProfileContract.Intent.ChangeCurrency(currency.code))
+                                    currencyDropdownExpanded = false
+                                }
+                            )
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-            // Refresh rate container
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.currency_rates_live),
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = state.exchangeRatesLastUpdated.ifBlank { "May 12, 2024 09:41 AM" },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
-                }
-                if (state.exchangeRateLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                } else {
-                    IconButton(onClick = { onIntent(ProfileContract.Intent.RefreshExchangeRates) }) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh Rates",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                Text(
+                    text = stringResource(R.string.currency_popular),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                Card(
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column {
+                        state.popularCurrencies.forEachIndexed { index, currency ->
+                            PopularCurrencyRow(
+                                flagEmoji = getFlagEmoji(currency.code),
+                                code = currency.code,
+                                name = currency.name,
+                                symbol = currency.symbol,
+                                rateToUsd = currency.rateToUsd,
+                                onClick = {
+                                    onIntent(ProfileContract.Intent.ChangeCurrency(currency.code))
+                                }
+                            )
+                            if (index < state.popularCurrencies.size - 1) {
+                                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
+                            }
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.currency_rates_live),
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = state.exchangeRatesLastUpdated.ifBlank { "May 12, 2024 09:41 AM" },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
+                    if (state.exchangeRateLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        IconButton(onClick = { onIntent(ProfileContract.Intent.RefreshExchangeRates) }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Refresh Rates",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = stringResource(R.string.currency_powered_by),
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp, bottom = 28.dp)
+                )
             }
-
-            Text(
-                text = stringResource(R.string.currency_powered_by),
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                modifier = Modifier.padding(start = 4.dp, top = 2.dp, bottom = 28.dp)
-            )
-
-
         }
+
+        ShopIQSnackBarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
+        )
     }
 }
 
