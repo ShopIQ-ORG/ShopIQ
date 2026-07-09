@@ -41,7 +41,7 @@ import com.iti.presentation.screens.address.components.AddressEmptyState
 import com.iti.presentation.screens.address.components.AddressListView
 import com.iti.presentation.screens.address.components.AddressLocationDetected
 import com.iti.presentation.screens.address.components.AddressMapPicker
-import com.iti.presentation.util.LocationPermissionHandler
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,16 +88,6 @@ fun AddressScreen(
             }
         }
     }
-
-    LocationPermissionHandler(
-        onPermissionGranted = {
-            viewModel.sendIntent(AddressContract.Intent.PermissionGranted)
-        },
-        onPermissionDenied = {
-            viewModel.sendIntent(AddressContract.Intent.PermissionDenied)
-        },
-        triggerRequest = state.triggerPermissionRequest,
-    )
 
     val screenState = state.screenState
     val topBarTitle = when (screenState) {
