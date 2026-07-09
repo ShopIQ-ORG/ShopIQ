@@ -1,11 +1,3 @@
-//
-//  SummaryStepContent.kt
-//  ShopIQ
-//
-//  Created by Antigravity on 7/6/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.checkout.components
 
 import androidx.compose.foundation.background
@@ -15,10 +7,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,6 +23,8 @@ import com.iti.domain.models.cart.Cart
 import com.iti.domain.models.checkout.DraftOrder
 import com.iti.presentation.R
 import com.iti.presentation.components.CustomNetworkImage
+import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.util.CurrencyManager
 
 @Composable
 fun SummaryStepContent(
@@ -38,6 +35,10 @@ fun SummaryStepContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false
 ) {
+    val context = LocalContext.current
+    // Recompose whenever the user switches currency
+    CurrencyManager.selectedCurrency.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -72,9 +73,15 @@ fun SummaryStepContent(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         shippingAddress?.let { address ->
-                            Text(text = address.name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
+                            Text(
+                                text = address.name,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                            )
                             Text(text = address.street, style = MaterialTheme.typography.bodyMedium)
-                            Text(text = "${address.city}, ${address.country}", style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text = "${address.city}, ${address.country}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
                 }
@@ -120,7 +127,10 @@ fun SummaryStepContent(
                             )
                         }
                         Text(
-                            text = "${item.price.amount} ${item.price.currencyCode}",
+                            text = CurrencyManager.convertFromUsdLocalized(
+                                item.price.amount.toDouble(),
+                                context
+                            ),
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                         )
                     }
@@ -128,57 +138,62 @@ fun SummaryStepContent(
             }
 
             item {
-                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
             }
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // draftOrder.totalPrice is already the *final, post-discount* payable amount.
+                    // "Subtotal" should reflect the pre-discount amount, so we add the discount back
+                    // on top of totalPrice. "Total" stays as the actual (discounted) payable amount.
+                    val discountValue = cart?.discountAmount?.amount?.toDouble() ?: 0.0
+                    val finalTotal = draftOrder?.totalPrice?.toDoubleOrNull() ?: 0.0
+                    val subtotal = finalTotal + discountValue
+                    val subtotalFormatted = CurrencyManager.convertFromUsdLocalized(subtotal, context)
+
+                    val tax = draftOrder?.totalTax?.toDoubleOrNull() ?: 0.0
+                    val taxFormatted = CurrencyManager.convertFromUsdLocalized(tax, context)
+
+                    val totalFormatted = CurrencyManager.convertFromUsdLocalized(finalTotal, context)
+
                     PriceSummaryRow(
                         label = stringResource(R.string.order_summary_subtotal),
-                        value = "${draftOrder?.subtotalPrice ?: "0.00"} EGP"
+                        value = subtotalFormatted
                     )
                     PriceSummaryRow(
                         label = stringResource(R.string.order_summary_tax),
-                        value = "${draftOrder?.totalTax ?: "0.00"} EGP"
+                        value = taxFormatted
                     )
                     val discount = cart?.discountAmount
                     if (discount != null) {
+                        val discountFormatted = CurrencyManager.convertFromUsdLocalized(
+                            discount.amount.toDouble(),
+                            context
+                        )
                         PriceSummaryRow(
                             label = stringResource(R.string.order_summary_discount),
-                            value = "-${discount.amount} EGP",
-                            valueColor = MaterialTheme.colorScheme.error
+                            value = "-$discountFormatted",
+                            valueColor = MaterialTheme.colorScheme.tertiary
                         )
                     }
                     PriceSummaryRow(
                         label = stringResource(R.string.order_summary_total),
-                        value = "${draftOrder?.totalPrice ?: "0.00"} EGP",
+                        value = totalFormatted,
                         isTotal = true
                     )
                 }
             }
         }
 
-        Button(
+        ShopIQButton(
+            text = stringResource(R.string.checkout_btn_place_order),
             onClick = onPlaceOrder,
-            enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Text(
-                    text = stringResource(R.string.checkout_btn_place_order),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
+            isLoading = isLoading,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -200,7 +215,9 @@ fun PriceSummaryRow(
         )
         Text(
             text = value,
-            style = if (isTotal) MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold) else MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            style = if (isTotal) MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold) else MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
             color = valueColor
         )
     }

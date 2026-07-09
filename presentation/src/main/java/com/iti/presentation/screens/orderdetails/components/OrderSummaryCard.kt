@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,7 +30,8 @@ import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.ui.theme.SuccessDark
 import com.iti.presentation.ui.theme.SuccessLight
-import com.iti.presentation.util.toCurrency
+import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.localizedCurrency
 
 @Composable
 fun OrderSummaryCard(order: Order) {
@@ -41,6 +43,7 @@ fun OrderSummaryCard(order: Order) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
             Text(
                 text = stringResource(R.string.order_summary_title),
                 style = MaterialTheme.typography.titleSmall,
@@ -51,51 +54,59 @@ fun OrderSummaryCard(order: Order) {
 
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_subtotal),
-                value = order.originalSubtotal.toCurrency()
+                value = order.originalSubtotal.localizedCurrency()
             )
 
             val discount = order.totalDiscount
             if (discount.amount > 0) {
                 Spacer(Modifier.height(8.dp))
+
                 val isDark = LocalDarkTheme.current
+
                 OrderSummaryRow(
                     label = stringResource(R.string.order_summary_discount),
-                    value = "-${discount.toCurrency()}",
+                    value = "-${discount.localizedCurrency()}",
                     valueColor = if (isDark) SuccessDark else SuccessLight
                 )
             }
 
             Spacer(Modifier.height(8.dp))
+
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_shipping_fee),
-                value = order.totalShippingPrice.toCurrency()
+                value = order.totalShippingPrice.localizedCurrency()
             )
 
             if (order.totalTax.amount > 0) {
                 Spacer(Modifier.height(8.dp))
+
                 OrderSummaryRow(
                     label = stringResource(R.string.order_summary_tax),
-                    value = order.totalTax.toCurrency()
+                    value = order.totalTax.localizedCurrency()
                 )
             }
 
             Spacer(Modifier.height(14.dp))
+
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
             Spacer(Modifier.height(14.dp))
 
             OrderSummaryRow(
                 label = stringResource(R.string.order_summary_total),
-                value = order.totalPrice.toCurrency(),
+                value = order.totalPrice.localizedCurrency(),
                 labelWeight = FontWeight.SemiBold,
                 valueWeight = FontWeight.SemiBold
             )
 
             if (order.totalRefunded.amount > 0) {
                 Spacer(Modifier.height(8.dp))
+
                 val isDark = LocalDarkTheme.current
+
                 OrderSummaryRow(
                     label = stringResource(R.string.order_summary_refunded),
-                    value = "-${order.totalRefunded.toCurrency()}",
+                    value = "-${order.totalRefunded.localizedCurrency()}",
                     valueColor = if (isDark) SuccessDark else SuccessLight
                 )
             }
@@ -111,13 +122,17 @@ private fun OrderSummaryRow(
     valueWeight: FontWeight = FontWeight.Medium,
     valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = labelWeight,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
@@ -132,7 +147,11 @@ private fun OrderSummaryRow(
 private fun OrderSummaryCardWithDiscountPreview() {
     ShopIQTheme {
         OrderSummaryCard(
-            order = previewOrder(subtotal = 95.50, shipping = 10.0, total = 100.50).withDiscountedLineItem()
+            order = previewOrder(
+                subtotal = 95.50,
+                shipping = 10.0,
+                total = 100.50
+            ).withDiscountedLineItem()
         )
     }
 }
@@ -142,7 +161,12 @@ private fun OrderSummaryCardWithDiscountPreview() {
 private fun OrderSummaryCardNoDiscountPreview() {
     ShopIQTheme {
         OrderSummaryCard(
-            order = previewOrder(subtotal = 95.50, shipping = 10.0, tax = 8.0, total = 113.50)
+            order = previewOrder(
+                subtotal = 95.50,
+                shipping = 10.0,
+                tax = 8.0,
+                total = 113.50
+            )
         )
     }
 }
@@ -153,8 +177,14 @@ private fun Order.withDiscountedLineItem(): Order = copy(
             title = "Sample Item",
             quantity = 1,
             currentQuantity = 1,
-            originalTotalPrice = Money(100.50, subtotalPrice.currencyCode),
-            discountedTotalPrice = Money(95.50, subtotalPrice.currencyCode),
+            originalTotalPrice = Money(
+                100.50,
+                subtotalPrice.currencyCode
+            ),
+            discountedTotalPrice = Money(
+                95.50,
+                subtotalPrice.currencyCode
+            ),
             variant = null
         )
     )

@@ -1,11 +1,3 @@
-//
-//  PaymentSuccessContent.kt
-//  ShopIQ
-//
-//  Created by Antigravity on 7/7/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.checkout.components
 
 import androidx.compose.foundation.layout.*
@@ -15,14 +7,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.cart.Cart
-import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.R
+import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.screens.checkout.PaymentMethodType
+import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.toCurrency
 
 @Composable
 fun PaymentSuccessContent(
@@ -39,7 +38,6 @@ fun PaymentSuccessContent(
     ) {
         Spacer(modifier = Modifier.weight(0.3f))
 
-        // Large green success icon
         Surface(
             modifier = Modifier.size(100.dp),
             shape = CircleShape,
@@ -57,11 +55,11 @@ fun PaymentSuccessContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        val title = if (paymentMethod == PaymentMethodType.COD) "COD Confirmed!" else "Payment Successful!"
+        val title = if (paymentMethod == PaymentMethodType.COD) stringResource(R.string.payment_success_cod_title) else stringResource(R.string.payment_success_online_title)
         val description = if (paymentMethod == PaymentMethodType.COD) {
-            "Your Cash on Delivery request has been recorded. Please proceed to review and finalize your order placement."
+            stringResource(R.string.payment_success_cod_desc)
         } else {
-            "Your payment transactions are secured & cleared. Please proceed to review and finalize your order placement."
+            stringResource(R.string.payment_success_online_desc)
         }
 
         Text(
@@ -83,7 +81,6 @@ fun PaymentSuccessContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Transaction Summary Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -93,17 +90,20 @@ fun PaymentSuccessContent(
                 modifier = Modifier.padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val selectedCurrency by CurrencyManager.selectedCurrency.collectAsState()
+                val amount = cart?.total?.amount?.toDoubleOrNull() ?: 0.0
+                val amountFormatted = amount.toCurrency(selectedCurrency.code)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Payment Method",
+                        text = stringResource(R.string.payment_success_method),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = if (paymentMethod == PaymentMethodType.COD) "Cash on Delivery" else "Online (Paymob)",
+                        text = if (paymentMethod == PaymentMethodType.COD) stringResource(R.string.payment_success_method_cod) else stringResource(R.string.payment_success_method_online),
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -113,12 +113,12 @@ fun PaymentSuccessContent(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Total Payment",
+                        text = stringResource(R.string.payment_success_total),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${cart?.total?.amount ?: "0.00"} ${cart?.total?.currencyCode ?: "EGP"}",
+                        text = amountFormatted,
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     )
                 }
@@ -127,20 +127,12 @@ fun PaymentSuccessContent(
 
         Spacer(modifier = Modifier.weight(0.7f))
 
-        Button(
+        ShopIQButton(
+            text = stringResource(R.string.payment_success_proceed),
             onClick = onProceed,
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(
-                text = "Proceed Your Order",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
+        )
     }
 }

@@ -1,11 +1,3 @@
-//
-//  AddressScreen.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.address
 
 import com.iti.domain.models.Address
@@ -28,15 +20,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,11 +34,13 @@ import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ErrorScreen
+import com.iti.presentation.components.ShopIQSnackBarHost
+import com.iti.presentation.components.showError
+import com.iti.presentation.components.showSuccess
 import com.iti.presentation.screens.address.components.AddressEmptyState
 import com.iti.presentation.screens.address.components.AddressListView
 import com.iti.presentation.screens.address.components.AddressLocationDetected
 import com.iti.presentation.screens.address.components.AddressMapPicker
-import com.iti.presentation.screens.address.components.TopSnackbar
 import com.iti.presentation.util.LocationPermissionHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,20 +49,28 @@ fun AddressScreen(
     viewModel: AddressViewModel,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState? = null,
     onAddressSelected: ((Address) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val localSnackbarHostState = remember { SnackbarHostState() }
+    val effectiveSnackbarHostState = snackbarHostState ?: localSnackbarHostState
 
-    var isSuccessSnackbarVisible by remember { mutableStateOf(false) }
+    val successMessage = stringResource(R.string.address_success_added)
 
     LaunchedEffect(state.showSuccessBadge) {
         if (state.showSuccessBadge) {
-            kotlinx.coroutines.delay(600)
-            isSuccessSnackbarVisible = true
-        } else {
-            isSuccessSnackbarVisible = false
+            effectiveSnackbarHostState.showSuccess(successMessage)
+            viewModel.sendIntent(AddressContract.Intent.DismissSuccessBadge)
+        }
+    }
+
+    LaunchedEffect(state.errorText) {
+        val message = state.errorText?.resolve(context)
+        if (!message.isNullOrEmpty()) {
+            effectiveSnackbarHostState.showError(message)
+            viewModel.sendIntent(AddressContract.Intent.ClearError)
         }
     }
 
@@ -83,14 +82,13 @@ fun AddressScreen(
                 }
                 is AddressContract.Effect.ShowMessage -> {
                     val messageString = effect.message.resolve(context)
-                    snackbarHostState.showSnackbar(messageString)
+                    effectiveSnackbarHostState.showError(messageString)
                 }
                 else -> Unit
             }
         }
     }
 
-    // Connect permission requests with standard system handler
     LocationPermissionHandler(
         onPermissionGranted = {
             viewModel.sendIntent(AddressContract.Intent.PermissionGranted)
@@ -101,7 +99,6 @@ fun AddressScreen(
         triggerRequest = state.triggerPermissionRequest,
     )
 
-    // Determine titles and top bar actions dynamically based on state
     val screenState = state.screenState
     val topBarTitle = when (screenState) {
         is AddressContract.ScreenState.LocationDetected -> {
@@ -128,11 +125,10 @@ fun AddressScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            if (onAddressSelected == null && 
-                screenState !is AddressContract.ScreenState.MapPicker && 
+            if (onAddressSelected == null &&
+                screenState !is AddressContract.ScreenState.MapPicker &&
                 screenState !is AddressContract.ScreenState.LocationDetected) {
                 BackTopBar(
                     title = topBarTitle,
@@ -157,8 +153,8 @@ fun AddressScreen(
             }
         }
     ) { innerPadding ->
-        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker || 
-                                 screenState is AddressContract.ScreenState.LocationDetected) {
+        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker ||
+            screenState is AddressContract.ScreenState.LocationDetected) {
             PaddingValues(0.dp)
         } else {
             innerPadding
@@ -252,22 +248,12 @@ fun AddressScreen(
                 }
             }
 
-            TopSnackbar(
-                message = stringResource(R.string.address_success_added),
-                visible = isSuccessSnackbarVisible,
-                onDismiss = { viewModel.sendIntent(AddressContract.Intent.DismissSuccessBadge) },
-                isError = false,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-
-            // Top floating error snackbar overlay
-            TopSnackbar(
-                message = state.errorText?.resolve(context) ?: "",
-                visible = state.errorText != null,
-                onDismiss = { viewModel.sendIntent(AddressContract.Intent.ClearError) },
-                isError = true,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+            if (snackbarHostState == null) {
+                ShopIQSnackBarHost(
+                    hostState = effectiveSnackbarHostState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         }
     }
 }
