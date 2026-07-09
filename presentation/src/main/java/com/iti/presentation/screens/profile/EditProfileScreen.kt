@@ -12,11 +12,6 @@ import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,8 +45,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,10 +54,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,6 +76,9 @@ import com.iti.presentation.R
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.components.ShopIQSnackBarHost
+import com.iti.presentation.components.showError
+import com.iti.presentation.components.showSuccess
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -99,23 +93,17 @@ fun EditProfileScreen(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    val msg = effect.message.resolve(context)
-                    scope.launch {
-                        showError(snackbarHostState, msg)
-                    }
+                    snackbarHostState.showError(effect.message.resolve(context))
                 }
                 ProfileContract.Effect.ShowSuccessMessage -> {
                     val msg = context.getString(R.string.profile_updated_successfully)
-                    scope.launch {
-                        showSuccess(snackbarHostState, msg)
-                    }
+                    snackbarHostState.showSuccess(msg)
                 }
                 else -> Unit
             }
@@ -150,8 +138,7 @@ fun EditProfileContent(
     var phone by remember { mutableStateOf(authUser?.phone ?: "") }
     var dateOfBirth by remember { mutableStateOf(authUser?.dateOfBirth ?: "") }
     var gender by remember { mutableStateOf(authUser?.gender ?: "") }
-    // Use state.user as key so avatarUrl resets when user data loads (important for Google Sign-In photo)
-    var avatarUrl by remember(state.user) { mutableStateOf(authUser?.avatarUrl ?: "") }
+    var avatarUrl by remember { mutableStateOf(authUser?.avatarUrl ?: "") }
 
     var fullNameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
@@ -182,7 +169,6 @@ fun EditProfileContent(
         }
     }
 
-    // Date Picker Setup
     val calendar = remember { Calendar.getInstance() }
     val datePickerDialog = remember {
         DatePickerDialog(
@@ -200,7 +186,6 @@ fun EditProfileContent(
         )
     }
 
-    // Gender selection toggle
     var genderExpanded by remember { mutableStateOf(false) }
 
     val photoPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -218,23 +203,22 @@ fun EditProfileContent(
                     avatarUrl = file.absolutePath
                 }
             } catch (e: Exception) {
-                // Ignore if saving fails, fallback to uri
                 avatarUrl = uri.toString()
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            BackTopBar(
-                title = stringResource(R.string.profile_edit_profile),
-                onBack = onNavigateBack
-            )
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                BackTopBar(
+                    title = stringResource(R.string.profile_edit_profile),
+                    onBack = onNavigateBack
+                )
+            }
+        ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -244,7 +228,6 @@ fun EditProfileContent(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Avatar Circle with Camera icon overlay
                 Box(
                     modifier = Modifier
                         .padding(bottom = 32.dp)
@@ -260,13 +243,7 @@ fun EditProfileContent(
                             val isDark = LocalDarkTheme.current
                             val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
 
-                            // Support: local file path "/" , file URI "file://", and remote URLs "http/https" (e.g. Google photo)
-                            val modelData: Any = when {
-                                avatarUrl.startsWith("/") -> java.io.File(avatarUrl)
-                                avatarUrl.startsWith("file://") -> android.net.Uri.parse(avatarUrl)
-                                avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://") -> avatarUrl
-                                else -> avatarUrl
-                            }
+                            val modelData = if (avatarUrl.startsWith("/")) java.io.File(avatarUrl) else if (avatarUrl.startsWith("file://")) android.net.Uri.parse(avatarUrl) else avatarUrl
                             AsyncImage(
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(modelData)
@@ -298,10 +275,9 @@ fun EditProfileContent(
                                     )
                                 )
                             }
-                        } // Close if-else block
-                    } // Close inner Box
+                        }
+                    }
 
-                    // Camera icon overlay button
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -325,7 +301,6 @@ fun EditProfileContent(
                     }
                 }
 
-                // Input: Full Name
                 ProfileInputField(
                     label = stringResource(R.string.full_name),
                     value = fullName,
@@ -339,11 +314,10 @@ fun EditProfileContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Input: Email
                 ProfileInputField(
                     label = stringResource(R.string.email_address),
                     value = email,
-                    onValueChange = {}, // Disabled
+                    onValueChange = {},
                     placeholder = stringResource(R.string.email_address),
                     errorMessage = null,
                     readOnly = true,
@@ -360,7 +334,6 @@ fun EditProfileContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Input: Phone Number
                 ProfileInputField(
                     label = stringResource(R.string.phone_number),
                     value = phone,
@@ -379,7 +352,6 @@ fun EditProfileContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Input: Date of Birth
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -404,7 +376,6 @@ fun EditProfileContent(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Input: Gender
                 Box(modifier = Modifier.fillMaxWidth()) {
                     val genderLabelMap = mapOf(
                         "Male" to stringResource(R.string.gender_male),
@@ -445,7 +416,6 @@ fun EditProfileContent(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Save Changes Button
                 val isModified = fullName != (state.user as? User.AuthenticatedUser)?.fullName ||
                         phone != state.user.phone ||
                         dateOfBirth != state.user.dateOfBirth ||
@@ -475,14 +445,15 @@ fun EditProfileContent(
                         .height(56.dp)
                 )
             }
+        }
 
-            com.iti.presentation.components.ShopIQSnackBarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 8.dp)
-            )
-        } // close Box
+        ShopIQSnackBarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
+        )
     }
 }
 

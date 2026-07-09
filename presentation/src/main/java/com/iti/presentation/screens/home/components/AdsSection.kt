@@ -101,8 +101,8 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                     Button(
                         onClick = { onAdClick(ad) },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
+                            containerColor = androidx.compose.ui.graphics.Color.White,
+                            contentColor = androidx.compose.ui.graphics.Color.Black
                         ),
                         shape = RoundedCornerShape(6.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
@@ -110,7 +110,8 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                     ) {
                         Text(
                             text = stringResource(R.string.shop_now),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
