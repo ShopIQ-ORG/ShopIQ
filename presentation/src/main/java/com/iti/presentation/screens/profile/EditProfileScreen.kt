@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,9 +45,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDefaults
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,6 +76,9 @@ import com.iti.presentation.R
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.components.ShopIQSnackBarHost
+import com.iti.presentation.components.showError
+import com.iti.presentation.components.showSuccess
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -98,11 +99,11 @@ fun EditProfileScreen(
             when (effect) {
                 ProfileContract.Effect.NavigateBack -> onNavigateBack()
                 is ProfileContract.Effect.ShowMessage -> {
-                    snackbarHostState.showSnackbar(effect.message.resolve(context))
+                    snackbarHostState.showError(effect.message.resolve(context))
                 }
                 ProfileContract.Effect.ShowSuccessMessage -> {
                     val msg = context.getString(R.string.profile_updated_successfully)
-                    snackbarHostState.showSnackbar(msg)
+                    snackbarHostState.showSuccess(msg)
                 }
                 else -> Unit
             }
@@ -159,16 +160,15 @@ fun EditProfileContent(
 
     val isFormValid by remember {
         derivedStateOf {
-            fullName.isNotBlank() && 
-            email.isNotBlank() && 
-            android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
-            fullNameError == null && 
-            emailError == null && 
-            phoneError == null
+            fullName.isNotBlank() &&
+                    email.isNotBlank() &&
+                    android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
+                    fullNameError == null &&
+                    emailError == null &&
+                    phoneError == null
         }
     }
 
-    // Date Picker Setup
     val calendar = remember { Calendar.getInstance() }
     val datePickerDialog = remember {
         DatePickerDialog(
@@ -186,7 +186,6 @@ fun EditProfileContent(
         )
     }
 
-    // Gender selection toggle
     var genderExpanded by remember { mutableStateOf(false) }
 
     val photoPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -204,266 +203,257 @@ fun EditProfileContent(
                     avatarUrl = file.absolutePath
                 }
             } catch (e: Exception) {
-                // Ignore if saving fails, fallback to uri
                 avatarUrl = uri.toString()
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { 
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                val isSuccess = data.visuals.message.contains("success", ignoreCase = true) || data.visuals.message.contains("بنجاح")
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = if (isSuccess) androidx.compose.ui.graphics.Color(0xFF4CAF50) else SnackbarDefaults.color,
-                    contentColor = if (isSuccess) androidx.compose.ui.graphics.Color.White else SnackbarDefaults.contentColor
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                BackTopBar(
+                    title = stringResource(R.string.profile_edit_profile),
+                    onBack = onNavigateBack
                 )
             }
-        },
-        topBar = {
-            BackTopBar(
-                title = stringResource(R.string.profile_edit_profile),
-                onBack = onNavigateBack
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Avatar Circle with Camera icon overlay
-            Box(
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
-                    .padding(bottom = 32.dp)
-                    .size(120.dp)
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .imePadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
+                        .padding(bottom = 32.dp)
+                        .size(120.dp)
                 ) {
-                if (avatarUrl.isNotBlank()) {
-                    val isDark = LocalDarkTheme.current
-                    val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
-
-                    val modelData = if (avatarUrl.startsWith("/")) java.io.File(avatarUrl) else if (avatarUrl.startsWith("file://")) android.net.Uri.parse(avatarUrl) else avatarUrl
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(modelData)
-                            .crossfade(true)
-                            .error(fallback)
-                            .fallback(fallback)
-                            .build(),
-                        contentDescription = stringResource(R.string.profile_edit_profile),
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                    )
-                } else {
-                    val firstLetter = if (fullName.isNotBlank()) fullName.trim().first().uppercaseChar().toString() else "?"
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer),
-                        contentAlignment = Alignment.Center
+                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
                     ) {
-                        Text(
-                            text = firstLetter,
-                            style = MaterialTheme.typography.displayLarge.copy(
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontSize = 40.sp
+                        if (avatarUrl.isNotBlank()) {
+                            val isDark = LocalDarkTheme.current
+                            val fallback = if (isDark) R.drawable.logo_dark else R.drawable.logo_light
+
+                            val modelData = if (avatarUrl.startsWith("/")) java.io.File(avatarUrl) else if (avatarUrl.startsWith("file://")) android.net.Uri.parse(avatarUrl) else avatarUrl
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(modelData)
+                                    .crossfade(true)
+                                    .error(fallback)
+                                    .fallback(fallback)
+                                    .build(),
+                                contentDescription = stringResource(R.string.profile_edit_profile),
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape)
                             )
+                        } else {
+                            val firstLetter = if (fullName.isNotBlank()) fullName.trim().first().uppercaseChar().toString() else "?"
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = firstLetter,
+                                    style = MaterialTheme.typography.displayLarge.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontSize = 40.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .align(Alignment.BottomEnd)
+                            .offset(x = (-4).dp, y = (-4).dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .clickable {
+                                photoPickerLauncher.launch(
+                                    androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.profile_edit_profile),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
-                } // Close if-else block
-                } // Close inner Box
+                }
 
-                // Camera icon overlay button
+                ProfileInputField(
+                    label = stringResource(R.string.full_name),
+                    value = fullName,
+                    onValueChange = {
+                        fullName = it
+                        fullNameError = if (it.isBlank()) context.getString(R.string.error_full_name_required) else null
+                    },
+                    placeholder = stringResource(R.string.full_name),
+                    errorMessage = fullNameError
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                ProfileInputField(
+                    label = stringResource(R.string.email_address),
+                    value = email,
+                    onValueChange = {},
+                    placeholder = stringResource(R.string.email_address),
+                    errorMessage = null,
+                    readOnly = true,
+                    enabled = false,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Uneditable",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                ProfileInputField(
+                    label = stringResource(R.string.phone_number),
+                    value = phone,
+                    onValueChange = {
+                        phone = it
+                        phoneError = if (it.isNotBlank() && it.length < 7) {
+                            context.getString(R.string.error_invalid_phone_length)
+                        } else {
+                            null
+                        }
+                    },
+                    placeholder = stringResource(R.string.phone_number),
+                    errorMessage = phoneError,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Box(
-                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(36.dp)
-                        .align(Alignment.BottomEnd)
-                        .offset(x = (-4).dp, y = (-4).dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .clickable { 
-                            photoPickerLauncher.launch(
-                                androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        .fillMaxWidth()
+                        .clickable { datePickerDialog.show() }
+                ) {
+                    ProfileInputField(
+                        label = stringResource(R.string.date_of_birth),
+                        value = dateOfBirth,
+                        onValueChange = {},
+                        placeholder = stringResource(R.string.select_date_of_birth),
+                        readOnly = true,
+                        enabled = false,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = stringResource(R.string.select_date_of_birth),
+                                modifier = Modifier.clickable { datePickerDialog.show() }
                             )
                         }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.profile_edit_profile),
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(18.dp)
                     )
                 }
-            }
 
-            // Input: Full Name
-            ProfileInputField(
-                label = stringResource(R.string.full_name),
-                value = fullName,
-                onValueChange = {
-                    fullName = it
-                    fullNameError = if (it.isBlank()) context.getString(R.string.error_full_name_required) else null
-                },
-                placeholder = stringResource(R.string.full_name),
-                errorMessage = fullNameError
-            )
+                Spacer(modifier = Modifier.height(20.dp))
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Input: Email
-            ProfileInputField(
-                label = stringResource(R.string.email_address),
-                value = email,
-                onValueChange = {}, // Disabled
-                placeholder = stringResource(R.string.email_address),
-                errorMessage = null,
-                readOnly = true,
-                enabled = false,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "Uneditable",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    val genderLabelMap = mapOf(
+                        "Male" to stringResource(R.string.gender_male),
+                        "Female" to stringResource(R.string.gender_female),
+                        "Other" to stringResource(R.string.gender_other)
                     )
-                }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Input: Phone Number
-            ProfileInputField(
-                label = stringResource(R.string.phone_number),
-                value = phone,
-                onValueChange = {
-                    phone = it
-                    phoneError = if (it.isNotBlank() && it.length < 7) {
-                        context.getString(R.string.error_invalid_phone_length)
-                    } else {
-                        null
-                    }
-                },
-                placeholder = stringResource(R.string.phone_number),
-                errorMessage = phoneError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Input: Date of Birth
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { datePickerDialog.show() }
-            ) {
-                ProfileInputField(
-                    label = stringResource(R.string.date_of_birth),
-                    value = dateOfBirth,
-                    onValueChange = {},
-                    placeholder = stringResource(R.string.select_date_of_birth),
-                    readOnly = true,
-                    enabled = false,
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = stringResource(R.string.select_date_of_birth),
-                            modifier = Modifier.clickable { datePickerDialog.show() }
-                        )
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Input: Gender
-            Box(modifier = Modifier.fillMaxWidth()) {
-                val genderLabelMap = mapOf(
-                    "Male" to stringResource(R.string.gender_male),
-                    "Female" to stringResource(R.string.gender_female),
-                    "Other" to stringResource(R.string.gender_other)
-                )
-                ProfileInputField(
-                    label = stringResource(R.string.gender),
-                    value = genderLabelMap[gender] ?: gender,
-                    onValueChange = {},
-                    placeholder = stringResource(R.string.select_gender),
-                    readOnly = true,
-                    enabled = false,
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = stringResource(R.string.select_gender),
-                            modifier = Modifier.clickable { genderExpanded = true }
-                        )
-                    },
-                    modifier = Modifier.clickable { genderExpanded = true }
-                )
-                DropdownMenu(
-                    expanded = genderExpanded,
-                    onDismissRequest = { genderExpanded = false }
-                ) {
-                    listOf("Male", "Female", "Other").forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(genderLabelMap[option] ?: option) },
-                            onClick = {
-                                gender = option
-                                genderExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Save Changes Button
-            val isModified = fullName != (state.user as? User.AuthenticatedUser)?.fullName ||
-                    phone != state.user.phone ||
-                    dateOfBirth != state.user.dateOfBirth ||
-                    gender != state.user.gender ||
-                    avatarUrl != (state.user.avatarUrl ?: "")
-
-            ShopIQButton(
-                text = stringResource(R.string.save_changes),
-                onClick = {
-                    if (isFormValid && isModified) {
-                        onIntent(
-                            ProfileContract.Intent.UpdateProfile(
-                                fullName = fullName,
-                                email = email,
-                                phone = phone,
-                                dateOfBirth = dateOfBirth,
-                                gender = gender,
-                                avatarUrl = avatarUrl
+                    ProfileInputField(
+                        label = stringResource(R.string.gender),
+                        value = genderLabelMap[gender] ?: gender,
+                        onValueChange = {},
+                        placeholder = stringResource(R.string.select_gender),
+                        readOnly = true,
+                        enabled = false,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = stringResource(R.string.select_gender),
+                                modifier = Modifier.clickable { genderExpanded = true }
                             )
-                        )
+                        },
+                        modifier = Modifier.clickable { genderExpanded = true }
+                    )
+                    DropdownMenu(
+                        expanded = genderExpanded,
+                        onDismissRequest = { genderExpanded = false }
+                    ) {
+                        listOf("Male", "Female", "Other").forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(genderLabelMap[option] ?: option) },
+                                onClick = {
+                                    gender = option
+                                    genderExpanded = false
+                                }
+                            )
+                        }
                     }
-                },
-                enabled = isFormValid && isModified,
-                isLoading = state.isUpdatingProfile,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            )
+                }
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                val isModified = fullName != (state.user as? User.AuthenticatedUser)?.fullName ||
+                        phone != state.user.phone ||
+                        dateOfBirth != state.user.dateOfBirth ||
+                        gender != state.user.gender ||
+                        avatarUrl != (state.user.avatarUrl ?: "")
+
+                ShopIQButton(
+                    text = stringResource(R.string.save_changes),
+                    onClick = {
+                        if (isFormValid && isModified) {
+                            onIntent(
+                                ProfileContract.Intent.UpdateProfile(
+                                    fullName = fullName,
+                                    email = email,
+                                    phone = phone,
+                                    dateOfBirth = dateOfBirth,
+                                    gender = gender,
+                                    avatarUrl = avatarUrl
+                                )
+                            )
+                        }
+                    },
+                    enabled = isFormValid && isModified,
+                    isLoading = state.isUpdatingProfile,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                )
+            }
         }
+
+        ShopIQSnackBarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
+        )
     }
 }
 
