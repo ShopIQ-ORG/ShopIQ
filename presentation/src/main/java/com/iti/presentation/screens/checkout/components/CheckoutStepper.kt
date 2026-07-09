@@ -1,11 +1,3 @@
-//
-//  CheckoutStepper.kt
-//  ShopIQ
-//
-//  Created by Antigravity on 7/6/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.checkout.components
 
 import androidx.compose.foundation.background
@@ -32,16 +24,13 @@ fun CheckoutStepper(
     currentStep: Int,
     modifier: Modifier = Modifier
 ) {
-    // Dynamically calculate the horizontal offset so connecting lines align exactly with circle centers.
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val halfStepWidth = screenWidth / 10
+    val halfStepWidth = screenWidth / 6
 
     val steps = listOf(
         stringResource(R.string.checkout_step_address),
         stringResource(R.string.checkout_step_method),
-        stringResource(R.string.checkout_step_payment),
-        stringResource(R.string.checkout_step_paid),
         stringResource(R.string.checkout_step_summary)
     )
 
@@ -55,12 +44,11 @@ fun CheckoutStepper(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Background connecting lines between circle centers
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = halfStepWidth)
-                    .height(36.dp), // Align vertically with the center of the 36.dp circles
+                    .height(36.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 HorizontalDivider(
@@ -73,19 +61,8 @@ fun CheckoutStepper(
                     thickness = 2.dp,
                     color = if (currentStep > 2) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outlineVariant
                 )
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 2.dp,
-                    color = if (currentStep > 3) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outlineVariant
-                )
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 2.dp,
-                    color = if (currentStep > 4) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.outlineVariant
-                )
             }
 
-            // Foreground step items (circle + description text)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

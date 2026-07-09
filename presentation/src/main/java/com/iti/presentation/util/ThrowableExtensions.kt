@@ -61,6 +61,8 @@ fun Throwable.toUiMessage(): UiText = when (this) {
         is AuthException.EmailNotVerified -> StringResource(R.string.verify_your_email)
         is AppException.TooManyRequests -> StringResource(R.string.too_many_request)
         is AuthException.ShopifyTokenUnavailable -> StringResource(R.string.login_required_title)
+        is AppException.PaymentIntentionCreationFailed ->
+            StringResource(R.string.payment_intention_creation_failed)
         is AppException.Unknown ->
             StringResource(R.string.error_unknown)
 

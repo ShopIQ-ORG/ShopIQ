@@ -1,59 +1,52 @@
-//
-//  CheckoutScreen.kt
-//  ShopIQ
-//
-//  Created by Antigravity on 7/6/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.checkout
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.iti.domain.models.Address
-import com.iti.domain.models.cart.Cart
-import com.iti.domain.models.checkout.DraftOrder
+import com.iti.presentation.BuildConfig
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
+import com.iti.presentation.components.ShopIQSnackBarHost
+import com.iti.presentation.components.showError
+import com.iti.presentation.components.showInfo
+import com.iti.presentation.components.showSuccess
 import com.iti.presentation.screens.address.AddressContract
 import com.iti.presentation.screens.address.AddressScreen
 import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.checkout.components.CheckoutStepper
-import com.iti.presentation.screens.checkout.components.PaymentStepContent
 import com.iti.presentation.screens.checkout.components.SummaryStepContent
 import com.iti.presentation.screens.checkout.components.SuccessStepContent
-import com.iti.presentation.ui.theme.*
-
+import com.iti.presentation.screens.checkout.payment.PaymentScreen
+import com.iti.presentation.screens.checkout.payment.PaymentViewModel
 import org.koin.androidx.compose.koinViewModel
 import com.iti.presentation.screens.checkout.components.PaymentMethodContent
-import com.iti.presentation.screens.checkout.components.PaymentSuccessContent
-import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.util.CurrencyManager
+import kotlinx.coroutines.launch
+import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,8 +59,13 @@ fun CheckoutScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val addressState by addressViewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    var showOnlinePayment by remember { mutableStateOf(false) }
+    val paymentSuccessfulText = stringResource(R.string.payment_successful)
+    val context = LocalContext.current
 
-    val showCheckoutHeaders = state.currentStep < 6 &&
+    val showCheckoutHeaders = state.currentStep < 4 &&
             addressState.screenState !is AddressContract.ScreenState.MapPicker &&
             addressState.screenState !is AddressContract.ScreenState.LocationDetected
 
@@ -77,137 +75,152 @@ fun CheckoutScreen(
                 CheckoutContract.Effect.NavigateBack -> onNavigateBack()
                 CheckoutContract.Effect.NavigateToHome -> onNavigateToHome()
                 is CheckoutContract.Effect.ShowError -> {
-                    // Handled inside Scaffold snackbar or Toast if needed
+                    scope.launch {
+                        snackbarHostState.showError(effect.message.resolve(context))
+                    }
                 }
             }
         }
     }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            if (showCheckoutHeaders) {
-                BackTopBar(
-                    title = when (state.currentStep) {
-                        1 -> stringResource(R.string.checkout_step_address)
-                        2 -> "Payment Method"
-                        3 -> "Payment Details"
-                        4 -> "Payment Confirmed"
-                        5 -> "Review Summary"
-                        else -> stringResource(R.string.checkout_title)
-                    },
-                    onBack = { viewModel.onEvent(CheckoutContract.Event.NavigateBack) },
-                    actions = {
-                        if (state.currentStep == 1) {
-                            IconButton(onClick = { addressViewModel.sendIntent(AddressContract.Intent.AddAddressClicked) }) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(R.string.address_action_add),
-                                    tint = MaterialTheme.colorScheme.onBackground
-                                )
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                if (showCheckoutHeaders) {
+                    BackTopBar(
+                        title = when (state.currentStep) {
+                            1 -> stringResource(R.string.checkout_step_address)
+                            2 -> stringResource(R.string.checkout_step_payment_method)
+                            3 -> stringResource(R.string.checkout_step_review_summary)
+                            else -> stringResource(R.string.checkout_title)
+                        },
+                        onBack = { viewModel.onEvent(CheckoutContract.Event.NavigateBack) },
+                        actions = {
+                            if (state.currentStep == 1) {
+                                IconButton(onClick = { addressViewModel.sendIntent(AddressContract.Intent.AddAddressClicked) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = stringResource(R.string.address_action_add),
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(if (showCheckoutHeaders) innerPadding else PaddingValues(0.dp))
-        ) {
-            if (showCheckoutHeaders) {
-                CheckoutStepper(currentStep = state.currentStep)
-            }
-
-            Box(
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(1f)
+                    .padding(if (showCheckoutHeaders) innerPadding else PaddingValues(0.dp))
             ) {
-                when (state.currentStep) {
-                    1 -> {
-                        AddressScreen(
-                            viewModel = addressViewModel,
-                            onNavigateBack = onNavigateBack,
-                            onAddressSelected = { address ->
-                                viewModel.onEvent(CheckoutContract.Event.AddressSelected(address))
-                            }
-                        )
-                    }
+                if (showCheckoutHeaders) {
+                    CheckoutStepper(currentStep = state.currentStep)
+                }
 
-                    2 -> {
-                        PaymentMethodContent(
-                            selectedMethod = state.paymentMethod,
-                            onSelectMethod = { method ->
-                                viewModel.onEvent(CheckoutContract.Event.PaymentMethodSelected(method))
-                            },
-                            onContinue = {
-                                viewModel.onEvent(CheckoutContract.Event.PaymentMethodConfirmed)
-                            },
-                            isLoading = state.isLoading
-                        )
-                    }
-
-                    3 -> {
-                        if (state.paymentMethod == PaymentMethodType.ONLINE) {
-                            val paymentViewModel: com.iti.presentation.screens.payment.PaymentViewModel = koinViewModel()
-                            val totalCents = ((state.cart?.total?.amount?.toDoubleOrNull() ?: 0.0) * 100).toLong()
-                            com.iti.presentation.screens.payment.PaymentScreen(
-                                viewModel = paymentViewModel,
-                                amountCents = totalCents,
-                                integrationId = com.iti.data.BuildConfig.PAYMOB_INTEGRATION_ID.toIntOrNull() ?: 5276242,
-                                onPaymentSuccess = {
-                                    viewModel.onEvent(CheckoutContract.Event.PaymentConfirmed)
-                                },
-                                onNavigateBack = {
-                                    viewModel.onEvent(CheckoutContract.Event.NavigateBack)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                ) {
+                    when (state.currentStep) {
+                        1 -> {
+                            AddressScreen(
+                                viewModel = addressViewModel,
+                                onNavigateBack = onNavigateBack,
+                                snackbarHostState = snackbarHostState,
+                                onAddressSelected = { address ->
+                                    viewModel.onEvent(CheckoutContract.Event.AddressSelected(address))
                                 }
                             )
-                        } else {
-                            PaymentStepContent(
-                                cart = state.cart,
-                                onConfirm = {
-                                    viewModel.onEvent(CheckoutContract.Event.PaymentConfirmed)
+                        }
+
+                        2 -> {
+                            PaymentMethodContent(
+                                selectedMethod = state.paymentMethod,
+                                onSelectMethod = { method ->
+                                    viewModel.onEvent(CheckoutContract.Event.PaymentMethodSelected(method))
+                                },
+                                onContinue = {
+                                    viewModel.onEvent(CheckoutContract.Event.PaymentMethodConfirmed)
                                 },
                                 isLoading = state.isLoading
                             )
                         }
-                    }
 
-                    4 -> {
-                        PaymentSuccessContent(
-                            paymentMethod = state.paymentMethod,
-                            cart = state.cart,
-                            onProceed = {
-                                viewModel.onEvent(CheckoutContract.Event.PaymentSuccessProceed)
+                        3 -> {
+                            SummaryStepContent(
+                                cart = state.cart,
+                                draftOrder = state.draftOrder,
+                                shippingAddress = state.selectedAddress,
+                                onPlaceOrder = {
+                                    if (state.paymentMethod == PaymentMethodType.ONLINE) {
+                                        showOnlinePayment = true
+                                    } else {
+                                        viewModel.onEvent(CheckoutContract.Event.PlaceOrder)
+                                    }
+                                },
+                                isLoading = state.isLoading
+                            )
+                        }
+
+                        4 -> {
+                            state.draftOrder?.let { draftOrder ->
+                                SuccessStepContent(
+                                    draftOrder = draftOrder,
+                                    currentUser = state.currentUser,
+                                    onGoHome = onNavigateToHome
+                                )
                             }
-                        )
-                    }
-
-                    5 -> {
-                        SummaryStepContent(
-                            cart = state.cart,
-                            draftOrder = state.draftOrder,
-                            shippingAddress = state.selectedAddress,
-                            onPlaceOrder = {
-                                viewModel.onEvent(CheckoutContract.Event.PlaceOrder)
-                            },
-                            isLoading = state.isLoading
-                        )
-                    }
-
-                    6 -> {
-                        SuccessStepContent(
-                            draftOrder = state.draftOrder,
-                            currentUser = state.currentUser,
-                            onGoHome = onNavigateToHome
-                        )
+                        }
                     }
                 }
             }
         }
+
+        if (showOnlinePayment) {
+            val paymentViewModel: PaymentViewModel = koinViewModel()
+            val amountUsd = state.cart?.total?.amount?.toDoubleOrNull() ?: 0.0
+            val convertedAmount = CurrencyManager.convertFromUsd(amountUsd)
+            val amountCents = (convertedAmount * 100).roundToLong()
+
+            PaymentScreen(
+                viewModel = paymentViewModel,
+                amountCents = amountCents,
+                integrationId = BuildConfig.PAYMOB_INTEGRATION_ID.toInt(),
+                onPaymentSuccess = {
+                    scope.launch {
+                        snackbarHostState.showSuccess(paymentSuccessfulText)
+                    }
+                    viewModel.onEvent(CheckoutContract.Event.PlaceOrder)
+                    showOnlinePayment = false
+                },
+                onPaymentFailure = { message ->
+                    scope.launch {
+                        snackbarHostState.showError(message)
+                    }
+                    showOnlinePayment = false
+                },
+                onShowInfo = { message ->
+                    scope.launch {
+                        snackbarHostState.showInfo(message)
+                    }
+                },
+                onNavigateBack = {
+                    showOnlinePayment = false
+                }
+            )
+        }
+
+        ShopIQSnackBarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
+        )
     }
 }

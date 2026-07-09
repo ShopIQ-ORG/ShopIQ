@@ -37,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.BottomNavItem
-import com.iti.presentation.components.ProfileTabContent
 import com.iti.presentation.components.WishlistTabContent
 import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.components.ShopIQSnackBarHost

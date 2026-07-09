@@ -12,6 +12,7 @@ import com.iti.data.storefront.fragment.CartFields
 import com.iti.domain.models.Money
 import com.iti.domain.models.cart.Cart
 import com.iti.domain.models.cart.CartItem
+import java.util.Locale
 
 fun CartFields.toDto(): CartDto {
     return CartDto(
@@ -169,7 +170,7 @@ private fun CartDto.computeDiscountAmount(): Money? {
     if (discount <= 0.0) return null
 
     return Money(
-        "%.2f".format(discount),
+        String.format(Locale.US, "%.2f", discount),
         subtotalAmount.currencyCode
     )
 }

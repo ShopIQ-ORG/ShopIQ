@@ -8,6 +8,8 @@
 
 package com.iti.presentation.screens.profile
 
+import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -77,6 +80,7 @@ import com.iti.presentation.screens.profile.components.SettingsSwitchItem
 import com.iti.presentation.util.ThemeManager
 import com.iti.domain.models.Currency
 import com.iti.presentation.components.UnauthorizedDialog
+import com.iti.presentation.util.LocaleManager
 
 @Composable
 fun AccountSettingsScreen(
@@ -102,6 +106,7 @@ fun AccountSettingsScreen(
                 is ProfileContract.Effect.ShowMessage -> {
                     snackbarHostState.showSnackbar(effect.message.resolve(context))
                 }
+
                 else -> Unit
             }
         }
@@ -170,6 +175,10 @@ fun AccountSettingsContent(
     }
 
     if (showLanguageBottomSheet) {
+        val context = LocalContext.current
+        val activity = context as? Activity
+        val currentLanguage = LocaleManager.currentLanguageTag(context)
+
         ModalBottomSheet(
             onDismissRequest = { showLanguageBottomSheet = false },
             containerColor = MaterialTheme.colorScheme.background,
@@ -190,27 +199,33 @@ fun AccountSettingsContent(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                val currentLanguage = androidx.compose.ui.platform.LocalConfiguration.current.locales[0].language
-
-                // English Option
                 LanguageItemRow(
                     languageName = "English",
-                    isSelected = currentLanguage == "en",
+                    isSelected = currentLanguage == LocaleManager.LANGUAGE_ENGLISH,
                     onClick = {
-                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("en"))
                         showLanguageBottomSheet = false
+                        activity?.let {
+                            LocaleManager.setAppLanguage(
+                                it,
+                                LocaleManager.LANGUAGE_ENGLISH
+                            )
+                        }
                     }
                 )
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f))
 
-                // Arabic Option
                 LanguageItemRow(
                     languageName = "العربية",
-                    isSelected = currentLanguage == "ar",
+                    isSelected = currentLanguage == LocaleManager.LANGUAGE_ARABIC,
                     onClick = {
-                        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ar"))
                         showLanguageBottomSheet = false
+                        activity?.let {
+                            LocaleManager.setAppLanguage(
+                                it,
+                                LocaleManager.LANGUAGE_ARABIC
+                            )
+                        }
                     }
                 )
 
@@ -288,7 +303,11 @@ fun AccountSettingsContent(
 
             Card(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                        alpha = 0.5f
+                    )
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
@@ -337,7 +356,11 @@ fun AccountSettingsContent(
 
             Card(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                        alpha = 0.5f
+                    )
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
