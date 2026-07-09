@@ -105,6 +105,7 @@ fun AddressMapPicker(
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var searchError by remember { mutableStateOf<String?>(null) }
+    var isLocating by remember { mutableStateOf(false) }
 
     val state = viewModel?.state?.collectAsState()?.value ?: AddressContract.State()
 
@@ -129,7 +130,7 @@ fun AddressMapPicker(
                         address.city.takeIf { it.isNotBlank() },
                         address.country.takeIf { it.isNotBlank() }
                     ).joinToString(", ")
-                    
+
                     searchQuery = addressStr
                     lastGeocodedLatLng = center
                 } catch (e: Exception) {
@@ -144,12 +145,16 @@ fun AddressMapPicker(
         viewModel?.effect?.collect { effect ->
             when (effect) {
                 is AddressContract.Effect.MoveCameraToLocation -> {
+                    isLocating = false
                     cameraPositionState.animate(
                         CameraUpdateFactory.newLatLngZoom(
                             LatLng(effect.latitude, effect.longitude),
                             17f
                         )
                     )
+                }
+                is AddressContract.Effect.ShowMessage -> {
+                    isLocating = false
                 }
                 else -> {}
             }
@@ -272,8 +277,8 @@ fun AddressMapPicker(
 
                     OutlinedTextField(
                         value = searchQuery,
-                        onValueChange = { 
-                            searchQuery = it 
+                        onValueChange = {
+                            searchQuery = it
                             searchError = null
                             viewModel?.sendIntent(AddressContract.Intent.SearchQueryChanged(it))
                         },
@@ -326,13 +331,13 @@ fun AddressMapPicker(
                         ) {
                             suggestions.forEach { suggestion ->
                                 DropdownMenuItem(
-                                    text = { 
+                                    text = {
                                         Text(
                                             text = suggestion.displayName,
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             style = MaterialTheme.typography.bodyMedium
-                                        ) 
+                                        )
                                     },
                                     onClick = {
                                         coroutineScope.launch {
@@ -373,6 +378,7 @@ fun AddressMapPicker(
             // GPS Floating Circular Button (Bottom Right, above confirmation button)
             FloatingActionButton(
                 onClick = {
+                    isLocating = true
                     viewModel?.sendIntent(AddressContract.Intent.RequestGPSLocation)
                 },
                 shape = CircleShape,
@@ -384,11 +390,19 @@ fun AddressMapPicker(
                     .padding(bottom = 96.dp, end = 24.dp)
                     .size(56.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.MyLocation,
-                    contentDescription = "Current Location",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                if (isLocating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Current Location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
             // Bottom Confirmation Button

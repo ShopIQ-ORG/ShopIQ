@@ -12,5 +12,6 @@ data class FirebaseUserInfo(
 data class CredentialAuthResult(
     val uid: String,
     val fullName: String,
-    val email: String
+    val email: String,
+    val photoUrl: String? = null
 )

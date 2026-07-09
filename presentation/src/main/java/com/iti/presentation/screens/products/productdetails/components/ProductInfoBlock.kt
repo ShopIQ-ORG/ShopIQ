@@ -63,7 +63,7 @@ fun ProductInfoBlock(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = "$currencyCode $amount",
+                    text = "$amount $currencyCode",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -76,7 +76,7 @@ fun ProductInfoBlock(
                     ) {
                         if (!compareAtAmount.isNullOrBlank()) {
                             Text(
-                                text = "$currencyCode $compareAtAmount",
+                                text = "$compareAtAmount $currencyCode",
                                 fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textDecoration = TextDecoration.LineThrough

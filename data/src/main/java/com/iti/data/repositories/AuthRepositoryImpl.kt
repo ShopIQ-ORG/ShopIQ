@@ -244,7 +244,8 @@ class AuthRepositoryImpl(
         val baseDto = UserDto(
             id = result.uid,
             fullName = result.fullName,
-            email = result.email
+            email = result.email,
+            avatarUrl = result.photoUrl
         )
 
         if (baseDto.email.isBlank()) {

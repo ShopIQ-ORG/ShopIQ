@@ -14,7 +14,8 @@ object HomeContract {
         val products: List<Product>,
         val brands: List<Brand>,
         val ads: List<Ad>,
-        val bestSellers: List<Product>
+        val bestSellers: List<Product>,
+        val newArrivals: List<Product> = emptyList()
     )
 
     sealed class ScreenState {
