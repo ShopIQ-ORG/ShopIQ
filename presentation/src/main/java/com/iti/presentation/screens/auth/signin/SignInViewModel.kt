@@ -43,7 +43,7 @@ class SignInViewModel(
 
             SignInContract.Event.Login -> login()
 
-            is SignInContract.Event.LoginWithGoogle -> loginWithGoogle(event.idToken)
+            is SignInContract.Event.LoginWithGoogle -> loginWithGoogle(event.idToken, event.photoUrl)
 
             SignInContract.Event.LoginAsGuest -> loginAsGuest()
 
@@ -73,7 +73,7 @@ class SignInViewModel(
         }
     }
 
-    private fun loginWithGoogle(idToken: String) {
+    private fun loginWithGoogle(idToken: String, photoUrl: String? = null) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, fieldErrors = emptyMap()) }
 

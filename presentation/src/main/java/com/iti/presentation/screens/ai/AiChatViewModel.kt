@@ -2,7 +2,6 @@ package com.iti.presentation.screens.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.facebook.appevents.codeless.internal.UnityReflection.sendMessage
 import com.iti.domain.models.ChatMessage
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
@@ -11,6 +10,7 @@ import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatContract.ChatMessageUi
 import com.iti.presentation.screens.ai.AiChatContract.ChatProductUi
+import com.iti.presentation.util.CurrencyManager
 import com.iti.presentation.util.NetworkMonitor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +31,20 @@ class AiChatViewModel(
 
     private val productCache = mutableMapOf<String, ChatProductUi>()
     private var historyJob: Job? = null
+    private var currencyObserverJob: Job? = null
+
+    private fun observeCurrencyChanges(userId: String) {
+        currencyObserverJob?.cancel()
+        currencyObserverJob = viewModelScope.launch {
+            CurrencyManager.selectedCurrency.collect {
+                productCache.clear()
+                val currentMessages = _state.value.messages
+                if (currentMessages.isNotEmpty()) {
+                    observeChatHistory(userId)
+                }
+            }
+        }
+    }
 
     fun sendIntent(intent: AiChatContract.Intent) {
         when (intent) {
@@ -38,8 +52,11 @@ class AiChatViewModel(
                 _state.update { it.copy(currentUser = intent.user) }
                 if (intent.user is User.AuthenticatedUser) {
                     observeChatHistory(intent.user.uid)
+                    observeCurrencyChanges(intent.user.uid)
                 } else {
                     historyJob?.cancel()
+                    currencyObserverJob?.cancel()
+                    productCache.clear()
                     _state.update { it.copy(messages = emptyList()) }
                 }
             }
@@ -52,7 +69,7 @@ class AiChatViewModel(
                         intent.imageBytes,
                         intent.attachedImageUrl,
                         intent.voiceDuration,
-                        com.iti.presentation.util.CurrencyManager.selectedCurrency.value.code
+                        CurrencyManager.selectedCurrency.value.code,
                     )
                 }
             }
@@ -84,7 +101,6 @@ class AiChatViewModel(
 
     private fun resolveProductsAndEmit(messages: List<ChatMessage>) {
         viewModelScope.launch {
-            // Perform background API calls to fetch product details before emitting
             val mappedMessages = messages.map { msg ->
                 val productsUi = msg.recommendedProductIds.mapNotNull { id ->
                     if (productCache.containsKey(id)) {
@@ -97,7 +113,15 @@ class AiChatViewModel(
                                 productsRepository.getProductDetails(longId).collect { res ->
                                     if (res is Result.Success) {
                                         val prod = res.data
-                                        val price = "${prod.minPrice.amount} ${prod.minPrice.currencyCode}"
+                                        val selectedCurrency = CurrencyManager.selectedCurrency.value
+                                        val rawAmountUsd = prod.minPrice.amount.toDoubleOrNull() ?: 0.0
+                                        val convertedAmount = CurrencyManager.convertFromUsd(rawAmountUsd)
+                                        val formattedAmount = if (convertedAmount % 1.0 == 0.0) {
+                                            convertedAmount.toLong().toString()
+                                        } else {
+                                            String.format("%.2f", convertedAmount)
+                                        }
+                                        val price = "$formattedAmount ${selectedCurrency.code}"
                                         val img = prod.images.firstOrNull()?.url ?: ""
                                         val stock = if (prod.variants.any { it.availableForSale }) "In Stock" else "Out of Stock"
                                         val ui = ChatProductUi(
@@ -140,7 +164,8 @@ class AiChatViewModel(
         imageBytes: ByteArray?,
         attachedImageUrl: String?,
         voiceDuration: String?,
-        currencyCode: String? = null
+        currencyCode: String? = null,
+        rate: Double = 1.0
     ) {
         viewModelScope.launch {
             if (!networkMonitor.isCurrentlyConnected()) {
@@ -174,8 +199,9 @@ class AiChatViewModel(
                 attachedImageUrl = attachedImageUrl,
                 voiceDuration = voiceDuration
             )
-            
-            sendChatMessageUseCase(userId, userMsg, imageBytes, currencyCode).collect { result ->
+
+            // ✅ التعديل هنا - إضافة rate
+            sendChatMessageUseCase(userId, userMsg, imageBytes, currencyCode, rate).collect { result ->
                 when (result) {
                     is Result.Loading -> {
                         _state.update { it.copy(isBotTyping = true) }

@@ -34,7 +34,6 @@ fun ReviewsListBlock(
     val baseReviews = getReviewsOrDefault(reviews)
     val totalCount = baseReviews.size
 
-    // Sort state: 0 = newest first, 1 = oldest first, 2 = highest rating
     var sortIndex by remember { mutableStateOf(0) }
     var showSortMenu by remember { mutableStateOf(false) }
 

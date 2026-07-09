@@ -10,8 +10,9 @@ class SendChatMessageUseCase(private val repository: ChatbotRepository) {
         userId: String,
         userMessage: ChatMessage,
         imageBytes: ByteArray? = null,
-        currencyContext: String? = null
+        currencyContext: String? = null,
+        exchangeRate: Double = 1.0
     ): Flow<Result<ChatMessage>> {
-        return repository.sendMessage(userId, userMessage, imageBytes, currencyContext)
+        return repository.sendMessage(userId, userMessage, imageBytes, currencyContext, exchangeRate)
     }
 }

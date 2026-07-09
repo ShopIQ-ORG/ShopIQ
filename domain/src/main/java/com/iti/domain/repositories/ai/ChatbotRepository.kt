@@ -10,7 +10,8 @@ interface ChatbotRepository {
         userId: String,
         userMessage: ChatMessage,
         imageBytes: ByteArray? = null,
-        currencyContext: String? = null
+        currencyContext: String? = null,
+        exchangeRate: Double = 1.0
     ): Flow<Result<ChatMessage>>
     fun clearChatHistory(userId: String): Flow<Result<Unit>>
 }
