@@ -1,48 +1,3 @@
-package com.iti.presentation.screens.address
-
-import com.iti.domain.models.Address
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.iti.presentation.R
-import com.iti.presentation.components.BackTopBar
-import com.iti.presentation.components.ErrorScreen
-import com.iti.presentation.components.ShopIQSnackBarHost
-import com.iti.presentation.components.showError
-import com.iti.presentation.components.showSuccess
-import com.iti.presentation.screens.address.components.AddressEmptyState
-import com.iti.presentation.screens.address.components.AddressListView
-import com.iti.presentation.screens.address.components.AddressLocationDetected
-import com.iti.presentation.screens.address.components.AddressMapPicker
-import com.iti.presentation.util.LocationPermissionHandler
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(
@@ -57,6 +12,7 @@ fun AddressScreen(
     val localSnackbarHostState = remember { SnackbarHostState() }
     val effectiveSnackbarHostState = snackbarHostState ?: localSnackbarHostState
 
+    val screenState = state.screenState
     val successMessage = stringResource(R.string.address_success_added)
 
     LaunchedEffect(state.showSuccessBadge) {
@@ -74,7 +30,7 @@ fun AddressScreen(
         }
     }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(true) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 AddressContract.Effect.NavigateBack -> {
@@ -89,17 +45,18 @@ fun AddressScreen(
         }
     }
 
-    LocationPermissionHandler(
-        onPermissionGranted = {
-            viewModel.sendIntent(AddressContract.Intent.PermissionGranted)
-        },
-        onPermissionDenied = {
-            viewModel.sendIntent(AddressContract.Intent.PermissionDenied)
-        },
-        triggerRequest = state.triggerPermissionRequest,
-    )
+    if (screenState !is AddressContract.ScreenState.MapPicker) {
+        LocationPermissionHandler(
+            onPermissionGranted = {
+                viewModel.sendIntent(AddressContract.Intent.PermissionGranted)
+            },
+            onPermissionDenied = {
+                viewModel.sendIntent(AddressContract.Intent.PermissionDenied)
+            },
+            triggerRequest = state.triggerPermissionRequest,
+        )
+    }
 
-    val screenState = state.screenState
     val topBarTitle = when (screenState) {
         is AddressContract.ScreenState.LocationDetected -> {
             if (screenState.isFromGps) {
@@ -140,7 +97,11 @@ fun AddressScreen(
                             else -> false
                         }
                         if (showAddIcon) {
-                            IconButton(onClick = { viewModel.sendIntent(AddressContract.Intent.AddAddressClicked) }) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.sendIntent(AddressContract.Intent.AddAddressClicked)
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = stringResource(R.string.address_action_add),
@@ -153,31 +114,35 @@ fun AddressScreen(
             }
         }
     ) { innerPadding ->
-        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker ||
-            screenState is AddressContract.ScreenState.LocationDetected) {
-            PaddingValues(0.dp)
-        } else {
-            innerPadding
-        }
+
+        val contentPadding =
+            if (screenState is AddressContract.ScreenState.MapPicker ||
+                screenState is AddressContract.ScreenState.LocationDetected
+            ) {
+                PaddingValues(0.dp)
+            } else {
+                innerPadding
+            }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
+
             AnimatedContent(
                 targetState = screenState,
                 transitionSpec = {
-                    fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                    fadeIn(tween(300)) togetherWith fadeOut(tween(300))
                 },
                 label = "ScreenStateTransition",
                 modifier = Modifier.fillMaxSize()
             ) { targetState ->
+
                 when (targetState) {
+
                     AddressContract.ScreenState.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(Modifier.fillMaxSize(), Alignment.Center) {
                             CircularProgressIndicator(
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(48.dp)
@@ -186,11 +151,9 @@ fun AddressScreen(
                     }
 
                     AddressContract.ScreenState.Empty -> {
-                        AddressEmptyState(
-                            onAddNewAddressClick = {
-                                viewModel.sendIntent(AddressContract.Intent.AddAddressClicked)
-                            }
-                        )
+                        AddressEmptyState {
+                            viewModel.sendIntent(AddressContract.Intent.AddAddressClicked)
+                        }
                     }
 
                     is AddressContract.ScreenState.LocationDetected -> {
@@ -227,11 +190,11 @@ fun AddressScreen(
                     is AddressContract.ScreenState.Success -> {
                         AddressListView(
                             addresses = targetState.addresses,
-                            onDeleteAddress = { id ->
-                                viewModel.sendIntent(AddressContract.Intent.DeleteAddress(id))
+                            onDeleteAddress = {
+                                viewModel.sendIntent(AddressContract.Intent.DeleteAddress(it))
                             },
-                            onSetDefaultAddress = { id ->
-                                viewModel.sendIntent(AddressContract.Intent.SetDefaultAddress(id))
+                            onSetDefaultAddress = {
+                                viewModel.sendIntent(AddressContract.Intent.SetDefaultAddress(it))
                             },
                             onAddressSelected = onAddressSelected
                         )

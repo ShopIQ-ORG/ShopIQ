@@ -25,12 +25,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.foundation.layout.height
 import com.valentinilk.shimmer.shimmer
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -68,6 +65,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.platform.LocalLocale
+import com.iti.presentation.components.ConfirmationDialog
 import com.iti.presentation.screens.ai.components.AiAvatar
 import kotlinx.coroutines.launch
 
@@ -96,34 +94,13 @@ fun AiHistoryScreen(
     }
 
     if (state.showDeleteConfirmDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.sendIntent(AiHistoryContract.Intent.DismissDeleteDialog) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
-            },
-            title = { Text(text = stringResource(id = R.string.delete_history_confirm_title)) },
-            text = { Text(text = stringResource(id = R.string.delete_history_confirm_message)) },
-            confirmButton = {
-                Button(
-                    onClick = { viewModel.sendIntent(AiHistoryContract.Intent.ConfirmDeleteAll) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(text = stringResource(id = R.string.delete), color = MaterialTheme.colorScheme.onError)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.sendIntent(AiHistoryContract.Intent.DismissDeleteDialog) }) {
-                    Text(text = stringResource(id = R.string.cancel))
-                }
-            },
-            shape = RoundedCornerShape(16.dp),
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ConfirmationDialog(
+            title = stringResource(id = R.string.delete_history_confirm_title),
+            message = stringResource(id = R.string.delete_history_confirm_message),
+            confirmText = stringResource(id = R.string.delete),
+            dismissText = stringResource(id = R.string.cancel),
+            onConfirm = { viewModel.sendIntent(AiHistoryContract.Intent.ConfirmDeleteAll) },
+            onDismiss = { viewModel.sendIntent(AiHistoryContract.Intent.DismissDeleteDialog) }
         )
     }
 
@@ -182,7 +159,7 @@ fun AiHistoryScreen(
                 val calendar = Calendar.getInstance()
                 val todayDay = calendar.get(Calendar.DAY_OF_YEAR)
                 val todayYear = calendar.get(Calendar.YEAR)
-                
+
                 calendar.add(Calendar.DAY_OF_YEAR, -1)
                 val yesterdayDay = calendar.get(Calendar.DAY_OF_YEAR)
                 val yesterdayYear = calendar.get(Calendar.YEAR)
@@ -205,7 +182,7 @@ fun AiHistoryScreen(
                 val showClearInToday = today.isNotEmpty()
                 val showClearInYesterday = yesterday.isNotEmpty() && today.isEmpty()
                 val showClearInOlder = older.isNotEmpty() && today.isEmpty() && yesterday.isEmpty()
-                
+
                 val clearChatButton: @Composable () -> Unit = {
                     Text(
                         text = stringResource(id = R.string.clear_history),

@@ -383,7 +383,8 @@ class HomeViewModel(
                                 products = updatedProducts,
                                 brands = (mainData.brandsResult as Result.Success).data,
                                 ads = (mainData.adsResult as Result.Success).data,
-                                bestSellers = updatedBestSellers
+                                bestSellers = updatedBestSellers,
+                                newArrivals = updatedProducts.takeLast(10)
                             )
                         ).also {
                             // Batch-fetch Arabic translations if device locale is AR

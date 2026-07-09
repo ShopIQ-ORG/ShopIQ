@@ -66,7 +66,8 @@ class AuthRemoteDataSourceImpl(
         return CredentialAuthResult(
             uid = uid,
             fullName = (profile?.get("name") as? String).orEmpty(),
-            email = (profile?.get("email") as? String).orEmpty()
+            email = (profile?.get("email") as? String).orEmpty(),
+            photoUrl = profile?.get("picture") as? String
         )
     }
 }

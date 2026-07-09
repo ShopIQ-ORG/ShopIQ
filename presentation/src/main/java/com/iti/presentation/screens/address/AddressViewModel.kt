@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 import com.iti.domain.usecases.address.GetPlaceSuggestionsUseCase
 import com.iti.domain.usecases.address.SearchLocationByNameUseCase
 
-class AddressViewModel (
+class AddressViewModel(
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
     private val getSavedAddressesUseCase: GetSavedAddressesUseCase,
     private val saveAddressUseCase: SaveAddressUseCase,
@@ -85,7 +85,7 @@ class AddressViewModel (
                 detectLocation()
             }
             AddressContract.Intent.PermissionDenied -> {
-                _state.update { 
+                _state.update {
                     it.copy(
                         triggerPermissionRequest = false,
                         isDetectingLocation = false
@@ -274,9 +274,9 @@ class AddressViewModel (
             return
         }
         searchJob = viewModelScope.launch {
-            delay(500) // Debounce 500ms
+            delay(500)
             val result = getPlaceSuggestionsUseCase(query, BuildConfig.MAPS_API_KEY)
-            if (result is com.iti.domain.models.Result.Success) {
+            if (result is Result.Success) {
                 val suggestions = result.data.map {
                     AddressContract.PlaceSuggestion(it.displayName, it.latitude, it.longitude)
                 }
@@ -292,7 +292,7 @@ class AddressViewModel (
 
     suspend fun searchLocationByName(query: String): LocationCoordinates? {
         val result = searchLocationByNameUseCase(query, BuildConfig.MAPS_API_KEY)
-        return if (result is com.iti.domain.models.Result.Success) result.data else null
+        return if (result is Result.Success) result.data else null
     }
 
     private fun emitEffect(effect: AddressContract.Effect) {
