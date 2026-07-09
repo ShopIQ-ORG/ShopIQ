@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,6 +31,7 @@ fun LocationPermissionHandler(
     val context = LocalContext.current
     var showRationaleDialog by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var denialCount by rememberSaveable { mutableStateOf(0) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -38,18 +40,11 @@ fun LocationPermissionHandler(
         val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
         
         if (fineGranted || coarseGranted) {
+            denialCount = 0
             onPermissionGranted()
         } else {
-            val activity = context as? android.app.Activity
-            val showRationale = activity?.let {
-                androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
-                    it, Manifest.permission.ACCESS_FINE_LOCATION
-                ) || androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
-                    it, Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            } ?: false
-
-            if (showRationale) {
+            denialCount++
+            if (denialCount == 1) {
                 showRationaleDialog = true
             } else {
                 showSettingsDialog = true
@@ -68,14 +63,19 @@ fun LocationPermissionHandler(
             ) == PackageManager.PERMISSION_GRANTED
 
             if (fineGranted || coarseGranted) {
+                denialCount = 0
                 onPermissionGranted()
             } else {
-                permissionLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
+                if (denialCount >= 2) {
+                    showSettingsDialog = true
+                } else {
+                    permissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
                     )
-                )
+                }
             }
         }
     }
