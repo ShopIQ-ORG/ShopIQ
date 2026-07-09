@@ -91,7 +91,6 @@ class AddressViewModel(
                         isDetectingLocation = false
                     )
                 }
-                emitEffect(AddressContract.Effect.ShowMessage(UiText.StringResource(R.string.error_network)))
             }
             is AddressContract.Intent.ConfirmAddress -> {
                 val currentAddress = temporaryDetectedAddress
