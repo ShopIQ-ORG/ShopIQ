@@ -26,6 +26,8 @@ fun RatingSummaryBlock(
     reviews: List<ProductReview>,
     modifier: Modifier = Modifier
 ) {
+
+    if(reviews.isEmpty()) return
     val finalReviews = getReviewsOrDefault(reviews)
     val totalCount = finalReviews.size
     val averageRating = if (totalCount > 0) {
