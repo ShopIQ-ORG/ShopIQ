@@ -1,84 +1,36 @@
-//
-//  AddressScreen.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
-package com.iti.presentation.screens.address
-
-import com.iti.domain.models.Address
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.iti.presentation.R
-import com.iti.presentation.components.BackTopBar
-import com.iti.presentation.components.ErrorScreen
-import com.iti.presentation.screens.address.components.AddressEmptyState
-import com.iti.presentation.screens.address.components.AddressListView
-import com.iti.presentation.screens.address.components.AddressLocationDetected
-import com.iti.presentation.screens.address.components.AddressMapPicker
-import com.iti.presentation.screens.address.components.TopSnackbar
-import com.iti.presentation.util.LocationPermissionHandler
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(
     viewModel: AddressViewModel,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState? = null,
     onAddressSelected: ((Address) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val localSnackbarHostState = remember { SnackbarHostState() }
+    val effectiveSnackbarHostState = snackbarHostState ?: localSnackbarHostState
 
-    // ✅ FIX: Moved screenState declaration here, before its first use below
     val screenState = state.screenState
-
-    var isSuccessSnackbarVisible by remember { mutableStateOf(false) }
+    val successMessage = stringResource(R.string.address_success_added)
 
     LaunchedEffect(state.showSuccessBadge) {
         if (state.showSuccessBadge) {
-            kotlinx.coroutines.delay(600)
-            isSuccessSnackbarVisible = true
-        } else {
-            isSuccessSnackbarVisible = false
+            effectiveSnackbarHostState.showSuccess(successMessage)
+            viewModel.sendIntent(AddressContract.Intent.DismissSuccessBadge)
         }
     }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(state.errorText) {
+        val message = state.errorText?.resolve(context)
+        if (!message.isNullOrEmpty()) {
+            effectiveSnackbarHostState.showError(message)
+            viewModel.sendIntent(AddressContract.Intent.ClearError)
+        }
+    }
+
+    LaunchedEffect(true) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 AddressContract.Effect.NavigateBack -> {
@@ -86,16 +38,13 @@ fun AddressScreen(
                 }
                 is AddressContract.Effect.ShowMessage -> {
                     val messageString = effect.message.resolve(context)
-                    snackbarHostState.showSnackbar(messageString)
+                    effectiveSnackbarHostState.showError(messageString)
                 }
                 else -> Unit
             }
         }
     }
 
-    // Connect permission requests with standard system handler.
-    // Only mount when NOT in MapPicker state — AddressMapPicker has its own handler,
-    // and having two handlers active simultaneously would show duplicate permission dialogs.
     if (screenState !is AddressContract.ScreenState.MapPicker) {
         LocationPermissionHandler(
             onPermissionGranted = {
@@ -108,7 +57,6 @@ fun AddressScreen(
         )
     }
 
-    // Determine titles and top bar actions dynamically based on state
     val topBarTitle = when (screenState) {
         is AddressContract.ScreenState.LocationDetected -> {
             if (screenState.isFromGps) {
@@ -134,7 +82,6 @@ fun AddressScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             if (onAddressSelected == null &&
@@ -150,7 +97,11 @@ fun AddressScreen(
                             else -> false
                         }
                         if (showAddIcon) {
-                            IconButton(onClick = { viewModel.sendIntent(AddressContract.Intent.AddAddressClicked) }) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.sendIntent(AddressContract.Intent.AddAddressClicked)
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = stringResource(R.string.address_action_add),
@@ -163,31 +114,35 @@ fun AddressScreen(
             }
         }
     ) { innerPadding ->
-        val contentPadding = if (screenState is AddressContract.ScreenState.MapPicker ||
-            screenState is AddressContract.ScreenState.LocationDetected) {
-            PaddingValues(0.dp)
-        } else {
-            innerPadding
-        }
+
+        val contentPadding =
+            if (screenState is AddressContract.ScreenState.MapPicker ||
+                screenState is AddressContract.ScreenState.LocationDetected
+            ) {
+                PaddingValues(0.dp)
+            } else {
+                innerPadding
+            }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
+
             AnimatedContent(
                 targetState = screenState,
                 transitionSpec = {
-                    fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                    fadeIn(tween(300)) togetherWith fadeOut(tween(300))
                 },
                 label = "ScreenStateTransition",
                 modifier = Modifier.fillMaxSize()
             ) { targetState ->
+
                 when (targetState) {
+
                     AddressContract.ScreenState.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(Modifier.fillMaxSize(), Alignment.Center) {
                             CircularProgressIndicator(
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(48.dp)
@@ -196,11 +151,9 @@ fun AddressScreen(
                     }
 
                     AddressContract.ScreenState.Empty -> {
-                        AddressEmptyState(
-                            onAddNewAddressClick = {
-                                viewModel.sendIntent(AddressContract.Intent.AddAddressClicked)
-                            }
-                        )
+                        AddressEmptyState {
+                            viewModel.sendIntent(AddressContract.Intent.AddAddressClicked)
+                        }
                     }
 
                     is AddressContract.ScreenState.LocationDetected -> {
@@ -237,11 +190,11 @@ fun AddressScreen(
                     is AddressContract.ScreenState.Success -> {
                         AddressListView(
                             addresses = targetState.addresses,
-                            onDeleteAddress = { id ->
-                                viewModel.sendIntent(AddressContract.Intent.DeleteAddress(id))
+                            onDeleteAddress = {
+                                viewModel.sendIntent(AddressContract.Intent.DeleteAddress(it))
                             },
-                            onSetDefaultAddress = { id ->
-                                viewModel.sendIntent(AddressContract.Intent.SetDefaultAddress(id))
+                            onSetDefaultAddress = {
+                                viewModel.sendIntent(AddressContract.Intent.SetDefaultAddress(it))
                             },
                             onAddressSelected = onAddressSelected
                         )
@@ -258,22 +211,12 @@ fun AddressScreen(
                 }
             }
 
-            TopSnackbar(
-                message = stringResource(R.string.address_success_added),
-                visible = isSuccessSnackbarVisible,
-                onDismiss = { viewModel.sendIntent(AddressContract.Intent.DismissSuccessBadge) },
-                isError = false,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-
-            // Top floating error snackbar overlay
-            TopSnackbar(
-                message = state.errorText?.resolve(context) ?: "",
-                visible = state.errorText != null,
-                onDismiss = { viewModel.sendIntent(AddressContract.Intent.ClearError) },
-                isError = true,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+            if (snackbarHostState == null) {
+                ShopIQSnackBarHost(
+                    hostState = effectiveSnackbarHostState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         }
     }
 }

@@ -1,11 +1,3 @@
-//
-//  PaymentMethodContent.kt
-//  ShopIQ
-//
-//  Created by Antigravity on 7/7/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.presentation.screens.checkout.components
 
 import androidx.compose.foundation.BorderStroke
@@ -24,10 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.iti.presentation.screens.checkout.PaymentMethodContract.PaymentMethodType
+import com.iti.presentation.R
+import com.iti.presentation.components.ShopIQButton
+import com.iti.presentation.screens.checkout.PaymentMethodType
 
 @Composable
 fun PaymentMethodContent(
@@ -52,126 +47,42 @@ fun PaymentMethodContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Choose a payment method",
+                text = stringResource(R.string.payment_method_choose_title),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Card: Cash on Delivery (COD)
             PaymentMethodCard(
-                title = "Cash on Delivery (COD)",
-                subtitle = "Pay with cash when your order is delivered.",
+                title = stringResource(R.string.payment_method_cod_title),
+                subtitle = stringResource(R.string.payment_method_cod_subtitle),
                 icon = rememberVectorPainter(Icons.Outlined.Payments),
                 type = PaymentMethodType.COD,
                 isSelected = selectedMethod == PaymentMethodType.COD,
                 onSelect = { onSelectMethod(it) }
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                ) {
-                    Text(
-                        text = "Maximum order amount for COD is $500.00",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(12.dp),
-                        lineHeight = 18.sp
-                    )
-                }
-            }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Card: Online Payment
             PaymentMethodCard(
-                title = "Online Payment",
-                subtitle = "Pay securely using your card, wallet or other methods.",
+                title = stringResource(R.string.payment_method_online_title),
+                subtitle = stringResource(R.string.payment_method_online_subtitle),
                 icon = rememberVectorPainter(Icons.Outlined.AccountBalanceWallet),
                 type = PaymentMethodType.ONLINE,
                 isSelected = selectedMethod == PaymentMethodType.ONLINE,
                 onSelect = { onSelectMethod(it) }
-            ) {
-                // Partner Logos
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Visa
-                    LogoContainer {
-                        Text(text = "VISA", color = Color(0xFF1A1F71), fontSize = 10.sp, fontWeight = FontWeight.Black)
-                    }
-
-                    // Mastercard
-                    LogoContainer {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(12.dp).background(Color(0xFFEB001B), CircleShape))
-                            Box(modifier = Modifier.size(12.dp).offset(x = (-4).dp).background(Color(0xFFFFAB00).copy(alpha = 0.8f), CircleShape))
-                        }
-                    }
-
-                    // PayPal
-                    LogoContainer {
-                        Text(text = "PayPal", color = Color(0xFF003087), fontSize = 10.sp, fontWeight = FontWeight.Black)
-                    }
-
-                    // Apple Pay
-                    LogoContainer {
-                        Text(text = "Pay", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                    }
-
-                    Text(
-                        text = "+ More",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-            }
+            )
         }
 
-        Button(
+        ShopIQButton(
+            text = stringResource(R.string.payment_method_continue),
             onClick = onContinue,
-            enabled = selectedMethod != null && !isLoading,
+            isLoading = isLoading,
+            enabled = selectedMethod != null,
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Text(
-                    text = "Continue",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LogoContainer(content: @Composable () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(4.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        shadowElevation = 0.5.dp
-    ) {
-        Box(modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)) {
-            content()
-        }
+        )
     }
 }

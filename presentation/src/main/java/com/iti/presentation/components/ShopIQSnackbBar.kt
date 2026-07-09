@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarData
@@ -47,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-enum class ShopIQSnackbarType { Success, Error }
+enum class ShopIQSnackbarType { Success, Error, Info }
 
 private data class ShopIQSnackbarVisuals(
     override val message: String,
@@ -99,10 +100,12 @@ fun ShopIQSnackBarHost(
         val baseColor = when (type) {
             ShopIQSnackbarType.Success -> MaterialTheme.colorScheme.primary
             ShopIQSnackbarType.Error -> MaterialTheme.colorScheme.error
+            ShopIQSnackbarType.Info -> MaterialTheme.colorScheme.onSurfaceVariant
         }
         val onBaseColor = when (type) {
             ShopIQSnackbarType.Success -> MaterialTheme.colorScheme.onPrimary
             ShopIQSnackbarType.Error -> MaterialTheme.colorScheme.onError
+            ShopIQSnackbarType.Info -> MaterialTheme.colorScheme.surface
         }
         val surfaceColor = MaterialTheme.colorScheme.surface
 
@@ -131,6 +134,7 @@ fun ShopIQSnackBarHost(
                         imageVector = when (type) {
                             ShopIQSnackbarType.Success -> Icons.Filled.CheckCircle
                             ShopIQSnackbarType.Error -> Icons.Filled.Error
+                            ShopIQSnackbarType.Info -> Icons.Filled.Info
                         },
                         contentDescription = null,
                         tint = baseColor,
@@ -170,6 +174,10 @@ suspend fun SnackbarHostState.showError(message: String, actionLabel: String? = 
 
 suspend fun SnackbarHostState.showSuccess(message: String, actionLabel: String? = null): SnackbarResult? {
     return showUnique(message = message, type = ShopIQSnackbarType.Success, actionLabel = actionLabel)
+}
+
+suspend fun SnackbarHostState.showInfo(message: String, actionLabel: String? = null): SnackbarResult? {
+    return showUnique(message = message, type = ShopIQSnackbarType.Info, actionLabel = actionLabel)
 }
 
 private suspend fun SnackbarHostState.showUnique(

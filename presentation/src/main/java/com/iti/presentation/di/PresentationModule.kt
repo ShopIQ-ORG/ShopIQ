@@ -18,7 +18,7 @@ import com.iti.presentation.screens.products.displayallproducts.AllProductsViewM
 import com.iti.presentation.screens.products.displayallproducts.AllProductsFilterManager
 import com.iti.presentation.screens.splash.SplashViewModel
 import com.iti.presentation.screens.wishlist.WishlistViewModel
-import com.iti.presentation.screens.payment.PaymentViewModel
+import com.iti.presentation.screens.checkout.payment.PaymentViewModel
 import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatViewModel
@@ -27,9 +27,6 @@ import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.profile.ProfileViewModel
 import com.iti.presentation.screens.auth.emailverification.EmailVerificationViewModel
 import com.iti.presentation.screens.auth.forgotpassword.ForgotPasswordViewModel
-import com.iti.presentation.screens.checkout.PaymentMethodContract
-import com.iti.presentation.screens.checkout.PaymentMethodViewModel
-import com.iti.presentation.screens.checkout.summary.CheckoutSummaryViewModel
 import com.iti.presentation.util.NetworkMonitor
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -57,7 +54,6 @@ val presentationModule = module {
     viewModel { SearchViewModel(get(), get(), get(), get(), get(), get()) }
     viewModelOf(::CartBadgeViewModel)
     viewModel { WishlistViewModel(get(), get(), get(), get()) }
-    viewModel { PaymentMethodViewModel(get()) }
     viewModel { CheckoutViewModel(get(), get(), get(), get(), get()) }
     viewModelOf(::OrdersViewModel)
     viewModelOf(::OrderDetailsViewModel)
@@ -65,8 +61,5 @@ val presentationModule = module {
     viewModelOf(::EmailVerificationViewModel)
     viewModel { AddressViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel { (paymentMethod: PaymentMethodContract.PaymentMethodType) ->
-        CheckoutSummaryViewModel(get(), get(), get(), paymentMethod)
-    }
     viewModel { PaymentViewModel(get()) }
 }

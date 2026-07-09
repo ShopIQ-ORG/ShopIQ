@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.iti.domain.models.Address
 import com.iti.presentation.R
 import com.iti.presentation.components.ConfirmationDialog
+import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.ui.theme.ShopIQTheme
 
 @Composable
@@ -92,18 +93,10 @@ fun AddressListView(
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
-                    Button(
+                    ShopIQButton(
+                        text= stringResource(R.string.checkout_btn_confirm_payment),
                         onClick = { onAddressSelected.invoke(selectedAddress!!) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.checkout_btn_confirm_payment),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+                    )
                 }
             }
         }

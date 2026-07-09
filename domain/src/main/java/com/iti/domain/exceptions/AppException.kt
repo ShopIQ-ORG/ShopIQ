@@ -4,4 +4,9 @@ sealed class AppException(message: String) : Exception(message) {
     class Unknown(cause: Throwable?) : AppException("An unknown error occurred: ${cause?.message}")
     class TooManyRequests : AppException(
         "Too many attempts. Please wait a few minutes before trying again."
-    )}
+    )
+
+    class PaymentIntentionCreationFailed : AppException(
+        "Payment Intention Creation Failed."
+    )
+}

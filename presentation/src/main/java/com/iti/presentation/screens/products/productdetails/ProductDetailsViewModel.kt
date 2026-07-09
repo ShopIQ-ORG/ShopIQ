@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import com.iti.domain.usecases.products.GetProductTranslationsUseCase
 import com.iti.presentation.util.ReviewsCache
+import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.first
 
 class ProductDetailsViewModel(
@@ -64,8 +65,19 @@ class ProductDetailsViewModel(
             is ProductDetailsIntent.ToggleWishlist -> toggleWishlist()
             is ProductDetailsIntent.AddToCart -> addToCart()
             is ProductDetailsIntent.DismissUnauthorizedDialog -> dismissUnauthorizedDialog()
-            is ProductDetailsIntent.SubmitReview -> submitReview(intent.rating, intent.title, intent.body)
-            is ProductDetailsIntent.EditReview -> editReview(intent.reviewId, intent.rating, intent.title, intent.body)
+            is ProductDetailsIntent.SubmitReview -> submitReview(
+                intent.rating,
+                intent.title,
+                intent.body
+            )
+
+            is ProductDetailsIntent.EditReview -> editReview(
+                intent.reviewId,
+                intent.rating,
+                intent.title,
+                intent.body
+            )
+
             is ProductDetailsIntent.DeleteReview -> deleteReview(intent.reviewId)
         }
     }
@@ -89,15 +101,23 @@ class ProductDetailsViewModel(
                 when (result) {
                     is Result.Loading -> {
                         if (_state.value.product == null) {
-                            _state.update { it.copy(isLoading = true, product = null, error = null) }
+                            _state.update {
+                                it.copy(
+                                    isLoading = true,
+                                    product = null,
+                                    error = null
+                                )
+                            }
                         }
                     }
+
                     is Result.Success -> {
                         val product = result.data
                         // Update ReviewsCache with the loaded product's reviews
                         ReviewsCache.updateReviews(product.id, product.reviews)
 
-                        val currentLanguage = com.iti.presentation.util.LocaleHelper.getCurrentLanguage()
+                        val currentLanguage =
+                            com.iti.presentation.util.LocaleHelper.getCurrentLanguage()
                         if (com.iti.presentation.util.LocaleHelper.isArabic()) {
                             viewModelScope.launch {
                                 val transResult = getProductTranslationsUseCase(product.id)
@@ -136,6 +156,7 @@ class ProductDetailsViewModel(
                             }
                         }
                     }
+
                     is Result.Failure -> {
                         _state.update {
                             it.copy(
@@ -219,7 +240,12 @@ class ProductDetailsViewModel(
                     } else {
                         UiText.StringResource(R.string.removed_from_wishlist)
                     }
-                    _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(message = message, kind = SnackbarKind.Success))
+                    _sideEffects.emit(
+                        ProductDetailsSideEffect.ShowSnackbar(
+                            message = message,
+                            kind = SnackbarKind.Success
+                        )
+                    )
 
                     kotlinx.coroutines.delay(1000)
                     favoriteOverride.value = null
@@ -262,13 +288,14 @@ class ProductDetailsViewModel(
                     _state.update { it.copy(isAddingToCart = false) }
                     _sideEffects.emit(
                         ProductDetailsSideEffect.ShowSnackbar(
-                            message = UiText.Plain("Added to Cart!"),
+                            message = UiText.StringResource(R.string.added_to_cart),
                             kind = SnackbarKind.Success,
                             actionLabel = UiText.StringResource(R.string.view_cart),
                             isCartAction = true
                         )
                     )
                 }
+
                 is Result.Failure -> {
                     _state.update { it.copy(isAddingToCart = false) }
                     if (result.exception is AuthException.UnauthorizedAccess) {
@@ -276,12 +303,12 @@ class ProductDetailsViewModel(
                     } else {
                         _sideEffects.emit(
                             ProductDetailsSideEffect.ShowSnackbar(
-                                message = UiText.Plain(result.exception.message ?: "Failed to add to cart"),
+                                message = result.exception.toUiMessage(),
                                 kind = SnackbarKind.Error
-                            )
-                        )
+                            ))
                     }
                 }
+
                 is Result.Loading -> Unit
             }
         }
@@ -299,7 +326,7 @@ class ProductDetailsViewModel(
                 _state.update { it.copy(showUnauthorizedDialog = true) }
                 return@launch
             }
-            
+
             val user = userRes.data as User.AuthenticatedUser
             _state.update { it.copy(isSubmittingReview = true, reviewError = null) }
 
@@ -316,6 +343,7 @@ class ProductDetailsViewModel(
                     is Result.Loading -> {
                         _state.update { it.copy(isSubmittingReview = true) }
                     }
+
                     is Result.Success -> {
                         _state.update { currentState ->
                             val currentProduct = currentState.product
@@ -327,7 +355,10 @@ class ProductDetailsViewModel(
                                     rating = rating,
                                     title = title,
                                     body = body,
-                                    createdAt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).format(java.util.Date()),
+                                    createdAt = java.text.SimpleDateFormat(
+                                        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                                        java.util.Locale.US
+                                    ).format(java.util.Date()),
                                     approved = true,
                                     avatarUrl = user.avatarUrl
                                 )
@@ -344,15 +375,27 @@ class ProductDetailsViewModel(
                         _state.value.product?.let { p ->
                             ReviewsCache.updateReviews(p.id, p.reviews)
                         }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.StringResource(R.string.review_submitted_successfully)))
+                        _sideEffects.emit(
+                            ProductDetailsSideEffect.ShowSnackbar(
+                                UiText.StringResource(
+                                    R.string.review_submitted_successfully
+                                )
+                            )
+                        )
                         // Re-load product details to fetch new reviews in the background
                         val numericId = product.id.substringAfterLast("/").toLongOrNull()
                         if (numericId != null) {
                             loadProductDetails(numericId)
                         }
                     }
+
                     is Result.Failure -> {
-                        _state.update { it.copy(isSubmittingReview = false, reviewError = result.exception.message) }
+                        _state.update {
+                            it.copy(
+                                isSubmittingReview = false,
+                                reviewError = result.exception.message
+                            )
+                        }
                         _sideEffects.emit(
                             ProductDetailsSideEffect.ShowSnackbar(
                                 UiText.Plain(result.exception.message ?: "Failed to submit review")
@@ -389,6 +432,7 @@ class ProductDetailsViewModel(
                     is Result.Loading -> {
                         _state.update { it.copy(isSubmittingReview = true) }
                     }
+
                     is Result.Success -> {
                         _state.update { currentState ->
                             val currentProduct = currentState.product
@@ -399,7 +443,10 @@ class ProductDetailsViewModel(
                                             rating = rating,
                                             title = title,
                                             body = body,
-                                            createdAt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).format(java.util.Date())
+                                            createdAt = java.text.SimpleDateFormat(
+                                                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                                                java.util.Locale.US
+                                            ).format(java.util.Date())
                                         )
                                     } else review
                                 }
@@ -422,9 +469,21 @@ class ProductDetailsViewModel(
                             loadProductDetails(numericId)
                         }
                     }
+
                     is Result.Failure -> {
-                        _state.update { it.copy(isSubmittingReview = false, reviewError = result.exception.message) }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.Plain(result.exception.message ?: "Failed to update review")))
+                        _state.update {
+                            it.copy(
+                                isSubmittingReview = false,
+                                reviewError = result.exception.message
+                            )
+                        }
+                        _sideEffects.emit(
+                            ProductDetailsSideEffect.ShowSnackbar(
+                                UiText.Plain(
+                                    result.exception.message ?: "Failed to update review"
+                                )
+                            )
+                        )
                     }
                 }
             }
@@ -444,11 +503,13 @@ class ProductDetailsViewModel(
                     is Result.Loading -> {
                         _state.update { it.copy(isSubmittingReview = true) }
                     }
+
                     is Result.Success -> {
                         _state.update { currentState ->
                             val currentProduct = currentState.product
                             val updatedProduct = if (currentProduct != null) {
-                                val filteredList = currentProduct.reviews.filter { it.id != reviewId }
+                                val filteredList =
+                                    currentProduct.reviews.filter { it.id != reviewId }
                                 currentProduct.copy(reviews = filteredList)
                             } else null
 
@@ -467,9 +528,16 @@ class ProductDetailsViewModel(
                             loadProductDetails(numericId)
                         }
                     }
+
                     is Result.Failure -> {
                         _state.update { it.copy(isSubmittingReview = false) }
-                        _sideEffects.emit(ProductDetailsSideEffect.ShowSnackbar(UiText.Plain(result.exception.message ?: "Failed to delete review")))
+                        _sideEffects.emit(
+                            ProductDetailsSideEffect.ShowSnackbar(
+                                UiText.Plain(
+                                    result.exception.message ?: "Failed to delete review"
+                                )
+                            )
+                        )
                     }
                 }
             }

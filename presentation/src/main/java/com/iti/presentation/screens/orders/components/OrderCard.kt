@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +51,8 @@ import com.iti.presentation.ui.theme.WarningLight
 import com.iti.domain.models.order.Order
 import com.iti.domain.models.order.OrderFinancialStatus
 import com.iti.domain.models.order.OrderStatus
-import com.iti.presentation.util.toCurrency
+import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.localizedCurrency
 import com.iti.presentation.util.toDisplayDate
 
 @Composable
@@ -123,7 +126,11 @@ private fun OrderMetricsRow(order: Order) {
     ) {
         OrderMetricItem(
             icon = Icons.Default.Inventory2,
-            label = pluralStringResource(R.plurals.order_items_count, order.itemsCount, order.itemsCount),
+            label = pluralStringResource(
+                R.plurals.order_items_count,
+                order.itemsCount,
+                order.itemsCount
+            ),
             value = stringResource(R.string.order_products_label)
         )
 
@@ -134,7 +141,7 @@ private fun OrderMetricsRow(order: Order) {
 
         OrderMetricItem(
             icon = Icons.Default.CreditCard,
-            label = order.totalPrice.toCurrency(),
+            label = order.totalPrice.localizedCurrency(),
             value = stringResource(R.string.order_total_label)
         )
     }
@@ -156,8 +163,16 @@ private fun OrderMetricItem(
         )
         Spacer(Modifier.width(8.dp))
         Column {
-            Text(text = label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
-            Text(text = value, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -247,7 +262,7 @@ fun OrderStatus.toStyle(): OrderStatusStyle {
 @Composable
 private fun PendingOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(status =OrderStatus.PENDING), onClick = {})
+        OrderCard(order = previewOrder(status = OrderStatus.PENDING), onClick = {})
     }
 }
 
@@ -255,7 +270,7 @@ private fun PendingOrderCardPreview() {
 @Composable
 private fun ProcessingOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(status =OrderStatus.PROCESSING), onClick = {})
+        OrderCard(order = previewOrder(status = OrderStatus.PROCESSING), onClick = {})
     }
 }
 
@@ -263,7 +278,7 @@ private fun ProcessingOrderCardPreview() {
 @Composable
 private fun CompletedOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(status =OrderStatus.COMPLETED), onClick = {})
+        OrderCard(order = previewOrder(status = OrderStatus.COMPLETED), onClick = {})
     }
 }
 
@@ -271,11 +286,15 @@ private fun CompletedOrderCardPreview() {
 @Composable
 private fun CancelledOrderCardPreview() {
     ShopIQTheme {
-        OrderCard(order = previewOrder(status =OrderStatus.CANCELLED), onClick = {})
+        OrderCard(order = previewOrder(status = OrderStatus.CANCELLED), onClick = {})
     }
 }
 
-@Preview(showBackground = true, name = "Dark - Completed", uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    name = "Dark - Completed",
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun DarkCompletedOrderCardPreview() {
     ShopIQTheme(darkTheme = true) {

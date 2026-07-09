@@ -1,6 +1,7 @@
 package com.iti.data.repositories
 
 import com.iti.data.sources.remote.payment.PaymobRemoteDataSource
+import com.iti.domain.exceptions.AppException
 import com.iti.domain.repositories.payment.PaymobIntentionResult
 import com.iti.domain.repositories.payment.PaymobRepository
 
@@ -15,8 +16,7 @@ class PaymobRepositoryImpl(
         currency: String,
         integrationId: Int
     ): Result<PaymobIntentionResult> {
-        return runCatching {
-            // Single-step: Create Payment Intention using the new API
+        return try {
             val intentionResponse = remoteDataSource.createIntention(
                 secretKey = secretKey,
                 amountCents = amountCents,
@@ -24,10 +24,14 @@ class PaymobRepositoryImpl(
                 integrationId = integrationId
             )
 
-            PaymobIntentionResult(
-                clientSecret = intentionResponse.client_secret,
-                publicKey = publicKey
+            Result.success(
+                PaymobIntentionResult(
+                    clientSecret = intentionResponse.client_secret,
+                    publicKey = publicKey
+                )
             )
+        } catch (e: Exception) {
+            Result.failure(AppException.PaymentIntentionCreationFailed())
         }
     }
 }
