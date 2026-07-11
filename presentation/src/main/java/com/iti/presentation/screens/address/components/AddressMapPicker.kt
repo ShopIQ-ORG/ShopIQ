@@ -76,7 +76,6 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.iti.presentation.R
-import com.iti.presentation.util.LocationPermissionHandler
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.screens.address.AddressContract
@@ -84,6 +83,7 @@ import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.ui.theme.BackgroundDark
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.util.LocationHelper
+import com.iti.presentation.util.LocationPermissionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

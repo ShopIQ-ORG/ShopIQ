@@ -73,15 +73,16 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.iti.domain.models.User
 import com.iti.presentation.R
-import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError
 import com.iti.presentation.components.showSuccess
+import com.iti.presentation.ui.theme.LocalDarkTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +132,7 @@ fun EditProfileContent(
     val context = LocalContext.current
 
     val authUser = state.user as? User.AuthenticatedUser
-    android.util.Log.d("EditProfile", "Initial authUser: $authUser")
+    Log.d("EditProfile", "Initial authUser: $authUser")
 
     var fullName by remember { mutableStateOf(authUser?.fullName ?: "") }
     var email by remember { mutableStateOf(authUser?.email ?: "") }
@@ -145,10 +146,10 @@ fun EditProfileContent(
     var phoneError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(state.user) {
-        android.util.Log.d("EditProfile", "state.user changed to: ${state.user}")
+        Log.d("EditProfile", "state.user changed to: ${state.user}")
         val u = state.user as? User.AuthenticatedUser
         u?.let {
-            android.util.Log.d("EditProfile", "Updating fields with user data: name=${it.fullName}, avatar=${it.avatarUrl}")
+            Log.d("EditProfile", "Updating fields with user data: name=${it.fullName}, avatar=${it.avatarUrl}")
             fullName = it.fullName
             email = it.email
             phone = it.phone

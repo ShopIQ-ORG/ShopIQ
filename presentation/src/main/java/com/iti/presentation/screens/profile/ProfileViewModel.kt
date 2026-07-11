@@ -22,16 +22,20 @@ import com.iti.domain.usecases.address.SaveAddressUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.auth.UpdateProfileUseCase
-import com.iti.domain.usecases.location.GetCurrentLocationUseCase
-import com.iti.domain.usecases.currency.GetSelectedCurrencyUseCase
-import com.iti.domain.usecases.currency.GetPopularCurrenciesUseCase
-import com.iti.domain.usecases.currency.GetExchangeRateHistoryUseCase
 import com.iti.domain.usecases.currency.FetchExchangeRatesUseCase
+import com.iti.domain.usecases.currency.GetExchangeRateHistoryUseCase
+import com.iti.domain.usecases.currency.GetPopularCurrenciesUseCase
+import com.iti.domain.usecases.currency.GetSelectedCurrencyUseCase
 import com.iti.domain.usecases.currency.SelectCurrencyUseCase
+import com.iti.domain.usecases.location.GetCurrentLocationUseCase
 import com.iti.presentation.BuildConfig
 import com.iti.presentation.R
 import com.iti.presentation.util.LocationHelper
 import com.iti.presentation.util.UiText
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -42,10 +46,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.UUID
 
 class ProfileViewModel(
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase,

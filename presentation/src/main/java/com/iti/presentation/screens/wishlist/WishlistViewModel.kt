@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.IsGuestUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ class WishlistViewModel(
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val authRepository: AuthRepository
+    private val isGuestUseCase: IsGuestUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WishlistUiState>(WishlistUiState.Loading)
@@ -41,7 +41,7 @@ class WishlistViewModel(
     }
 
     private fun loadFavorites() {
-        if (authRepository.isGuest()) {
+        if (isGuestUseCase()) {
             _uiState.value = WishlistUiState.RequireAuth
             return
         }

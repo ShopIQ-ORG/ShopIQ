@@ -38,15 +38,15 @@ import com.iti.presentation.screens.address.AddressContract
 import com.iti.presentation.screens.address.AddressScreen
 import com.iti.presentation.screens.address.AddressViewModel
 import com.iti.presentation.screens.checkout.components.CheckoutStepper
-import com.iti.presentation.screens.checkout.components.SummaryStepContent
+import com.iti.presentation.screens.checkout.components.PaymentMethodContent
 import com.iti.presentation.screens.checkout.components.SuccessStepContent
+import com.iti.presentation.screens.checkout.components.SummaryStepContent
 import com.iti.presentation.screens.checkout.payment.PaymentScreen
 import com.iti.presentation.screens.checkout.payment.PaymentViewModel
-import org.koin.androidx.compose.koinViewModel
-import com.iti.presentation.screens.checkout.components.PaymentMethodContent
 import com.iti.presentation.util.CurrencyManager
-import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

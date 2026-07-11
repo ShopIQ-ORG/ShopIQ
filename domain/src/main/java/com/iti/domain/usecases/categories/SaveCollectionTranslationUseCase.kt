@@ -1,11 +1,11 @@
 package com.iti.domain.usecases.categories
 
 import com.iti.domain.models.Result
-import com.iti.domain.repositories.products.ProductsRepository
+import com.iti.domain.repositories.product.ProductRepository
 import kotlinx.coroutines.flow.Flow
 
 class SaveCollectionTranslationUseCase(
-    private val repository: ProductsRepository
+    private val repository: ProductRepository
 ) {
     operator fun invoke(
         collectionId: String,

@@ -1,5 +1,9 @@
 package com.iti.presentation.screens.products.productdetails
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,10 +41,6 @@ import com.iti.domain.models.Money
 import com.iti.domain.models.Product
 import com.iti.domain.models.ProductImage
 import com.iti.presentation.R
-import com.iti.presentation.util.CurrencyManager
-import com.iti.presentation.util.compareAtPrice
-import com.iti.presentation.util.discountPercent
-import com.iti.presentation.util.getLocalizedCode
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ConfirmationDialog
 import com.iti.presentation.components.NoInternetScreen
@@ -52,16 +52,16 @@ import com.iti.presentation.components.showSuccess
 import com.iti.presentation.screens.products.productdetails.components.ColorSelectionSection
 import com.iti.presentation.screens.products.productdetails.components.ProductImageGallery
 import com.iti.presentation.screens.products.productdetails.components.ProductInfoBlock
-import com.iti.presentation.screens.products.productdetails.components.SingleProductImage
 import com.iti.presentation.screens.products.productdetails.components.RatingSummaryBlock
 import com.iti.presentation.screens.products.productdetails.components.ReviewsListBlock
+import com.iti.presentation.screens.products.productdetails.components.SingleProductImage
 import com.iti.presentation.ui.theme.ShopIQTheme
+import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.compareAtPrice
+import com.iti.presentation.util.discountPercent
+import com.iti.presentation.util.getLocalizedCode
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.core.tween
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -13,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -26,8 +28,6 @@ import com.iti.presentation.components.ProductsGrid
 import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.screens.products.displayallproducts.components.AllProductsShimmer
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 
 @Composable
 fun CategoryDetailsScreen(

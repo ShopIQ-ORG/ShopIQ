@@ -5,17 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.IsGuestUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
-import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import com.iti.domain.repositories.auth.AuthRepository
-import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
 import com.iti.domain.usecases.products.GetProductTranslationsUseCase
+import com.iti.domain.usecases.products.GetProductsPaginatedUseCase
+import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.presentation.R
-import com.iti.presentation.util.UiText
 import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.FilterState
 import com.iti.presentation.screens.products.displayallproducts.AllProductsContract.SortOption
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
@@ -33,7 +33,7 @@ class AllProductsViewModel(
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val authRepository: AuthRepository,
+    private val isGuestUseCase: IsGuestUseCase,
     private val getProductsPaginatedUseCase: GetProductsPaginatedUseCase,
     private val filterManager: AllProductsFilterManager,
     private val getProductTranslationsUseCase: GetProductTranslationsUseCase
@@ -166,7 +166,7 @@ class AllProductsViewModel(
 
     private fun toggleFavorite(product: Product) {
         // FAST check for guest status
-        if (authRepository.isGuest()) {
+        if (isGuestUseCase()) {
             emitEffect(AllProductsContract.Effect.ShowAuthRequired)
             return
         }

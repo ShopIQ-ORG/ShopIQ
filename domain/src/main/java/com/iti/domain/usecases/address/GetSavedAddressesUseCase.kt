@@ -10,11 +10,11 @@ package com.iti.domain.usecases.address
 
 import com.iti.domain.models.Address
 import com.iti.domain.models.Result
-import com.iti.domain.repositories.address.AddressRepository
+import com.iti.domain.repositories.user.UserRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetSavedAddressesUseCase(
-    private val repository: AddressRepository
+    private val repository: UserRepository
 ) {
     operator fun invoke(): Flow<Result<List<Address>>> {
         return repository.getSavedAddresses()

@@ -9,16 +9,17 @@ import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
-import com.iti.data.repositories.AddressRepositoryImpl
-import com.iti.data.repositories.AuthRepositoryImpl
+import com.iti.data.repositories.ProductRepositoryImpl
+import com.iti.data.repositories.UserRepositoryImpl
+import com.iti.data.repositories.OrderRepositoryImpl
+import com.iti.data.repositories.SettingsRepositoryImpl
+import com.iti.domain.repositories.product.ProductRepository
+import com.iti.domain.repositories.user.UserRepository
+import com.iti.domain.repositories.order.OrderRepository
+import com.iti.domain.repositories.settings.SettingsRepository
 import com.iti.data.repositories.CartRepositoryImpl
 import com.iti.data.repositories.ChatbotRepositoryImpl
-import com.iti.data.repositories.CurrencyRepositoryImpl
 import com.iti.data.repositories.LocationTrackerImpl
-import com.iti.data.repositories.OnboardingRepositoryImpl
-import com.iti.data.repositories.OrdersRepositoryImpl
-import com.iti.data.repositories.ProductsRepositoryImpl
-import com.iti.data.repositories.SearchHistoryRepositoryImpl
 import com.iti.data.sources.local.currency.CurrencyLocalDataSource
 import com.iti.data.sources.local.currency.CurrencyLocalDataSourceImpl
 import com.iti.data.sources.local.room.AppDatabase
@@ -42,16 +43,9 @@ import com.iti.data.sources.remote.shopifycustomer.ShopifyCustomerRemoteDataSour
 import com.iti.data.sources.remote.user.UserRemoteDataSource
 import com.iti.data.sources.remote.user.UserRemoteDataSourceImpl
 import com.iti.data.utils.ShopifyNetworkConfig
-import com.iti.domain.repositories.address.AddressRepository
 import com.iti.domain.repositories.ai.ChatbotRepository
-import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.domain.repositories.cart.CartRepository
-import com.iti.domain.repositories.currency.CurrencyRepository
 import com.iti.domain.repositories.location.LocationTracker
-import com.iti.domain.repositories.onboarding.OnboardingRepository
-import com.iti.domain.repositories.orders.OrdersRepository
-import com.iti.domain.repositories.products.ProductsRepository
-import com.iti.domain.repositories.search.SearchHistoryRepository
 import com.iti.domain.util.CacheInvalidator
 import com.iti.domain.util.ShopifyTokenProvider
 import io.ktor.client.HttpClient
@@ -69,8 +63,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import com.iti.data.sources.remote.payment.PaymobRemoteDataSource
-import com.iti.data.repositories.PaymobRepositoryImpl
-import com.iti.domain.repositories.payment.PaymobRepository
 import com.iti.data.BuildConfig
 
 import org.koin.dsl.bind
@@ -78,20 +70,21 @@ import org.koin.dsl.binds
 import org.koin.dsl.module
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSourceImpl
-import com.iti.data.repositories.CheckoutRepositoryImpl
 import com.iti.data.sources.local.onboarding.OnboardingLocalDataSource
 import com.iti.data.sources.local.onboarding.OnboardingLocalDataSourceImpl
 import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSource
 import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSourceImpl
-import com.iti.domain.repositories.checkout.CheckoutRepository
 
 val dataModule = module {
+    single { UserRepositoryImpl(get(), get(), get(), get(), get(), get(), androidContext()) } binds arrayOf(UserRepository::class, ShopifyTokenProvider::class)
+    single<ProductRepository> { ProductRepositoryImpl(get(), get(), get(), get(), get(), get()) }
+    single<OrderRepository> { OrderRepositoryImpl(get(), get(), get(), get(), BuildConfig.PAYMOB_SECRET_KEY, BuildConfig.PAYMOB_PUBLIC_KEY, get()) }
+    single<SettingsRepository> { SettingsRepositoryImpl(get(), get(), get()) }
     single { HttpClient(OkHttp) }
     single { Gson() }
     single(named("adminApolloClient")) { ShopifyNetworkConfig.apolloClient }
     single(named("storefrontApolloClient")) { ShopifyNetworkConfig.storefrontApolloClient }
     single<ProductsRemoteDataSource> { ProductsRemoteDataSourceImpl(get(named("adminApolloClient"))) }
-    single<ProductsRepository> { ProductsRepositoryImpl(get(), get(), get(), get(), get()) }
     single<FavoriteRemoteDataSource> { FavoriteRemoteDataSourceImpl(get()) }
 
     // DataStore
@@ -114,12 +107,7 @@ val dataModule = module {
     // Auth
     single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(get()) }
 
-    single {
-        AuthRepositoryImpl(get(), get(), get(), get())
-    } binds arrayOf(
-        AuthRepository::class,
-        ShopifyTokenProvider::class
-    )
+
 
     // Chatbot
     single<ChatbotRepository> { ChatbotRepositoryImpl(get(), get(), androidContext()) }
@@ -185,29 +173,16 @@ val dataModule = module {
     }
 
     single { PaymobRemoteDataSource(get()) }
-    single<PaymobRepository> {
-        PaymobRepositoryImpl(
-            remoteDataSource = get(),
-            secretKey = BuildConfig.PAYMOB_SECRET_KEY,
-            publicKey = BuildConfig.PAYMOB_PUBLIC_KEY
-        )
-    }
 
-    single<OrdersRepository> { OrdersRepositoryImpl(get(), get()) }
 
     // Other repos
     single<OnboardingLocalDataSource> { OnboardingLocalDataSourceImpl(get()) }
-    single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
 
     single<com.iti.data.sources.local.search.SearchHistoryLocalDataSource> { com.iti.data.sources.local.search.SearchHistoryLocalDataSourceImpl(get(), get()) }
-    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get()) }
     single { LocationServices.getFusedLocationProviderClient(androidContext()) }
 
     single<LocationTracker> { LocationTrackerImpl(get()) }
-    single<AddressRepository> { AddressRepositoryImpl(get(), get(), androidContext()) }
     single<CurrencyRemoteDataSource> { CurrencyRemoteDataSourceImpl(get()) }
     single<CurrencyLocalDataSource> { CurrencyLocalDataSourceImpl(get()) }
-    single<CurrencyRepository> { CurrencyRepositoryImpl(get(), get()) }
     single<CheckoutRemoteDataSource> { CheckoutRemoteDataSourceImpl(get()) }
-    single<CheckoutRepository> { CheckoutRepositoryImpl(get(), get()) }
 }

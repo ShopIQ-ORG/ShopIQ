@@ -10,10 +10,10 @@ package com.iti.domain.usecases.address
 
 import com.iti.domain.models.Address
 import com.iti.domain.models.Result
-import com.iti.domain.repositories.address.AddressRepository
+import com.iti.domain.repositories.user.UserRepository
 
 class SaveAddressUseCase(
-    private val repository: AddressRepository
+    private val repository: UserRepository
 ) {
     suspend operator fun invoke(address: Address): Result<Unit> {
         return repository.saveAddress(address)

@@ -2,7 +2,7 @@ package com.iti.presentation.screens.checkout.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iti.domain.repositories.payment.PaymobRepository
+import com.iti.domain.usecases.payment.CreatePaymentIntentionUseCase
 import com.iti.presentation.R
 import com.iti.presentation.util.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PaymentViewModel(
-    private val paymobRepository: PaymobRepository
+    private val createPaymentIntentionUseCase: CreatePaymentIntentionUseCase
 ) : ViewModel() {
 
     private val _paymentUiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Idle)
@@ -36,20 +36,26 @@ class PaymentViewModel(
         viewModelScope.launch {
             _paymentUiState.value = PaymentUiState.Loading
 
-            paymobRepository.createPaymentIntention(
+            when (val result = createPaymentIntentionUseCase(
                 amountCents = amountCents,
                 currency = currency,
                 integrationId = integrationId
-            ).onSuccess { result ->
-                _paymentUiState.value = PaymentUiState.Success(
-                    clientSecret = result.clientSecret,
-                    publicKey = result.publicKey
-                )
-            }.onFailure { exception ->
-                _paymentUiState.value = PaymentUiState.Error(
-                    exception.message?.let(UiText::Plain)
-                        ?: UiText.StringResource(R.string.payment_intention_creation_failed)
-                )
+            )) {
+                is com.iti.domain.models.Result.Success -> {
+                    _paymentUiState.value = PaymentUiState.Success(
+                        clientSecret = result.data.clientSecret,
+                        publicKey = result.data.publicKey
+                    )
+                }
+                is com.iti.domain.models.Result.Failure -> {
+                    _paymentUiState.value = PaymentUiState.Error(
+                        result.exception.message?.let(UiText::Plain)
+                            ?: UiText.StringResource(R.string.payment_intention_creation_failed)
+                    )
+                }
+                is com.iti.domain.models.Result.Loading -> {
+                    // Handled above
+                }
             }
         }
     }

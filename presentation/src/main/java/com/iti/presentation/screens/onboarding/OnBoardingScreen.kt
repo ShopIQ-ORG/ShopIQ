@@ -2,7 +2,6 @@ package com.iti.presentation.screens.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import com.iti.presentation.ui.theme.LocalDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,11 +18,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQButton
@@ -32,9 +31,10 @@ import com.iti.presentation.components.showError
 import com.iti.presentation.screens.onboarding.components.OnboardingIndicator
 import com.iti.presentation.screens.onboarding.components.OnboardingSlideContent
 import com.iti.presentation.screens.onboarding.model.OnboardingSlide
+import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.util.Constants
-import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.absoluteValue
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

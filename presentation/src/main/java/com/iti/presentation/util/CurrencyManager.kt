@@ -2,10 +2,10 @@ package com.iti.presentation.util
 
 import android.content.Context
 import com.iti.domain.models.Currency
+import kotlin.math.roundToLong
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlin.math.roundToLong
 
 object CurrencyManager {
     private val _selectedCurrency = MutableStateFlow(Currency("EGP", "Egyptian Pound", "EGP", 48.0))

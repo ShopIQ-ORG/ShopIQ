@@ -41,8 +41,12 @@ import com.iti.domain.usecases.products.IsProductFavoriteUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
 import com.iti.domain.usecases.shopify.GetValidShopifyTokenUseCase
 import org.koin.dsl.module
+import com.iti.domain.usecases.auth.IsGuestUseCase
+import com.iti.domain.usecases.payment.CreatePaymentIntentionUseCase
 
 val domainModule = module {
+    factoryOf(::IsGuestUseCase)
+    factoryOf(::CreatePaymentIntentionUseCase)
     factory { GetProductsByNumberUseCase(get()) }
     factory { GetProductsPaginatedUseCase(get()) }
     factory { com.iti.domain.usecases.products.SearchProductsUseCase(get()) }

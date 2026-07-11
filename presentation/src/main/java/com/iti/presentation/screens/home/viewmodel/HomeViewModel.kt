@@ -4,25 +4,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
+import com.iti.domain.usecases.auth.IsGuestUseCase
 import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
+import com.iti.domain.usecases.auth.LogoutUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetAdsUseCase
-import com.iti.domain.usecases.auth.LogoutUseCase
+import com.iti.domain.usecases.products.GetBestSellersUseCase
 import com.iti.domain.usecases.products.GetBrandsUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
+import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.GetProductTranslationsUseCase
 import com.iti.domain.usecases.products.GetProductsByNumberUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import com.iti.domain.usecases.products.GetBestSellersUseCase
-import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.products.SearchProductsUseCase
-import com.iti.domain.usecases.products.GetProductTranslationsUseCase
-import com.iti.domain.repositories.auth.AuthRepository
 import com.iti.presentation.R
 import com.iti.presentation.components.ShopIQSnackbarType
 import com.iti.presentation.screens.home.HomeContract
-import com.iti.presentation.util.UiText
 import com.iti.presentation.util.Stopwords
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
@@ -47,7 +47,7 @@ class HomeViewModel(
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val authRepository: AuthRepository,
+    private val isGuestUseCase: IsGuestUseCase,
     private val getChatHistoryUseCase: GetChatHistoryUseCase,
     private val getBestSellersUseCase: GetBestSellersUseCase,
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
@@ -252,7 +252,7 @@ class HomeViewModel(
     }
 
     private fun toggleFavorite(product: Product) {
-        if (authRepository.isGuest()) {
+        if (isGuestUseCase()) {
             emitEffect(HomeContract.Effect.ShowAuthRequired)
             return
         }

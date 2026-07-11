@@ -26,9 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.R
-import com.iti.presentation.components.SearchBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.NoResultsFeedback
+import com.iti.presentation.components.SearchBar
 import com.iti.presentation.components.ShopIQScaffold
 import com.iti.presentation.screens.category.components.CategoryCard
 import com.iti.presentation.screens.category.components.CategoryCardShimmer

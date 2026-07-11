@@ -1,11 +1,11 @@
 package com.iti.presentation.util
 
+import com.iti.domain.models.order.Money
 import java.text.NumberFormat
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Currency
 import java.util.Locale
-import com.iti.domain.models.order.Money
 
 fun Money.toCurrency(): String = amount.toCurrency(currencyCode)
 

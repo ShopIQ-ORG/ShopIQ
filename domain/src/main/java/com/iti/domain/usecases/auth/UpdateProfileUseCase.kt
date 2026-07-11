@@ -2,10 +2,10 @@ package com.iti.domain.usecases.auth
 
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
-import com.iti.domain.repositories.auth.AuthRepository
+import com.iti.domain.repositories.user.UserRepository
 
 class UpdateProfileUseCase(
-    private val authRepository: AuthRepository
+    private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(
         fullName: String,
@@ -14,7 +14,7 @@ class UpdateProfileUseCase(
         gender: String?,
         avatarUrl: String?
     ): Result<User> {
-        return authRepository.updateProfile(
+        return userRepository.updateProfile(
             fullName = fullName,
             phone = phone,
             dateOfBirth = dateOfBirth,

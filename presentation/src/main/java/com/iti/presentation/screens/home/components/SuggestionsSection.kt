@@ -18,8 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -39,12 +39,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.valentinilk.shimmer.shimmer
 import com.iti.domain.models.Product
 import com.iti.presentation.R
 import com.iti.presentation.components.ProductCard
 import com.iti.presentation.screens.ai.components.AiAvatar
 import com.iti.presentation.ui.theme.LocalDarkTheme
+import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun SuggestionsSection(

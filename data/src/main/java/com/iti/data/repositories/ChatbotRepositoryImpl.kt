@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
+import com.google.ai.client.generativeai.type.Content
 import com.google.firebase.firestore.FirebaseFirestore
 import com.iti.data.BuildConfig
 import com.iti.data.utils.toFriendlyError
@@ -12,7 +13,7 @@ import com.iti.domain.models.ChatMessage
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
 import com.iti.domain.repositories.ai.ChatbotRepository
-import com.iti.domain.repositories.products.ProductsRepository
+import com.iti.domain.repositories.product.ProductRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +24,7 @@ import kotlinx.coroutines.tasks.await
 
 class ChatbotRepositoryImpl(
     private val firestore: FirebaseFirestore,
-    private val productsRepository: ProductsRepository,
+    private val productRepository: ProductRepository,
     private val context: Context
 ) : ChatbotRepository {
 
@@ -93,9 +94,9 @@ class ChatbotRepositoryImpl(
 
             var productsList = emptyList<Product>()
             try {
-                productsRepository.getProductsByNumber(100).collect { res ->
+                productRepository.getProductsByNumber(100).collect { res ->
                     if (res is Result.Success) {
-                        productsList = res.data
+                        productsList = res.data as List<Product>
                     }
                 }
             } catch (e: Exception) {
@@ -125,7 +126,7 @@ class ChatbotRepositoryImpl(
                 .get()
                 .await()
 
-            val historyList = mutableListOf<com.google.ai.client.generativeai.type.Content>()
+            val historyList = mutableListOf<Content>()
             
             historySnapshot.documents.forEach { doc ->
                 val sender = doc.getString("sender") ?: ""

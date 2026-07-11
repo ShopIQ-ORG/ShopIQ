@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.iti.domain.models.order.Order
 import com.iti.domain.models.order.*
+import com.iti.domain.models.order.Order
 import com.iti.presentation.ui.theme.ShopIQTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

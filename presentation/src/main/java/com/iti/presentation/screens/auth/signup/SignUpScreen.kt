@@ -19,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iti.presentation.components.ShopIQSnackBarHost
 import com.iti.presentation.components.showError
-import com.iti.presentation.screens.auth.signup.components.SignUpContent
 import com.iti.presentation.screens.auth.signup.SignUpContract
+import com.iti.presentation.screens.auth.signup.components.SignUpContent
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.util.AuthField
 import com.iti.presentation.util.rememberSubmitAction

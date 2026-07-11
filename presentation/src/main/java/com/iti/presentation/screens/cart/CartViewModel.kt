@@ -15,6 +15,7 @@ import com.iti.domain.usecases.cart.UpdateCartItemQuantityUseCase
 import com.iti.presentation.R
 import com.iti.presentation.util.UiText
 import com.iti.presentation.util.toUiMessage
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
@@ -26,7 +27,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.milliseconds
 
 class CartViewModel(
     private val getCartUseCase: GetCartUseCase,

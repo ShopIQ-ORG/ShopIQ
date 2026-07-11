@@ -9,10 +9,10 @@
 package com.iti.domain.usecases.address
 
 import com.iti.domain.models.Result
-import com.iti.domain.repositories.address.AddressRepository
+import com.iti.domain.repositories.user.UserRepository
 
 class DeleteAddressUseCase(
-    private val repository: AddressRepository
+    private val repository: UserRepository
 ) {
     suspend operator fun invoke(addressId: String): Result<Unit> {
         return repository.deleteAddress(addressId)
