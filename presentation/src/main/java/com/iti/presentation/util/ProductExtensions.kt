@@ -1,7 +1,7 @@
 package com.iti.presentation.util
 
-import com.iti.domain.models.Product
 import com.iti.domain.models.Money
+import com.iti.domain.models.Product
 
 val Product.discountPercent: Int
     get() = when (this.id.substringAfterLast("/").toLongOrNull() ?: 0L) {

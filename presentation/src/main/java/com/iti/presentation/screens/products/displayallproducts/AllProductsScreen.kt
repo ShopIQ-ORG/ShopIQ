@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -40,10 +42,11 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
-import com.iti.presentation.components.UnauthorizedDialog
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,21 +56,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import com.iti.presentation.R
 import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.components.NoResultsFeedback
 import com.iti.presentation.components.ProductCard
-import com.iti.presentation.screens.products.displayallproducts.components.FilterBottomSheet
-import com.iti.presentation.screens.products.displayallproducts.components.SortBottomSheet
+import com.iti.presentation.components.UnauthorizedDialog
 import com.iti.presentation.screens.products.displayallproducts.components.ActiveFiltersRow
-import com.iti.presentation.screens.products.displayallproducts.components.FilterBanner
-import com.iti.presentation.screens.products.displayallproducts.components.ProductsHeaderControls
 import com.iti.presentation.screens.products.displayallproducts.components.AllProductsShimmer
+import com.iti.presentation.screens.products.displayallproducts.components.FilterBanner
+import com.iti.presentation.screens.products.displayallproducts.components.FilterBottomSheet
+import com.iti.presentation.screens.products.displayallproducts.components.ProductsHeaderControls
+import com.iti.presentation.screens.products.displayallproducts.components.SortBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

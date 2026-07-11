@@ -8,7 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.iti.domain.repositories.currency.CurrencyRepository
+import com.iti.domain.repositories.settings.SettingsRepository
 import com.iti.presentation.navigation.AppNavigation
 import com.iti.presentation.ui.theme.ShopIQTheme
 import com.iti.presentation.util.CurrencyManager
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class MainActivity : androidx.appcompat.app.AppCompatActivity() {
-    private val currencyRepository: CurrencyRepository by inject()
+    private val settingsRepository: SettingsRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.initialize(applicationContext)
@@ -27,12 +27,12 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
 
         // Sync local CurrencyManager with stored DB currency state
         lifecycleScope.launch {
-            currencyRepository.getSelectedCurrency().collect { currency ->
+            settingsRepository.getSelectedCurrency().collect { currency ->
                 CurrencyManager.updateSelectedCurrency(currency)
             }
         }
         lifecycleScope.launch {
-            currencyRepository.getPopularCurrencies().collect { currencies ->
+            settingsRepository.getPopularCurrencies().collect { currencies ->
                 CurrencyManager.updateSupportedCurrencies(currencies)
             }
         }

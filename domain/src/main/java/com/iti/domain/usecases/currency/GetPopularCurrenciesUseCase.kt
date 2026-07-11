@@ -9,11 +9,11 @@
 package com.iti.domain.usecases.currency
 
 import com.iti.domain.models.Currency
-import com.iti.domain.repositories.currency.CurrencyRepository
+import com.iti.domain.repositories.settings.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetPopularCurrenciesUseCase(
-    private val repository: CurrencyRepository
+    private val repository: SettingsRepository
 ) {
     operator fun invoke(): Flow<List<Currency>> = repository.getPopularCurrencies()
 }

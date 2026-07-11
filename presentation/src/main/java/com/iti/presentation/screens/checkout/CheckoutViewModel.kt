@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
-import com.iti.domain.usecases.cart.GetCartUseCase
-import com.iti.domain.usecases.cart.ClearCartUseCase
-import com.iti.domain.usecases.checkout.CreateDraftOrderUseCase
-import com.iti.domain.usecases.checkout.CompleteDraftOrderUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
+import com.iti.domain.usecases.cart.ClearCartUseCase
+import com.iti.domain.usecases.cart.GetCartUseCase
+import com.iti.domain.usecases.checkout.CompleteDraftOrderUseCase
+import com.iti.domain.usecases.checkout.CreateDraftOrderUseCase
 import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

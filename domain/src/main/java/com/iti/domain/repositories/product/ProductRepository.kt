@@ -1,4 +1,4 @@
-package com.iti.domain.repositories.products
+package com.iti.domain.repositories.product
 
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
@@ -8,7 +8,7 @@ import com.iti.domain.models.Category
 import com.iti.domain.models.Result
 import kotlinx.coroutines.flow.Flow
 
-interface ProductsRepository {
+interface ProductRepository {
     fun getBrands(): Flow<Result<List<Brand>>>
     fun getAds(): Flow<Result<List<Ad>>>
     fun getProductsByNumber(count: Int = 10): Flow<Result<List<Product>>>
@@ -19,35 +19,19 @@ interface ProductsRepository {
     suspend fun removeFromFavorites(productId: String)
     fun getFavorites(): Flow<Result<List<Product>>>
     suspend fun isFavorite(productId: String): Boolean
-
     fun searchProducts(query: String): Flow<Result<List<Product>>>
     fun getPopularProducts(count: Int = 10): Flow<Result<List<Product>>>
     fun getProductsByCategory(categoryId: String, count: Int = 10): Flow<Result<List<Product>>>
     fun getBestSellers(count: Int = 10): Flow<Result<List<Product>>>
-    fun addProductReview(
-        productId: String,
-        customerName: String,
-        customerId: String,
-        rating: Int,
-        title: String,
-        body: String,
-        avatarUrl: String? = null
-    ): Flow<Result<Unit>>
-    fun updateProductReview(
-        reviewId: String,
-        customerName: String,
-        customerId: String,
-        rating: Int,
-        title: String,
-        body: String,
-        avatarUrl: String? = null
-    ): Flow<Result<Unit>>
-    fun deleteProductReview(
-        productId: String,
-        reviewId: String
-    ): Flow<Result<Unit>>
+    fun addProductReview(productId: String, customerName: String, customerId: String, rating: Int, title: String, body: String, avatarUrl: String? = null): Flow<Result<Unit>>
+    fun updateProductReview(reviewId: String, customerName: String, customerId: String, rating: Int, title: String, body: String, avatarUrl: String? = null): Flow<Result<Unit>>
+    fun deleteProductReview(productId: String, reviewId: String): Flow<Result<Unit>>
     fun getProductTranslations(productId: String): Flow<Result<Map<String, String>>>
     fun getCollectionTranslations(collectionId: String, locale: String): Flow<Result<Map<String, String>?>>
     fun saveCollectionTranslation(collectionId: String, locale: String, title: String, bodyHtml: String): Flow<Result<Unit>>
-}
 
+    fun getSearchHistory(): Flow<List<String>>
+    suspend fun addSearchQuery(query: String)
+    suspend fun deleteSearchQuery(query: String)
+    suspend fun clearSearchHistory()
+}

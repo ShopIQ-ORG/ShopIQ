@@ -1,17 +1,13 @@
-//
-//  CurrencyRepositoryImpl.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/2/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.data.repositories
 
 import com.iti.data.sources.local.currency.CurrencyLocalDataSource
+import com.iti.data.sources.local.onboarding.OnboardingLocalDataSource
 import com.iti.data.sources.remote.currency.CurrencyRemoteDataSource
 import com.iti.domain.models.Currency
-import com.iti.domain.repositories.currency.CurrencyRepository
+import com.iti.domain.repositories.settings.SettingsRepository
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,20 +15,18 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
-class CurrencyRepositoryImpl(
+class SettingsRepositoryImpl(
     private val remoteDataSource: CurrencyRemoteDataSource,
-    private val localDataSource: CurrencyLocalDataSource
-) : CurrencyRepository {
+    private val currencyLocalDataSource: CurrencyLocalDataSource,
+    private val localDataSource: OnboardingLocalDataSource
+) : SettingsRepository {
 
-    private val fallbackCurrencies = listOf(Currency("USD", "US Dollar", "$", 1.0))
+private val fallbackCurrencies = listOf(Currency("USD", "US Dollar", "$", 1.0))
     private val _currenciesState = MutableStateFlow<List<Currency>>(emptyList())
 
     override fun getSelectedCurrency(): Flow<Currency> {
-        return localDataSource.getSelectedCurrency()
+        return currencyLocalDataSource.getSelectedCurrency()
             .map { it ?: fallbackCurrencies.first() }
             .onStart { emit(fallbackCurrencies.first()) }
     }
@@ -70,7 +64,7 @@ class CurrencyRepositoryImpl(
 
     override suspend fun changeSelectedCurrency(code: String) {
         val currency = getCurrencyByCode(code)
-        localDataSource.saveSelectedCurrency(currency)
+        currencyLocalDataSource.saveSelectedCurrency(currency)
     }
 
     private fun getCurrencyByCode(code: String): Currency {
@@ -79,4 +73,11 @@ class CurrencyRepositoryImpl(
             ?: Currency("USD", "US Dollar", "$", 1.0)
     }
 
+override fun isOnboardingCompleted(): Flow<Boolean> {
+        return localDataSource.isOnboardingCompleted()
+    }
+
+    override suspend fun setOnboardingCompleted() {
+        localDataSource.setOnboardingCompleted()
+    }
 }

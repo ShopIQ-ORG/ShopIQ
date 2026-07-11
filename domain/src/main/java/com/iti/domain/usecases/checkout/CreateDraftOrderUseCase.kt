@@ -8,14 +8,14 @@
 
 package com.iti.domain.usecases.checkout
 
-import com.iti.domain.models.Result
-import com.iti.domain.models.checkout.DraftOrder
 import com.iti.domain.models.Address
+import com.iti.domain.models.Result
 import com.iti.domain.models.cart.Cart
-import com.iti.domain.repositories.checkout.CheckoutRepository
+import com.iti.domain.models.checkout.DraftOrder
+import com.iti.domain.repositories.order.OrderRepository
 
 class CreateDraftOrderUseCase(
-    private val repository: CheckoutRepository
+    private val repository: OrderRepository
 ) {
     suspend operator fun invoke(
         cart: Cart,

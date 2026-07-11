@@ -1,32 +1,52 @@
-//
-//  CheckoutRepositoryImpl.kt
-//  ShopIQ
-//
-//  Created by Abdullh Gaber on 7/6/26.
-//  Copyright © 2026 ITI. All rights reserved.
-//
-
 package com.iti.data.repositories
 
 import com.iti.data.dto.checkout.*
+import com.iti.data.mappers.toDomain
 import com.iti.data.sources.local.shopify.ShopifyTokenLocalDataSource
 import com.iti.data.sources.remote.checkout.CheckoutRemoteDataSource
+import com.iti.data.sources.remote.orders.OrdersRemoteDataSource
+import com.iti.data.sources.remote.payment.PaymobRemoteDataSource
 import com.iti.data.utils.handleException
-import com.iti.domain.models.Result
-import com.iti.domain.models.checkout.DraftOrder
+import com.iti.domain.exceptions.AppException
+import com.iti.domain.exceptions.OrderException
 import com.iti.domain.models.Address
+import com.iti.domain.models.Result
 import com.iti.domain.models.cart.Cart
-import com.iti.domain.repositories.checkout.CheckoutRepository
+import com.iti.domain.models.checkout.DraftOrder
+import com.iti.domain.models.order.Order
+import com.iti.domain.models.order.PaymobIntentionResult
+import com.iti.domain.repositories.order.OrderRepository
+import com.iti.domain.util.ShopifyTokenProvider
+import kotlin.collections.map
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class CheckoutRepositoryImpl(
-    private val remoteDataSource: CheckoutRemoteDataSource,
-    private val tokenLocalDataSource: ShopifyTokenLocalDataSource
-) : CheckoutRepository {
+class OrderRepositoryImpl(
+    private val remote: OrdersRemoteDataSource,
+    private val tokenProvider: ShopifyTokenProvider,
+    private val paymobRemoteDataSource: PaymobRemoteDataSource,
+    private val tokenLocalDataSource: ShopifyTokenLocalDataSource,
+    private val secretKey: String,
+    private val publicKey: String,
+    private val checkoutRemoteDataSource: CheckoutRemoteDataSource
+) : OrderRepository {
 
-    override suspend fun createDraftOrder(
+override suspend fun getOrders(): Result<List<Order>> {
+        val accessToken = when (val tokenResult = tokenProvider.getValidToken()) {
+            is Result.Success -> tokenResult.data.accessToken
+            is Result.Failure -> return tokenResult
+            is Result.Loading -> return Result.Loading
+        }
+
+        return safeCall {
+            remote.getOrders(accessToken).map { it.toDomain() }
+        }
+    }
+
+    
+
+override suspend fun createDraftOrder(
         cart: Cart,
         shippingAddress: Address?,
         email: String?
@@ -102,14 +122,14 @@ class CheckoutRepositoryImpl(
                 useCustomerDefaultAddress = false
             )
 
-            val dto = remoteDataSource.createDraftOrder(input)
+            val dto = checkoutRemoteDataSource.createDraftOrder(input)
             dto.toDomain()
         }
     }
 
     override suspend fun completeDraftOrder(draftOrderId: String): Result<DraftOrder> = withContext(Dispatchers.IO) {
         safeCall {
-            remoteDataSource.completeDraftOrder(draftOrderId).toDomain()
+            checkoutRemoteDataSource.completeDraftOrder(draftOrderId).toDomain()
         }
     }
 
@@ -131,6 +151,30 @@ class CheckoutRepositoryImpl(
             throw e
         } catch (e: Exception) {
             Result.Failure(e.handleException())
+        }
+    }
+
+override suspend fun createPaymentIntention(
+        amountCents: Long,
+        currency: String,
+        integrationId: Int
+    ): Result<PaymobIntentionResult> {
+        return try {
+            val intentionResponse = paymobRemoteDataSource.createIntention(
+                secretKey = secretKey,
+                amountCents = amountCents,
+                currency = currency,
+                integrationId = integrationId
+            )
+
+            Result.Success(
+                PaymobIntentionResult(
+                    clientSecret = intentionResponse.client_secret,
+                    publicKey = publicKey
+                )
+            )
+        } catch (e: Exception) {
+            Result.Failure(AppException.PaymentIntentionCreationFailed())
         }
     }
 }

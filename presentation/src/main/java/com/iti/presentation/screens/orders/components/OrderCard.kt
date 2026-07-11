@@ -19,7 +19,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.Card
@@ -41,6 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.order.Money
+import com.iti.domain.models.order.Order
+import com.iti.domain.models.order.OrderFinancialStatus
+import com.iti.domain.models.order.OrderStatus
 import com.iti.presentation.R
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.ui.theme.ShopIQTheme
@@ -48,9 +50,6 @@ import com.iti.presentation.ui.theme.SuccessDark
 import com.iti.presentation.ui.theme.SuccessLight
 import com.iti.presentation.ui.theme.WarningDark
 import com.iti.presentation.ui.theme.WarningLight
-import com.iti.domain.models.order.Order
-import com.iti.domain.models.order.OrderFinancialStatus
-import com.iti.domain.models.order.OrderStatus
 import com.iti.presentation.util.CurrencyManager
 import com.iti.presentation.util.localizedCurrency
 import com.iti.presentation.util.toDisplayDate

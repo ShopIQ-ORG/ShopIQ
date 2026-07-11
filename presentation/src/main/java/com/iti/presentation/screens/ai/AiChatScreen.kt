@@ -19,13 +19,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.iti.domain.models.User
 import com.iti.presentation.R
+import com.iti.presentation.components.NoInternetScreen
 import com.iti.presentation.screens.ai.components.*
 import com.iti.presentation.ui.theme.LocalDarkTheme
+import com.iti.presentation.util.NetworkMonitor
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import com.iti.presentation.util.NetworkMonitor
-import com.iti.presentation.components.NoInternetScreen
-import kotlinx.coroutines.launch
 
 @Composable
 fun AiChatScreen(

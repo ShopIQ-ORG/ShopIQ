@@ -8,10 +8,10 @@
 
 package com.iti.domain.usecases.currency
 
-import com.iti.domain.repositories.currency.CurrencyRepository
+import com.iti.domain.repositories.settings.SettingsRepository
 
 class FetchExchangeRatesUseCase(
-    private val repository: CurrencyRepository
+    private val repository: SettingsRepository
 ) {
     suspend operator fun invoke() = repository.fetchExchangeRates()
 }

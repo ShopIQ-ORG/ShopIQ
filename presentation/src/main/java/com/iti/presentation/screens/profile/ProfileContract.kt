@@ -9,8 +9,8 @@
 package com.iti.presentation.screens.profile
 
 import com.iti.domain.models.Address
-import com.iti.domain.models.User
 import com.iti.domain.models.Currency
+import com.iti.domain.models.User
 
 object ProfileContract {
 

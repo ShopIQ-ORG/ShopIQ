@@ -5,32 +5,32 @@ import androidx.lifecycle.viewModelScope
 import com.iti.domain.exceptions.AuthException
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
+import com.iti.domain.usecases.auth.IsGuestUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
-import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.cart.AddCartItemUseCase
-import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.AddProductReviewUseCase
+import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
+import com.iti.domain.usecases.products.DeleteProductReviewUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
+import com.iti.domain.usecases.products.GetProductDetailsUseCase
+import com.iti.domain.usecases.products.GetProductTranslationsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
-import com.iti.domain.repositories.auth.AuthRepository
+import com.iti.domain.usecases.products.UpdateProductReviewUseCase
+import com.iti.presentation.R
+import com.iti.presentation.util.ReviewsCache
+import com.iti.presentation.util.UiText
+import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
-import com.iti.presentation.util.UiText
-import com.iti.presentation.R
-import com.iti.domain.usecases.products.AddProductReviewUseCase
-import com.iti.domain.usecases.products.UpdateProductReviewUseCase
-import com.iti.domain.usecases.products.DeleteProductReviewUseCase
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import com.iti.domain.usecases.products.GetProductTranslationsUseCase
-import com.iti.presentation.util.ReviewsCache
-import com.iti.presentation.util.toUiMessage
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
@@ -38,7 +38,7 @@ class ProductDetailsViewModel(
     private val removeProductFromFavoritesUseCase: RemoveProductFromFavoritesUseCase,
     private val getFavoriteProductsUseCase: GetFavoriteProductsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val authRepository: AuthRepository,
+    private val isGuestUseCase: IsGuestUseCase,
     private val addToCartUseCase: AddCartItemUseCase,
     private val addProductReviewUseCase: AddProductReviewUseCase,
     private val updateProductReviewUseCase: UpdateProductReviewUseCase,

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.ChatMessage
 import com.iti.domain.models.Result
 import com.iti.domain.models.User
-import com.iti.domain.repositories.products.ProductsRepository
+import com.iti.domain.usecases.products.GetProductDetailsUseCase
 import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.ai.SendChatMessageUseCase
 import com.iti.presentation.screens.ai.AiChatContract.ChatMessageUi
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 class AiChatViewModel(
     private val getChatHistoryUseCase: GetChatHistoryUseCase,
     private val sendChatMessageUseCase: SendChatMessageUseCase,
-    private val productsRepository: ProductsRepository,
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
@@ -110,7 +110,7 @@ class AiChatViewModel(
                         try {
                             val longId = id.substringAfterLast("/").toLongOrNull()
                             if (longId != null) {
-                                productsRepository.getProductDetails(longId).collect { res ->
+                                getProductDetailsUseCase(longId).collect { res ->
                                     if (res is Result.Success) {
                                         val prod = res.data
                                         val selectedCurrency = CurrencyManager.selectedCurrency.value

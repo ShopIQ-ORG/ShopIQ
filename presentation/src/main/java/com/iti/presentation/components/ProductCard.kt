@@ -46,10 +46,10 @@ import com.iti.domain.models.Product
 import com.iti.presentation.R
 import com.iti.presentation.ui.theme.WarningLight
 import com.iti.presentation.util.CurrencyManager
+import com.iti.presentation.util.ReviewsCache
 import com.iti.presentation.util.compareAtPrice
 import com.iti.presentation.util.discountPercent
 import com.iti.presentation.util.getLocalizedCode
-import com.iti.presentation.util.ReviewsCache
 
 
 @Composable

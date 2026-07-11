@@ -48,7 +48,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import com.iti.presentation.components.BackTopBar
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,6 +76,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.iti.domain.models.Address
 import com.iti.presentation.R
+import com.iti.presentation.components.BackTopBar
 import com.iti.presentation.components.ShopIQButton
 import com.iti.presentation.ui.theme.LocalDarkTheme
 import com.iti.presentation.ui.theme.ShopIQTheme

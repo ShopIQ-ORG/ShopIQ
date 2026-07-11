@@ -9,6 +9,8 @@ import com.iti.domain.usecases.categories.GetProductsByCategoryUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetFavoriteProductsUseCase
 import com.iti.domain.usecases.products.RemoveProductFromFavoritesUseCase
+import com.iti.presentation.R
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +19,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.iti.presentation.R
-import com.iti.presentation.util.UiText
 
 class CategoryDetailsViewModel(
     private val getProductsByCategoryUseCase: GetProductsByCategoryUseCase,

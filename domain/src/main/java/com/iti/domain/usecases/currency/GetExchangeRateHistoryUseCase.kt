@@ -8,11 +8,11 @@
 
 package com.iti.domain.usecases.currency
 
-import com.iti.domain.repositories.currency.CurrencyRepository
+import com.iti.domain.repositories.settings.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetExchangeRateHistoryUseCase(
-    private val repository: CurrencyRepository
+    private val repository: SettingsRepository
 ) {
     operator fun invoke(currencyCode: String): Flow<List<Pair<String, Double>>> =
         repository.getExchangeRateHistory(currencyCode)

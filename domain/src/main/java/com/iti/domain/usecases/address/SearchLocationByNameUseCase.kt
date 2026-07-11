@@ -10,10 +10,10 @@ package com.iti.domain.usecases.address
 
 import com.iti.domain.models.LocationCoordinates
 import com.iti.domain.models.Result
-import com.iti.domain.repositories.address.AddressRepository
+import com.iti.domain.repositories.user.UserRepository
 
 class SearchLocationByNameUseCase(
-    private val repository: AddressRepository
+    private val repository: UserRepository
 ) {
     suspend operator fun invoke(query: String, apiKey: String): Result<LocationCoordinates?> {
         return repository.searchLocationByName(query, apiKey)

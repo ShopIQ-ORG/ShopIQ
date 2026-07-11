@@ -1,44 +1,49 @@
 package com.iti.data.repositories
 
-import com.iti.data.utils.handleException
+import com.iti.domain.repositories.user.UserRepository
+
+import com.iti.data.mappers.toDomainAd
+import com.iti.data.mappers.toDomainBrand
+import com.iti.data.mappers.toDomainCategories
+import com.iti.data.mappers.toDomainProduct
+import com.iti.data.mappers.toDomainProducts
+import com.iti.data.mappers.toFavoriteEntity
+import com.iti.data.sources.local.room.FavoriteDao
+import com.iti.data.sources.local.room.FavoriteEntity
+import com.iti.data.sources.local.search.SearchHistoryLocalDataSource
 import com.iti.data.sources.remote.ProductsRemoteDataSource
 import com.iti.data.sources.remote.favorites.FavoriteRemoteDataSource
 import com.iti.data.sources.remote.user.UserRemoteDataSource
-import com.iti.data.mappers.toDomainAd
-import com.iti.data.mappers.toDomainBrand
-import com.iti.data.mappers.toDomainProducts
-import com.iti.data.mappers.toDomainProduct
-import com.iti.data.mappers.toDomainCategories
-import com.iti.data.mappers.toFavoriteEntity
-import com.iti.data.sources.local.room.FavoriteDao
-import com.iti.domain.models.User
+import com.iti.data.utils.handleException
 import com.iti.domain.models.Ad
 import com.iti.domain.models.Brand
+import com.iti.domain.models.Category
+import com.iti.domain.models.PaginatedProducts
 import com.iti.domain.models.Product
 import com.iti.domain.models.ProductReview
-import com.iti.domain.models.PaginatedProducts
-import com.iti.domain.models.Category
 import com.iti.domain.models.Result
-import com.iti.domain.repositories.auth.AuthRepository
-import com.iti.domain.repositories.products.ProductsRepository
-import kotlinx.coroutines.tasks.await
-import com.iti.data.sources.local.room.FavoriteEntity
+import com.iti.domain.models.User
+import com.iti.domain.repositories.product.ProductRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import android.util.Log
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class ProductsRepositoryImpl(
+class ProductRepositoryImpl(
     private val remoteDataSource: ProductsRemoteDataSource,
     private val favoriteDao: FavoriteDao,
     private val favoriteRemoteDataSource: FavoriteRemoteDataSource,
-    private val authRepository: AuthRepository,
-    private val userRemoteDataSource: UserRemoteDataSource
-) : ProductsRepository {
+    private val userRepository: UserRepository,
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val localDataSource: SearchHistoryLocalDataSource
+) : ProductRepository {
 
-    override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
+override fun getProductsByNumber(count: Int): Flow<Result<List<Product>>> = flow {
         emit(Result.Loading)
         try {
             val shopifyResponse = remoteDataSource.getProductsByNumber(count)
@@ -163,14 +168,14 @@ class ProductsRepositoryImpl(
 
             try {
                 favoriteRemoteDataSource.addFavorite(userId, cleanId)
-                android.util.Log.d(
+                Log.d(
                     "ProductsRepository",
                     "Firestore addToFavorites OK: cleanId=$cleanId"
                 )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
-                android.util.Log.e("ProductsRepository", "Firestore addToFavorites failed", e)
+                Log.e("ProductsRepository", "Firestore addToFavorites failed", e)
             }
         }
     }
@@ -185,14 +190,14 @@ class ProductsRepositoryImpl(
 
             try {
                 favoriteRemoteDataSource.removeFavorite(userId, cleanId)
-                android.util.Log.d(
+                Log.d(
                     "ProductsRepository",
                     "Firestore removeFromFavorites OK: cleanId=$cleanId"
                 )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
-                android.util.Log.e("ProductsRepository", "Firestore removeFromFavorites failed", e)
+                Log.e("ProductsRepository", "Firestore removeFromFavorites failed", e)
             }
         }
     }
@@ -229,7 +234,7 @@ class ProductsRepositoryImpl(
                                     null
                                 }
                             } catch (e: Exception) {
-                                android.util.Log.e(
+                                Log.e(
                                     "ProductsRepository",
                                     "Failed to fetch product details from Shopify for ID: $cleanId",
                                     e
@@ -242,14 +247,14 @@ class ProductsRepositoryImpl(
 
                 favoriteDao.deleteFavoritesForUser(userId)
                 favorites.forEach { favoriteDao.insertFavorite(it) }
-                android.util.Log.d(
+                Log.d(
                     "ProductsRepository",
                     "Firestore getFavorites synced ${favorites.size} items from favorites list for users/$userId"
                 )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
-                android.util.Log.e("ProductsRepository", "Firestore getFavorites failed", e)
+                Log.e("ProductsRepository", "Firestore getFavorites failed", e)
             }
 
             favoriteDao.getAllFavorites(userId).collect { list ->
@@ -271,8 +276,8 @@ class ProductsRepositoryImpl(
     }
 
     private suspend fun getCurrentUser(): User {
-        val userRes = authRepository.getCurrentUser()
-        return if (userRes is Result.Success) userRes.data else User.GuestUser
+        val userRes = userRepository.getCurrentUser()
+        return if (userRes is Result.Success<*>) userRes.data as User else User.GuestUser
     }
 
     override fun searchProducts(query: String): Flow<Result<List<Product>>> = flow {
@@ -338,7 +343,7 @@ class ProductsRepositoryImpl(
             val existingIds = productDetails.data.product?.reviews?.map { it.id } ?: emptyList()
 
             val formatter =
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
             formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
             val createdAt = formatter.format(java.util.Date())
 
@@ -376,7 +381,7 @@ class ProductsRepositoryImpl(
         emit(Result.Loading)
         try {
             val formatter =
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
             formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
             val createdAt = formatter.format(java.util.Date())
 
@@ -462,5 +467,21 @@ class ProductsRepositoryImpl(
         } catch (e: Exception) {
             emit(Result.Failure(e))
         }
+    }
+
+override fun getSearchHistory(): Flow<List<String>> {
+        return localDataSource.getSearchHistory()
+    }
+
+    override suspend fun addSearchQuery(query: String) {
+        localDataSource.addSearchQuery(query)
+    }
+
+    override suspend fun deleteSearchQuery(query: String) {
+        localDataSource.deleteSearchQuery(query)
+    }
+
+    override suspend fun clearSearchHistory() {
+        localDataSource.clearSearchHistory()
     }
 }
