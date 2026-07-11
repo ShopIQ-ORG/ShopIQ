@@ -10,7 +10,7 @@
 [![Target SDK](https://img.shields.io/badge/Target%20SDK-35-informational?style=for-the-badge)](#)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](#)
 
-[Features](#-key-features) • [Architecture](#-architecture--patterns) • [Tech Stack](#-tech-stack) • [Screenshots](#-screenshots) • [Setup](#-installation--setup) • [Contributors](#-contributors)
+[Features](#key-features) • [Architecture](#architecture) • [Tech Stack](#tech-stack) • [Screenshots](#screenshots) • [Setup](#setup) • [Contributors](#contributors)
 
 </div>
 
@@ -21,7 +21,7 @@
 **ShopIQ** is a fully-featured m-commerce Android application built on top of the **Shopify Storefront & Admin APIs**. Designed during the intensive 2-week **JETS MobileX Challenge 2026** at **ITI Smart Village**, the app delivers a seamless shopping experience — from product discovery and AI-powered assistance to checkout and payment — all wrapped in a modern, theme-adaptive, bilingual interface.
 
 ---
-
+<a id="key-features"></a>
 ## ✨ Key Features
 
 ### 🛒 E-Commerce Workflows
@@ -54,7 +54,7 @@
 * **Shared debug Keystore** committed to the repo, allowing teammates to pull and build instantly without SHA-1 fingerprint registration.
 
 ---
-
+<a id="architecture"></a>
 ## 🏛️ Architecture & Patterns
 
 ShopIQ strictly follows **Clean Architecture** with multi-module separation to ensure scalability and maintainability:
@@ -90,7 +90,7 @@ ShopIQ strictly follows **Clean Architecture** with multi-module separation to e
 | **Debounce Optimization** | Strategically applied to search (300ms), address suggestions (500ms), and map geocoding (800ms). |
 
 ---
-
+<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
 ### Core Frameworks
@@ -116,7 +116,7 @@ ShopIQ strictly follows **Clean Architecture** with multi-module separation to e
 ![Paymob](https://img.shields.io/badge/Paymob%20SDK-1.9.2-1A73E8?style=for-the-badge)
 
 ---
-
+<a id="screenshots"></a>
 ## 📸 Screenshots
 
 ### 🌞 Light Theme — English (LTR)
@@ -140,7 +140,7 @@ ShopIQ strictly follows **Clean Architecture** with multi-module separation to e
 | <img width="1226" height="2559" alt="home_light_ar" src="https://github.com/user-attachments/assets/50dc4a31-ac53-4377-911c-616d76976e48" /> | <img width="1226" height="2559" alt="product_details_ar_dark" src="https://github.com/user-attachments/assets/ad7101e5-b25a-4614-b54b-faea64b36671" /> | <img width="1226" height="2559" alt="cart_ar_light" src="https://github.com/user-attachments/assets/c5b54a6c-d4a5-4e5e-b0c0-33d2a3ba0042" /> | <img width="1226" height="2559" alt="checkout_ar_dark" src="https://github.com/user-attachments/assets/2346ecf0-6650-488c-ac7f-d213db9ccc6a" /> |
 
 ---
-
+<a id="setup"></a>
 ## 🚀 Installation & Setup
 
 ### Prerequisites
@@ -203,7 +203,7 @@ The app consumes **two Shopify API services** configured via Apollo Kotlin:
 | `shopify-storefront` | Storefront API | 12 operations | Customer Auth, Cart CRUD operations, and Order placements. |
 
 ---
-
+<a id="contributors"></a>
 ## 👥 Contributors
 
 | Name | Role |
