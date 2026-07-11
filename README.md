@@ -1,4 +1,5 @@
 <div align="center">
+<img width="200" height="200" src="https://github.com/user-attachments/assets/5fba7f8e-6943-4417-935c-272567ed4e8a" />
 
 # 🛍️ ShopIQ — Smart M-Commerce for Android
 
@@ -9,7 +10,7 @@
 [![Target SDK](https://img.shields.io/badge/Target%20SDK-35-informational?style=for-the-badge)](#)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](#)
 
-[Features](#-key-features) • [Architecture](#-architecture--patterns) • [Tech Stack](#-tech-stack) • [Screenshots](#-screenshots) • [Setup](#-installation--setup) • [Contributors](#-contributors)
+[Features](#key-features) • [Architecture](#architecture) • [Tech Stack](#tech-stack) • [Screenshots](#screenshots) • [Setup](#setup) • [Contributors](#contributors)
 
 </div>
 
@@ -20,7 +21,7 @@
 **ShopIQ** is a fully-featured m-commerce Android application built on top of the **Shopify Storefront & Admin APIs**. Designed during the intensive 2-week **JETS MobileX Challenge 2026** at **ITI Smart Village**, the app delivers a seamless shopping experience — from product discovery and AI-powered assistance to checkout and payment — all wrapped in a modern, theme-adaptive, bilingual interface.
 
 ---
-
+<a id="key-features"></a>
 ## ✨ Key Features
 
 ### 🛒 E-Commerce Workflows
@@ -53,7 +54,7 @@
 * **Shared debug Keystore** committed to the repo, allowing teammates to pull and build instantly without SHA-1 fingerprint registration.
 
 ---
-
+<a id="architecture"></a>
 ## 🏛️ Architecture & Patterns
 
 ShopIQ strictly follows **Clean Architecture** with multi-module separation to ensure scalability and maintainability:
@@ -89,7 +90,7 @@ ShopIQ strictly follows **Clean Architecture** with multi-module separation to e
 | **Debounce Optimization** | Strategically applied to search (300ms), address suggestions (500ms), and map geocoding (800ms). |
 
 ---
-
+<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
 ### Core Frameworks
@@ -115,31 +116,31 @@ ShopIQ strictly follows **Clean Architecture** with multi-module separation to e
 ![Paymob](https://img.shields.io/badge/Paymob%20SDK-1.9.2-1A73E8?style=for-the-badge)
 
 ---
-
+<a id="screenshots"></a>
 ## 📸 Screenshots
 
 ### 🌞 Light Theme — English (LTR)
 
 | Home | Product Details | Cart | Checkout |
 | :---: | :---: | :---: | :---: |
-| <img src="screenshots/en_light_home.png" width="220" alt="Home"/> | <img src="screenshots/en_light_product_details.png" width="220" alt="Product Details"/> | <img src="screenshots/en_light_cart.png" width="220" alt="Cart"/> | <img src="screenshots/en_light_checkout.png" width="220" alt="Checkout"/> |
+|<img  width="220"  alt="home"     src="https://github.com/user-attachments/assets/47848fdc-0216-4036-a888-dfb500590f1c" />|<img  width="220"  alt="details"  src="https://github.com/user-attachments/assets/11e8021b-5d96-4f2a-bb19-e32a9d297614" />|<img   width="220"   alt="cart"     src="https://github.com/user-attachments/assets/1c8776c0-c940-43f6-9cc0-9e0940e2b556" />|<img width="220" alt="checkout" src="https://github.com/user-attachments/assets/85d0fce5-bf30-4abf-a655-6ea28220ab21" />|
 | **Search** | **Orders** | **Profile** | **AI Chat** |
-| <img src="screenshots/en_light_search.png" width="220" alt="Search"/> | <img src="screenshots/en_light_orders.png" width="220" alt="Orders"/> | <img src="screenshots/en_light_profile.png" width="220" alt="Profile"/> | <img src="screenshots/en_light_ai_chat.png" width="220" alt="AI Chat"/> |
+|<img width="220" alt="search" src="https://github.com/user-attachments/assets/5de7ea07-356f-4e16-aa45-ac3632f5ce06" />|<img width="220" alt="orders" src="https://github.com/user-attachments/assets/daad499b-dc4c-4b85-a11a-42cf876499f4" />|<img width="220" alt="profile" src="https://github.com/user-attachments/assets/f419bdeb-bb33-4a60-8e50-28da4d69e9eb" />|<img width="220" alt="ai chat" src="https://github.com/user-attachments/assets/b0db558a-b0af-4aef-a0e0-0a955f23b437" />|
 
 ### 🌙 Dark Theme — English (LTR)
 
 | Home | Product Details | Cart | Checkout |
 | :---: | :---: | :---: | :---: |
-| <img src="screenshots/en_dark_home.png" width="220" alt="Home Dark"/> | <img src="screenshots/en_dark_product_details.png" width="220" alt="Product Details Dark"/> | <img src="screenshots/en_dark_cart.png" width="220" alt="Cart Dark"/> | <img src="screenshots/en_dark_checkout.png" width="220" alt="Checkout Dark"/> |
+| <img width="220" alt="home_dark" src="https://github.com/user-attachments/assets/237dfe40-b362-4e9e-af29-639e4881d273" /> | <img width="220" alt="product_details_dark" src="https://github.com/user-attachments/assets/ce657910-81d0-4402-8d31-1e23b390f1df" /> | <img width="220" alt="cart_dark" src="https://github.com/user-attachments/assets/96e92c51-891c-4ecd-b2ce-1fa07a0b423a" /> | <img width="220" alt="checkout_dark" src="https://github.com/user-attachments/assets/7672415e-cba6-4bf1-8515-e9c28f773de1" /> |
 
 ### 🌍 Arabic (RTL) Showcase
 
 | الرئيسية (Home Light) | تفاصيل المنتج (Product Dark) | السلة (Cart Light) | الدفع (Checkout Dark) |
 | :---: | :---: | :---: | :---: |
-| <img src="screenshots/ar_light_home.png" width="220" alt="Home Arabic"/> | <img src="screenshots/ar_dark_product_details.png" width="220" alt="Product Details Arabic Dark"/> | <img src="screenshots/ar_light_cart.png" width="220" alt="Cart Arabic"/> | <img src="screenshots/ar_dark_checkout.png" width="220" alt="Checkout Arabic Dark"/> |
+| <img width="1226" height="2559" alt="home_light_ar" src="https://github.com/user-attachments/assets/50dc4a31-ac53-4377-911c-616d76976e48" /> | <img width="1226" height="2559" alt="product_details_ar_dark" src="https://github.com/user-attachments/assets/ad7101e5-b25a-4614-b54b-faea64b36671" /> | <img width="1226" height="2559" alt="cart_ar_light" src="https://github.com/user-attachments/assets/c5b54a6c-d4a5-4e5e-b0c0-33d2a3ba0042" /> | <img width="1226" height="2559" alt="checkout_ar_dark" src="https://github.com/user-attachments/assets/2346ecf0-6650-488c-ac7f-d213db9ccc6a" /> |
 
 ---
-
+<a id="setup"></a>
 ## 🚀 Installation & Setup
 
 ### Prerequisites
@@ -202,7 +203,7 @@ The app consumes **two Shopify API services** configured via Apollo Kotlin:
 | `shopify-storefront` | Storefront API | 12 operations | Customer Auth, Cart CRUD operations, and Order placements. |
 
 ---
-
+<a id="contributors"></a>
 ## 👥 Contributors
 
 | Name | Role |
