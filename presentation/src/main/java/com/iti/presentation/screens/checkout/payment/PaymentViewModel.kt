@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.iti.domain.usecases.payment.CreatePaymentIntentionUseCase
 import com.iti.presentation.R
 import com.iti.presentation.util.UiText
+import com.iti.presentation.util.toUiMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,8 +50,7 @@ class PaymentViewModel(
                 }
                 is com.iti.domain.models.Result.Failure -> {
                     _paymentUiState.value = PaymentUiState.Error(
-                        result.exception.message?.let(UiText::Plain)
-                            ?: UiText.StringResource(R.string.payment_intention_creation_failed)
+                        result.exception.toUiMessage()
                     )
                 }
                 is com.iti.domain.models.Result.Loading -> {

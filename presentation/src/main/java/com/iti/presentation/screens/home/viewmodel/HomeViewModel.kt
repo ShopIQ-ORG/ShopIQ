@@ -395,13 +395,23 @@ class HomeViewModel(
                         }
                     }
                 }
-                Pair(screenState, recommendationsState)
-            }.collect { (screenState, recommendationsState) ->
+                val updatedRecommendations = recommendationsState?.recommendedProducts?.map { product ->
+                    val favoriteIds = if (mainData.favoritesResult is Result.Success) {
+                        mainData.favoritesResult.data.map { it.id }.toSet()
+                    } else emptySet()
+                    val isFavoriteInDb = product.id in favoriteIds
+                    val isFavorite = mainData.overrides[product.id] ?: isFavoriteInDb
+                    product.copy(isFavorite = isFavorite)
+                } ?: emptyList()
+
+                Pair(screenState, Pair(recommendationsState?.hasChatHistory ?: false, updatedRecommendations))
+            }.collect { (screenState, recommendationsPair) ->
+                val (hasChatHistory, updatedRecommendations) = recommendationsPair
                 _state.update { currentState ->
                     currentState.copy(
                         screenState = screenState,
-                        aiRecommendedProducts = recommendationsState?.recommendedProducts ?: emptyList(),
-                        hasChatHistory = recommendationsState?.hasChatHistory ?: false
+                        aiRecommendedProducts = updatedRecommendations,
+                        hasChatHistory = hasChatHistory
                     )
                 }
             }

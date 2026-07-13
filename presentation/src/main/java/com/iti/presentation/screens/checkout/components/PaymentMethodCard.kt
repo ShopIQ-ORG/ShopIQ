@@ -93,7 +93,7 @@ fun PaymentMethodCard(
                     Icon(
                         painter = icon,
                         contentDescription = null,
-                        tint = Color.Unspecified,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(24.dp)
                     )
 

@@ -65,6 +65,11 @@ class CheckoutViewModel(
             CheckoutContract.Event.NavigateBack -> {
                 navigateBack()
             }
+            is CheckoutContract.Event.GoToStep -> {
+                if (event.step < _state.value.currentStep && event.step in 1..3) {
+                    _state.update { it.copy(currentStep = event.step) }
+                }
+            }
         }
     }
 

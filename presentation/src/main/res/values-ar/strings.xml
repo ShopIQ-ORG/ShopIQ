@@ -607,7 +607,7 @@
     <string name="success_today">اليوم</string>
 
     <string name="payment_successful">تم الدفع بنجاح</string>
-    <string name="payment_failed">فشل الدفع: %1$s</string>
+    <string name="payment_failed">فشل الدفع</string>
     <string name="payment_pending">الدفع معلق</string>
     <string name="payment_sdk_error">خطأ في بدء SDK: %1$s</string>
     <string name="pay_now_amount">ادفع الآن $%1$s</string>

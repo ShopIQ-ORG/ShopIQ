@@ -83,6 +83,10 @@ fun CheckoutScreen(
         }
     }
 
+    androidx.activity.compose.BackHandler(enabled = state.currentStep > 1 && state.currentStep < 4) {
+        viewModel.onEvent(CheckoutContract.Event.NavigateBack)
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -118,7 +122,12 @@ fun CheckoutScreen(
                     .padding(if (showCheckoutHeaders) innerPadding else PaddingValues(0.dp))
             ) {
                 if (showCheckoutHeaders) {
-                    CheckoutStepper(currentStep = state.currentStep)
+                    CheckoutStepper(
+                        currentStep = state.currentStep,
+                        onStepClick = { step ->
+                            viewModel.onEvent(CheckoutContract.Event.GoToStep(step))
+                        }
+                    )
                 }
 
                 Box(

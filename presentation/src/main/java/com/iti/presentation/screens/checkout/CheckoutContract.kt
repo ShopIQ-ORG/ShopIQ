@@ -23,6 +23,7 @@ sealed interface CheckoutContract {
         object PaymentMethodConfirmed : Event
         object PlaceOrder : Event
         object NavigateBack : Event
+        data class GoToStep(val step: Int) : Event
     }
 
     sealed interface Effect {

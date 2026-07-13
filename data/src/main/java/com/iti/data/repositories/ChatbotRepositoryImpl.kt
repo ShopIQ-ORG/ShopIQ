@@ -96,7 +96,7 @@ class ChatbotRepositoryImpl(
             try {
                 productRepository.getProductsByNumber(100).collect { res ->
                     if (res is Result.Success) {
-                        productsList = res.data as List<Product>
+                        productsList = res.data
                     }
                 }
             } catch (e: Exception) {

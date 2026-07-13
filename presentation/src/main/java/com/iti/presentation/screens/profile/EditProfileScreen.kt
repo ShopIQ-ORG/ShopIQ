@@ -364,9 +364,10 @@ fun EditProfileContent(
                         onValueChange = {},
                         placeholder = stringResource(R.string.select_date_of_birth),
                         readOnly = true,
-                        enabled = false,
+                        enabled = true,
                         trailingIcon = {
                             Icon(
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 imageVector = Icons.Default.DateRange,
                                 contentDescription = stringResource(R.string.select_date_of_birth),
                                 modifier = Modifier.clickable { datePickerDialog.show() }
@@ -389,9 +390,10 @@ fun EditProfileContent(
                         onValueChange = {},
                         placeholder = stringResource(R.string.select_gender),
                         readOnly = true,
-                        enabled = false,
+                        enabled = true,
                         trailingIcon = {
                             Icon(
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = stringResource(R.string.select_gender),
                                 modifier = Modifier.clickable { genderExpanded = true }

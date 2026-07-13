@@ -72,7 +72,28 @@ fun PaymentMethodContent(
                 type = PaymentMethodType.ONLINE,
                 isSelected = selectedMethod == PaymentMethodType.ONLINE,
                 onSelect = { onSelectMethod(it) }
-            )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_visa),
+                        contentDescription = "Visa",
+                        modifier = Modifier.height(24.dp)
+                    )
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_master_card),
+                        contentDescription = "MasterCard",
+                        modifier = Modifier.height(24.dp)
+                    )
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_paymob),
+                        contentDescription = "Paymob",
+                        modifier = Modifier.height(24.dp)
+                    )
+                }
+            }
         }
 
         ShopIQButton(

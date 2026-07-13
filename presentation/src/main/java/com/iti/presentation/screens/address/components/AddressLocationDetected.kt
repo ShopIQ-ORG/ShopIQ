@@ -410,7 +410,7 @@ fun AddressLocationDetected(
                     checked = isDefaultAddress,
                     onCheckedChange = { isDefaultAddress = it },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                         checkedTrackColor = MaterialTheme.colorScheme.primary,
                         uncheckedThumbColor = MaterialTheme.colorScheme.outline,
                         uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant

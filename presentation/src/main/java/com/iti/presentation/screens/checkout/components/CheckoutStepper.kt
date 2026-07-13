@@ -2,6 +2,7 @@ package com.iti.presentation.screens.checkout.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,8 @@ import com.iti.presentation.R
 @Composable
 fun CheckoutStepper(
     currentStep: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onStepClick: ((Int) -> Unit)? = null
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -88,7 +90,13 @@ fun CheckoutStepper(
 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .then(
+                                if (isDone && onStepClick != null) {
+                                    Modifier.clickable { onStepClick(stepNumber) }
+                                } else Modifier
+                            )
                     ) {
                         Box(
                             modifier = Modifier
