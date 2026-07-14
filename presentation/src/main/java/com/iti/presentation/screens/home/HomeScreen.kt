@@ -76,6 +76,10 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     var showAuthDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    LaunchedEffect(configuration.locales) {
+        viewModel.sendIntent(HomeContract.Intent.LocaleChanged)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->

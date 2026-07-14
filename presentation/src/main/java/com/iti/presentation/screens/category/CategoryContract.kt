@@ -1,13 +1,14 @@
 package com.iti.presentation.screens.category
 
 import com.iti.presentation.screens.category.model.CategoryItem
+import com.iti.presentation.util.UiText
 
 interface CategoryContract {
     data class State(
         val categories: List<CategoryItem> = emptyList(),
         val searchQuery: String = "",
         val isLoading: Boolean = false,
-        val errorMessage: String? = null
+        val errorMessage: UiText? = null
     )
 
     sealed interface Intent {

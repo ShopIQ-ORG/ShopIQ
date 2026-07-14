@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +42,7 @@ import com.iti.presentation.screens.address.components.AddressEmptyState
 import com.iti.presentation.screens.address.components.AddressListView
 import com.iti.presentation.screens.address.components.AddressLocationDetected
 import com.iti.presentation.screens.address.components.AddressMapPicker
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,10 +61,14 @@ fun AddressScreen(
 
     val successMessage = stringResource(R.string.address_success_added)
 
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(state.showSuccessBadge) {
         if (state.showSuccessBadge) {
-            effectiveSnackbarHostState.showSuccess(successMessage)
             viewModel.sendIntent(AddressContract.Intent.DismissSuccessBadge)
+            scope.launch {
+                effectiveSnackbarHostState.showSuccess(successMessage)
+            }
         }
     }
 

@@ -11,8 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-
+import com.iti.presentation.R
 import com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase
+import com.iti.presentation.util.UiText
 import kotlinx.coroutines.flow.update
 
 class CategoryViewModel(
@@ -69,7 +70,8 @@ class CategoryViewModel(
                     is Result.Failure -> {
                         _state.value = _state.value.copy(
                             isLoading = false,
-                            errorMessage = result.exception.localizedMessage ?: "Failed to load categories"
+                            errorMessage = result.exception.localizedMessage?.let { UiText.Plain(it) }
+                                ?: UiText.StringResource(R.string.error_loading_categories)
                         )
                     }
                 }

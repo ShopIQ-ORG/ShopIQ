@@ -54,6 +54,7 @@ object HomeContract {
         data object ViewAllProductsClicked : Intent()
         data object SearchBarClicked : Intent()
         data object NavigateToAiChat : Intent()
+        data object LocaleChanged : Intent()
         data object Logout : Intent()
     }
 

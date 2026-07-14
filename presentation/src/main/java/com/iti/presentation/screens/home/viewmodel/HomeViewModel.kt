@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iti.domain.models.Product
 import com.iti.domain.models.Result
-import com.iti.domain.usecases.auth.IsGuestUseCase
 import com.iti.domain.usecases.ai.GetChatHistoryUseCase
 import com.iti.domain.usecases.auth.GetCurrentUserUseCase
+import com.iti.domain.usecases.auth.IsGuestUseCase
 import com.iti.domain.usecases.auth.LogoutUseCase
+import com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase
 import com.iti.domain.usecases.products.AddProductToFavoritesUseCase
 import com.iti.domain.usecases.products.GetAdsUseCase
 import com.iti.domain.usecases.products.GetBestSellersUseCase
@@ -35,8 +36,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-import com.iti.domain.usecases.categories.GetCollectionTranslationsUseCase
 
 class HomeViewModel(
     private val getProductsByNumberUseCase: GetProductsByNumberUseCase,
@@ -239,6 +238,17 @@ class HomeViewModel(
 
             is HomeContract.Intent.SearchBarClicked ->
                 emitEffect(HomeContract.Effect.NavigateToSearch)
+                
+            is HomeContract.Intent.LocaleChanged -> {
+                val currentState = _state.value.screenState
+                if (currentState is HomeContract.ScreenState.Success) {
+                    if (com.iti.presentation.util.LocaleHelper.isArabic()) {
+                        fetchTranslationsForProducts(currentState.data.products + currentState.data.bestSellers)
+                        fetchTranslationsForBrands(currentState.data.brands)
+                        fetchTranslationsForAds(currentState.data.ads)
+                    }
+                }
+            }
 
             is HomeContract.Intent.Logout -> logout()
         }
@@ -391,6 +401,7 @@ class HomeViewModel(
                             if (com.iti.presentation.util.LocaleHelper.isArabic()) {
                                 fetchTranslationsForProducts(updatedProducts + updatedBestSellers)
                                 fetchTranslationsForBrands(mainData.brandsResult.data)
+                                fetchTranslationsForAds(mainData.adsResult.data)
                             }
                         }
                     }
@@ -485,6 +496,40 @@ class HomeViewModel(
                     screenState.copy(
                         data = data.copy(
                             brands = data.brands.map { translatedMap[it.id] ?: it }
+                        )
+                    ).let { newScreenState ->
+                        currentState.copy(screenState = newScreenState)
+                    }
+                } else currentState
+            }
+        }
+    }
+
+    private fun fetchTranslationsForAds(ads: List<com.iti.domain.models.Ad>) {
+        viewModelScope.launch {
+            val translatedMap = ads.distinctBy { it.id }.map { ad ->
+                async {
+                    try {
+                        val result = getCollectionTranslationsUseCase(ad.id, "ar").first { it !is Result.Loading }
+                        if (result is Result.Success) {
+                            val map = result.data
+                            ad.id to ad.copy(
+                                arSubtitle = map?.get("title")?.uppercase()
+                            )
+                        } else ad.id to ad
+                    } catch (_: Exception) {
+                        ad.id to ad
+                    }
+                }
+            }.awaitAll().toMap()
+
+            _state.update { currentState ->
+                val screenState = currentState.screenState
+                if (screenState is HomeContract.ScreenState.Success) {
+                    val data = screenState.data
+                    screenState.copy(
+                        data = data.copy(
+                            ads = data.ads.map { translatedMap[it.id] ?: it }
                         )
                     ).let { newScreenState ->
                         currentState.copy(screenState = newScreenState)

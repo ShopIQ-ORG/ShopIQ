@@ -675,4 +675,6 @@
     <string name="clear_history">Clear Chat</string>
     <string name="added_to_cart">Added To Cart</string>
 
+    <string name="new_collection">New Collection</string>
+    <string name="error_loading_categories">Failed to load categories</string>
 </resources>

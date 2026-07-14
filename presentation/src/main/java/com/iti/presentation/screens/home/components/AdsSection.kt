@@ -69,7 +69,7 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CustomNetworkImage(
                     imageUrl = ad.imageUrl,
-                    contentDescription = ad.title,
+                    contentDescription = stringResource(R.string.new_collection),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -85,14 +85,14 @@ fun AdsSection(ads: List<Ad>, onAdClick: (Ad) -> Unit) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = ad.title,
+                        text = stringResource(R.string.new_collection),
                         style = MaterialTheme.typography.labelMedium,
                         color = androidx.compose.ui.graphics.Color.White,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = ad.subtitle,
+                        text = if (com.iti.presentation.util.LocaleHelper.isArabic()) ad.arSubtitle ?: ad.subtitle else ad.subtitle,
                         style = MaterialTheme.typography.headlineMedium,
                         color = androidx.compose.ui.graphics.Color.White,
                         fontWeight = FontWeight.Bold

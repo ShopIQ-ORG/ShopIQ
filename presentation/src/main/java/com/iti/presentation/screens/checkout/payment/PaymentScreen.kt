@@ -52,8 +52,6 @@ fun PaymentScreen(
             integrationId = integrationId
         )
     }
-    val isDark = isSystemInDarkTheme()
-    val composeConfig = LocalConfiguration.current
 
     LaunchedEffect(uiState) {
         when (val current = uiState) {

@@ -490,7 +490,7 @@
     <string name="profile_payment_methods_desc">البطاقات والمحافظ المحفوظة</string>
     <string name="profile_order_history">سجل الطلبات</string>
     <string name="profile_order_history_desc">عرض طلباتك السابقة</string>
-    <string name="profile_localization_currency">العملة المفضلة</string>
+    <string name="profile_localization_currency">عملة الشراء</string>
     <string name="profile_localization_currency_desc">اللغة، العملة &amp; المزيد</string>
     <string name="profile_preferences">التفضيلات</string>
     <string name="profile_dark_theme">الوضع الداكن</string>
@@ -674,4 +674,6 @@
     <string name="too_many_request">محاولات كثيرة جداً. يرجى الانتظار قليلاً قبل المحاولة مرة أخرى.</string>
     <string name="clear_history">مسح المحادثة</string>
     <string name="added_to_cart">أُضيف إلى السلة</string>
+    <string name="new_collection">تشكيلة جديدة</string>
+    <string name="error_loading_categories">فشل في تحميل الفئات</string>
 </resources>

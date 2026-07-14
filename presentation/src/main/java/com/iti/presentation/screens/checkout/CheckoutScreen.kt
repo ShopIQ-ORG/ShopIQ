@@ -167,7 +167,13 @@ fun CheckoutScreen(
                                 shippingAddress = state.selectedAddress,
                                 onPlaceOrder = {
                                     if (state.paymentMethod == PaymentMethodType.ONLINE) {
-                                        showOnlinePayment = true
+                                        if (CurrencyManager.selectedCurrency.value.code == "EGP") {
+                                            showOnlinePayment = true
+                                        } else {
+                                            scope.launch {
+                                                snackbarHostState.showError(context.getString(R.string.payment_currency_not_supported))
+                                            }
+                                        }
                                     } else {
                                         viewModel.onEvent(CheckoutContract.Event.PlaceOrder)
                                     }
