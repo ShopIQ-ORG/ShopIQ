@@ -1,7 +1,7 @@
 <div align="center">
 <img width="200" height="200" src="https://github.com/user-attachments/assets/5fba7f8e-6943-4417-935c-272567ed4e8a" />
 
-# 🛍️ ShopIQ — Smart M-Commerce for Android
+# 🛍️ ShopIQ — Smart M-Commerce For Android
 
 **A production-grade, Shopify-powered mobile commerce experience built with Jetpack Compose, Apollo GraphQL, and Clean Architecture.**
 
